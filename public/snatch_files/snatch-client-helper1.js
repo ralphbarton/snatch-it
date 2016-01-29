@@ -166,25 +166,64 @@ function cancelWordButtonHandler(){
     WordCreate.CancelWord();
 }
 
+
+//Here is the function that will draw the "scores" box onto the screen
 function playersListButtonHandler(){
+
+    console.log("drawing on the players list...");
 
     var DIM = getTileSize() * 1.35;
     var tile_DIM = getTileSize();
+    var tile_stroke_prop = 0.1;
+    var font_size = myZoneWidth * 0.030;
 
     var windowBox = new fabric.Rect({
-	left:DIM,
-	top:DIM,
-	width: myZoneWidth - 2*tile_DIM,
-	height: myZoneHeight - 2*tile_DIM,
+	width: myZoneWidth - DIM * 2.1,
+	height: myZoneHeight - DIM * 0.7,
 	fill: '#AAA',
 	stroke: fg_col,
-	strokeWidth: tile_DIM*tile_stroke_prop,
-	rx: 0.12*tile_DIM,
-	ry: 0.12*tile_DIM
+	strokeWidth: DIM*tile_stroke_prop,
+	rx: 0.12 * DIM,
+	ry: 0.12 * DIM
     });
 
-    canvas.add(windowBox);
+    var titleText = new fabric.Text("Players listing and scores",{
+	left: DIM * 0.5,
+	fill: 'black',
+	fontWeight: 'bold',
+	fontSize: font_size * 1.7
+    });
 
+    var playerObjList = [];
+    for(i=0; i<players.length; i++){
+	//run through all players...
+	var myName = players[i].name;
+
+	var playerText = new fabric.Text((i+1)+ ". " + myName,{
+	    left: DIM * 0.5,
+	    top: DIM * 1.5 + DIM * i * 0.6,
+	    fill: 'black',
+	    fontSize: font_size * 1.4
+	});
+	playerObjList[i] = playerText;
+
+    }
+
+    var visuals = [windowBox, titleText].concat(playerObjList);
+    console.log(visuals);
+
+    var windowGrp = new fabric.Group( visuals, {
+	hasControls: false,
+	hasBorders: false,
+	selectable: false,
+	top: DIM*0.1,
+	left: DIM
+    });
+
+
+    //canvas.add(windowBox, titleText);
+    canvas.add(windowGrp);
+    canvas.renderAll();
 }
 
 
@@ -227,11 +266,6 @@ function createGenericButton(text,n_ind,N_but){
 	top: 6,
 	left: button_left
     });
-
-//E0D7C5
-    //make the colour change on mouseover & mousedown
-    buttonGrp.on("mouse:over",function(e){alert("mouse over");});
-
     
     buttonGrp.gameButtonID = n_ind;
 

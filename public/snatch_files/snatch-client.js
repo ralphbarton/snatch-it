@@ -193,7 +193,7 @@ function handleMouseDownDuringGame(e) {
 	}
 	
 	if(GCindex == 2){
-	    playersLiseButtonHandler();
+	    playersListButtonHandler();
 	}
 	
 	if(GCindex == 3){
