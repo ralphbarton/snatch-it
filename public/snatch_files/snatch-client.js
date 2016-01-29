@@ -93,7 +93,6 @@ socket.on('tile turn assert', function(tileDetailsObjStr){
     var targetTileData = tileset[tileID];
     targetTileData.status="turned";//whilst the status change is immediate, the animation causes delay
 
-    console.log(detailsObj);
     modifyTileObject(TargetTile, "flipping",{player_i:playerIndex,time:2});
     canvas.renderAll();
 });
@@ -183,6 +182,8 @@ function handleMouseDownDuringGame(e) {
     GCindex = e.target.gameButtonID;
     if(GCindex!==undefined){
 
+	recolourGameControlButtons(e.target,"press");
+
 	if(GCindex == 0){
 	    cancelWordButtonHandler();
 	}
@@ -227,20 +228,35 @@ function handleMouseUpDuringGame(e) {
 	    }
 	}
     }
-}
 
-
-function handleMouseDownDuringGame(e) {
-
-    //for handling mouse down on the row of buttons accross the top.
+    //for handling "mouse:over" on the row of buttons accross the top.
     GCindex = e.target.gameButtonID;
     if(GCindex!==undefined){
+	recolourGameControlButtons(e.target,"normal");
+    }
+}
+
+
+function handleMouseOverDuringGame(e) {
+
+    //for handling "mouse:over" on the row of buttons accross the top.
+    GCindex = e.target.gameButtonID;
+    if(GCindex!==undefined){
+	recolourGameControlButtons(e.target,"hover");
+    }
 
 }
 
 
+function handleMouseOutDuringGame(e) {
 
+    //for handling "mouse:out" on the row of buttons accross the top.
+    GCindex = e.target.gameButtonID;
+    if(GCindex!==undefined){
+	recolourGameControlButtons(e.target,"normal");
+    }
 
+}
 
 
 

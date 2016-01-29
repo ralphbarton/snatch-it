@@ -249,5 +249,18 @@ function createGameControlButtons(){
 }
 
 
-function recolourGameControlButtons(){
-
+function recolourGameControlButtons(myButtonGrp,style){
+    if (style=="hover"){
+    	myButtonGrp.item(0).setStroke('#FF0');
+    	myButtonGrp.item(0).setFill('#AAA');
+    }
+    else if (style=="press"){
+        myButtonGrp.item(0).setStroke('#FF0');
+    	myButtonGrp.item(0).setFill(fg_col);
+    }
+    else{
+    	myButtonGrp.item(0).setStroke(fg_col);
+    	myButtonGrp.item(0).setFill('#AAA');
+    }
+    canvas.renderAll();
+}
