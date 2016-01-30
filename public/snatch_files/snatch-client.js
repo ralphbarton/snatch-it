@@ -35,6 +35,7 @@ var tiles_bottom_px=0;
 var WordCreate = undefined;
 var ClientPlayerIndex = undefined;
 
+
 socket.emit('player joining game', 0);
 
 socket.on('player color choices', function(colorSetObjStr){
@@ -178,6 +179,12 @@ function handleMouseDownDuringGame(e) {
 	}
     }
 
+
+    //it's important this comes before the button handlers, or the window will get drawn then removed.
+    if(playersListWindowVisible){
+	playersListWindowRemove();
+    }
+
     //for handling mouse down on the row of buttons accross the top.
     GCindex = e.target.gameButtonID;
     if(GCindex!==undefined){
@@ -200,6 +207,7 @@ function handleMouseDownDuringGame(e) {
 	    resetGameButtonHandler();
 	}
     }
+
 }
 
 

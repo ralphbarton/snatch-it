@@ -168,7 +168,11 @@ function cancelWordButtonHandler(){
 
 
 //Here is the function that will draw the "scores" box onto the screen
+var playersListWindowVisible = false;
+var scoreWindowGrp = undefined;
 function playersListButtonHandler(){
+
+    playersListWindowVisible = true;
 
     console.log("drawing on the players list...");
 
@@ -178,20 +182,21 @@ function playersListButtonHandler(){
     var font_size = myZoneWidth * 0.030;
 
     var windowBox = new fabric.Rect({
-	width: myZoneWidth - DIM * 2.1,
+	width: myZoneWidth - DIM * 3.1,
 	height: myZoneHeight - DIM * 0.7,
 	fill: '#AAA',
 	stroke: fg_col,
 	strokeWidth: DIM*tile_stroke_prop,
-	rx: 0.12 * DIM,
-	ry: 0.12 * DIM
+	rx: DIM * 0.18,
+	ry: DIM * 0.18
     });
 
     var titleText = new fabric.Text("Players listing and scores",{
-	left: DIM * 0.5,
+	left: myZoneWidth * 0.105,
+	top: DIM * 0.3,
 	fill: 'black',
 	fontWeight: 'bold',
-	fontSize: font_size * 1.7
+	fontSize: font_size * 1.85
     });
 
     var playerObjList = [];
@@ -200,30 +205,65 @@ function playersListButtonHandler(){
 	var myName = players[i].name;
 
 	var playerText = new fabric.Text((i+1)+ ". " + myName,{
-	    left: DIM * 0.5,
-	    top: DIM * 1.5 + DIM * i * 0.6,
 	    fill: 'black',
-	    fontSize: font_size * 1.4
+	    fontSize: font_size * 1.5
 	});
-	playerObjList[i] = playerText;
+
+/*
+	var BBi = new fabric.Circle({
+	    left: myZoneWidth * 0.30,
+	    radius: DIM * 0.3,
+	    stroke: 'black',
+	    strokeWidth:DIM * 0.3 * 0.2,
+	    fill: players[i].color
+	});
+*/
+
+	function getRandomInt(min, max) {
+	    return Math.floor(Math.random() * (max - min)) + min;
+	}
+
+	var playerScoreText = new fabric.Text(getRandomInt(1,18).toString(), {
+	    left: myZoneWidth * 0.40,
+	    stroke: 'black',
+	    fontWeight: 'bold',
+	    strokeWidth: font_size * 0.05,
+	    fill: players[i].color,
+	    fontSize: font_size * 1.8
+	});
+
+
+	var playerRowGrp = new fabric.Group([playerText,/*BBi,*/playerScoreText], {
+	    left: DIM * 0.5,
+	    top: DIM * 1.5 + DIM * i * 0.75
+	});
+
+
+	playerObjList[i] = playerRowGrp;
 
     }
 
     var visuals = [windowBox, titleText].concat(playerObjList);
-    console.log(visuals);
 
-    var windowGrp = new fabric.Group( visuals, {
+    scoreWindowGrp = new fabric.Group( visuals, {
 	hasControls: false,
 	hasBorders: false,
 	selectable: false,
-	top: DIM*0.1,
-	left: DIM
+	top: DIM*0.3,
+	left: DIM*1.5
     });
 
 
     //canvas.add(windowBox, titleText);
-    canvas.add(windowGrp);
+    canvas.add(scoreWindowGrp);
     canvas.renderAll();
+}
+
+
+function playersListWindowRemove(){
+    console.log("removing the scores window...");
+    canvas.remove(scoreWindowGrp);
+    playersListWindowVisible=false;
 }
 
 
