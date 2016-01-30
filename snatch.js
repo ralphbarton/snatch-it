@@ -16,7 +16,7 @@ var myGame = snatchSvr(50);//create a snatch game instance with 50 tiles...
 io.on('connection', function(socket){
 
     //basic logging
-    console.log('a user connected, with ID:'+socket.id);
+    console.log('a user connected, with ID: '+socket.id);
     socket.on('disconnect', function(){
 	//does a player with this socket ID still exist in the server's list anyway?
 	if(myGame.playerWithSocketExists(socket.id)){
@@ -29,7 +29,7 @@ io.on('connection', function(socket){
 	    var gameObj = myGame.getGameObjectAsStr();
 	    socket.broadcast.emit('full game state transmission', gameObj);
 	}
-	console.log('user disconnected with ID'+socket.id);
+	console.log('user disconnected with ID: '+socket.id);
     });
 
     //this is the first message a client will send...

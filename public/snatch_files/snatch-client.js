@@ -86,6 +86,7 @@ socket.on('full game state transmission', function(gameState){
 	canvas.clear();	    
 
 	var GameStateObject = JSON.parse(gameState);
+	//for now, use this line of code in place of manually pushing or deleting player...
 	players = GameStateObject.playerSet;
 	tiles_bottom_px = loadTilesOntoCanvas(tileset);
 
@@ -139,8 +140,8 @@ socket.on('give client their player index', function(myIndex){
 
 
 socket.on('player has joined game', function(playerObjStr){
-    var newPlayer = JSON.parse(playerObjStr);
-    players.push(newPlayer);
+    //var newPlayer = JSON.parse(playerObjStr);
+    //players.push(newPlayer);
     //won't necessarily need to redraw screen here, since player hasn't necessarily got words
 });
 
@@ -313,6 +314,7 @@ function handleMouseOutDuringGame(e) {
 
 //this is a container for functions and data for Word creation (the generally yellow bit)...
 wCreate = function(){
+    // a note about players[i].saved_x_plotter // TODO write the note...
     var x_home = players[ClientPlayerIndex].saved_x_plotter;
     var y_home = players[ClientPlayerIndex].saved_y_plotter;
     var ActiveLetterSet = [];
@@ -326,6 +328,13 @@ wCreate = function(){
 
 
     return {
+	//set the home coordinates for this word creator object
+	updateHomeCoordsFromPlayer: function(){
+	    x_home = players[ClientPlayerIndex].saved_x_plotter;
+	    y_home = players[ClientPlayerIndex].saved_y_plotter;
+	},
+
+
 	//shuffles letters horizonally, making a gap
 	shuffleAnagramDrag: function(dTile){
 	    var daT = dTile.activeGrpIndex;//dragging tile's index within the Active Letter Set
@@ -380,7 +389,7 @@ wCreate = function(){
 		prev_DT_rdNt = DT_rdNt;
 
 	    }
-	},xhome:x_home,
+	},
 
 	//at the end of a drag event (anagram=>no new letter added) reshuffle the array to reflect...
 	shuffleAnagramRelease: function(dTile){
@@ -786,15 +795,15 @@ function drawPlayerZoneBox(myplayer, mytop, myheight){
 
 // for example player.words : [[23,14,11],[44,12,13,19,4]]
 function drawPlayerWords(myplayer, mytop){
-    var h_space_word = getTileSize() * 0.6;
+    var h_space_word = getTileSize() * 0.6;//define a constant: additional horizonal spacing pixels to use for a space between words
     var h_spacer = getTileSize() * 1.04;
     var v_spacer = getTileSize() * 1.12;
-    var x_plotter_R = 2*marginUnit;
+    var x_plotter_R = 2*marginUnit; //this is just defining a constant, the x-coordinate of drawing to set upon "carriage return"
     var x_plotter = x_plotter_R;
     var y_plotter = mytop + 1.8*marginUnit;
-    for (i=0; i<myplayer.words.length; i++){
+    for (i=0; i<myplayer.words.length; i++){//LOOP thru all the player's words...
 	var lettersOfThisWord = [];
-	for (j=0; j<myplayer.words[i].length; j++){
+	for (j=0; j<myplayer.words[i].length; j++){//LOOP thru the letters of one specific word...
 	    var thisLetterIndex = myplayer.words[i][j];
 	    var thisTile = TileArray[thisLetterIndex];
 	    //move the relevant tile (already existing on the canvas) to location...
@@ -832,7 +841,10 @@ function drawPlayerWords(myplayer, mytop){
     }
     myplayer.saved_x_plotter = x_plotter;
     myplayer.saved_y_plotter = y_plotter;
+    if(WordCreate){WordCreate.updateHomeCoordsFromPlayer();}
 }
+
+
 
 function drawEntirePlayerZone(){
 
