@@ -47,40 +47,59 @@ socket.on('player color choices', function(colorSetObjStr){
 //HERE sits the code to render a game from scratch
 socket.on('full game state transmission', function(gameState){
 
-    rmLoadingMsg();//unnecessary now due to the next instruction...
-    canvas.setBackgroundColor(bg_col);
-    canvas.clear();	    
+    /*
+      there is a design decision to be made whether a full game state transmission
+      is always crudely used when a snatch occurs etc, or whether to send a more specific
+      update message to clients instead. The latter seems more efficient but more work.
+      
+      For now, receipt of the first ever game state message (compared with others) is detected
+      by looking at the global N_tiles, which is initially zero.
+     */
+    if(N_tiles==0){//RECIEVE THE MESSAGE FOR THE FIRST time
 
-    var GameStateObject = JSON.parse(gameState);
-    tileset = GameStateObject.tileSet;
-    players = GameStateObject.playerSet;
-    N_tiles = tileset.length;
-    tiles_bottom_px = loadTilesOntoCanvas(tileset);
+	rmLoadingMsg();//unnecessary now due to the next instruction...
+	canvas.setBackgroundColor(bg_col);
+	canvas.clear();	    
 
-    //this is the BIG DEAL and it creates all of the objects for the game
-    drawEntirePlayerZone();
+	var GameStateObject = JSON.parse(gameState);
+	tileset = GameStateObject.tileSet;
+	players = GameStateObject.playerSet;
+	N_tiles = tileset.length;
+	tiles_bottom_px = loadTilesOntoCanvas(tileset);
 
-    createGameControlButtons();
+	//this is the BIG DEAL and it creates all of the objects for the game
+	drawEntirePlayerZone();
 
-    //also add the lister functions to the canvas for handling the game's mouse events
-    canvas.on('mouse:down', function(e){
-	handleMouseDownDuringGame(e);
-    });
+	createGameControlButtons();
 
-    canvas.on('mouse:up', function(e){
-	handleMouseUpDuringGame(e);
-    });
+	addMouseEventListernersToCanvas();
 
-    canvas.on('mouse:over', function(e) {
-	handleMouseOverDuringGame(e);
-    });
+	//todo: consider if this global flag is good design / necessary...
+	fullGameStateRequestPending=false;//now we have handled the request
+	canvas.renderAll();
 
-    canvas.on('mouse:out', function(e) {
-	handleMouseOutDuringGame(e);
-    });
+	
+    }else{
+	//no actions specific to this...
+	// OK - this is the hacky bit...
 
-    fullGameStateRequestPending=false;//now we have handled the request
-    canvas.renderAll();
+	canvas.clear();	    
+
+	var GameStateObject = JSON.parse(gameState);
+	players = GameStateObject.playerSet;
+	tiles_bottom_px = loadTilesOntoCanvas(tileset);
+
+	//this is the BIG DEAL and it creates all of the objects for the game
+	drawEntirePlayerZone();
+	createGameControlButtons();//seems a shame (or wrong to call this a second time when they should persist) TODO
+
+	//mustn't call this function twice!!
+	//addMouseEventListernersToCanvas();
+
+	canvas.renderAll();
+
+
+    }
 
 });//end of function to load game data
 
@@ -145,6 +164,29 @@ function verticalMovement(tile){
     var ady = Math.abs(tile.yPickup - tile.getTop());
     var threshold = getTileSize()*1.2;
     return ady>threshold;
+
+}
+
+
+
+function addMouseEventListernersToCanvas(){
+
+    //also add the lister functions to the canvas for handling the game's mouse events
+    canvas.on('mouse:down', function(e){
+	handleMouseDownDuringGame(e);
+    });
+
+    canvas.on('mouse:up', function(e){
+	handleMouseUpDuringGame(e);
+    });
+
+    canvas.on('mouse:over', function(e) {
+	handleMouseOverDuringGame(e);
+    });
+
+    canvas.on('mouse:out', function(e) {
+	handleMouseOutDuringGame(e);
+    });
 
 }
 
