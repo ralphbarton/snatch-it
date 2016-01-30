@@ -80,6 +80,8 @@ module.exports = function (nTiles){
 	    return PI;
 	},
 	playerAgreesToReset: function(ID) {
+	    // this function takes as input the ID of a player who wishes to reset.
+	    // it returns true iff every player is willing to reset.
 	    var PI = playerSocketKeys[ID];
 	    playerSet[PI].agrees_to_reset = true;
 	    var lets_reset = true;

@@ -23,6 +23,11 @@ io.on('connection', function(socket){
 	    var disconnectedPlrName = myGame.getPlayerNameBySocket(socket.id);
 	    socket.broadcast.emit('player disconnected',disconnectedPlrName);
 	    myGame.removePlayer(socket.id);
+
+	    //TODO: this is duplication of the intent of the message above. Rethink this a little and neaten
+	    //Transmit entire gamestate to everyone to inform them of the player who has left the game...
+	    var gameObj = myGame.getGameObjectAsStr();
+	    socket.broadcast.emit('full game state transmission', gameObj);
 	}
 	console.log('user disconnected with ID'+socket.id);
     });
@@ -36,14 +41,15 @@ io.on('connection', function(socket){
 	socket.emit('player color choices', colorSetStr);
     });
 
-    //client provides player detials, which is also a request for the full game state
+    //client provides player details, which is also a request for the full game state
     socket.on('player joined with details', function (details_obj){
 	//this newly joined player can be added to the game...
 	//myGame.addPlater
 	console.log('player joined with details : ' + details_obj);
 	myGame.addPlayer(details_obj,socket.id);
 	var gameObj = myGame.getGameObjectAsStr();
-	socket.emit('full game state transmission', gameObj);
+	//socket.emit('full game state transmission', gameObj);//not just transmit to the new player
+	io.emit('full game state transmission', gameObj);//TODO: this is inefficient. Transmit entire gamestate to everyone to include new player
 	console.log('the full game state was transmitted');
 	var pl_i = myGame.playerIndexFromSocket(socket.id);
 	socket.emit('give client their player index', pl_i);
@@ -52,7 +58,7 @@ io.on('connection', function(socket){
     });
 
     socket.on('reset request', function (blank_msg){
-	var all_one_agree = myGame.playerAgreesToReset(socket.id);
+	var all_one_agree = myGame.playerAgreesToReset(socket.id);//the return value indicates whether all players agree to the reset
 	if (all_one_agree){
 	    myGame.resetGame(50);
 	    //now sent out the new game object:
@@ -71,7 +77,7 @@ io.on('connection', function(socket){
 	var responseObjStr = JSON.stringify({playerName: playerName,response: agrees});
 	socket.broadcast.emit('player response to reset request', responseObjStr);
 	if(agrees){
-	    var reset_agreement = myGame.playerAgreesToReset(socket.id);
+	    var reset_agreement = myGame.playerAgreesToReset(socket.id);//the return value indicates whether all players agree to the reset
 	    if (reset_agreement){
 		myGame.resetGame(50);
 		//now sent out the new game object:
