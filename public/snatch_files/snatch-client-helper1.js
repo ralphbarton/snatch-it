@@ -179,10 +179,13 @@ function playersListButtonHandler(){
     var DIM = getTileSize() * 1.35;
     var tile_DIM = getTileSize();
     var tile_stroke_prop = 0.1;
-    var font_size = myZoneWidth * 0.030;
+    var myZoneSmaller = Math.min(myZoneWidth,myZoneHeight); 
+    var font_size =  myZoneSmaller * 0.030;
+
+    var windowWidth = myZoneSmaller - DIM * 3.1;
 
     var windowBox = new fabric.Rect({
-	width: myZoneWidth - DIM * 3.1,
+	width: windowWidth,
 	height: myZoneHeight - DIM * 0.7,
 	fill: '#AAA',
 	stroke: fg_col,
@@ -192,7 +195,7 @@ function playersListButtonHandler(){
     });
 
     var titleText = new fabric.Text("Players listing and scores",{
-	left: myZoneWidth * 0.105,
+	left: windowWidth * 0.105,
 	top: DIM * 0.3,
 	fill: 'black',
 	fontWeight: 'bold',
@@ -224,7 +227,7 @@ function playersListButtonHandler(){
 	}
 
 	var playerScoreText = new fabric.Text(getRandomInt(1,18).toString(), {
-	    left: myZoneWidth * 0.40,
+	    left: myZoneSmaller * 0.40,
 	    stroke: 'black',
 	    fontWeight: 'bold',
 	    strokeWidth: font_size * 0.05,
@@ -234,8 +237,8 @@ function playersListButtonHandler(){
 
 
 	var playerRowGrp = new fabric.Group([playerText,/*BBi,*/playerScoreText], {
-	    left: DIM * 0.5,
-	    top: DIM * 1.5 + DIM * i * 0.75
+	    left: font_size * 2,
+	    top: font_size * (i+2.5) * 1.5
 	});
 
 
