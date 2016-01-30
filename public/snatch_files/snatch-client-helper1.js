@@ -182,7 +182,7 @@ function playersListButtonHandler(){
     var myZoneSmaller = Math.min(myZoneWidth,myZoneHeight); 
     var font_size =  myZoneSmaller * 0.030;
 
-    var windowWidth = myZoneSmaller - DIM * 3.1;
+    var windowWidth = myZoneSmaller*0.8;
 
     var windowBox = new fabric.Rect({
 	width: windowWidth,
@@ -252,8 +252,8 @@ function playersListButtonHandler(){
 	hasControls: false,
 	hasBorders: false,
 	selectable: false,
-	top: DIM*0.3,
-	left: DIM*1.5
+	top: DIM * 0.3,
+	left: myZoneSmaller * 0.1
     });
 
 
