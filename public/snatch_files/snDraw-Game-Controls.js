@@ -37,7 +37,7 @@ snDraw.Game.Controls = {
 	    originX: 'center',
 	    top: 0,
 	    fill: '#AAA',
-	    stroke: fg_col,
+	    stroke: snDraw.Game.fg_col,
 	    strokeWidth: line_thickness,
 	    width: button_width,
 	    height: tile_DIM,
@@ -66,10 +66,10 @@ snDraw.Game.Controls = {
 	}
 	else if (style=="press"){
             myButtonGrp.item(0).setStroke('#FF0');
-    	    myButtonGrp.item(0).setFill(fg_col);
+    	    myButtonGrp.item(0).setFill(snDraw.Game.fg_col);
 	}
 	else{
-    	    myButtonGrp.item(0).setStroke(fg_col);
+    	    myButtonGrp.item(0).setStroke(snDraw.Game.fg_col);
     	    myButtonGrp.item(0).setFill('#AAA');
 	}
 	canvas.renderAll();
@@ -114,7 +114,7 @@ snDraw.Game.Controls = {
 	    width: windowWidth,
 	    height: myZoneHeight - DIM * 0.7,
 	    fill: '#AAA',
-	    stroke: fg_col,
+	    stroke: snDraw.Game.fg_col,
 	    strokeWidth: DIM*tile_stroke_prop,
 	    rx: DIM * 0.18,
 	    ry: DIM * 0.18

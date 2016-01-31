@@ -173,9 +173,9 @@ snDraw.Game = {
 	var plr_top_cumulator = this.playersZoneTopPx;
 	
 	for (aa=0; aa<players.length; aa++){
-	    drawPlayerZoneBox(players[aa],plr_top_cumulator,heights_px[aa]);// Draws the BOX
-	    drawPlayerWords(players[aa],plr_top_cumulator);//Draws all the WORDS
-	    plr_top_cumulator += heights_px[aa] + textMarginUnit + stroke_px;
+	    this.drawPlayerZoneBox(players[aa],plr_top_cumulator,heights_px[aa]);// Draws the BOX
+	    this.drawPlayerWords(players[aa],plr_top_cumulator);//Draws all the WORDS
+	    plr_top_cumulator += heights_px[aa] + this.textMarginUnit + this.stroke_px;
 	}
     },
 
@@ -196,8 +196,8 @@ snDraw.Game = {
 
 	//determine total amount of height contained within players' zone boxes
 	section_height = myZoneHeight - this.playersZoneTopPx;
-	zones_sum_height = section_height - nPlayers * stroke_px - (nPlayers-1)*textMarginUnit - marginUnit;
-	basic_height = getTileSize() + 4*marginUnit;
+	zones_sum_height = section_height - nPlayers * this.stroke_px - (nPlayers-1)*this.textMarginUnit - this.marginUnit;
+	basic_height = this.tileSize + 4*this.marginUnit;
 	shareable_height = zones_sum_height - nPlayers * basic_height;
 
 	zoneHeightPlayer = [];
@@ -220,19 +220,19 @@ snDraw.Game = {
     drawPlayerZoneBox: function(myplayer, mytop, myheight){
 
 	var zoneBox = new fabric.Rect({
-	    left: marginUnit,
+	    left: this.marginUnit,
 	    top: mytop,
 	    fill: this.bg_col,
 	    stroke: myplayer.color,
-	    strokeWidth: stroke_px,
-	    width: myZoneWidth-2*marginUnit-stroke_px,
+	    strokeWidth: this.stroke_px,
+	    width: myZoneWidth-2*this.marginUnit-this.stroke_px,
 	    height: myheight,
 	});
 
 	var plrName = new fabric.Text(myplayer.name,{
-	    left: 4*marginUnit,
-	    top: mytop - textMarginUnit,
-	    fontSize: 2*textMarginUnit,
+	    left: 4*this.marginUnit,
+	    top: mytop - this.textMarginUnit,
+	    fontSize: 2 * this.textMarginUnit,
 	    textBackgroundColor: this.bg_col,
 	    fill: myplayer.color,
 	});
@@ -250,12 +250,12 @@ snDraw.Game = {
 
     // for example player.words : [[23,14,11],[44,12,13,19,4]]
     drawPlayerWords: function(myplayer, mytop){
-	var h_space_word = getTileSize() * 0.6;//define a constant: additional horizonal spacing pixels to use for a space between words
-	var h_spacer = getTileSize() * 1.04;
-	var v_spacer = getTileSize() * 1.12;
-	var x_plotter_R = 2*marginUnit; //this is just defining a constant, the x-coordinate of drawing to set upon "carriage return"
+	var h_space_word = this.tileSize * 0.6;//define a constant: additional horizonal spacing pixels to use for a space between words
+	var h_spacer = this.tileSize * 1.04;
+	var v_spacer = this.tileSize * 1.12;
+	var x_plotter_R = 2*this.marginUnit; //this is just defining a constant, the x-coordinate of drawing to set upon "carriage return"
 	var x_plotter = x_plotter_R;
-	var y_plotter = mytop + 1.8*marginUnit;
+	var y_plotter = mytop + 1.8*this.marginUnit;
 	for (i=0; i<myplayer.words.length; i++){//LOOP thru all the player's words...
 	    var lettersOfThisWord = [];
 	    for (j=0; j<myplayer.words[i].length; j++){//LOOP thru the letters of one specific word...
@@ -288,7 +288,7 @@ snDraw.Game = {
 	    //first check if the player has more words...
 	    var upcomingWord = myplayer.words[i+1]; 
 	    if(upcomingWord){
-		if(x_plotter+(h_spacer*upcomingWord.length)>myZoneWidth - marginUnit){
+		if(x_plotter+(h_spacer*upcomingWord.length)>myZoneWidth - this.marginUnit){
 		    y_plotter+= v_spacer;
 		    x_plotter=x_plotter_R;
 		}
