@@ -18,7 +18,6 @@ snDraw.Game.Splash = {
 	});
 
 	top_btm_px = prompt_text_obj.getHeight()*0.9;
-	console.log(top_btm_px);
 
 	canvas.add(prompt_text_obj);
 

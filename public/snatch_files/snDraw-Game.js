@@ -22,18 +22,6 @@ snDraw.Game = {
 
 
     //methods:
-    calculateRenderingDimentionConstants: function(){    //this function relies upon a defined number of tiles, which is only after game state is loaded...
-	var N_pixels = myZoneWidth * myZoneHeight;
-	var Tile_pixels = N_pixels * Ratio_tile / N_tiles;
-	var tile_dim = Math.sqrt(Tile_pixels);
-	this.tileSize = Math.round(tile_dim);
-	
-	this.marginUnit = this.tileSize*0.13;
-	this.textMarginUnit = this.tileSize*0.2;
-	this.playersZoneTopPx = Math.round(this.unusedTilesBottomPx) + this.marginUnit;
-	this.stroke_px = Math.round(this.marginUnit*0.5);
-    },
-
     setDarkBackground: function(isDark){
 	dark_background = isDark;
 	this.bg_col = isDark ? 'black' : 'white';
@@ -42,12 +30,24 @@ snDraw.Game = {
     },
 
     initialDrawEntireGame: function(){
+	this.calculateRenderingDimentionConstants();
 	canvas.setBackgroundColor(this.bg_col);
 	canvas.clear();	    
-	this.createEveryTileObject_inGridAtTop();
-	this.drawEntirePlayerZone();//this is the BIG DEAL and it creates all of the objects for the game
-	snDraw.Game.Controls.createControls();
+	snDraw.Game.Controls.createControls();//draw buttons on the top of the screen
+	this.createEveryTileObject_inGridAtTop();//next draw all the unturned tiles underneath
+	this.drawEntirePlayerZone();//next draw all the players word zones
 	canvas.renderAll();
+    },
+
+    calculateRenderingDimentionConstants: function(){    //this function relies upon a defined number of tiles, which is only after game state is loaded...
+	var N_pixels = myZoneWidth * myZoneHeight;
+	var Tile_pixels = N_pixels * this.Ratio_tile / tileset.length;
+	var tile_dim = Math.sqrt(Tile_pixels);
+	this.tileSize = Math.round(tile_dim);
+	
+	this.marginUnit = this.tileSize*0.13;
+	this.textMarginUnit = this.tileSize*0.2;
+	this.stroke_px = Math.round(this.marginUnit * 0.5);
     },
 
     createEveryTileObject_inGridAtTop: function (){
@@ -64,6 +64,7 @@ snDraw.Game = {
 	for (i=0; i<tileset.length; i++){
 	    
 	    var myTile = this.generateTileObject(tileset[i],i);//here is the BUSINESS code to create the Fabric object for a tile
+	    
 	    myTile.set({top:y_plotter,left:x_plotter});
 	    this.TileArray[i]=myTile;
 	    canvas.add(myTile);
@@ -80,6 +81,9 @@ snDraw.Game = {
 
 	//handles the case of a full bottom line of tiles...
 	this.unusedTilesBottomPx = y_plotter + (x_plotter==XPD ? 0 :  tile_space_px + this.tileSize);
+	
+	//it's only upon determining the bottom of the unsed tiles that we can set this variable (and it's done once, right now...)
+	this.playersZoneTopPx = Math.round(this.unusedTilesBottomPx + this.marginUnit);
     },
 
 
@@ -158,8 +162,6 @@ snDraw.Game = {
 	    canvas.renderAll();
 	}
 	else if(to_state=="ACTIVE"){
-    	    console.log("checkpoint 5");
-
 	    myTile.item(1).setFill('red');
 	    myTile.item(0).setFill('yellow');
 	    canvas.renderAll();
