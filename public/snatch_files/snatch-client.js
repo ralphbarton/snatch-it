@@ -7,15 +7,16 @@ var players = [];//global reference - for server data...
 var ClientPlayerIndex = undefined;
 
 //initialise the Canvas
-snDraw.initialiseCanvas();
+
 
 
 socket.emit('player joining game', 0);
 
 
 socket.on('player color choices', function(colorSetObjStr){
-    //probably need to decode colorSet here...
-    playerIdentityPrompt(colorSetObjStr);
+    snDraw.initialiseCanvas();
+    //probably need to decode colorSet here... ToDO - wtf does this comment mean?
+    snDraw.Game.Splash.identityPrompt(colorSetObjStr);
 });
 
 

@@ -125,7 +125,7 @@ snDraw.Game.Splash = {
 		}
 		canvas.remove(prompt_text_obj);
 		
-		gameMessage("Waiting for server\nto send the state of the ongoing\nSNATCH-IT game...",myZoneWidth * 0.065,'rgb(230,0,40)'); 
+		snDraw.gameMessage("Waiting for server\nto send the state of the ongoing\nSNATCH-IT game...",myZoneWidth * 0.065,'rgb(230,0,40)'); 
 
 		//send the data to the server
 		var playerDetailsObj = {

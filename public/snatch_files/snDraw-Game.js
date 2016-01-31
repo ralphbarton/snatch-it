@@ -36,13 +36,13 @@ snDraw.Game = {
 
     setDarkBackground: function(isDark){
 	dark_background = isDark;
-	bg_col: isDark ? 'black' : 'white';
-	fg_col: isDark ? 'white' : 'black';
+	this.bg_col = isDark ? 'black' : 'white';
+	this.fg_col = isDark ? 'white' : 'black';
 
     },
 
     initialDrawEntireGame: function(){
-	canvas.setBackgroundColor(bg_col);
+	canvas.setBackgroundColor(this.bg_col);
 	canvas.clear();	    
 	this.createEveryTileObject_inGridAtTop();
 	this.drawEntirePlayerZone();//this is the BIG DEAL and it creates all of the objects for the game
@@ -65,7 +65,7 @@ snDraw.Game = {
 	    
 	    var myTile = this.generateTileObject(tileset[i],i);//here is the BUSINESS code to create the Fabric object for a tile
 	    myTile.set({top:y_plotter,left:x_plotter});
-	    TileArray[i]=myTile;
+	    this.TileArray[i]=myTile;
 	    canvas.add(myTile);
 
 	    //modify the plot coordinates, ready to place the next tile alongside...
@@ -137,7 +137,7 @@ snDraw.Game = {
 		if (hs%2){
 		    myTile.item(0).setStroke(pl_col);
 		}else{
-		    myTile.item(0).setStroke(bg_col);
+		    myTile.item(0).setStroke(this.bg_col);
 		}
 		canvas.renderAll();
 		var hs2 = hs-1;
@@ -222,7 +222,7 @@ snDraw.Game = {
 	var zoneBox = new fabric.Rect({
 	    left: marginUnit,
 	    top: mytop,
-	    fill: bg_col,
+	    fill: this.bg_col,
 	    stroke: myplayer.color,
 	    strokeWidth: stroke_px,
 	    width: myZoneWidth-2*marginUnit-stroke_px,
@@ -233,7 +233,7 @@ snDraw.Game = {
 	    left: 4*marginUnit,
 	    top: mytop - textMarginUnit,
 	    fontSize: 2*textMarginUnit,
-	    textBackgroundColor: bg_col,
+	    textBackgroundColor: this.bg_col,
 	    fill: myplayer.color,
 	});
 
@@ -260,7 +260,7 @@ snDraw.Game = {
 	    var lettersOfThisWord = [];
 	    for (j=0; j<myplayer.words[i].length; j++){//LOOP thru the letters of one specific word...
 		var thisLetterIndex = myplayer.words[i][j];
-		var thisTile = TileArray[thisLetterIndex];
+		var thisTile = this.TileArray[thisLetterIndex];
 		//move the relevant tile (already existing on the canvas) to location...
 		thisTile.set({
 		    left: x_plotter,
