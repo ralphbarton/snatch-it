@@ -98,12 +98,14 @@ snDraw.Game.Splash = {
 	//now add canvas mouse events...
 	canvas.on('mouse:down',function(e){
 	    //right, so on mousedown shrink all the other circles to nothing then delete
-	    BB_hit = e.target.BBindex;
-	    if(BB_hit!==undefined){
+	    if(e.target){
+		BB_hit = e.target.BBindex;
+		if(BB_hit!==undefined){
 
-		for (i=0; i<5; i++){
-		    if(i==BB_hit){continue;}//don't vanish the BB we just hit!
-		    shrinkBB(BlipBlop[i]);
+		    for (i=0; i<5; i++){
+			if(i==BB_hit){continue;}//don't vanish the BB we just hit!
+			shrinkBB(BlipBlop[i]);
+		    }
 		}
 	    }
 	}); 
@@ -112,35 +114,37 @@ snDraw.Game.Splash = {
 
 	canvas.on('mouse:up',function(e){
 	    //and on mouse UP, this is when we transmit to the server and move things along
-	    shrinkBB(e.target);
-	    BB_hit = e.target.BBindex;
 	    
-
-	    function finalBBanimationComplete(){
-
-
-		for (i=0; i<5; i++){
-		    canvas.remove(BlipBlop[i]);
-		}
-		canvas.remove(prompt_text_obj);
+	    if(e.target){
+		shrinkBB(e.target);
+		BB_hit = e.target.BBindex;
 		
-		snDraw.gameMessage("Waiting for server\nto send the state of the ongoing\nSNATCH-IT game...",myZoneWidth * 0.065,'rgb(230,0,40)'); 
 
-		//send the data to the server
-		var playerDetailsObj = {
-		    name: playerName,
-		    color_index: colorChoices[BB_hit].index
-		};
-		var encodedObj = JSON.stringify(playerDetailsObj);
+		function finalBBanimationComplete(){
 
-		//after details are supplied, load the latest game state (timing is important here...)
-		socket.emit('player joined with details', encodedObj);
-		canvas.off('mouse:down');
-		canvas.off('mouse:up');
+
+		    for (i=0; i<5; i++){
+			canvas.remove(BlipBlop[i]);
+		    }
+		    canvas.remove(prompt_text_obj);
+		    
+		    snDraw.gameMessage("Waiting for server\nto send the state of the ongoing\nSNATCH-IT game...",myZoneWidth * 0.065,'rgb(230,0,40)'); 
+
+		    //send the data to the server
+		    var playerDetailsObj = {
+			name: playerName,
+			color_index: colorChoices[BB_hit].index
+		    };
+		    var encodedObj = JSON.stringify(playerDetailsObj);
+
+		    //after details are supplied, load the latest game state (timing is important here...)
+		    socket.emit('player joined with details', encodedObj);
+		    canvas.off('mouse:down');
+		    canvas.off('mouse:up');
+		}
+
+		setTimeout(function(){finalBBanimationComplete();},myDur);
 	    }
-
-	    setTimeout(function(){finalBBanimationComplete();},myDur);
-
 	});
     }
 };

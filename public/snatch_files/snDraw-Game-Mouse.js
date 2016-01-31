@@ -4,7 +4,6 @@
 snDraw.Game.Mouse = {
     
     mDown: function (e) {
-	if(WordCreate===undefined){WordCreate = wCreate();}
 	myTileID = e.target.tileID;
 	if(myTileID !== undefined){//for when a click landed on a tile...
 	    if(tileset[myTileID].status=="unturned"){
@@ -35,15 +34,15 @@ snDraw.Game.Mouse = {
 
 
 	//it's important this comes before the button handlers, or the window will get drawn then removed.
-	if(playersListWindowVisible){
-	    playersListWindowRemove();
+	if(snDraw.Game.Controls.playersListWindowVisible){
+	    snDraw.Game.Controls.playersListWindowRemove();
 	}
 
 	//for handling mouse down on the row of buttons accross the top.
 	GCindex = e.target.gameButtonID;
 	if(GCindex!==undefined){
 
-	    recolourGameControlButtons(e.target,"press");
+	    snDraw.Game.Controls.buttonRecolor(e.target,"press");
 
 	    if(GCindex == 0){
 		cancelWordButtonHandler();
@@ -72,7 +71,6 @@ snDraw.Game.Mouse = {
 	    if(tileset[myTileID].status=="turned"){
 		if(e.target.visual=="flipped"){
 		    if(!this.significantMovement(e.target)){
-			console.log("checkpoint 1");
 			//move the tile into the ActiveGroup
 			snDraw.Game.Spell.addLetter(e.target);		    
 		    }
@@ -93,7 +91,7 @@ snDraw.Game.Mouse = {
 	//for handling "mouse:over" on the row of buttons accross the top.
 	GCindex = e.target.gameButtonID;
 	if(GCindex!==undefined){
-	    recolourGameControlButtons(e.target,"normal");
+	    snDraw.Game.Controls.buttonRecolor(e.target,"normal");
 	}
     },
 
@@ -102,7 +100,7 @@ snDraw.Game.Mouse = {
 	//for handling "mouse:over" on the row of buttons accross the top.
 	GCindex = e.target.gameButtonID;
 	if(GCindex!==undefined){
-	    recolourGameControlButtons(e.target,"hover");
+	    snDraw.Game.Controls.buttonRecolor(e.target,"hover");
 	}
 
     },
@@ -112,7 +110,7 @@ snDraw.Game.Mouse = {
 	//for handling "mouse:out" on the row of buttons accross the top.
 	GCindex = e.target.gameButtonID;
 	if(GCindex!==undefined){
-	    recolourGameControlButtons(e.target,"normal");
+	    snDraw.Game.Controls.buttonRecolor(e.target,"normal");
 	}
 
     },

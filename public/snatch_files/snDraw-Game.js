@@ -133,6 +133,7 @@ snDraw.Game = {
 
     modifyTileObject: function(myTile,to_state,options){
 	myTile.visual = to_state;
+	var anon_modifyTileObject = arguments.callee;
 	if(to_state=="flipping"){//this will animate the tile...
 
 	    pl_col = players[options.player_i].color;
@@ -148,7 +149,7 @@ snDraw.Game = {
 		if(hs2){
 		    setTimeout(function(){animateCountDown(hs2);},125);
 		}else{
-		    modifyTileObject(myTile,"flipped");
+		    anon_modifyTileObject(myTile,"flipped");// this is a recursive call of my modifyTileObject function
 		}
 	    }
 	    animateCountDown(8*options.time);
@@ -270,7 +271,7 @@ snDraw.Game = {
 		});
 		
 		canvas.remove(thisTile);
-		modifyTileObject(thisTile,"flipped");//TODO: delete this line of code it should not be required.
+		this.modifyTileObject(thisTile,"flipped");//TODO: delete this line of code it should not be required.
 
 		lettersOfThisWord[j]=thisTile;
 		
@@ -299,6 +300,16 @@ snDraw.Game = {
 	//record the coordinates at which to start word spelling...
 	snDraw.Game.Spell.x_first_letter = x_plotter;
 	snDraw.Game.Spell.y_first_letter = y_plotter;
-    }
+    },
 
+
+    animateTileFlip: function(flipping_player_i, tile_id){
+
+	var TargetTile = this.TileArray[tile_id];
+	var targetTileData = tileset[tile_id];
+	targetTileData.status="turned";//whilst the status change is immediate, the animation causes delay
+
+	this.modifyTileObject(TargetTile, "flipping",{player_i:flipping_player_i,time:2});
+	
+    }
 };

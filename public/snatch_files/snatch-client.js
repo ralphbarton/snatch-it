@@ -32,6 +32,16 @@ socket.on('full game state transmission', function(gameState){
       For now, receipt of the first ever game state message (compared with others) is detected
       by looking at the global tileset, which is initially [].
     */
+
+    if(tileset.length<1){//RECIEVE THE MESSAGE FOR THE FIRST time - in this case need to add the listeners...
+
+	canvas.on('mouse:down', function(e){snDraw.Game.Mouse.mDown(e); });
+	canvas.on('mouse:up',   function(e){snDraw.Game.Mouse.mUp(e);   });
+	canvas.on('mouse:over', function(e){snDraw.Game.Mouse.mOver(e); });
+	canvas.on('mouse:out',  function(e){snDraw.Game.Mouse.mOut(e);  });
+
+    }
+
     var GameStateObject = JSON.parse(gameState);
     tileset = GameStateObject.tileSet;
     players = GameStateObject.playerSet;
@@ -40,16 +50,6 @@ socket.on('full game state transmission', function(gameState){
     snDraw.Game.initialDrawEntireGame();
 
 
-    if(tileset==[]){//RECIEVE THE MESSAGE FOR THE FIRST time
-
-	fullGameStateRequestPending=false;//now we have handled the request
-
-	canvas.on('mouse:down', function(e){snDraw.Game.Mouse.mDown(e); });
-	canvas.on('mouse:up',   function(e){snDraw.Game.Mouse.mUp(e);   });
-	canvas.on('mouse:over', function(e){snDraw.Game.Mouse.mOver(e); });
-	canvas.on('mouse:out',  function(e){snDraw.Game.Mouse.mOut(e);  });
-
-    }
 });//end of function to load game data
 
 
@@ -57,14 +57,10 @@ socket.on('full game state transmission', function(gameState){
 ///upon server assertion that a letter is turned over
 socket.on('tile turn assert', function(tileDetailsObjStr){
     var detailsObj = JSON.parse(tileDetailsObjStr);
-    var playerIndex = detailsObj.playerIndex;
-    var tileID = detailsObj.tileID;
-    var TargetTile = TileArray[tileID];
-    var targetTileData = tileset[tileID];
-    targetTileData.status="turned";//whilst the status change is immediate, the animation causes delay
+    var flipping_player_i = detailsObj.playerIndex;
+    var tile_id = detailsObj.tileID;
 
-    modifyTileObject(TargetTile, "flipping",{player_i:playerIndex,time:2});
-    canvas.renderAll();
+    snDraw.Game.animateTileFlip(flipping_player_i, tile_id);
 });
 
 socket.on('player wants reset', function(playerName){
