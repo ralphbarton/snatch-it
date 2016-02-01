@@ -1,5 +1,3 @@
-//this code below is going to need a lot of work
-// TODO: said work...
 
 snDraw.Game.Mouse = {
     
@@ -45,19 +43,19 @@ snDraw.Game.Mouse = {
 	    snDraw.Game.Controls.buttonRecolor(e.target,"press");
 
 	    if(GCindex == 0){
-		cancelWordButtonHandler();
+		snDraw.Game.Controls.cancelWordButtonHandler();
 	    }
 
 	    if(GCindex == 1){
-		snatchItButtonHandler();
+		snDraw.Game.Controls.snatchItButtonHandler();
 	    }
 	    
 	    if(GCindex == 2){
-		playersListButtonHandler();
+		snDraw.Game.Controls.playersListButtonHandler();
 	    }
 	    
 	    if(GCindex == 3){
-		resetGameButtonHandler();
+		snDraw.Game.Controls.resetGameButtonHandler();
 	    }
 	}
 

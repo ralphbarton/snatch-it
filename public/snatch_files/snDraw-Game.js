@@ -8,6 +8,11 @@ snDraw.Game = {
     marginUnit: undefined,
     textMarginUnit: undefined,
     stroke_px: undefined,
+
+    h_space_word: undefined,
+    h_spacer: undefined,
+    v_spacer: undefined,
+
     Ratio_tile: 0.15, //Tuneable
 
     //member variables - dynamic, for rendering...
@@ -48,6 +53,11 @@ snDraw.Game = {
 	this.marginUnit = this.tileSize*0.13;
 	this.textMarginUnit = this.tileSize*0.2;
 	this.stroke_px = Math.round(this.marginUnit * 0.5);
+	
+	this.h_space_word = this.tileSize * 0.6;//define a constant: additional horizonal spacing pixels to use for a space between words
+	this.h_spacer = this.tileSize * 1.04;
+	this.v_spacer = this.tileSize * 1.12;
+
     },
 
     createEveryTileObject_inGridAtTop: function (){
@@ -253,9 +263,6 @@ snDraw.Game = {
 
     // for example player.words : [[23,14,11],[44,12,13,19,4]]
     drawPlayerWords: function(myplayer, mytop){
-	var h_space_word = this.tileSize * 0.6;//define a constant: additional horizonal spacing pixels to use for a space between words
-	var h_spacer = this.tileSize * 1.04;
-	var v_spacer = this.tileSize * 1.12;
 	var x_plotter_R = 2*this.marginUnit; //this is just defining a constant, the x-coordinate of drawing to set upon "carriage return"
 	var x_plotter = x_plotter_R;
 	var y_plotter = mytop + 1.8*this.marginUnit;
@@ -275,7 +282,7 @@ snDraw.Game = {
 
 		lettersOfThisWord[j]=thisTile;
 		
-		x_plotter += h_spacer;
+		x_plotter += this.h_spacer;
 	    }
 
 	    //at a completion of the inner loop, a word has just been drawn on canvas
@@ -285,21 +292,20 @@ snDraw.Game = {
 	    });
 	    
 	    canvas.add(PlayerWordGRP);
-	    x_plotter+=h_space_word;
+	    x_plotter+=this.h_space_word;
 	    
 	    //word wrap handler
 	    //first check if the player has more words...
 	    var upcomingWord = myplayer.words[i+1]; 
 	    if(upcomingWord){
-		if(x_plotter+(h_spacer*upcomingWord.length)>myZoneWidth - this.marginUnit){
-		    y_plotter+= v_spacer;
+		if(x_plotter + (this.h_spacer * upcomingWord.length) > myZoneWidth - this.marginUnit){
+		    y_plotter+= this.v_spacer;
 		    x_plotter=x_plotter_R;
 		}
 	    }
 	}
 	//record the coordinates at which to start word spelling...
-	snDraw.Game.Spell.x_first_letter = x_plotter;
-	snDraw.Game.Spell.y_first_letter = y_plotter;
+	snDraw.Game.Spell.setBasePosition(x_plotter,y_plotter);
     },
 
 
