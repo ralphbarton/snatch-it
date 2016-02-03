@@ -44,15 +44,16 @@ io.on('connection', function(socket){
     //client provides player details, which is also a request for the full game state
     socket.on('player joined with details', function (details_obj){
 	//this newly joined player can be added to the game...
-	//myGame.addPlater
 	console.log('player joined with details : ' + details_obj);
+	//first send the player their ID (required to fully interpret the gameState Data
 	myGame.addPlayer(details_obj,socket.id);
+	var pl_i = myGame.playerIndexFromSocket(socket.id);
+	socket.emit('give client their player index', pl_i);
+
 	var gameObj = myGame.getGameObjectAsStr();
 	//socket.emit('full game state transmission', gameObj);//not just transmit to the new player
 	io.emit('full game state transmission', gameObj);//TODO: this is inefficient. Transmit entire gamestate to everyone to include new player
 	console.log('the full game state was transmitted');
-	var pl_i = myGame.playerIndexFromSocket(socket.id);
-	socket.emit('give client their player index', pl_i);
 	var playerAsStr = myGame.getPlayerObjectAsStr(socket.id);
 	socket.broadcast.emit('player has joined game', playerAsStr);
     });

@@ -45,6 +45,7 @@ snDraw.Game.Spell = {
 
 	if(DT_rdNt != this.prev_DT_rdNt){
 	    
+	    //within the context of a context-defined function, instead of keyword this we must use full reference 'snDraw.Game.Spell'
 	    function letterShuffler(prev_DT_rdNt, DT_rdNt){
 		pos=true;
 		console.log("transition", prev_DT_rdNt, DT_rdNt);
@@ -54,11 +55,12 @@ snDraw.Game.Spell = {
 		    pos=false;
 		}
 		
-		var animateTile = this.ActiveLetterSet[daT+anT];
+
+		var animateTile = snDraw.Game.Spell.ActiveLetterSet[daT+anT];
 		
 		shiftRight = prev_DT_rdNt > DT_rdNt;
 		destC = (daT+anT) + shiftRight-pos;
-		destPx = destC * snDraw.Game.h_spacer + this.x_next_letter;
+		destPx = destC * snDraw.Game.h_spacer + snDraw.Game.Spell.x_next_letter;
 
 		animateTile.animate('left', destPx, {
 		    onChange: function() {
@@ -118,9 +120,6 @@ snDraw.Game.Spell = {
 	myTile.activeGrpIndex=this.nActiveLetters;
 	this.nActiveLetters++;
 	x_loco = this.x_next_letter + (this.nActiveLetters-1) * snDraw.Game.h_spacer;
-	console.log(this.x_next_letter);
-	console.log(this.nActiveLetters);
-	console.log(snDraw.Game.h_spacer);
 
 	
 	myTile.set({

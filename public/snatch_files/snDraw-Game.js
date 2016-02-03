@@ -308,7 +308,11 @@ snDraw.Game = {
 	    }
 	}
 	//record the coordinates at which to start word spelling...
-	snDraw.Game.Spell.setBasePosition(x_plotter,y_plotter);
+	if(myplayer==players[ClientPlayerIndex]){//the assignment is only valid for the player of the client...
+	    // n.b. consider adding just one word back to the word list of any player. So we do need a base position for every player stored...
+	    snDraw.Game.Spell.setBasePosition(x_plotter,y_plotter);
+	    console.log("base position set for "+myplayer.name);
+	}
     },
 
 

@@ -79,6 +79,7 @@ socket.on('player response to reset request', function(responseObj){
 });
 
 socket.on('give client their player index', function(myIndex){
+    console.log("player index of " + myIndex + " recieved");
     ClientPlayerIndex = myIndex;
     
 });
