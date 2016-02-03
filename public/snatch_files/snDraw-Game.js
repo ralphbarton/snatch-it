@@ -147,22 +147,25 @@ snDraw.Game = {
 	if(to_state=="flipping"){//this will animate the tile...
 
 	    pl_col = players[options.player_i].color;
-	    function animateCountDown(hs){
+	    
+	    //this function is used for flashing the border of a tile to provide a warning when it is turned over...
+	    function animateCountDown(hs,pco){
 		// variable 'hs' is number of quarter-seconds remaining
+		// 'pco' is the colour to flash the boarder 
 		if (hs%2){
-		    myTile.item(0).setStroke(pl_col);
+		    myTile.item(0).setStroke(pco);
 		}else{
-		    myTile.item(0).setStroke(this.bg_col);
+		    myTile.item(0).setStroke(this.bg_col);//this hides the boarder (e.g. black with a black backgrond)
 		}
 		canvas.renderAll();
 		var hs2 = hs-1;
 		if(hs2){
-		    setTimeout(function(){animateCountDown(hs2);},125);
+		    setTimeout(function(){animateCountDown(hs2,pco);},125);
 		}else{
 		    anon_modifyTileObject(myTile,"flipped");// this is a recursive call of my modifyTileObject function
 		}
 	    }
-	    animateCountDown(8*options.time);
+	    animateCountDown(8*options.time, pl_col);
 	}
 	if(to_state=="flipped"){//only to be called from within the function
 	    myTile.item(1).setFill('yellow');
