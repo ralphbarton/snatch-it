@@ -33,7 +33,7 @@ snDraw.Game.Mouse = {
 
 	//it's important this comes before the button handlers, or the window will get drawn then removed.
 	if(snDraw.Game.Controls.playersListWindowVisible){
-	    snDraw.Game.Controls.playersListWindowRemove();
+	    snDraw.Game.Controls.removePlayersListWindow();
 	}
 
 	//for handling mouse down on the row of buttons accross the top.

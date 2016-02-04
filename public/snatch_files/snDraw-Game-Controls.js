@@ -96,8 +96,8 @@ snDraw.Game.Controls = {
 
     //Here is the function that will draw the "scores" box onto the screen
     playersListButtonHandler: function(){
-	createPlayersListWindow();
-	playersListWindowVisible = true;
+	this.createPlayersListWindow();
+	this.playersListWindowVisible = true;
 
     },
 
@@ -169,7 +169,7 @@ snDraw.Game.Controls = {
 	    hasBorders: false,
 	    selectable: false,
 	    top: DIM * 0.3,
-	    left: myZoneSmaller * 0.1
+	    left: (myZoneWidth - windowWidth)/2
 	});
 
 	canvas.add(ScoresWindow);
