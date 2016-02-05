@@ -52,7 +52,16 @@ module.exports = function (nTiles){
 
 	getGameObjectAsStr: function() {
 	    var gameObject = {tileSet:tileSet, playerSet:playerSet}; 
-	    return JSON.stringify(gameObject);
+	    
+	    var gameObj_clone = JSON.parse(JSON.stringify(gameObject));
+	    var cc_plr = gameObj_clone.playerSet
+	    
+	    //remove some server-side only attributes of the player objects before transmission...
+	    for (i=0; i < cc_plr.length; i++){
+		delete cc_plr[i].agrees_to_reset;
+		delete cc_plr[i].socket_key;
+	    }
+	    return JSON.stringify(gameObj_clone);
 	},
 	getPlayerObjectAsStr: function(ID) {
 	    var PI = playerSocketKeys[ID];
