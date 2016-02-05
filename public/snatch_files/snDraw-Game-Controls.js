@@ -78,7 +78,7 @@ snDraw.Game.Controls = {
     //deals with the resetting of the game (lots of confirmation steps)
     resetGameButtonHandler: function(){
 	var really = confirm("Do you really want to reset this game?");
-	RESET_REQUEST();
+	if(really){RESET_REQUEST();}
     },
 
     //submit word to server
@@ -104,7 +104,7 @@ snDraw.Game.Controls = {
 
     createPlayersListWindow: function(){
 	var DIM = snDraw.Game.tileSize * 1.35;
-	var tile_stroke_prop = 0.1;
+	var stroke_px = DIM * 0.1;
 	var myZoneSmaller = Math.min(myZoneWidth,myZoneHeight); 
 	var font_size =  myZoneSmaller * 0.030;
 
@@ -115,7 +115,7 @@ snDraw.Game.Controls = {
 	    height: myZoneHeight - DIM * 0.7,
 	    fill: '#AAA',
 	    stroke: snDraw.Game.fg_col,
-	    strokeWidth: DIM*tile_stroke_prop,
+	    strokeWidth: stroke_px,
 	    rx: DIM * 0.18,
 	    ry: DIM * 0.18
 	});

@@ -71,9 +71,17 @@ module.exports = function (nTiles){
 	resetGame: function(nTiles) {
 	    tileSet = generateNewRandomTileSet(nTiles);
 	    color_palette = shuffle(color_palette);
+
+	    //remove all words from all players
 	    for (i=0; i<playerSet.length; i++){
 		playerSet[i].words = [];//empty...
 	    }
+
+	    //resetore all players to not yet agreeing to the next reset request
+	    for (i=0;i<playerSet.length;i++){
+		playerSet[i].agrees_to_reset = false;
+	    }
+
 	},
 	playerIndexFromSocket: function(ID) {
 	    var PI = playerSocketKeys[ID];
