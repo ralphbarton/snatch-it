@@ -4,7 +4,7 @@ module.exports = function (nTiles){
     var tileSet = generateNewRandomTileSet(nTiles);//don't cut down number of tiles
     var playerSet = [];//this would be an emply player set for game start
 //    var playerSet = provideDemoPlayerSet();//this is some demo data
-    var playerSocketKeys = [];
+    var player_index_from_socketKey_lkup = [];
     color_palette = shuffle(color_palette);//Temporary - until restart working
     emergency_colors=color_palette.slice(0);
     emergency_colors=shuffle(emergency_colors);
@@ -18,36 +18,36 @@ module.exports = function (nTiles){
 
     //this is the collection of externally callable functions
     return{
-	addPlayer: function(playerDetailsStr,ID) {//todo implement this
+	addPlayer: function(playerDetailsStr,socket_key) {//todo implement this
 	    var receivedPlayerObj = JSON.parse(playerDetailsStr); 
 	    var nm = receivedPlayerObj.name;
 	    var ci = receivedPlayerObj.color_index;
-	    var col = bound_palette[ID][ci];
+	    var col = bound_palette[socket_key][ci];
 	    
 	    //return the unused colours to the list...
 	    for(i=0;i<5;i++){
 		if(i==ci){continue;}
-		color_palette.push(bound_palette[ID][i]);
+		color_palette.push(bound_palette[socket_key][i]);
 	    }
 
-	    delete bound_palette[ID];
+	    delete bound_palette[socket_key];
 
 	    var newPlayer = {
 		name : nm,
 		color : col,
 		words : [],
 		agrees_to_reset: false,
-		socket_key: ID
+		socket_key: socket_key
 	    };
 	    playerSet.push(newPlayer);
-	    playerSocketKeys[ID] = playerSet.length-1;
+	    player_index_from_socketKey_lkup[socket_key] = playerSet.length-1;
 	},
-	removePlayer: function(ID) {
-	    var PI = playerSocketKeys[ID];
+	removePlayer: function(socket_key) {
+	    var PI = player_index_from_socketKey_lkup[socket_key];
 	    playerSet[PI].socket_key = false;//never use this key again...
 	  
 	    disconnectedPlayerRefs.push(PI);
-	    delete playerSocketKeys[ID];
+	    delete player_index_from_socketKey_lkup[socket_key];
 	},
 
 	getGameObjectAsStr: function() {
@@ -63,15 +63,15 @@ module.exports = function (nTiles){
 	    }
 	    return JSON.stringify(gameObj_clone);
 	},
-	getPlayerObjectAsStr: function(ID) {
-	    var PI = playerSocketKeys[ID];
+	getPlayerObjectAsStr: function(socket_key) {
+	    var PI = player_index_from_socketKey_lkup[socket_key];
 	    return JSON.stringify(playerSet[PI]);
 	},
-	playerWithSocketExists: function(ID) {
-	    return playerSocketKeys[ID] != undefined;
+	playerWithSocketExists: function(socket_key) {
+	    return player_index_from_socketKey_lkup[socket_key] != undefined;
 	},
-	getPlayerNameBySocket: function(ID) {
-	    var PI = playerSocketKeys[ID];
+	getPlayerNameBySocket: function(socket_key) {
+	    var PI = player_index_from_socketKey_lkup[socket_key];
 	    return playerSet[PI].name;
 	},
 	flipLetter: function(tileID) {
@@ -92,14 +92,13 @@ module.exports = function (nTiles){
 	    }
 
 	},
-	playerIndexFromSocket: function(ID) {
-	    var PI = playerSocketKeys[ID];
-	    return PI;
+	playerIndexFromSocket: function(socket_key) {
+	    return player_index_from_socketKey_lkup[socket_key];
 	},
-	playerAgreesToReset: function(ID) {
-	    // this function takes as input the ID of a player who wishes to reset.
+	playerAgreesToReset: function(socket_key) {
+	    // this function takes as input the socket_key of a player who wishes to reset.
 	    // it returns true iff every player is willing to reset.
-	    var PI = playerSocketKeys[ID];
+	    var PI = player_index_from_socketKey_lkup[socket_key];
 	    playerSet[PI].agrees_to_reset = true;
 	    var lets_reset = true;
 	    for (i=0;i<playerSet.length;i++){
@@ -108,22 +107,66 @@ module.exports = function (nTiles){
 	    console.log(playerSet.length,lets_reset);
 	    return lets_reset;
 	},
-	playerSnatches: function(letterArrayStr,ID) {
-	    var PI = playerSocketKeys[ID];
-	    var letterArray = JSON.parse(letterArrayStr);
-	    playerSet[PI].words.push(letterArray);
-	    console.log("word set after snatch (player " + PI + "): ");
-	    console.log(playerSet[PI].words);
+	snatchWordValidation: function(tile_id_array){
+	    // the most basic check is that it is over 3 letters
+	    if(tile_id_array.length < 3){
+		return 'insufficient length';
+	    }
+	    // also check that it is made of letters which are available among the free letters on-server
+	    // issues here may arise due to latency of the free letters due to one client's snatch not reaching the other client fast enough
+	    
+	    //TODO this check needs modification (loosening) so that it handles valid snatches of other peoples words, where status will be 'inword'
+	    //for now, let it only handle fully new snatches.
+	    for(i=0; i<tile_id_array.length; i++){
+		if(tileSet[i].status!='turned'){
+		    return 'letters unavailable';
+		}
+	    }
+
+	    // also check is it a valid word
+	    //dictionary comparison, still TODO!!
+	    return 'accepted';
+
+	},
+	playerSnatches: function(letterArrayStr,socket_key) {
+	    var PI = player_index_from_socketKey_lkup[socket_key];
+	    var tile_id_array = JSON.parse(letterArrayStr);
+	    var Response.val_check = this.snatchWordValidation(tile_id_array);
+
+	    //check the snatch is valid:
+	    if( Response.val_check == 'accepted'){// snatch accepted
+	    	    console.log("Player " + PI + " SNATCH accepted.");
+
+		//update all letters so that they cannot be claimed again as status 'turned' single letters
+		for(i=0; i<tile_id_array.length; i++){
+		    tileSet[i].status = 'inword';
+		}
+		//BUSINESS LOGIC: puts the snatched word into the server's data structure
+		playerSet[PI].words.push(tile_id_array);
+		
+		Response.SnatchUpdateMsg = {
+		    player_index: PI,
+		    wordIndeces: tile_id_array
+		}
+
+
+	    }else{ // snatch rejected
+	    	    console.log("Player " + PI + " SNATCH rejected : " + );
+
+	    }
+
+	    console.log("Word set now: " + playerSet[PI].words);
+	    return Response;
 	},
 	//we could make this an embedded class and be snazzy! Is there time??
-	provideColorChoiceAsStr: function(ID) {
+	provideColorChoiceAsStr: function(socket_key) {
 
 	    var mySet = [];
 	    if(color_palette.length>=5){
 		for(i=0;i<5;i++){
 		    mySet.push({index: i, color: color_palette[i]});
 		}
-		bound_palette[ID]=color_palette.splice(0,5);//remove 5 colours from the palette
+		bound_palette[socket_key] = color_palette.splice(0,5);//remove 5 colours from the palette
 		}
 	    else{
 		for(i=0;i<5;i++){
@@ -238,7 +281,7 @@ function generateNewRandomTileSet(nTiles){
 	for(j=0; j<N_myLetter; j++){
 	    tileset.push({
 		letter:theletter,
-		status:'unturned'
+		status:'unturned'// alternative enum values: 'turned', 'inword'
 	    });
 	}
 

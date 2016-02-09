@@ -90,12 +90,18 @@ io.on('connection', function(socket){
 
 
     socket.on('player submits word', function(snatchWordbyIndecesStr){
-	console.log("snatch (new) with letters:"+snatchWordbyIndecesStr);
-	myGame.playerSnatches(snatchWordbyIndecesStr,socket.id)
-	//this is most definitely a hack, but for now handle by resending the entire game state
-	//upon a player snatching
-	var gameObj = myGame.getGameObjectAsStr();
-	io.emit('full game state transmission', gameObj);
+	console.log("Snatch Submission with letters:"+snatchWordbyIndecesStr);
+
+	var SnatchResponse = myGame.playerSnatches(snatchWordbyIndecesStr,socket.id)
+
+
+	if(SnatchResponse.val_check == 'accepted'){
+	    io.emit('snatch assert', SnatchResponse.SnatchUpdateMsg);	    
+	}else{
+	    socket.emit('snatch rejected', SnatchResponse.val_check);
+	}
+
+    
     });
 
 

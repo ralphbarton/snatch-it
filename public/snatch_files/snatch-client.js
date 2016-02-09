@@ -92,6 +92,18 @@ socket.on('player has joined game', function(playerObjStr){
 });
 
 
+socket.on('snatch assert', function(SnatchUpdateMsg){
+
+    //this needs to trigger the following:
+
+    //a toast
+    //removal of letters from the tile zone
+    //placement of a word object into the correct player zone
+    //update of the players and the tile-set data structures
+    // resizing of the player zones...
+
+});
+
 function PLAYER_SUBMITS_WORD(p){socket.emit('player submits word', p);}
 function RESET_REQUEST()       {socket.emit('reset request', 0);}
 
