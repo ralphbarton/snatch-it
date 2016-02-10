@@ -4,11 +4,11 @@ var socket = io();
 var tileset = [];//global reference - for server data...
 var players = [];//global reference - for server data...
 
-var ClientPlayerIndex = undefined;
+var client_player_index = undefined;
 
 //initialise the Canvas
 
-
+console.log("we got this far...");
 
 socket.emit('player joining game', 0);
 
@@ -35,7 +35,7 @@ socket.on('full game state transmission', function(gameState){
 
     if(tileset.length<1){//RECIEVE THE MESSAGE FOR THE FIRST time - in this case need to add the listeners...
 
-	canvas.on('mouse:down', function(e){snDraw.Game.Mouse.mDown(e); });
+	canvas.on('mouse:down', function(e){snDraw.Game.Mouse.mDown(e); console.log("mouse down event";});
 	canvas.on('mouse:up',   function(e){snDraw.Game.Mouse.mUp(e);   });
 	canvas.on('mouse:over', function(e){snDraw.Game.Mouse.mOver(e); });
 	canvas.on('mouse:out',  function(e){snDraw.Game.Mouse.mOut(e);  });
@@ -50,8 +50,8 @@ socket.on('full game state transmission', function(gameState){
     //TODO: this code needs to reside within a function called both on reciept of a *set* of players and upon addition of a single player... 
     for (i=0; i<players.length; i++){
 	players[i].self_index = i;
-	players[i].x_next_zone_letter = undefined;
-	players[i].y_next_zone_letter = undefined;
+	players[i].x_next_word = undefined;
+	players[i].y_next_word = undefined;
     }
 
     //draws the entire game state on the canvas from the data supplied
@@ -88,7 +88,7 @@ socket.on('player response to reset request', function(responseObj){
 
 socket.on('give client their player index', function(myIndex){
     console.log("player index of " + myIndex + " recieved");
-    ClientPlayerIndex = myIndex;
+    client_player_index = myIndex;
     
 });
 
@@ -124,6 +124,13 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
 
 
 });
+/*
+socket.on('snatch rejected', function(rejection_reason){
+    
+    //a toast here
+    snDraw.Game.Spell.CancelWord();
+    console.log("The snatch was rejected by the server for the following reason: " + rejection_reason);
+});*/
 
 function PLAYER_SUBMITS_WORD(p){socket.emit('player submits word', p);}
 function RESET_REQUEST()       {socket.emit('reset request', 0);}

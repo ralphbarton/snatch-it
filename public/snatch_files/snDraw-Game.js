@@ -12,6 +12,7 @@ snDraw.Game = {
     h_space_word: undefined,
     h_spacer: undefined,
     v_spacer: undefined,
+    x_plotter_R: undefined, // x-coordinate of "carriage return"
 
     Ratio_tile: 0.15, //Tuneable
 
@@ -57,6 +58,7 @@ snDraw.Game = {
 	this.h_space_word = this.tileSize * 0.6;//define a constant: additional horizonal spacing pixels to use for a space between words
 	this.h_spacer = this.tileSize * 1.04;
 	this.v_spacer = this.tileSize * 1.12;
+	this.x_plotter_R = 2 * this.marginUnit;
 
     },
 
@@ -191,7 +193,7 @@ snDraw.Game = {
 	for (var i=0; i<players.length; i++){
 	    players[i].zone_top = plr_top_cumulator;
 	    this.drawPlayerZoneBox(players[i]);// Draws the BOX
-	    this.drawPlayerWords(players[i]);//Draws all the WORDS
+	    this.drawAllPlayerWords(players[i]);//Draws all the WORDS
 	    plr_top_cumulator += players[i].zone_height + this.textMarginUnit + this.stroke_px;
 	}
     },
@@ -264,20 +266,24 @@ snDraw.Game = {
 
 
     // for example player.words : [[23,14,11],[44,12,13,19,4]]
-    drawPlayerWords: function(myplayer){
+    drawAllPlayerWords: function(myplayer){
+	//since this function is only invoked when first drawing the game for each player, this is the time to set the base coordinates:
+	myplayer.x_next_word = this.x_plotter_R;
+	myplayer.y_next_word = myplayer.zone_top + 1.8 * this.marginUnit;
 	//LOOP thru all the player's words...
 	// draw them onscreen
 	for (var i=0; i<myplayer.words.length; i++){
 	    this.drawSingleCapturedWord(myplayer, myplayer.words[i]);	
 	}
+	//this prep's the SPELL class to place letters in the right location
+	snDraw.Game.Spell.restoreBasePosition();
     },
 
 
     drawSingleCapturedWord: function(myplayer, word_index){
 
-	var x_plotter_R = 2 * this.marginUnit; //this is just defining a constant, the x-coordinate of drawing to set upon "carriage return"
-	var x_plotter = myplayer.x_next_word || x_plotter_R;
-	var y_plotter = myplayer.y_next_word || myplayer.zone_top + 1.8 * this.marginUnit;
+	var x_plotter = myplayer.x_next_word;
+	var y_plotter = myplayer.y_next_word;
 
 	var word_as_tile_index_array = myplayer.words[word_index]; 
 
@@ -285,7 +291,7 @@ snDraw.Game = {
 	//if this word will run over the end of the line, do a carriage return...
 	if(x_plotter + (this.h_spacer * word_as_tile_index_array.length) > myZoneWidth - this.marginUnit){
 	    y_plotter += this.v_spacer;
-	    x_plotter = x_plotter_R;
+	    x_plotter = this.x_plotter_R;
 	}
 
 	var LettersOfThisWord = [];//this is an array of Fabric objects (the tiles)

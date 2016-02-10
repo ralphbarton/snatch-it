@@ -3,8 +3,6 @@
 snDraw.Game.Spell = {
 
     // a note about players[i].saved_x_plotter // TODO write the note...
-    x_first_letter: undefined,
-    y_first_letter: undefined,
     x_next_letter: undefined,
     y_next_letter: undefined,
 
@@ -17,16 +15,10 @@ snDraw.Game.Spell = {
     //member objects & arrays of Fabric objects:
     ActiveLetterSet: [],
 
-    setBasePosition: function(x_px,y_px){
-	this.x_next_letter = x_px;
-	this.x_first_letter = x_px;
-	this.y_next_letter = y_px;
-	this.y_first_letter = y_px;
-    },
-
     restoreBasePosition: function(){
-	this. x_next_letter = this.x_first_letter;
-	this. y_next_letter = this.y_first_letter;
+	var ClientPlayer = players[client_player_index];
+	this.x_next_letter = ClientPlayer.x_next_word;
+	this.y_next_letter = ClientPlayer.y_next_word;
     },
 
     //shuffles letters horizonally, making a gap
@@ -171,61 +163,44 @@ snDraw.Game.Spell = {
 
 
     //send a candidate word to the server
-    SubmitWord: function(){
+    ClearWordFromSpeller: function(replace_tiles_on_grid){
 	
-	var myWord_tileIndeces = [];
+	var tile_indeces_of_word = [];
 
-	for(i=0; i<this.nActiveLetters; i++){
-	    //take the tile's actual ID
+	for(i=0; i<this.nActiveLetters; i++){//for each TILE making up the word...
+	    //run through the Letter objects to extract the word's tile indeces into an array
 	    myTile = this.ActiveLetterSet[i];
-	    myWord_tileIndeces[i] = myTile.tileID;
-	    //this tile is no longer in the active group
-	    myTile.activeGrpIndex=undefined;
+	    tile_indeces_of_word[i] = myTile.tileID;
+	    if(replace_tiles_on_grid){
+		myTile.set({
+		    left: myTile.x_availableSpace,
+		    top: myTile.y_availableSpace
+		});
+	    }
+	    //restore tile from it's special states when it's being used to spell a word
+	    myTile.activeGrpIndex = undefined;
 	    myTile.off('moving');
-	    //graphically remove tile
-
-	    snDraw.Game.modifyTileObject(myTile,"flipped");//do we need this here?
-	    //I think if we just rerender the screen, its incorrect...
+	    snDraw.Game.modifyTileObject(myTile,"flipped");
 	}
-
 	
 	//finally, reset plotters back the the original values (TODO: is this necessary, they will be immediately changed back if word is accepted)
 	this.restoreBasePosition();
 	this.ActiveLetterSet = [];
 	this.nActiveLetters = 0;
-
 	this.prev_DT_rdNt = 0;//previous Drag Tile's shift in tile position...
-	
-	PLAYER_SUBMITS_WORD(JSON.stringify(myWord_tileIndeces));
 
+	return tile_indeces_of_word;
+    },
+
+    //send a candidate word to the server
+    SubmitWord: function(){
+	var word_by_tile_indeces = this.ClearWordFromSpeller(false);
+	PLAYER_SUBMITS_WORD(JSON.stringify(word_by_tile_indeces));
     },
 
     //cancel word
     CancelWord: function(){
-	
-	var myWord_tileIndeces = [];
-
-	for(i=0; i<this.nActiveLetters; i++){
-	    myTile = this.ActiveLetterSet[i];
-	    //logically remove tile
-	    myTile.activeGrpIndex=undefined;
-	    myTile.off('moving');
-	    //graphically remove tile
-	    myTile.set({
-		left: myTile.x_availableSpace,
-		top: myTile.y_availableSpace
-	    });
-	    canvas.remove(myTile);
-	    canvas.add(myTile);
-	    snDraw.Game.modifyTileObject(myTile,"flipped");//do we need this here?
-	}
-
-	//reset the data objects of the WordCreate class.
-	this.restoreBasePosition();
-	this.ActiveLetterSet = [];
-	this.nActiveLetters = 0;
-	this.prev_DT_rdNt = 0;//previous Drag Tile's shift in tile position...
-	
+	this.ClearWordFromSpeller(true);	
     },
 
 
