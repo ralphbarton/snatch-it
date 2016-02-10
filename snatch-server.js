@@ -131,7 +131,8 @@ module.exports = function (nTiles){
 	playerSnatches: function(letterArrayStr,socket_key) {
 	    var PI = player_index_from_socketKey_lkup[socket_key];
 	    var tile_id_array = JSON.parse(letterArrayStr);
-	    var Response.val_check = this.snatchWordValidation(tile_id_array);
+	    var Response = {};
+	    Response.val_check = this.snatchWordValidation(tile_id_array);
 
 	    //check the snatch is valid:
 	    if( Response.val_check == 'accepted'){// snatch accepted
@@ -146,12 +147,12 @@ module.exports = function (nTiles){
 		
 		Response.SnatchUpdateMsg = {
 		    player_index: PI,
-		    wordIndeces: tile_id_array
+		    tile_id_array: tile_id_array
 		}
 
 
 	    }else{ // snatch rejected
-	    	    console.log("Player " + PI + " SNATCH rejected : " + );
+	    	    console.log("Player " + PI + " SNATCH rejected : " + Response.val_check);
 
 	    }
 

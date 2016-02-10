@@ -71,7 +71,7 @@ snDraw.Game = {
 	var y_plotter = 6 + this.tileSize + tile_space_px;
 
 	//now create a fabric object for every tile...
-	for (i=0; i<tileset.length; i++){
+	for (var i=0; i<tileset.length; i++){
 	    
 	    var myTile = this.generateTileObject(tileset[i],i);//here is the BUSINESS code to create the Fabric object for a tile
 	    
@@ -185,15 +185,17 @@ snDraw.Game = {
 
     drawEntirePlayerZone: function(){
 
-	var heights_px = this.calculatePlayerZoneSizes();
+	this.calculatePlayerZoneSizes();//this sets attributes within the player objects
 	var plr_top_cumulator = this.playersZoneTopPx;// the starting value for this variable is the lower edge of the tile zone...
-	
-	for (i=0; i<players.length; i++){
+	console.log("players.length" + players.length);
+
+	for (var i=0; i<players.length; i++){
+	    console.log("i = " + i);
 	    players[i].zone_top = plr_top_cumulator;
-	    players[i].zone_height = heights_px[i];//TODO alter this too...
 	    this.drawPlayerZoneBox(players[i]);// Draws the BOX
 	    this.drawPlayerWords(players[i]);//Draws all the WORDS
-	    plr_top_cumulator += heights_px[i] + this.textMarginUnit + this.stroke_px;
+	    plr_top_cumulator += players[i].zone_height + this.textMarginUnit + this.stroke_px;
+	    console.log("plr_top_cumulator = " + plr_top_cumulator);
 	}
     },
 
@@ -269,7 +271,7 @@ snDraw.Game = {
 
 	//LOOP thru all the player's words...
 	// draw them onscreen
-	for (i=0; i<myplayer.words.length; i++){
+	for (var i=0; i<myplayer.words.length; i++){
 	    this.drawSingleCapturedWord(myplayer, myplayer.words[i]);	
 	}
 
