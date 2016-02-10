@@ -35,7 +35,7 @@ socket.on('full game state transmission', function(gameState){
 
     if(tileset.length<1){//RECIEVE THE MESSAGE FOR THE FIRST time - in this case need to add the listeners...
 
-	canvas.on('mouse:down', function(e){snDraw.Game.Mouse.mDown(e); console.log("mouse down event");  });
+	canvas.on('mouse:down', function(e){snDraw.Game.Mouse.mDown(e); });
 	canvas.on('mouse:up',   function(e){snDraw.Game.Mouse.mUp(e);   });
 	canvas.on('mouse:over', function(e){snDraw.Game.Mouse.mOver(e); });
 	canvas.on('mouse:out',  function(e){snDraw.Game.Mouse.mOut(e);  });

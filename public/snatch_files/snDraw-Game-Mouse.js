@@ -6,7 +6,7 @@ snDraw.Game.Mouse = {
 	if(myTileID !== undefined){//for when a click landed on a tile...
 	    if(tileset[myTileID].status=="unturned"){
 		tileTurnObj = {
-		    playerIndex: ClientPlayerIndex,
+		    playerIndex: client_player_index,
 		    tileID: myTileID
 		}
 		var ObjStr = JSON.stringify(tileTurnObj);
