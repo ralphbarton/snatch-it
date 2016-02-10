@@ -35,7 +35,7 @@ socket.on('full game state transmission', function(gameState){
 
     if(tileset.length<1){//RECIEVE THE MESSAGE FOR THE FIRST time - in this case need to add the listeners...
 
-	canvas.on('mouse:down', function(e){snDraw.Game.Mouse.mDown(e); console.log("mouse down event";});
+	canvas.on('mouse:down', function(e){snDraw.Game.Mouse.mDown(e); console.log("mouse down event");  });
 	canvas.on('mouse:up',   function(e){snDraw.Game.Mouse.mUp(e);   });
 	canvas.on('mouse:over', function(e){snDraw.Game.Mouse.mOver(e); });
 	canvas.on('mouse:out',  function(e){snDraw.Game.Mouse.mOut(e);  });
@@ -59,6 +59,7 @@ socket.on('full game state transmission', function(gameState){
 
 
 });//end of function to load game data
+
 
 
 
@@ -124,13 +125,13 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
 
 
 });
-/*
+
 socket.on('snatch rejected', function(rejection_reason){
     
     //a toast here
     snDraw.Game.Spell.CancelWord();
     console.log("The snatch was rejected by the server for the following reason: " + rejection_reason);
-});*/
+});
 
 function PLAYER_SUBMITS_WORD(p){socket.emit('player submits word', p);}
 function RESET_REQUEST()       {socket.emit('reset request', 0);}
@@ -147,3 +148,4 @@ Array.prototype.move = function (old_index, new_index) {
     this.splice(new_index, 0, this.splice(old_index, 1)[0]);
     return this; // for testing purposes
 };
+
