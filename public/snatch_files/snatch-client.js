@@ -45,6 +45,14 @@ socket.on('full game state transmission', function(gameState){
     var GameStateObject = JSON.parse(gameState);
     tileset = GameStateObject.tileSet;
     players = GameStateObject.playerSet;
+    
+    //this adds some further attributes for each player object that can be generated client-side and do not need to get sent by the server
+    //TODO: this code needs to reside within a function called both on reciept of a *set* of players and upon addition of a single player... 
+    for (i=0; i<players.length; i++){
+	players[i].self_index = i;
+	players[i].x_next_zone_letter = undefined;
+	players[i].y_next_zone_letter = undefined;
+    }
 
     //draws the entire game state on the canvas from the data supplied
     snDraw.Game.initialDrawEntireGame();
@@ -97,10 +105,23 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     //this needs to trigger the following:
 
     //a toast
-    //removal of letters from the tile zone
-    //placement of a word object into the correct player zone
-    //update of the players and the tile-set data structures
-    // resizing of the player zones...
+    
+    //update the players data structure:
+    var tile_indices = SnatchUpdateMsg.tile_id_array
+    var PI = SnatchUpdateMsg.player_index;
+    var myplayer = players[PI];
+    myplayer.words.push(tile_indices);
+
+    //update the tiles data structure:
+    for(i=0; i<tile_indices.length; i++){
+	tileset[i].status = 'inword';
+    }
+    
+    //draw the new word into the player zone...
+    snDraw.Game.drawSingleCapturedWord(myplayer,myplayer.words.length - 1);
+
+    //resize the player zones
+
 
 });
 

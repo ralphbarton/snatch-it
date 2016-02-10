@@ -266,9 +266,6 @@ snDraw.Game = {
 
     // for example player.words : [[23,14,11],[44,12,13,19,4]]
     drawPlayerWords: function(myplayer){
-	var x_plotter_R = 2 * this.marginUnit; //this is just defining a constant, the x-coordinate of drawing to set upon "carriage return"
-	var x_plotter = x_plotter_R;
-	var y_plotter = myplayer.zone_top + 1.8 * this.marginUnit;
 
 	//LOOP thru all the player's words...
 	// draw them onscreen
@@ -286,13 +283,18 @@ snDraw.Game = {
 
 
     drawSingleCapturedWord: function(myplayer, word_index){
+
+	var x_plotter_R = 2 * this.marginUnit; //this is just defining a constant, the x-coordinate of drawing to set upon "carriage return"
+	var x_plotter = x_plotter_R;
+	var y_plotter = myplayer.zone_top + 1.8 * this.marginUnit;
+
 	var word_as_tile_index_array = myplayer.words[word_index]; 
 
 	//word wrap handler
 	//if this word will run over the end of the line, do a carriage return...
 	if(x_plotter + (this.h_spacer * word_as_tile_index_array.length) > myZoneWidth - this.marginUnit){
-	    y_plotter+= this.v_spacer;
-	    x_plotter=x_plotter_R;
+	    y_plotter += this.v_spacer;
+	    x_plotter = x_plotter_R;
 	}
 
 	var LettersOfThisWord = [];//this is an array of Fabric objects (the tiles)
@@ -321,14 +323,10 @@ snDraw.Game = {
 	x_plotter+=this.h_space_word;    
     },
 
-
     animateTileFlip: function(flipping_player_i, tile_id){
-
 	var TargetTile = this.TileArray[tile_id];
 	var targetTileData = tileset[tile_id];
 	targetTileData.status="turned";//whilst the status change is immediate, the animation causes delay
-
 	this.modifyTileObject(TargetTile, "flipping",{player_i:flipping_player_i,time:2});
-	
     }
 };
