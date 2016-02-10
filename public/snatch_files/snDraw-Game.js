@@ -187,15 +187,12 @@ snDraw.Game = {
 
 	this.calculatePlayerZoneSizes();//this sets attributes within the player objects
 	var plr_top_cumulator = this.playersZoneTopPx;// the starting value for this variable is the lower edge of the tile zone...
-	console.log("players.length" + players.length);
 
 	for (var i=0; i<players.length; i++){
-	    console.log("i = " + i);
 	    players[i].zone_top = plr_top_cumulator;
 	    this.drawPlayerZoneBox(players[i]);// Draws the BOX
 	    this.drawPlayerWords(players[i]);//Draws all the WORDS
 	    plr_top_cumulator += players[i].zone_height + this.textMarginUnit + this.stroke_px;
-	    console.log("plr_top_cumulator = " + plr_top_cumulator);
 	}
     },
 
@@ -268,18 +265,10 @@ snDraw.Game = {
 
     // for example player.words : [[23,14,11],[44,12,13,19,4]]
     drawPlayerWords: function(myplayer){
-
 	//LOOP thru all the player's words...
 	// draw them onscreen
 	for (var i=0; i<myplayer.words.length; i++){
 	    this.drawSingleCapturedWord(myplayer, myplayer.words[i]);	
-	}
-
-	//record the coordinates at which to start word spelling...
-	if(myplayer==players[ClientPlayerIndex]){//the assignment is only valid for the player of the client...
-	    // n.b. consider adding just one word back to the word list of any player. So we do need a base position for every player stored...
-	    snDraw.Game.Spell.setBasePosition(x_plotter,y_plotter);
-	    console.log("base position set for "+myplayer.name);
 	}
     },
 
@@ -287,8 +276,8 @@ snDraw.Game = {
     drawSingleCapturedWord: function(myplayer, word_index){
 
 	var x_plotter_R = 2 * this.marginUnit; //this is just defining a constant, the x-coordinate of drawing to set upon "carriage return"
-	var x_plotter = x_plotter_R;
-	var y_plotter = myplayer.zone_top + 1.8 * this.marginUnit;
+	var x_plotter = myplayer.x_next_word || x_plotter_R;
+	var y_plotter = myplayer.y_next_word || myplayer.zone_top + 1.8 * this.marginUnit;
 
 	var word_as_tile_index_array = myplayer.words[word_index]; 
 
@@ -322,7 +311,11 @@ snDraw.Game = {
 	});
 	
 	canvas.add(PlayerWordGRP);
-	x_plotter+=this.h_space_word;    
+	x_plotter+=this.h_space_word;
+
+	//finally, always at the end of writing a word, record the coordinates for writing a new word...
+	myplayer.x_next_word = x_plotter;
+	myplayer.y_next_word = y_plotter;
     },
 
     animateTileFlip: function(flipping_player_i, tile_id){
