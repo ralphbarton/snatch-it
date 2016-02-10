@@ -186,12 +186,14 @@ snDraw.Game = {
     drawEntirePlayerZone: function(){
 
 	var heights_px = this.calculatePlayerZoneSizes();
-	var plr_top_cumulator = this.playersZoneTopPx;
+	var plr_top_cumulator = this.playersZoneTopPx;// the starting value for this variable is the lower edge of the tile zone...
 	
-	for (aa=0; aa<players.length; aa++){
-	    this.drawPlayerZoneBox(players[aa],plr_top_cumulator,heights_px[aa]);// Draws the BOX
-	    this.drawPlayerWords(players[aa],plr_top_cumulator);//Draws all the WORDS
-	    plr_top_cumulator += heights_px[aa] + this.textMarginUnit + this.stroke_px;
+	for (i=0; i<players.length; i++){
+	    players[i].zone_top = plr_top_cumulator;
+	    players[i].zone_height = heights_px[i];//TODO alter this too...
+	    this.drawPlayerZoneBox(players[i]);// Draws the BOX
+	    this.drawPlayerWords(players[i]);//Draws all the WORDS
+	    plr_top_cumulator += heights_px[i] + this.textMarginUnit + this.stroke_px;
 	}
     },
 
@@ -216,7 +218,6 @@ snDraw.Game = {
 	basic_height = this.tileSize + 4*this.marginUnit;
 	shareable_height = zones_sum_height - nPlayers * basic_height;
 
-	zoneHeightPlayer = [];
 	for(i=0; i<nPlayers; i++){
 	    //now, we don't want to go dividing by zero if it's a new game with nothing played!!
 	    var hRatio = 0;
@@ -226,28 +227,27 @@ snDraw.Game = {
 		hRatio = 1 / nPlayers;
 	    }
 
-	    zoneHeightPlayer[i] = basic_height + Math.round( hRatio * shareable_height );
+	    //this line of code adds the attribute calculated to the relevant player object within the array...
+	    players[i].zone_height = basic_height + Math.round( hRatio * shareable_height );
 	}
-
-	return zoneHeightPlayer;
     },
 
 
-    drawPlayerZoneBox: function(myplayer, mytop, myheight){
+    drawPlayerZoneBox: function(myplayer){
 
 	var zoneBox = new fabric.Rect({
 	    left: this.marginUnit,
-	    top: mytop,
+	    top: myplayer.zone_top,
 	    fill: this.bg_col,
 	    stroke: myplayer.color,
 	    strokeWidth: this.stroke_px,
-	    width: myZoneWidth-2*this.marginUnit-this.stroke_px,
-	    height: myheight,
+	    width: myZoneWidth - 2 * this.marginUnit - this.stroke_px,
+	    height: myplayer.zone_height,
 	});
 
 	var plrName = new fabric.Text(myplayer.name,{
-	    left: 4*this.marginUnit,
-	    top: mytop - this.textMarginUnit,
+	    left: 4 * this.marginUnit,
+	    top: myplayer.zone_top - this.textMarginUnit,
 	    fontSize: 2 * this.textMarginUnit,
 	    textBackgroundColor: this.bg_col,
 	    fill: myplayer.color,
@@ -265,54 +265,60 @@ snDraw.Game = {
 
 
     // for example player.words : [[23,14,11],[44,12,13,19,4]]
-    drawPlayerWords: function(myplayer, mytop){
-	var x_plotter_R = 2*this.marginUnit; //this is just defining a constant, the x-coordinate of drawing to set upon "carriage return"
+    drawPlayerWords: function(myplayer){
+	var x_plotter_R = 2 * this.marginUnit; //this is just defining a constant, the x-coordinate of drawing to set upon "carriage return"
 	var x_plotter = x_plotter_R;
-	var y_plotter = mytop + 1.8*this.marginUnit;
-	for (i=0; i<myplayer.words.length; i++){//LOOP thru all the player's words...
-	    var lettersOfThisWord = [];
-	    for (j=0; j<myplayer.words[i].length; j++){//LOOP thru the letters of one specific word...
-		var thisLetterIndex = myplayer.words[i][j];
-		var thisTile = this.TileArray[thisLetterIndex];
-		//move the relevant tile (already existing on the canvas) to location...
-		thisTile.set({
-		    left: x_plotter,
-		    top: y_plotter
-		});
-		
-		canvas.remove(thisTile);
-		this.modifyTileObject(thisTile,"flipped");//TODO: delete this line of code it should not be required.
+	var y_plotter = myplayer.zone_top + 1.8 * this.marginUnit;
 
-		lettersOfThisWord[j]=thisTile;
-		
-		x_plotter += this.h_spacer;
-	    }
-
-	    //at a completion of the inner loop, a word has just been drawn on canvas
-	    var PlayerWordGRP = new fabric.Group( lettersOfThisWord, {
-		hasControls: false,
-		hasBorders: false
-	    });
-	    
-	    canvas.add(PlayerWordGRP);
-	    x_plotter+=this.h_space_word;
-	    
-	    //word wrap handler
-	    //first check if the player has more words...
-	    var upcomingWord = myplayer.words[i+1]; 
-	    if(upcomingWord){
-		if(x_plotter + (this.h_spacer * upcomingWord.length) > myZoneWidth - this.marginUnit){
-		    y_plotter+= this.v_spacer;
-		    x_plotter=x_plotter_R;
-		}
-	    }
+	//LOOP thru all the player's words...
+	// draw them onscreen
+	for (i=0; i<myplayer.words.length; i++){
+	    this.drawSingleCapturedWord(myplayer, myplayer.words[i]);	
 	}
+
 	//record the coordinates at which to start word spelling...
 	if(myplayer==players[ClientPlayerIndex]){//the assignment is only valid for the player of the client...
 	    // n.b. consider adding just one word back to the word list of any player. So we do need a base position for every player stored...
 	    snDraw.Game.Spell.setBasePosition(x_plotter,y_plotter);
 	    console.log("base position set for "+myplayer.name);
 	}
+    },
+
+
+    drawSingleCapturedWord: function(myplayer, word_index){
+	var word_as_tile_index_array = myplayer.words[word_index]; 
+
+	//word wrap handler
+	//if this word will run over the end of the line, do a carriage return...
+	if(x_plotter + (this.h_spacer * word_as_tile_index_array.length) > myZoneWidth - this.marginUnit){
+	    y_plotter+= this.v_spacer;
+	    x_plotter=x_plotter_R;
+	}
+
+	var LettersOfThisWord = [];//this is an array of Fabric objects (the tiles)
+	for (j=0; j<word_as_tile_index_array.length; j++){//LOOP thru the letters of one specific word...
+	    var this_tile_index = word_as_tile_index_array[j];
+	    var thisTile = this.TileArray[this_tile_index];
+	    //move the relevant tile (already existing on the canvas) to location...
+	    thisTile.set({
+		left: x_plotter,
+		top: y_plotter
+	    });
+	    
+	    //we remove the tile as a standalone entity because it is to be readded as a group...
+	    canvas.remove(thisTile);
+	    LettersOfThisWord[j]=thisTile;
+	    x_plotter += this.h_spacer;
+	}
+
+	//at a completion of the inner loop, tiles are in position on the Canvas
+	var PlayerWordGRP = new fabric.Group( LettersOfThisWord, {
+	    hasControls: false,
+	    hasBorders: false
+	});
+	
+	canvas.add(PlayerWordGRP);
+	x_plotter+=this.h_space_word;    
     },
 
 
