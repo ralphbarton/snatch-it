@@ -118,7 +118,9 @@ module.exports = function (nTiles){
 	    //TODO this check needs modification (loosening) so that it handles valid snatches of other peoples words, where status will be 'inword'
 	    //for now, let it only handle fully new snatches.
 	    for(i=0; i<tile_id_array.length; i++){
-		if(tileSet[i].status!='turned'){
+		var TID = tile_id_array[i]
+		if(tileSet[TID].status!='turned'){
+		    console.log("a letter had status" + tileSet[TID].status);
 		    return 'letters unavailable';
 		}
 	    }
