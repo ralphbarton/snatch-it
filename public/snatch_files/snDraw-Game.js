@@ -275,7 +275,9 @@ snDraw.Game = {
 	for (var i=0; i<myplayer.words.length; i++){
 	    this.drawSingleCapturedWord(myplayer, i);	
 	}
+
 	//this prep's the SPELL class to place letters in the right location
+	// it is needed within this function call because the player won't necessarily have any words at the start...
 	snDraw.Game.Spell.restoreBasePosition();
     },
 
@@ -325,6 +327,10 @@ snDraw.Game = {
 	//finally, always at the end of writing a word, record the coordinates for writing a new word...
 	myplayer.x_next_word = x_plotter;
 	myplayer.y_next_word = y_plotter;
+
+	//this prep's the SPELL class to place letters in the right location
+	// it is needed within this function call because this function is called directly by a SNATCH ASSERT
+	snDraw.Game.Spell.restoreBasePosition();
     },
 
     animateTileFlip: function(flipping_player_i, tile_id){

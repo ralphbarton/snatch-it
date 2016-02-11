@@ -32,8 +32,8 @@ socket.on('full game state transmission', function(gameState){
 
     if(tileset.length<1){//RECIEVE THE MESSAGE FOR THE FIRST time - in this case need to add the listeners...
 
-	canvas.on('mouse:down', function(e){console.log("mDn1"); snDraw.Game.Mouse.mDown(e); console.log("mDn2");});
-	canvas.on('mouse:up',   function(e){console.log("mUp1"); snDraw.Game.Mouse.mUp(e);   console.log("mUp2");});
+	canvas.on('mouse:down', function(e){snDraw.Game.Mouse.mDown(e); });
+	canvas.on('mouse:up',   function(e){snDraw.Game.Mouse.mUp(e);   });
 	canvas.on('mouse:over', function(e){snDraw.Game.Mouse.mOver(e); });
 	canvas.on('mouse:out',  function(e){snDraw.Game.Mouse.mOut(e);  });
 
@@ -101,6 +101,7 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     var PI = SnatchUpdateMsg.player_index;
     var myplayer = players[PI];
     myplayer.words.push(tile_indices);
+    snDraw.Game.Spell.ClearWordFromSpeller(false);//remove it from the speller (clears up the speller)
 
     //update the tiles data structure:
     for(i=0; i<tile_indices.length; i++){
@@ -119,7 +120,7 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
 socket.on('snatch rejected', function(rejection_reason){
     
     //a toast here
-    snDraw.Game.Spell.CancelWord();
+    snDraw.Game.Spell.ClearWordFromSpeller(true);
     console.log("The snatch was rejected by the server for the following reason: " + rejection_reason);
 });
 

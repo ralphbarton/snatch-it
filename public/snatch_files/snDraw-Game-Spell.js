@@ -13,7 +13,7 @@ snDraw.Game.Spell = {
     destDragTileIndex: 0,
 
     //member objects & arrays of Fabric objects:
-    ActiveLetterSet: [],
+    ActiveLetterSet: [],//the set of yellow letters
 
     restoreBasePosition: function(){
 	var ClientPlayer = players[client_player_index];
@@ -108,7 +108,6 @@ snDraw.Game.Spell = {
     //include a new letter in the ActiveLetterSet
     addLetter: function(myTile){
 	this.ActiveLetterSet.push(myTile);
-	console.log(this.ActiveLetterSet);
 	myTile.activeGrpIndex=this.nActiveLetters;
 	this.nActiveLetters++;
 	x_loco = this.x_next_letter + (this.nActiveLetters-1) * snDraw.Game.h_spacer;
@@ -120,7 +119,6 @@ snDraw.Game.Spell = {
 	});
 	canvas.remove(myTile);
 	canvas.add(myTile);
-	console.log(myTile);
 	snDraw.Game.modifyTileObject(myTile,"ACTIVE");
     },
 
@@ -162,15 +160,22 @@ snDraw.Game.Spell = {
     },
 
 
-    //send a candidate word to the server
-    ClearWordFromSpeller: function(replace_tiles_on_grid){
-	
+    getTileIndecesFromSpeller: function(){
 	var tile_indeces_of_word = [];
-
 	for(i=0; i<this.nActiveLetters; i++){//for each TILE making up the word...
 	    //run through the Letter objects to extract the word's tile indeces into an array
 	    myTile = this.ActiveLetterSet[i];
 	    tile_indeces_of_word[i] = myTile.tileID;
+	}
+	return tile_indeces_of_word;
+    },
+
+    //send a candidate word to the server
+    ClearWordFromSpeller: function(replace_tiles_on_grid){
+	
+	for(i=0; i<this.nActiveLetters; i++){//for each TILE making up the word...
+	    //run through the Letter objects to extract the word's tile indeces into an array
+	    myTile = this.ActiveLetterSet[i];
 	    if(replace_tiles_on_grid){
 		myTile.set({
 		    left: myTile.x_availableSpace,
@@ -192,13 +197,11 @@ snDraw.Game.Spell = {
 	this.ActiveLetterSet = [];
 	this.nActiveLetters = 0;
 	this.prev_DT_rdNt = 0;//previous Drag Tile's shift in tile position...
-
-	return tile_indeces_of_word;
     },
 
     //send a candidate word to the server
     SubmitWord: function(){
-	var word_by_tile_indeces = this.ClearWordFromSpeller(false);
+	var word_by_tile_indeces = this.getTileIndecesFromSpeller();
 	PLAYER_SUBMITS_WORD(JSON.stringify(word_by_tile_indeces));
     },
 
