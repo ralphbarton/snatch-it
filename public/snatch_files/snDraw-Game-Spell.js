@@ -176,6 +176,10 @@ snDraw.Game.Spell = {
 		    left: myTile.x_availableSpace,
 		    top: myTile.y_availableSpace
 		});
+		//whenever namually changing tile coordinates, must do this to update drag zone
+		canvas.remove(myTile);
+		canvas.add(myTile);
+
 	    }
 	    //restore tile from it's special states when it's being used to spell a word
 	    myTile.activeGrpIndex = undefined;
@@ -200,7 +204,7 @@ snDraw.Game.Spell = {
 
     //cancel word
     CancelWord: function(){
-	this.ClearWordFromSpeller(true);	
+	this.ClearWordFromSpeller(true);
     },
 
 
