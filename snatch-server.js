@@ -8,7 +8,7 @@ module.exports = function (nTiles){
     color_palette = shuffle(color_palette);//Temporary - until restart working
     emergency_colors=color_palette.slice(0);
     emergency_colors=shuffle(emergency_colors);
-    bound_palette = [];
+    bound_palette = [[]];
 
 //    tileSet = modifyTileSetForTurned(tileSet);
 

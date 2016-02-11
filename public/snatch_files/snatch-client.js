@@ -45,14 +45,6 @@ socket.on('full game state transmission', function(gameState){
     var GameStateObject = JSON.parse(gameState);
     tileset = GameStateObject.tileSet;
     players = GameStateObject.playerSet;
-    
-    //this adds some further attributes for each player object that can be generated client-side and do not need to get sent by the server
-    //TODO: this code needs to reside within a function called both on reciept of a *set* of players and upon addition of a single player... 
-    for (i=0; i<players.length; i++){
-	players[i].self_index = i;
-	players[i].x_next_word = undefined;
-	players[i].y_next_word = undefined;
-    }
 
     //draws the entire game state on the canvas from the data supplied
     snDraw.Game.initialDrawEntireGame();

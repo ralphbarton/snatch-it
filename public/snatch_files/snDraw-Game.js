@@ -273,7 +273,7 @@ snDraw.Game = {
 	//LOOP thru all the player's words...
 	// draw them onscreen
 	for (var i=0; i<myplayer.words.length; i++){
-	    this.drawSingleCapturedWord(myplayer, myplayer.words[i]);	
+	    this.drawSingleCapturedWord(myplayer, i);	
 	}
 	//this prep's the SPELL class to place letters in the right location
 	snDraw.Game.Spell.restoreBasePosition();
@@ -318,6 +318,9 @@ snDraw.Game = {
 	
 	canvas.add(PlayerWordGRP);
 	x_plotter+=this.h_space_word;
+
+	//refresh the canvas with the changes to the letters triggered
+	canvas.renderAll();
 
 	//finally, always at the end of writing a word, record the coordinates for writing a new word...
 	myplayer.x_next_word = x_plotter;
