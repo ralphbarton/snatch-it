@@ -99,9 +99,13 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     //update the players data structure:
     var tile_indices = SnatchUpdateMsg.tile_id_array
     var PI = SnatchUpdateMsg.player_index;
-    var myplayer = players[PI];
+    var myplayer = players[PI];//please note that in this case object 'myplayer' is the snatching player... 
     myplayer.words.push(tile_indices);
-    snDraw.Game.Spell.ClearWordFromSpeller(false);//remove it from the speller (clears up the speller)
+    
+    if(client_player_index == PI){//only clear the speller for the snatching player...
+	snDraw.Game.Spell.ClearWordFromSpeller(false);//remove it from the speller (clears up the speller)
+    }
+    //TODO: in actual fact, a good feature here would be to clear the speller for any player sharing a letter in the now-snatched word...
 
     //update the tiles data structure:
     for(i=0; i<tile_indices.length; i++){
