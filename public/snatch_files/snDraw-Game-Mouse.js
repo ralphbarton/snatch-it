@@ -3,6 +3,7 @@ snDraw.Game.Mouse = {
     
     mDown: function (e) {
 	myTileID = e.target.tileID;
+	console.log("waypoint 1");
 	if(myTileID !== undefined){//for when a click landed on a tile...
 	    if(tileset[myTileID].status=="unturned"){
 		tileTurnObj = {
@@ -10,13 +11,15 @@ snDraw.Game.Mouse = {
 		    tileID: myTileID
 		}
 		var ObjStr = JSON.stringify(tileTurnObj);
-		socket.emit('tile turn request', ObjStr);//for an unturned tile, always message to flip
+		TILE_TURN_REQUEST(ObjStr);//for an unturned tile, always message to flip
 	    }
 	    if(tileset[myTileID].status=="turned"){//click on a turned tile. Log coords of start of drag
+		console.log("waypoint 2");
 		e.target.xPickup=e.target.getLeft();
 		e.target.yPickup=e.target.getTop();
 		//log its old board coordinates in case it is to be returned
 		if(e.target.visual=="flipped"){
+		    console.log("waypoint 3");
 		    e.target.x_availableSpace=e.target.getLeft();
 		    e.target.y_availableSpace=e.target.getTop();
 		}

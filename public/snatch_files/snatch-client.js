@@ -8,10 +8,7 @@ var client_player_index = undefined;
 
 //initialise the Canvas
 
-console.log("we got this far...");
-
 socket.emit('player joining game', 0);
-
 
 socket.on('player color choices', function(colorSetObjStr){
     snDraw.initialiseCanvas();
@@ -35,8 +32,8 @@ socket.on('full game state transmission', function(gameState){
 
     if(tileset.length<1){//RECIEVE THE MESSAGE FOR THE FIRST time - in this case need to add the listeners...
 
-	canvas.on('mouse:down', function(e){snDraw.Game.Mouse.mDown(e); });
-	canvas.on('mouse:up',   function(e){snDraw.Game.Mouse.mUp(e);   });
+	canvas.on('mouse:down', function(e){console.log("mUp1"); snDraw.Game.Mouse.mDown(e); console.log("mUp2");});
+	canvas.on('mouse:up',   function(e){console.log("mDn1"); snDraw.Game.Mouse.mUp(e);   console.log("mDn2");});
 	canvas.on('mouse:over', function(e){snDraw.Game.Mouse.mOver(e); });
 	canvas.on('mouse:out',  function(e){snDraw.Game.Mouse.mOut(e);  });
 
@@ -127,7 +124,7 @@ socket.on('snatch rejected', function(rejection_reason){
 
 function PLAYER_SUBMITS_WORD(p){socket.emit('player submits word', p);}
 function RESET_REQUEST()       {socket.emit('reset request', 0);}
-
+function TILE_TURN_REQUEST(p)  {socket.emit('tile turn request', p);}
 
 ///Todo what uses this function? Can it be placed elsewhere in the code?
 Array.prototype.move = function (old_index, new_index) {
