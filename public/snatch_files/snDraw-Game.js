@@ -338,23 +338,6 @@ snDraw.Game = {
 	var targetTileData = tileset[tile_id];
 	targetTileData.status="turned";//whilst the status change is immediate, the animation causes delay
 	this.modifyTileObject(TargetTile, "flipping",{player_i:flipping_player_i,time:2});
-    },
-
-    clientToFlipTopTile: function(){
-	//find the unturned tile with the highest index: 
-	var target_tile_index = undefined;
-	for (var i=0; i<tileset.length; i++){
-	    if (tileset[i].status == 'unturned'){
-		target_tile_index = i;
-	    } 
-	}
-	var TargetTile = this.TileArray[target_tile_index];
-
-	//now execute the turning over of the tile...
-	tileset[target_tile_index].status = "turned";
-	this.modifyTileObject(TargetTile, "flipping",{player_i:client_player_index,time:2});
-
     }
-
 
 };

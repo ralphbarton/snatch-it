@@ -149,7 +149,21 @@ snDraw.Game.KB = {
 
 	if(myKeycode == 32){//space bar
 	    // let this be turn a letter
-	    snDraw.Game.clientToFlipTopTile();
+
+	    //find the unturned tile with the highest index: 
+	    var target_tile_index = undefined;
+	    for (var i=0; i<tileset.length; i++){
+		if (tileset[i].status == 'unturned'){
+		    target_tile_index = i;
+		} 
+	    }
+
+	    tileTurnObj = {
+		playerIndex: client_player_index,
+		tileID: target_tile_index
+	    }
+	    var ObjStr = JSON.stringify(tileTurnObj);
+	    TILE_TURN_REQUEST(ObjStr);//for an unturned tile, always message to flip
 	}
 
 	if(myKeycode == 8){//delete key
