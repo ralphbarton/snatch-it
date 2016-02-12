@@ -13,15 +13,8 @@ snDraw.Game.Mouse = {
 		TILE_TURN_REQUEST(ObjStr);//for an unturned tile, always message to flip
 	    }
 	    if(tileset[my_tile_index].status=="turned"){//click on a turned tile. Log coords of start of drag
-		//assigning new attributes...
-		e.target.xPickup=e.target.getLeft();
-		e.target.yPickup=e.target.getTop();
-		//log its old board coordinates in case it is to be returned
-		if(e.target.visual=="flipped"){
-		    e.target.x_availableSpace=e.target.getLeft();
-		    e.target.y_availableSpace=e.target.getTop();
-		}
-		//upon pickup of an active tile, add the event listener
+		this.recordDragStartCoords(e.target);
+		//Actually upon pickup of an active tile, add the event listener to potentially move other tiles around beneath...
 		// this is really only for the fresh word create case?
 		if(e.target.visual=="ACTIVE"){
 		    e.target.on('moving',function (o){
@@ -71,7 +64,7 @@ snDraw.Game.Mouse = {
 		if(e.target.visual=="flipped"){
 		    if(!this.significantMovement(e.target)){
 			//move the tile into the ActiveGroup
-			snDraw.Game.Spell.addLetter(e.target);		    
+			snDraw.Game.Spell.addLetter(e.target);
 		    }
 		}
 		//ELSE is really important, because the first statement changes it to the second
@@ -131,9 +124,18 @@ snDraw.Game.Mouse = {
 	var threshold = snDraw.Game.tileSize * 1.2;
 	return ady>threshold;
 
+    },
+
+    recordDragStartCoords: function(MyTile){
+	//assigning new attributes...
+	MyTile.xPickup=MyTile.getLeft();
+	MyTile.yPickup=MyTile.getTop();
+	//log its old board coordinates in case it is to be returned
+	if(MyTile.visual=="flipped"){
+	    MyTile.x_availableSpace=MyTile.getLeft();
+	    MyTile.y_availableSpace=MyTile.getTop();
+	}
     }
-
-
 };
 
 
@@ -145,19 +147,24 @@ snDraw.Game.KB = {
 
 	if( (myKeycode >= 65) && (myKeycode <= 90) ){//any letter key
 	    //
+	    var grabit_tile_index = this.seachForTurnedTileOfLetter(keyPressed);
+	    console.log(grabit_tile_index);
+	    if (grabit_tile_index !== undefined){
+		//
+		var TargetTile = snDraw.Game.TileArray[grabit_tile_index];
+		snDraw.Game.Mouse.recordDragStartCoords(TargetTile);
+		snDraw.Game.Spell.addLetter(TargetTile); 
+	    }
+	    else{
+		//take action if the user hits a letter and its not available.
+		
+		//TODO concider the detail and graphics for various scenarious of subsets of letters from word sources... (i.e. other peoples' words)
+	    }
 	}
 
 	if(myKeycode == 32){//space bar
 	    // let this be turn a letter
-
-	    //find the unturned tile with the highest index: 
-	    var target_tile_index = undefined;
-	    for (var i=0; i<tileset.length; i++){
-		if (tileset[i].status == 'unturned'){
-		    target_tile_index = i;
-		} 
-	    }
-
+	    var target_tile_index = this.getLargestUnturnedTileIndex();
 	    tileTurnObj = {
 		playerIndex: client_player_index,
 		tileID: target_tile_index
@@ -186,6 +193,27 @@ snDraw.Game.KB = {
 	
 	}
 */
-    }
+    },
 
+    getLargestUnturnedTileIndex: function(){
+	var highest_unturned = undefined;
+	for (var i=0; i<tileset.length; i++){
+	    if (tileset[i].status == 'unturned'){
+		highest_unturned = i;
+	    } 
+	}
+	return highest_unturned;
+    },
+
+    seachForTurnedTileOfLetter: function(myletter){
+	var tile_index_matching_letter = undefined;
+	for (var i=0; i<tileset.length; i++){
+	    if ((tileset[i].status == 'turned')&&(tileset[i].letter==myletter)){
+		if(snDraw.Game.TileArray[i].visual != "ACTIVE"){
+		    tile_index_matching_letter = i;
+		}
+	    } 
+	}
+	return tile_index_matching_letter;
+    }
 };
