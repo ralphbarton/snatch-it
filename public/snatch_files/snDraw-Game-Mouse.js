@@ -2,17 +2,18 @@
 snDraw.Game.Mouse = {
     
     mDown: function (e) {
-	myTileID = e.target.tileID;
-	if(myTileID !== undefined){//for when a click landed on a tile...
-	    if(tileset[myTileID].status=="unturned"){
+	my_tile_index = e.target.tileID;
+	if(my_tile_index !== undefined){//for when a click landed on a tile...
+	    if(tileset[my_tile_index].status=="unturned"){
 		tileTurnObj = {
 		    playerIndex: client_player_index,
-		    tileID: myTileID
+		    tileID: my_tile_index
 		}
 		var ObjStr = JSON.stringify(tileTurnObj);
 		TILE_TURN_REQUEST(ObjStr);//for an unturned tile, always message to flip
 	    }
-	    if(tileset[myTileID].status=="turned"){//click on a turned tile. Log coords of start of drag
+	    if(tileset[my_tile_index].status=="turned"){//click on a turned tile. Log coords of start of drag
+		//assigning new attributes...
 		e.target.xPickup=e.target.getLeft();
 		e.target.yPickup=e.target.getTop();
 		//log its old board coordinates in case it is to be returned
@@ -62,11 +63,11 @@ snDraw.Game.Mouse = {
     },
 
     mUp: function (e) {
-	myTileID = e.target.tileID;
-	if(myTileID !== undefined){//for when a mouse up landed on a tile...
+	my_tile_index = e.target.tileID;
+	if(my_tile_index !== undefined){//for when a mouse up landed on a tile...
 
 	    //this is for RELEASES that land on a blue tile in the free tiles area
-	    if(tileset[myTileID].status=="turned"){
+	    if(tileset[my_tile_index].status=="turned"){
 		if(e.target.visual=="flipped"){
 		    if(!this.significantMovement(e.target)){
 			//move the tile into the ActiveGroup
@@ -132,5 +133,45 @@ snDraw.Game.Mouse = {
 
     }
 
+
+};
+
+
+snDraw.Game.KB = {
+
+    kDown: function (e) {
+	var myKeycode = e.keyCode;
+	var keyPressed = String.fromCharCode(myKeycode);//note that this is non-case sensitive.
+
+	if( (myKeycode >= 65) && (myKeycode <= 90) ){//any letter key
+	    //
+	}
+
+	if(myKeycode == 32){//space bar
+	    // let this be turn a letter
+	    snDraw.Game.clientToFlipTopTile();
+	}
+
+	if(myKeycode == 8){//delete key
+	    // let this be remove the final letter of the spell (if present)
+	}
+
+	if(myKeycode == 13){//enter key
+	    // let this be submit word
+	}
+
+	if(myKeycode == 27){//escape key
+	    // let this be cancel word
+	}
+/*
+	if(myKeycode == 16){//shift key
+	
+	}
+
+	if(myKeycode == 17){//control key
+	
+	}
+*/
+    }
 
 };
