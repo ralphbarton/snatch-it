@@ -67,7 +67,7 @@ snDraw.Game.Mouse = {
 			snDraw.Game.Spell.addLetter(e.target);
 		    }
 		}
-		//ELSE is really important, because the first statement changes it to the second
+		//ELSE is really important, because the first statement mutates data such that  that the second condition might then be met
 		//this is for RELEASES that land on active tiles...
 		else if(e.target.visual=="ACTIVE"){
 		    if(this.verticalMovement(e.target)){
@@ -175,10 +175,14 @@ snDraw.Game.KB = {
 
 	if(myKeycode == 8){//delete key
 	    // let this be remove the final letter of the spell (if present)
+	    var SpellArray = snDraw.Game.Spell.ActiveLetterSet;
+	    var LastTile = SpellArray[SpellArray.length-1];
+	    snDraw.Game.Spell.removeLetter(LastTile);
 	}
 
 	if(myKeycode == 13){//enter key
 	    // let this be submit word
+	    snDraw.Game.Spell.SubmitWord();
 	}
 
 	if(myKeycode == 27){//escape key
