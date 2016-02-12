@@ -148,11 +148,11 @@ snDraw.Game.KB = {
 	if( (myKeycode >= 65) && (myKeycode <= 90) ){//any letter key
 	    //
 	    var grabit_tile_index = this.seachForTurnedTileOfLetter(keyPressed);
-	    console.log(grabit_tile_index);
 	    if (grabit_tile_index !== undefined){
 		//
 		var TargetTile = snDraw.Game.TileArray[grabit_tile_index];
 		snDraw.Game.Mouse.recordDragStartCoords(TargetTile);
+		console.log("checkpoint Q");
 		snDraw.Game.Spell.addLetter(TargetTile); 
 	    }
 	    else{

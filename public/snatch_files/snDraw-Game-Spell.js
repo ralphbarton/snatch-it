@@ -7,6 +7,7 @@ snDraw.Game.Spell = {
     y_next_letter: undefined,
 
     nActiveLetters: 0,
+    n_letters_unwrap: undefined,
 
     prev_DT_rdNt: 0,//previous Drag Tile's shift in tile position...
 
@@ -95,7 +96,7 @@ snDraw.Game.Spell = {
 	});
 
 	//make sure all the stored indecies for position in activeletter set reflect new ordering
-	for(i=0;i<this.nActiveLetters;i++){
+	for(var i=0;i<this.nActiveLetters;i++){
 	    this.ActiveLetterSet[i].activeGrpIndex = i;
 	}
 	this.prev_DT_rdNt = 0;//needs reset so as not to use old data
@@ -111,14 +112,23 @@ snDraw.Game.Spell = {
 	myTile.activeGrpIndex=this.nActiveLetters;
 	this.nActiveLetters++;
 	x_loco = this.x_next_letter + (this.nActiveLetters-1) * snDraw.Game.h_spacer;
-
-	
-	myTile.set({
-	    left: x_loco,
-	    top: this.y_next_letter
-	});
-	canvas.remove(myTile);
-	canvas.add(myTile);
+	//check to see if Wrap is necessary (pixel condition and not already wrapped condition)
+	if( snDraw.Game.xCoordExceedsWrapThreshold(x_loco + snDraw.Game.h_spacer) && (this.n_letters_unwrap===undefined)){
+	    //retain how the word must be reduced for unwrap to occur
+	    this.n_letters_unwrap = this.nActiveLetters-2; //(minus 2 for hysteresis)
+	    //shift all letters
+	    this.x_next_letter = snDraw.Game.x_plotter_R;
+	    this.y_next_letter += snDraw.Game.v_spacer;
+	    this.rebaseSpellerLocation();
+	}
+	else{//behaviour contigent on wrap NOT happening:
+	    myTile.set({
+		left: x_loco,
+		top: this.y_next_letter
+	    });
+	    canvas.remove(myTile);
+	    canvas.add(myTile);
+	}
 	snDraw.Game.modifyTileObject(myTile,"ACTIVE");
     },
 
@@ -130,10 +140,19 @@ snDraw.Game.Spell = {
 
 	//TODO: must remove it from the arry ACTIVELETTERSET 
 	this.ActiveLetterSet.splice(myTile.activeGrpIndex,1);
-	myTile.activeGrpIndex=undefined;//it no longer has such an index.
+	myTile.activeGrpIndex = undefined;//it no longer has such an index.
+
+	//potentially unwrap
+	if(this.n_letters_unwrap !== undefined){
+	    if(this.nActiveLetters <= this.n_letters_unwrap){//detect that word length has reduced so that it can all be moved back to the previous line...
+		this.n_letters_unwrap = undefined;
+		this.restoreBasePosition();
+		this.rebaseSpellerLocation();
+	    }
+	}
 
 	//make sure all the stored indecies for position in activeletter reflect removal    
-	for(i=0;i<this.nActiveLetters;i++){
+	for(var i=0;i<this.nActiveLetters;i++){
 	    this.ActiveLetterSet[i].activeGrpIndex = i;
 	    this.ActiveLetterSet[i].setLeft(this.x_next_letter + i * snDraw.Game.h_spacer);
 	    //whenever namually changing tile coordinates, must do this to update drag zone
@@ -159,10 +178,22 @@ snDraw.Game.Spell = {
 
     },
 
+    rebaseSpellerLocation: function(){
+	for(var i=0; i<this.nActiveLetters; i++){//for each TILE making up the word...
+	    var IterTile = this.ActiveLetterSet[i];
+	    var x_loco = this.x_next_letter + i * snDraw.Game.h_spacer;
+	    IterTile.set({
+		left: x_loco,
+		top: this.y_next_letter
+	    });
+	    canvas.remove(IterTile);
+	    canvas.add(IterTile);
+	}
+    },
 
     getTileIndecesFromSpeller: function(){
 	var tile_indeces_of_word = [];
-	for(i=0; i<this.nActiveLetters; i++){//for each TILE making up the word...
+	for(var i=0; i<this.nActiveLetters; i++){//for each TILE making up the word...
 	    //run through the Letter objects to extract the word's tile indeces into an array
 	    myTile = this.ActiveLetterSet[i];
 	    tile_indeces_of_word[i] = myTile.tileID;
@@ -173,7 +204,7 @@ snDraw.Game.Spell = {
     //send a candidate word to the server
     ClearWordFromSpeller: function(replace_tiles_on_grid){
 	
-	for(i=0; i<this.nActiveLetters; i++){//for each TILE making up the word...
+	for(var i=0; i<this.nActiveLetters; i++){//for each TILE making up the word...
 	    //run through the Letter objects to extract the word's tile indeces into an array
 	    myTile = this.ActiveLetterSet[i];
 	    if(replace_tiles_on_grid){
@@ -197,6 +228,7 @@ snDraw.Game.Spell = {
 	this.ActiveLetterSet = [];
 	this.nActiveLetters = 0;
 	this.prev_DT_rdNt = 0;//previous Drag Tile's shift in tile position...
+	this.n_letters_unwrap=undefined;//reset the record of wrap occuring
     },
 
     //send a candidate word to the server

@@ -291,7 +291,7 @@ snDraw.Game = {
 
 	//word wrap handler
 	//if this word will run over the end of the line, do a carriage return...
-	if(x_plotter + (this.h_spacer * word_as_tile_index_array.length) > myZoneWidth - this.marginUnit){
+	if( this.xCoordExceedsWrapThreshold(x_plotter + (this.h_spacer * word_as_tile_index_array.length))){
 	    y_plotter += this.v_spacer;
 	    x_plotter = this.x_plotter_R;
 	}
@@ -331,6 +331,10 @@ snDraw.Game = {
 	//this prep's the SPELL class to place letters in the right location
 	// it is needed within this function call because this function is called directly by a SNATCH ASSERT
 	snDraw.Game.Spell.restoreBasePosition();
+    },
+
+    xCoordExceedsWrapThreshold: function(x_coord){
+	return (x_coord > myZoneWidth - this.marginUnit);
     },
 
     animateTileFlip: function(flipping_player_i, tile_id){
