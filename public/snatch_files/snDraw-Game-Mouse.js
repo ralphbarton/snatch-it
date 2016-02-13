@@ -1,5 +1,8 @@
-
 snDraw.Game.Mouse = {
+    //global variables
+    significant_drag: false,
+
+    //TODO: (n.b. given that there's only one mouse but the recorded coordinates here too...
     
     mDown: function (e) {
 	my_tile_index = e.target.tileID;
@@ -17,42 +20,32 @@ snDraw.Game.Mouse = {
 		//Actually upon pickup of an active tile, add the event listener to potentially move other tiles around beneath...
 		// this is really only for the fresh word create case?
 		if(e.target.visual=="ACTIVE"){
+		    this.significant_drag = false;
+		    var count = 0;
 		    e.target.on('moving',function (o){
 			snDraw.Game.Spell.shuffleAnagramDrag(e.target);
+			count++;
+			if (count % 5 == 0){//an attempted efficiency boost
+			    var pointer = canvas.getPointer(e.e);
+			    snDraw.Game.Mouse.significant_drag = snDraw.Game.Mouse.significant_drag || snDraw.Game.Mouse.significantMovement(e.target,pointer);
+			}
 		    });
 		}
 	    }
 	}
-
-
 	//it's important this comes before the button handlers, or the window will get drawn then removed.
 	if(snDraw.Game.Controls.playersListWindowVisible){
 	    snDraw.Game.Controls.removePlayersListWindow();
 	}
-
 	//for handling mouse down on the row of buttons accross the top.
 	GCindex = e.target.gameButtonID;
-	if(GCindex!==undefined){
-
-	    snDraw.Game.Controls.buttonRecolor(e.target,"press");
-
-	    if(GCindex == 0){
-		snDraw.Game.Controls.cancelWordButtonHandler();
-	    }
-
-	    if(GCindex == 1){
-		snDraw.Game.Controls.snatchItButtonHandler();
-	    }
-	    
-	    if(GCindex == 2){
-		snDraw.Game.Controls.playersListButtonHandler();
-	    }
-	    
-	    if(GCindex == 3){
-		snDraw.Game.Controls.resetGameButtonHandler();
-	    }
+	if(GCindex!==undefined){ //implies the click landed on a button...
+	    snDraw.Game.Controls.buttonRecolor(e.target,"press"); // visual
+	    if(GCindex == 0){  snDraw.Game.Controls.cancelWordButtonHandler();   }
+	    if(GCindex == 1){  snDraw.Game.Controls.snatchItButtonHandler();     }	    
+	    if(GCindex == 2){  snDraw.Game.Controls.playersListButtonHandler();  }	    
+	    if(GCindex == 3){  snDraw.Game.Controls.resetGameButtonHandler();    }
 	}
-
     },
 
     mUp: function (e) {
@@ -70,12 +63,13 @@ snDraw.Game.Mouse = {
 		//ELSE is really important, because the first statement mutates data such that  that the second condition might then be met
 		//this is for RELEASES that land on active tiles...
 		else if(e.target.visual=="ACTIVE"){
-		    if(this.verticalMovement(e.target)){
+		    if(this.verticalMovement(e.target) ||  //if the yellow letter is dragged up/down, remove it
+		       (!this.significant_drag)){//if a click is released without a significant move, remove it
 			snDraw.Game.Spell.removeLetter(e.target);
+
 		    }else{
 			snDraw.Game.Spell.shuffleAnagramRelease(e.target);
 		    }
-		    
 		}
 	    }
 	}
@@ -108,13 +102,21 @@ snDraw.Game.Mouse = {
     },
 
 
-    significantMovement: function(tile){
-
-	var adx = Math.abs(tile.xPickup - tile.getLeft());
-	var ady = Math.abs(tile.yPickup - tile.getTop()); 
+    significantMovement: function(tile, options){
+	var final_x = undefined;
+	var final_y = undefined;
+	
+	if(options){
+	    final_x = options.x;
+	    final_y = options.y;
+	}else{
+	    final_x = tile.getLeft();
+	    final_y = tile.getTop();
+	}
+	var adx = Math.abs(tile.xPickup - final_x);
+	var ady = Math.abs(tile.yPickup - final_y); 
 	var threshold = snDraw.Game.tileSize * 0.1;
 	return (adx>threshold)||(ady>threshold);
-
     },
 
     verticalMovement: function(tile){
