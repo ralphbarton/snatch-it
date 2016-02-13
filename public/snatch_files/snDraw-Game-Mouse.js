@@ -55,7 +55,8 @@ snDraw.Game.Mouse = {
 	    //this is for RELEASES that land on a blue tile in the free tiles area
 	    if(tileset[my_tile_index].status=="turned"){
 		if(e.target.visual=="flipped"){
-		    if(!this.significantMovement(e.target)){
+		    if((!this.significantMovement(e.target)) ||
+		       (this.draggedIntoPlayZone(e.target))){
 			//move the tile into the ActiveGroup
 			snDraw.Game.Spell.addLetter(e.target);
 		    }
@@ -102,7 +103,7 @@ snDraw.Game.Mouse = {
     },
 
 
-    significantMovement: function(tile, options){
+    significantMovement: function(MyTile, options){
 	var final_x = undefined;
 	var final_y = undefined;
 	
@@ -110,19 +111,19 @@ snDraw.Game.Mouse = {
 	    final_x = options.x;
 	    final_y = options.y;
 	}else{
-	    final_x = tile.getLeft();
-	    final_y = tile.getTop();
+	    final_x = MyTile.getLeft();
+	    final_y = MyTile.getTop();
 	}
-	var adx = Math.abs(tile.xPickup - final_x);
-	var ady = Math.abs(tile.yPickup - final_y); 
+	var adx = Math.abs(MyTile.xPickup - final_x);
+	var ady = Math.abs(MyTile.yPickup - final_y); 
 	var threshold = snDraw.Game.tileSize * 0.1;
-	return (adx>threshold)||(ady>threshold);
+	return (adx>threshold) || (ady>threshold);
     },
 
-    verticalMovement: function(tile){
+    verticalMovement: function(MyTile){
 
 	//getTop is the final position, and an a reduced Y coord (i.e. positive dy) implies upwards
-	var ady = Math.abs(tile.yPickup - tile.getTop());
+	var ady = Math.abs(MyTile.yPickup - MyTile.getTop());
 	var threshold = snDraw.Game.tileSize * 1.2;
 	return ady>threshold;
 
@@ -130,13 +131,17 @@ snDraw.Game.Mouse = {
 
     recordDragStartCoords: function(MyTile){
 	//assigning new attributes...
-	MyTile.xPickup=MyTile.getLeft();
-	MyTile.yPickup=MyTile.getTop();
+	MyTile.xPickup = MyTile.getLeft();
+	MyTile.yPickup = MyTile.getTop();
 	//log its old board coordinates in case it is to be returned
 	if(MyTile.visual=="flipped"){
-	    MyTile.x_availableSpace=MyTile.getLeft();
-	    MyTile.y_availableSpace=MyTile.getTop();
+	    MyTile.x_availableSpace = MyTile.getLeft();
+	    MyTile.y_availableSpace = MyTile.getTop();
 	}
+    },
+
+    draggedIntoPlayZone: function(MyTile){
+	return MyTile.getTop() > snDraw.Game.playersZoneTopPx - (snDraw.Game.tileSize * 0.9);
     }
 };
 
