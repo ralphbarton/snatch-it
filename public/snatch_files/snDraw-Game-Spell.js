@@ -49,18 +49,18 @@ snDraw.Game.Spell = {
 		}
 		
 
-		var animateTile = snDraw.Game.Spell.ActiveLetterSet[daT+anT];
+		var AnimateTile = snDraw.Game.Spell.ActiveLetterSet[daT+anT];
 		
 		shiftRight = prev_DT_rdNt > DT_rdNt;
 		destC = (daT+anT) + shiftRight-pos;
 		destPx = destC * snDraw.Game.h_spacer + snDraw.Game.Spell.x_next_letter;
 
-		animateTile.animate('left', destPx, {
+		AnimateTile.animate('left', destPx, {
 		    onChange: function() {
 			canvas.renderAll();
 		    },
 		    easing: fabric.util.ease.easeOutBounce,
-		    duration: 200
+		    duration: 150
 		});
 	    }
 
@@ -107,9 +107,9 @@ snDraw.Game.Spell = {
     },
 
     //include a new letter in the ActiveLetterSet
-    addLetter: function(myTile){
-	this.ActiveLetterSet.push(myTile);
-	myTile.activeGrpIndex=this.nActiveLetters;
+    addLetter: function(MyTile){
+	this.ActiveLetterSet.push(MyTile);
+	MyTile.activeGrpIndex=this.nActiveLetters;
 	this.nActiveLetters++;
 	x_loco = this.x_next_letter + (this.nActiveLetters-1) * snDraw.Game.h_spacer;
 	//check to see if Wrap is necessary (pixel condition and not already wrapped condition)
@@ -122,25 +122,34 @@ snDraw.Game.Spell = {
 	    this.rebaseSpellerLocation();
 	}
 	else{//behaviour contigent on wrap NOT happening:
-	    myTile.set({
+
+	    MyTile.animate({
 		left: x_loco,
 		top: this.y_next_letter
+	    },{
+		onChange: function() {
+		    canvas.renderAll();
+		},
+		easing: fabric.util.ease.easeOutQuart,
+		duration: 150
 	    });
-	    canvas.remove(myTile);
-	    canvas.add(myTile);
+
+	    //remember that these steps are necessary if animation is not used
+	    //canvas.remove(MyTile);
+	    //canvas.add(MyTile);
 	}
-	snDraw.Game.modifyTileObject(myTile,"ACTIVE");
+	snDraw.Game.modifyTileObject(MyTile,"ACTIVE");
     },
 
 
     //remove a letter from the ActiveLetterSet
-    removeLetter: function(myTile){
+    removeLetter: function(MyTile){
 
 	this.nActiveLetters--;
 
 	//TODO: must remove it from the arry ACTIVELETTERSET 
-	this.ActiveLetterSet.splice(myTile.activeGrpIndex,1);
-	myTile.activeGrpIndex = undefined;//it no longer has such an index.
+	this.ActiveLetterSet.splice(MyTile.activeGrpIndex,1);
+	MyTile.activeGrpIndex = undefined;//it no longer has such an index.
 
 	//potentially unwrap
 	if(this.n_letters_unwrap !== undefined){
@@ -162,19 +171,22 @@ snDraw.Game.Spell = {
 
 
 	//remove the event listener for that tile...
-	myTile.off('moving');
+	MyTile.off('moving');
 
 	//move the tile to be removed back to wherever it was before
-	myTile.set({
-	    left: myTile.x_availableSpace,
-	    top: myTile.y_availableSpace
+	console.log("animating tile" + MyTile.tileID);
+	MyTile.animate({
+	    left: MyTile.x_availableSpace,
+	    top: MyTile.y_availableSpace
+	},{
+	    onChange: function() {
+		canvas.renderAll();
+	    },
+	    easing: fabric.util.ease.easeOutQuart,
+	    duration: 150
 	});
-	//whenever namually changing tile coordinates, must do this to update drag zone
-	canvas.remove(myTile);
-	canvas.add(myTile);
 
-
-	snDraw.Game.modifyTileObject(myTile,"flipped");
+	snDraw.Game.modifyTileObject(MyTile,"flipped");
 
     },
 
@@ -195,33 +207,51 @@ snDraw.Game.Spell = {
 	var tile_indeces_of_word = [];
 	for(var i=0; i<this.nActiveLetters; i++){//for each TILE making up the word...
 	    //run through the Letter objects to extract the word's tile indeces into an array
-	    myTile = this.ActiveLetterSet[i];
-	    tile_indeces_of_word[i] = myTile.tileID;
+	    var MyTile = this.ActiveLetterSet[i];
+	    tile_indeces_of_word[i] = MyTile.tileID;
 	}
 	return tile_indeces_of_word;
     },
 
     //send a candidate word to the server
     ClearWordFromSpeller: function(replace_tiles_on_grid){
-	
+    	
 	for(var i=0; i<this.nActiveLetters; i++){//for each TILE making up the word...
 	    //run through the Letter objects to extract the word's tile indeces into an array
-	    myTile = this.ActiveLetterSet[i];
+	    var MyTile = this.ActiveLetterSet[i];
 	    if(replace_tiles_on_grid){
-		myTile.set({
-		    left: myTile.x_availableSpace,
-		    top: myTile.y_availableSpace
-		});
-		//whenever namually changing tile coordinates, must do this to update drag zone
-		canvas.remove(myTile);
-		canvas.add(myTile);
 
-	    }
+		if(i==0){//only want one render function for everything...
+		    //case animation spec and add render
+		    MyTile.animate({
+			left: MyTile.x_availableSpace,
+			top: MyTile.y_availableSpace
+		    },{
+			onChange: function() {
+			    canvas.renderAll();
+			},
+			easing: fabric.util.ease.easeOutQuart,
+			duration: 150
+		    });
+
+		}else{
+		    //case animation spec and no render
+		    MyTile.animate({
+			left: MyTile.x_availableSpace,
+			top: MyTile.y_availableSpace
+		    },{
+			easing: fabric.util.ease.easeOutQuart,
+			duration: 150
+		    });
+		}
+	    }//restore tiles on grid
+
+	    
 	    //restore tile from it's special states when it's being used to spell a word
-	    myTile.activeGrpIndex = undefined;
-	    myTile.off('moving');
-	    snDraw.Game.modifyTileObject(myTile,"flipped");
-	}
+	    MyTile.activeGrpIndex = undefined;
+	    MyTile.off('moving');
+	    snDraw.Game.modifyTileObject(MyTile,"flipped");
+	}//for loop
 	
 	//finally, reset plotters back the the original values (TODO: is this necessary, they will be immediately changed back if word is accepted)
 	this.restoreBasePosition();
