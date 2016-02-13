@@ -16,6 +16,22 @@ snDraw.Game.Spell = {
     //member objects & arrays of Fabric objects:
     ActiveLetterSet: [],//the set of yellow letters
 
+    //animation descriptors:
+    AnimationSpec_single_tile: {
+	easing: fabric.util.ease.easeOutQuart,
+	duration: 400
+    },
+
+    //animation descriptors:
+    R_AnimationSpec_single_tile: {
+	onChange: function() {
+	    canvas.renderAll();
+	},
+	easing: fabric.util.ease.easeOutQuart,
+	duration: 400
+    },
+    
+
     restoreBasePosition: function(){
 	var ClientPlayer = players[client_player_index];
 	this.x_next_letter = ClientPlayer.x_next_word;
@@ -126,13 +142,7 @@ snDraw.Game.Spell = {
 	    MyTile.animate({
 		left: x_loco,
 		top: this.y_next_letter
-	    },{
-		onChange: function() {
-		    canvas.renderAll();
-		},
-		easing: fabric.util.ease.easeOutQuart,
-		duration: 150
-	    });
+	    },this.R_AnimationSpec_single_tile);
 
 	    //remember that these steps are necessary if animation is not used
 	    //canvas.remove(MyTile);
@@ -178,13 +188,7 @@ snDraw.Game.Spell = {
 	MyTile.animate({
 	    left: MyTile.x_availableSpace,
 	    top: MyTile.y_availableSpace
-	},{
-	    onChange: function() {
-		canvas.renderAll();
-	    },
-	    easing: fabric.util.ease.easeOutQuart,
-	    duration: 150
-	});
+	},this.R_AnimationSpec_single_tile);
 
 	snDraw.Game.modifyTileObject(MyTile,"flipped");
 
@@ -216,6 +220,8 @@ snDraw.Game.Spell = {
     //send a candidate word to the server
     ClearWordFromSpeller: function(replace_tiles_on_grid){
     	
+	//setInterval(function(){ canvas.renderAll(); console.log("rendering all");}, 1/50);
+
 	for(var i=0; i<this.nActiveLetters; i++){//for each TILE making up the word...
 	    //run through the Letter objects to extract the word's tile indeces into an array
 	    var MyTile = this.ActiveLetterSet[i];
@@ -226,23 +232,14 @@ snDraw.Game.Spell = {
 		    MyTile.animate({
 			left: MyTile.x_availableSpace,
 			top: MyTile.y_availableSpace
-		    },{
-			onChange: function() {
-			    canvas.renderAll();
-			},
-			easing: fabric.util.ease.easeOutQuart,
-			duration: 150
-		    });
+		    },this.R_AnimationSpec_single_tile);
 
 		}else{
 		    //case animation spec and no render
 		    MyTile.animate({
 			left: MyTile.x_availableSpace,
 			top: MyTile.y_availableSpace
-		    },{
-			easing: fabric.util.ease.easeOutQuart,
-			duration: 150
-		    });
+		    },this.AnimationSpec_single_tile);
 		}
 	    }//restore tiles on grid
 
