@@ -118,7 +118,7 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     }
     
     //draw the new word into the player zone...
-    snDraw.Game.drawSingleCapturedWord(myplayer,myplayer.words.length - 1);
+    snDraw.Game.drawSingleCapturedWord(myplayer,myplayer.words.length - 1, true);
 
     //resize the player zones
 

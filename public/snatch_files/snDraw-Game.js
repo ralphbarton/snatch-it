@@ -282,8 +282,8 @@ snDraw.Game = {
     },
 
 
-    drawSingleCapturedWord: function(myplayer, word_index){
-
+    drawSingleCapturedWord: function(myplayer, word_index, animate){
+	console.log("called drawSingleCapturedWord");
 	var x_plotter = myplayer.x_next_word;
 	var y_plotter = myplayer.y_next_word;
 
@@ -296,33 +296,45 @@ snDraw.Game = {
 	    x_plotter = this.x_plotter_R;
 	}
 
+	console.log(word_as_tile_index_array.length);
 	var LettersOfThisWord = [];//this is an array of Fabric objects (the tiles)
-	for (j=0; j<word_as_tile_index_array.length; j++){//LOOP thru the letters of one specific word...
-	    var this_tile_index = word_as_tile_index_array[j];
-	    var thisTile = this.TileArray[this_tile_index];
+	for (var i=0; i<word_as_tile_index_array.length; i++){//LOOP thru the letters of one specific word...
+	    console.log(i);
+	    var this_tile_index = word_as_tile_index_array[i];
+	    var ThisTile = this.TileArray[this_tile_index];
+	    LettersOfThisWord[i]=ThisTile;
+
 	    //move the relevant tile (already existing on the canvas) to location...
-	    thisTile.set({
+	    
+	    //console.log("animating tile " + ThisTile.tileID);
+	    ThisTile.set({
 		left: x_plotter,
 		top: y_plotter
-	    });
+	    });//},snDraw.Game.Spell.R_AnimationSpec_single_tile);
 	    
-	    //we remove the tile as a standalone entity because it is to be readded as a group...
-	    canvas.remove(thisTile);
-	    LettersOfThisWord[j]=thisTile;
+
 	    x_plotter += this.h_spacer;
 	}
 
 	//at a completion of the inner loop, tiles are in position on the Canvas
-	var PlayerWordGRP = new fabric.Group( LettersOfThisWord, {
-	    hasControls: false,
-	    hasBorders: false
-	});
 	
-	canvas.add(PlayerWordGRP);
-	x_plotter+=this.h_space_word;
+	//setTimeout(function(){//TODO: if it even gets through testing, this archetecture is a bit of a mess with the timeouts...
+	    
+	    //console.log(LettersOfThisWord);
+	    for (var i=0; i<LettersOfThisWord.length; i++){//LOOP thru the letters of one specific word...
+		//we remove the tile as a standalone entity because it is to be readded as a group...
+		canvas.remove(LettersOfThisWord[i]);//remove the single tile (after animation) so that it can be readded as a group...
+	    }
 
-	//refresh the canvas with the changes to the letters triggered
-	canvas.renderAll();
+	    var PlayerWordGRP = new fabric.Group( LettersOfThisWord, {
+		hasControls: false,
+		hasBorders: false
+	    });
+	    
+	    canvas.add(PlayerWordGRP);
+	//}, snDraw.Game.Spell.R_AnimationSpec_single_tile.duration * 1.05);//TODO: less messy coding please!
+
+	x_plotter+=this.h_space_word;
 
 	//finally, always at the end of writing a word, record the coordinates for writing a new word...
 	myplayer.x_next_word = x_plotter;
