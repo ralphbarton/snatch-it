@@ -1,6 +1,8 @@
 
 //this file contains the functions that render the game onto the screen
 
+var TA = [];//this is to enable faster debugging
+
 snDraw.Game = {
     
     //member variables - relating to specific dimentions to use on this screen...
@@ -43,6 +45,7 @@ snDraw.Game = {
 	this.createEveryTileObject_inGridAtTop();//next draw all the unturned tiles underneath
 	this.drawEntirePlayerZone();//next draw all the players word zones
 	canvas.renderAll();
+	TA = this.TileArray;//this is to enable faster debugging
     },
 
     calculateRenderingDimentionConstants: function(){    //this function relies upon a defined number of tiles, which is only after game state is loaded...
@@ -296,43 +299,35 @@ snDraw.Game = {
 	    x_plotter = this.x_plotter_R;
 	}
 
-	console.log(word_as_tile_index_array.length);
 	var LettersOfThisWord = [];//this is an array of Fabric objects (the tiles)
 	for (var i=0; i<word_as_tile_index_array.length; i++){//LOOP thru the letters of one specific word...
-	    console.log(i);
 	    var this_tile_index = word_as_tile_index_array[i];
 	    var ThisTile = this.TileArray[this_tile_index];
 	    LettersOfThisWord[i]=ThisTile;
 
 	    //move the relevant tile (already existing on the canvas) to location...
 	    
-	    //console.log("animating tile " + ThisTile.tileID);
-	    ThisTile.set({
-		left: x_plotter,
-		top: y_plotter
-	    });//},snDraw.Game.Spell.R_AnimationSpec_single_tile);
-	    
+	    if(i==0){
+		ThisTile.animate({
+		    left: x_plotter,
+		    top: y_plotter
+		}, snDraw.Game.Spell.R_AnimationSpec_single_tile);
+	    }else{
+		ThisTile.animate({
+		    left: x_plotter,
+		    top: y_plotter
+		}, snDraw.Game.Spell.AnimationSpec_single_tile);
+	    }
 
 	    x_plotter += this.h_spacer;
 	}
 
 	//at a completion of the inner loop, tiles are in position on the Canvas
 	
-	//setTimeout(function(){//TODO: if it even gets through testing, this archetecture is a bit of a mess with the timeouts...
-	    
-	    //console.log(LettersOfThisWord);
-	    for (var i=0; i<LettersOfThisWord.length; i++){//LOOP thru the letters of one specific word...
-		//we remove the tile as a standalone entity because it is to be readded as a group...
-		canvas.remove(LettersOfThisWord[i]);//remove the single tile (after animation) so that it can be readded as a group...
-	    }
+	//it is required to make the tiles into their group (i.e. so entire word can be dragged) only upon completion of animation. Hence timeout usage here.
+	setTimeout(function(){snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord);}, snDraw.Game.Spell.R_AnimationSpec_single_tile.duration * 2);
 
-	    var PlayerWordGRP = new fabric.Group( LettersOfThisWord, {
-		hasControls: false,
-		hasBorders: false
-	    });
-	    
-	    canvas.add(PlayerWordGRP);
-	//}, snDraw.Game.Spell.R_AnimationSpec_single_tile.duration * 1.05);//TODO: less messy coding please!
+	//end of instructions subject to timeout...
 
 	x_plotter+=this.h_space_word;
 
@@ -343,6 +338,28 @@ snDraw.Game = {
 	//this prep's the SPELL class to place letters in the right location
 	// it is needed within this function call because this function is called directly by a SNATCH ASSERT
 	snDraw.Game.Spell.restoreBasePosition();
+    },
+
+    makeTilesDraggableGroup: function(LettersOfThisWord){
+	var grp_left = LettersOfThisWord[0].getLeft() - 0.5;
+	var grp_top = LettersOfThisWord[0].getTop() - 0.5;
+	
+	for (var i=0; i<LettersOfThisWord.length; i++){//LOOP thru the letters of one specific word...
+	    canvas.remove(LettersOfThisWord[i]);//remove the single tile (after animation) so that it can be readded as a group...
+	}
+
+	var PlayerWordGRP = new fabric.Group( LettersOfThisWord, {
+	    hasControls: false,
+	    hasBorders: false
+	});
+
+	PlayerWordGRP.set({
+	    left: grp_left,
+	    top: grp_top
+	});
+
+	canvas.add(PlayerWordGRP);
+	canvas.renderAll();
     },
 
     xCoordExceedsWrapThreshold: function(x_coord){
