@@ -307,16 +307,21 @@ snDraw.Game = {
 
 	    //move the relevant tile (already existing on the canvas) to location...
 	    
-	    if(i==0){
+	    if(animate){
+		
 		ThisTile.animate({
 		    left: x_plotter,
 		    top: y_plotter
-		}, snDraw.Game.Spell.R_AnimationSpec_single_tile);
-	    }else{
-		ThisTile.animate({
+		}, snDraw.ani.sty_Sing);
+		
+		//snDraw.animateForTime(snDraw.Game.Spell.R_AnimationSpec_single_tile.duration);
+	    }
+	    else{
+		ThisTile.set({
 		    left: x_plotter,
 		    top: y_plotter
-		}, snDraw.Game.Spell.AnimationSpec_single_tile);
+		});
+
 	    }
 
 	    x_plotter += this.h_spacer;
@@ -325,7 +330,7 @@ snDraw.Game = {
 	//at a completion of the inner loop, tiles are in position on the Canvas
 	
 	//it is required to make the tiles into their group (i.e. so entire word can be dragged) only upon completion of animation. Hence timeout usage here.
-	setTimeout(function(){snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord);}, snDraw.Game.Spell.R_AnimationSpec_single_tile.duration * 2);
+	setTimeout(function(){snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord);}, snDraw.ani.sty_Sing.duration * 2);
 
 	//end of instructions subject to timeout...
 

@@ -8,6 +8,26 @@ var snDraw = {
     myZoneWidth: undefined,
     myZoneHeight: undefined,
 
+    //for animation
+    frame_rate: 1000/60,//60 frames per second
+    remaining_animation_time: 0,
+
+    //define animation styles data here...
+    ani: {
+	sty_Anag: {
+	    easing: fabric.util.ease.easeOutBounce,
+	    duration: 150
+	},
+	sty_Sing: {
+	    easing: fabric.util.ease.easeOutQuart,
+	    duration: 200
+	},
+	sty_Bloc: {
+	    easing: fabric.util.ease.easeOutQuart,
+	    duration: 400
+	},
+    },
+    
     //methods
     initialiseCanvas: function(){
 	// Obtain a canvas drawing surface from fabric.js
@@ -25,9 +45,14 @@ var snDraw = {
 	//speedup?
 	canvas.renderOnAddRemove = false;
 	canvas.stateful = false;
-
+	this.startScreenFrameDrawing();
     },
-  
+
+    startScreenFrameDrawing: function(){
+	canvas.renderAll();
+	window.requestAnimationFrame(function(){snDraw.startScreenFrameDrawing();});
+    },
+
     gameMessage: function (message,size,text_color){
 	
 	toastText = new fabric.Text('null text', {

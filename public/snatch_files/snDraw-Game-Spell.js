@@ -1,5 +1,4 @@
 //this is a container for functions and data for Word creation (the generally yellow bit)...
-
 snDraw.Game.Spell = {
 
     // a note about players[i].saved_x_plotter // TODO write the note...
@@ -16,21 +15,7 @@ snDraw.Game.Spell = {
     //member objects & arrays of Fabric objects:
     ActiveLetterSet: [],//the set of yellow letters
 
-    //animation descriptors:
-    AnimationSpec_single_tile: {
-	easing: fabric.util.ease.easeOutQuart,
-	duration: 400
-    },
 
-    //animation descriptors:
-    R_AnimationSpec_single_tile: {
-	onChange: function() {
-	    canvas.renderAll();
-	},
-	easing: fabric.util.ease.easeOutQuart,
-	duration: 400
-    },
-    
 
     restoreBasePosition: function(){
 	var ClientPlayer = players[client_player_index];
@@ -71,13 +56,7 @@ snDraw.Game.Spell = {
 		destC = (daT+anT) + shiftRight-pos;
 		destPx = destC * snDraw.Game.h_spacer + snDraw.Game.Spell.x_next_letter;
 
-		AnimateTile.animate('left', destPx, {
-		    onChange: function() {
-			canvas.renderAll();
-		    },
-		    easing: fabric.util.ease.easeOutBounce,
-		    duration: 150
-		});
+		AnimateTile.animate('left', destPx, snDraw.ani.sty_Anag);
 	    }
 
 	    //these lines of code handle a transition of more than 1 tile
@@ -103,13 +82,7 @@ snDraw.Game.Spell = {
 	dTile.setTop(this.y_next_letter);
 	destPx = this.destDragTileIndex * snDraw.Game.h_spacer + this.x_next_letter;
 	
-	dTile.animate('left', destPx, {
-	    onChange: function() {
-		canvas.renderAll();
-	    },
-	    easing: fabric.util.ease.easeOutBounce,
-	    duration: 100
-	});
+	dTile.animate('left', destPx, snDraw.ani.sty_Anag);
 
 	//make sure all the stored indecies for position in activeletter set reflect new ordering
 	for(var i=0;i<this.nActiveLetters;i++){
@@ -142,7 +115,7 @@ snDraw.Game.Spell = {
 	    MyTile.animate({
 		left: x_loco,
 		top: this.y_next_letter
-	    },this.R_AnimationSpec_single_tile);
+	    },snDraw.ani.sty_Sing);
 
 	    //remember that these steps are necessary if animation is not used
 	    //canvas.remove(MyTile);
@@ -188,7 +161,7 @@ snDraw.Game.Spell = {
 	MyTile.animate({
 	    left: MyTile.x_availableSpace,
 	    top: MyTile.y_availableSpace
-	},this.R_AnimationSpec_single_tile);
+	},snDraw.ani.sty_Sing);
 
 	snDraw.Game.modifyTileObject(MyTile,"flipped");
 
@@ -227,20 +200,12 @@ snDraw.Game.Spell = {
 	    var MyTile = this.ActiveLetterSet[i];
 	    if(replace_tiles_on_grid){
 
-		if(i==0){//only want one render function for everything...
-		    //case animation spec and add render
-		    MyTile.animate({
-			left: MyTile.x_availableSpace,
-			top: MyTile.y_availableSpace
-		    },this.R_AnimationSpec_single_tile);
+		//case animation spec and add render
+		MyTile.animate({
+		    left: MyTile.x_availableSpace,
+		    top: MyTile.y_availableSpace
+		},snDraw.ani.sty_Sing);
 
-		}else{
-		    //case animation spec and no render
-		    MyTile.animate({
-			left: MyTile.x_availableSpace,
-			top: MyTile.y_availableSpace
-		    },this.AnimationSpec_single_tile);
-		}
 	    }//restore tiles on grid
 
 	    
