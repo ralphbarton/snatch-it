@@ -324,12 +324,21 @@ snDraw.Game = {
 	    i++;
 	    if(i < word_length){
 		if(animate){
-		    setTimeout(function(){Recursive_Letters_Loop(i);}, snDraw.ani.sty_Sing.duration * 0.5);
+		    setTimeout(function(){Recursive_Letters_Loop(i);}, snDraw.ani.sty_Sing.duration * 0.3);
 		}
 		else{
 		    Recursive_Letters_Loop(i);
 		}
-	    }else{
+	    }else{//the letters of the word have finished being run through
+
+		//it is required to make the tiles into their group (i.e. so entire word can be dragged) only upon completion of animation. Hence timeout usage here.
+		if(animate){
+		    setTimeout(function(){snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord);}, snDraw.ani.sty_Sing.duration * (0.7 + 0.5));//the 0.5 allows a delay margin...
+		}
+		else{
+		    snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord);
+		}
+
 		//when the letter has been moved, these instructions finish it all off
 		x_plotter+=this.h_space_word;
 
@@ -340,26 +349,9 @@ snDraw.Game = {
 		//this prep's the SPELL class to place letters in the right location
 		// it is needed within this function call because this function is called directly by a SNATCH ASSERT
 		snDraw.Game.Spell.restoreBasePosition();
-
 	    }
 	}
 	Recursive_Letters_Loop(0);
-
-
-	for (var i=0; i < word_length; i++){//LOOP thru the letters of one specific word...
-
-	}
-
-	//at a completion of the inner loop, tiles are in position on the Canvas
-	
-	//it is required to make the tiles into their group (i.e. so entire word can be dragged) only upon completion of animation. Hence timeout usage here.
-	if(animate){
-	    setTimeout(function(){snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord);}, snDraw.ani.sty_Sing.duration * (1 + 0.5 * word_length));
-	}
-	else{
-	    snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord);
-	}
-
     },
 
     makeTilesDraggableGroup: function(LettersOfThisWord){
