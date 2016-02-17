@@ -56,7 +56,10 @@ snDraw.Game.Spell = {
 		destC = (daT+anT) + shiftRight-pos;
 		destPx = destC * snDraw.Game.h_spacer + snDraw.Game.Spell.x_next_letter;
 
-		AnimateTile.animate('left', destPx, snDraw.ani.sty_Anag);
+		snDraw.moveSwitchable(AnimateTile, true, snDraw.ani.sty_Anag,{
+		    left: destPx
+		});
+
 	    }
 
 	    //these lines of code handle a transition of more than 1 tile
@@ -82,7 +85,9 @@ snDraw.Game.Spell = {
 	dTile.setTop(this.y_next_letter);
 	destPx = this.destDragTileIndex * snDraw.Game.h_spacer + this.x_next_letter;
 	
-	dTile.animate('left', destPx, snDraw.ani.sty_Anag);
+	snDraw.moveSwitchable(dTile, true, snDraw.ani.sty_Anag,{
+	    left: destPx
+	});
 
 	//make sure all the stored indecies for position in activeletter set reflect new ordering
 	for(var i=0;i<this.nActiveLetters;i++){
@@ -111,15 +116,10 @@ snDraw.Game.Spell = {
 	    this.rebaseSpellerLocation();
 	}
 	else{//behaviour contigent on wrap NOT happening:
-
-	    MyTile.animate({
+	    snDraw.moveSwitchable(MyTile, true, snDraw.ani.sty_Sing,{
 		left: x_loco,
 		top: this.y_next_letter
-	    },snDraw.ani.sty_Sing);
-
-	    //remember that these steps are necessary if animation is not used
-	    //canvas.remove(MyTile);
-	    //canvas.add(MyTile);
+	    });
 	}
 	snDraw.Game.modifyTileObject(MyTile,"ACTIVE");
     },
@@ -157,12 +157,10 @@ snDraw.Game.Spell = {
 	MyTile.off('moving');
 
 	//move the tile to be removed back to wherever it was before
-	console.log("animating tile" + MyTile.tileID);
-	MyTile.animate({
+	snDraw.moveSwitchable(MyTile, true, snDraw.ani.sty_Sing,{
 	    left: MyTile.x_availableSpace,
 	    top: MyTile.y_availableSpace
-	},snDraw.ani.sty_Sing);
-
+	});
 	snDraw.Game.modifyTileObject(MyTile,"flipped");
 
     },
@@ -201,10 +199,11 @@ snDraw.Game.Spell = {
 	    if(replace_tiles_on_grid){
 
 		//case animation spec and add render
-		MyTile.animate({
+		
+		snDraw.moveSwitchable(MyTile, true, snDraw.ani.sty_Sing,{
 		    left: MyTile.x_availableSpace,
 		    top: MyTile.y_availableSpace
-		},snDraw.ani.sty_Sing);
+		});
 
 	    }//restore tiles on grid
 

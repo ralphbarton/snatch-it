@@ -195,6 +195,10 @@ snDraw.Game.KB = {
 	if(myKeycode == 27){//escape key
 	    // let this be cancel word
 	}
+
+	if(keyPressed == '1'){
+	    //alert("hit 1");
+	}
 /*
 	if(myKeycode == 16){//shift key
 	

@@ -9,8 +9,7 @@ var snDraw = {
     myZoneHeight: undefined,
 
     //for animation
-    frame_rate: 1000/60,//60 frames per second
-    remaining_animation_time: 0,
+    AnimationFunction: [],
 
     //define animation styles data here...
     ani: {
@@ -22,9 +21,9 @@ var snDraw = {
 	    easing: fabric.util.ease.easeOutQuart,
 	    duration: 200
 	},
-	sty_Bloc: {
-	    easing: fabric.util.ease.easeOutQuart,
-	    duration: 400
+	sty_Outl: {
+	    easing: fabric.util.ease.easeOutQuad,
+	    duration: 2000
 	},
     },
     
@@ -45,12 +44,44 @@ var snDraw = {
 	//speedup?
 	canvas.renderOnAddRemove = false;
 	canvas.stateful = false;
-	this.startScreenFrameDrawing();
+    },
+
+    frame_rendering_timeout: undefined,
+    setFrameRenderingTimeout: function(duration){
+	var already_running = this.frame_rendering_timeout !== undefined;
+	if(already_running){
+	    clearTimeout(this.frame_rendering_timeout);
+	}
+	this.frame_rendering_timeout = setTimeout(function(){snDraw.frame_rendering_timeout = undefined;}, duration * 1.5);//fudge factor
+	if(!already_running){
+	    this.startScreenFrameDrawing();//this ensures another chain of recusive function calls will not happen but timeout can still be adjusted.
+	}
     },
 
     startScreenFrameDrawing: function(){
-	canvas.renderAll();
-	window.requestAnimationFrame(function(){snDraw.startScreenFrameDrawing();});
+
+	//this extra bit is for my custom animation processing...
+	for (var i=0; i<this.AnimationFunction.length; i++){
+	    var complete = this.AnimationFunction[i].frame();
+	    if (complete){
+		this.AnimationFunction.splice(i,1);
+	    }
+	}
+	if(this.frame_rendering_timeout!==undefined){
+	    canvas.renderAll();
+	    window.requestAnimationFrame(function(){snDraw.startScreenFrameDrawing();});
+	}
+    },
+
+    moveSwitchable: function(TileObject,animate,animation_style,properties){
+	if(animate){
+	    TileObject.animate(properties, animation_style);
+	    this.setFrameRenderingTimeout(animation_style.duration);
+	}
+	else{
+	    TileObject.set(properties);
+	    canvas.renderAll();
+	}
     },
 
     gameMessage: function (message,size,text_color){

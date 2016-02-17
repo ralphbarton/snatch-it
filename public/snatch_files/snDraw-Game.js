@@ -152,25 +152,29 @@ snDraw.Game = {
 	if(to_state=="flipping"){//this will animate the tile...
 
 	    pl_col = players[options.player_i].color;
-	    
-	    //this function is used for flashing the border of a tile to provide a warning when it is turned over...
-	    function animateCountDown(hs,pco){
-		// variable 'hs' is number of quarter-seconds remaining
-		// 'pco' is the colour to flash the boarder 
-		if (hs%2){
-		    myTile.item(0).setStroke(pco);
-		}else{
-		    myTile.item(0).setStroke(this.bg_col);//this hides the boarder (e.g. black with a black backgrond)
+	    myTile.item(0).setStroke(pl_col);
+	    var l_tot = snDraw.Game.tileSize*3.9;
+	    myTile.item(0).setStrokeDashArray([0, l_tot]);
+	    var fps = 25;
+	    var dur = 2;
+	    var f_tot = dur*fps;
+	    snDraw.AnimationFunction.push({
+		R: myTile.item(0),
+		count:0,
+		frame: function(){
+		    this.count++;
+		    var s = (this.count/f_tot)*l_tot;
+		    this.R.setStrokeDashArray([s, l_tot-s]);
+		    if(this.count > f_tot){//animation completed...
+			//anon_modifyTileObject(myTile,"flipped");// this is a recursive call of my modifyTileObject function
+			snDraw.Game.modifyTileObject(myTile,"flipped");
+			return true;
+		    }else{
+			return false;
+		    }
 		}
-		canvas.renderAll();
-		var hs2 = hs-1;
-		if(hs2){
-		    setTimeout(function(){animateCountDown(hs2,pco);},125);
-		}else{
-		    anon_modifyTileObject(myTile,"flipped");// this is a recursive call of my modifyTileObject function
-		}
-	    }
-	    animateCountDown(8*options.time, pl_col);
+	    });
+	    snDraw.setFrameRenderingTimeout (3000);//the correspondence is not exact, but this should allow the custom animation to ply through...
 	}
 	if(to_state=="flipped"){//only to be called from within the function
 	    myTile.item(1).setFill('yellow');
@@ -306,24 +310,10 @@ snDraw.Game = {
 	    LettersOfThisWord[i]=ThisTile;
 
 	    //move the relevant tile (already existing on the canvas) to location...
-	    
-	    if(animate){
-		
-		ThisTile.animate({
-		    left: x_plotter,
-		    top: y_plotter
-		}, snDraw.ani.sty_Sing);
-		
-		//snDraw.animateForTime(snDraw.Game.Spell.R_AnimationSpec_single_tile.duration);
-	    }
-	    else{
-		ThisTile.set({
-		    left: x_plotter,
-		    top: y_plotter
-		});
-
-	    }
-
+	    snDraw.moveSwitchable(ThisTile, animate, snDraw.ani.sty_Sing,{
+		left: x_plotter,
+		top: y_plotter
+	    });
 	    x_plotter += this.h_spacer;
 	}
 
