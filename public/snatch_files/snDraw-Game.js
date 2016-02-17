@@ -290,7 +290,6 @@ snDraw.Game = {
 
 
     drawSingleCapturedWord: function(myplayer, word_index, animate){
-	console.log("called drawSingleCapturedWord");
 	var x_plotter = myplayer.x_next_word;
 	var y_plotter = myplayer.y_next_word;
 
@@ -308,7 +307,9 @@ snDraw.Game = {
 
 	//generates a new animation properties object which includes a callback to group the relevant set of letter tiles upon completion of the animation
 	var ani_withGRPcallback = jQuery.extend({
-	    onComplete: function(){snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord);}
+	    onComplete: function(){
+		snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord);
+	    }
 	}, snDraw.ani.sty_Sing);
 
 	function Recursive_Letters_Loop(i){
@@ -333,20 +334,19 @@ snDraw.Game = {
 		    Recursive_Letters_Loop(i);
 		}
 	    }else{//the letters of the word have finished being run through
-
 		if(!animate){snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord);}//this only gets called via a later callback in the case of animation (see above)
 
 		//when the letter has been moved, these instructions finish it all off
-		x_plotter+=this.h_space_word;
+		x_plotter += snDraw.Game.h_space_word;
 
 		//finally, always at the end of writing a word, record the coordinates for writing a new word...
+		console.log(x_plotter);
 		myplayer.x_next_word = x_plotter;
 		myplayer.y_next_word = y_plotter;
 
 		//this prep's the SPELL class to place letters in the right location
 		// it is needed within this function call because this function is called directly by a SNATCH ASSERT
 		snDraw.Game.Spell.restoreBasePosition();
-
 	    }
 	}
 	Recursive_Letters_Loop(0);

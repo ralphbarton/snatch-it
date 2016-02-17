@@ -105,11 +105,14 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     var PI = SnatchUpdateMsg.player_index;
     var myplayer = players[PI];//please note that in this case object 'myplayer' is the snatching player... 
     myplayer.words.push(tile_indices);
-    
-    if(client_player_index == PI){//only clear the speller for the snatching player...
+    var client_is_snatcher = client_player_index == PI;
+
+    if(client_is_snatcher){//only clear the speller for the snatching player...
 	snDraw.Game.Spell.ClearWordFromSpeller(false);//remove it from the speller (clears up the speller)
     }
+
     //TODO: in actual fact, a good feature here would be to clear the speller for any player sharing a letter in the now-snatched word...
+    /// the comment above is in fact necessary to avoid glitches and is Issue 077
 
     //update the tiles data structure:
     for(i=0; i<tile_indices.length; i++){
@@ -118,7 +121,9 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     }
     
     //draw the new word into the player zone...
-    snDraw.Game.drawSingleCapturedWord(myplayer,myplayer.words.length - 1, true);
+    //for the case of the Snatcher being the Client player here, this is still necessary as it has the effect of grouping the letters, even if not moving them
+    //the final parameter of this function call determines if animation is required; not required if client is snatcher.
+    snDraw.Game.drawSingleCapturedWord(myplayer,myplayer.words.length - 1, (!client_is_snatcher));
 
     //resize the player zones
 
@@ -137,7 +142,8 @@ function RESET_REQUEST()       {socket.emit('reset request', 0);}
 function TILE_TURN_REQUEST(p)  {socket.emit('tile turn request', p);}
 
 ///Todo what uses this function? Can it be placed elsewhere in the code?
-Array.prototype.move = function (old_index, new_index) {
+// Answer: used within snDraw.Game.Spell.shuffleAnagramRelease
+Array.prototype.move = function (old_index, new_index) { 
     if (new_index >= this.length) {
         var k = new_index - this.length;
         while ((k--) + 1) {
