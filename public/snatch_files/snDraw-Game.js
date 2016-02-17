@@ -306,15 +306,18 @@ snDraw.Game = {
 
 	var LettersOfThisWord = [];//this is an array of Fabric objects (the tiles)
 
+	//generates a new animation properties object which includes a callback to group the relevant set of letter tiles upon completion of the animation
+	var ani_withGRPcallback = jQuery.extend({
+	    onComplete: function(){snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord);}
+	}, snDraw.ani.sty_Sing);
+
 	function Recursive_Letters_Loop(i){
 	    var this_tile_index = word_as_tile_index_array[i];
 	    var ThisTile = snDraw.Game.TileArray[this_tile_index];
 	    LettersOfThisWord[i]=ThisTile;
 
-	    console.log("Index:"+i)
-	    console.log("moving"+ThisTile.letter)
 	    //move the relevant tile (already existing on the canvas) to location...
-	    snDraw.moveSwitchable(ThisTile, animate, snDraw.ani.sty_Sing,{
+	    snDraw.moveSwitchable(ThisTile, animate, (i == word_length-1) ? ani_withGRPcallback : snDraw.ani.sty_Sing,{
 		left: x_plotter,
 		top: y_plotter
 	    });
@@ -331,13 +334,7 @@ snDraw.Game = {
 		}
 	    }else{//the letters of the word have finished being run through
 
-		//it is required to make the tiles into their group (i.e. so entire word can be dragged) only upon completion of animation. Hence timeout usage here.
-		if(animate){
-		    setTimeout(function(){snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord);}, snDraw.ani.sty_Sing.duration * (0.7 + 0.5));//the 0.5 allows a delay margin...
-		}
-		else{
-		    snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord);
-		}
+		if(!animate){snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord);}//this only gets called via a later callback in the case of animation (see above)
 
 		//when the letter has been moved, these instructions finish it all off
 		x_plotter+=this.h_space_word;
@@ -349,6 +346,7 @@ snDraw.Game = {
 		//this prep's the SPELL class to place letters in the right location
 		// it is needed within this function call because this function is called directly by a SNATCH ASSERT
 		snDraw.Game.Spell.restoreBasePosition();
+
 	    }
 	}
 	Recursive_Letters_Loop(0);
