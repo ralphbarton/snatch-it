@@ -295,6 +295,7 @@ snDraw.Game = {
 	var y_plotter = myplayer.y_next_word;
 
 	var word_as_tile_index_array = myplayer.words[word_index]; 
+	var word_length = word_as_tile_index_array.length;
 
 	//word wrap handler
 	//if this word will run over the end of the line, do a carriage return...
@@ -304,35 +305,61 @@ snDraw.Game = {
 	}
 
 	var LettersOfThisWord = [];//this is an array of Fabric objects (the tiles)
-	for (var i=0; i<word_as_tile_index_array.length; i++){//LOOP thru the letters of one specific word...
+
+	function Recursive_Letters_Loop(i){
 	    var this_tile_index = word_as_tile_index_array[i];
-	    var ThisTile = this.TileArray[this_tile_index];
+	    var ThisTile = snDraw.Game.TileArray[this_tile_index];
 	    LettersOfThisWord[i]=ThisTile;
 
+	    console.log("Index:"+i)
+	    console.log("moving"+ThisTile.letter)
 	    //move the relevant tile (already existing on the canvas) to location...
 	    snDraw.moveSwitchable(ThisTile, animate, snDraw.ani.sty_Sing,{
 		left: x_plotter,
 		top: y_plotter
 	    });
-	    x_plotter += this.h_spacer;
+	    x_plotter += snDraw.Game.h_spacer;
+	
+	    //recursively call this function to achieve looping
+	    i++;
+	    if(i < word_length){
+		if(animate){
+		    setTimeout(function(){Recursive_Letters_Loop(i);}, snDraw.ani.sty_Sing.duration * 0.5);
+		}
+		else{
+		    Recursive_Letters_Loop(i);
+		}
+	    }else{
+		//when the letter has been moved, these instructions finish it all off
+		x_plotter+=this.h_space_word;
+
+		//finally, always at the end of writing a word, record the coordinates for writing a new word...
+		myplayer.x_next_word = x_plotter;
+		myplayer.y_next_word = y_plotter;
+
+		//this prep's the SPELL class to place letters in the right location
+		// it is needed within this function call because this function is called directly by a SNATCH ASSERT
+		snDraw.Game.Spell.restoreBasePosition();
+
+	    }
+	}
+	Recursive_Letters_Loop(0);
+
+
+	for (var i=0; i < word_length; i++){//LOOP thru the letters of one specific word...
+
 	}
 
 	//at a completion of the inner loop, tiles are in position on the Canvas
 	
 	//it is required to make the tiles into their group (i.e. so entire word can be dragged) only upon completion of animation. Hence timeout usage here.
-	setTimeout(function(){snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord);}, snDraw.ani.sty_Sing.duration * 2);
+	if(animate){
+	    setTimeout(function(){snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord);}, snDraw.ani.sty_Sing.duration * (1 + 0.5 * word_length));
+	}
+	else{
+	    snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord);
+	}
 
-	//end of instructions subject to timeout...
-
-	x_plotter+=this.h_space_word;
-
-	//finally, always at the end of writing a word, record the coordinates for writing a new word...
-	myplayer.x_next_word = x_plotter;
-	myplayer.y_next_word = y_plotter;
-
-	//this prep's the SPELL class to place letters in the right location
-	// it is needed within this function call because this function is called directly by a SNATCH ASSERT
-	snDraw.Game.Spell.restoreBasePosition();
     },
 
     makeTilesDraggableGroup: function(LettersOfThisWord){
