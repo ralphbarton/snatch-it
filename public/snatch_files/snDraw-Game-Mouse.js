@@ -207,23 +207,24 @@ snDraw.Game.KB = {
 	    TILE_TURN_REQUEST(ObjStr);//for an unturned tile, always message to flip
 	}
 
-	if(myKeycode == 8){//delete key
+	if((myKeycode == 8)||(keyPressed == '3')){//delete key
 	    // let this be remove the final letter of the spell (if present)
 	    var SpellArray = snDraw.Game.Spell.ActiveLetterSet;
 	    var LastTile = SpellArray[SpellArray.length-1];
 	    snDraw.Game.Spell.removeLetter(LastTile);
 	}
 
-	if(myKeycode == 13){//enter key
+	if((myKeycode == 13)||(keyPressed == '2')){//enter key
 	    // let this be submit word
 	    snDraw.Game.Spell.SubmitWord();
 	}
 
-	if(myKeycode == 27){//escape key
+	if((myKeycode == 27)||(keyPressed == '1')){//escape key
 	    // let this be cancel word
+	    snDraw.Game.Spell.CancelWord();
 	}
 
-	if(keyPressed == '1'){
+	if(keyPressed == '4'){
 	    //alert("hit 1");
 	}
 /*
