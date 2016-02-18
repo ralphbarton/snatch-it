@@ -27,7 +27,7 @@ snDraw.Game = {
 
     //member objects (the point with these is that they contain fabric objects and are not native variables):
     TileArray: [],
-
+    TileGroupsArray: [],//not convinced we need this...
 
     //methods:
     setDarkBackground: function(isDark){
@@ -308,7 +308,7 @@ snDraw.Game = {
 	//generates a new animation properties object which includes a callback to group the relevant set of letter tiles upon completion of the animation
 	var ani_withGRPcallback = jQuery.extend({
 	    onComplete: function(){
-		snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord);
+		snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord, myplayer, word_index);
 	    }
 	}, snDraw.ani.sty_Sing);
 
@@ -334,7 +334,7 @@ snDraw.Game = {
 		    Recursive_Letters_Loop(i);
 		}
 	    }else{//the letters of the word have finished being run through
-		if(!animate){snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord);}//this only gets called via a later callback in the case of animation (see above)
+		if(!animate){snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord, myplayer, word_index);}//this only gets called via a later callback in the case of animation (see above)
 
 		//when the letter has been moved, these instructions finish it all off
 		x_plotter += snDraw.Game.h_space_word;
@@ -351,7 +351,7 @@ snDraw.Game = {
 	Recursive_Letters_Loop(0);
     },
 
-    makeTilesDraggableGroup: function(LettersOfThisWord){
+    makeTilesDraggableGroup: function(LettersOfThisWord, myplayer, word_index){
 	var grp_left = LettersOfThisWord[0].getLeft() - 0.5;
 	var grp_top = LettersOfThisWord[0].getTop() - 0.5;
 	
@@ -364,13 +364,20 @@ snDraw.Game = {
 	    hasBorders: false
 	});
 
+	PlayerWordGRP.OwnerPlayer = myplayer;
+	PlayerWordGRP.Player_word_index = word_index;
+	this.TileGroupsArray[myplayer.index].push(PlayerWordGRP);
+
 	PlayerWordGRP.set({
 	    left: grp_left,
 	    top: grp_top
 	});
 
+
 	canvas.add(PlayerWordGRP);
 	canvas.renderAll();
+
+
     },
 
     xCoordExceedsWrapThreshold: function(x_coord){

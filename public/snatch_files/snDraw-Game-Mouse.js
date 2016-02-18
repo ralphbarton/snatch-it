@@ -24,6 +24,7 @@ snDraw.Game.Mouse = {
 		    var count = 0;
 		    e.target.on('moving',function (o){
 			snDraw.Game.Spell.shuffleAnagramDrag(e.target);
+			//the next few lines of code used in determining if significant movement has occured between pickup and drop
 			count++;
 			if (count % 5 == 0){//an attempted efficiency boost
 			    var pointer = canvas.getPointer(e.e);
@@ -46,10 +47,15 @@ snDraw.Game.Mouse = {
 	    if(GCindex == 2){  snDraw.Game.Controls.playersListButtonHandler();  }	    
 	    if(GCindex == 3){  snDraw.Game.Controls.resetGameButtonHandler();    }
 	}
+
+	var word_owner = e.target.OwnerPlayer;
+	if(word_owner!==undefined){//mouse down on a word 
+	    this.recordDragStartCoords(e.target);
+	}
     },
 
     mUp: function (e) {
-	my_tile_index = e.target.tileID;
+	var my_tile_index = e.target.tileID;
 	if(my_tile_index !== undefined){//for when a mouse up landed on a tile...
 
 	    //this is for RELEASES that land on a blue tile in the free tiles area
@@ -59,6 +65,17 @@ snDraw.Game.Mouse = {
 		       (this.draggedIntoPlayZone(e.target))){
 			//move the tile into the ActiveGroup
 			snDraw.Game.Spell.addLetter(e.target);
+		    }else{//tile has been dragged to a different location within tile zone
+			//as per Josh's suggestion, drop it back where it was before. Animation.
+
+			//move the tile to be removed back to wherever it was before
+			snDraw.moveSwitchable(e.target, true, snDraw.ani.sty_Anag,{
+			    left: e.target.x_availableSpace,
+			    top: e.target.y_availableSpace
+			});
+
+			//TODO implement alternative, which is to lock to nearest grid location.
+		    
 		    }
 		}
 		//ELSE is really important, because the first statement mutates data such that  that the second condition might then be met
@@ -75,10 +92,20 @@ snDraw.Game.Mouse = {
 	    }
 	}
 
-	//for handling "mouse:over" on the row of buttons accross the top.
-	GCindex = e.target.gameButtonID;
+	//for handling "mouse:up" on the row of buttons accross the top.
+	var GCindex = e.target.gameButtonID;
 	if(GCindex!==undefined){
 	    snDraw.Game.Controls.buttonRecolor(e.target,"normal");
+	}
+
+	var word_owner = e.target.OwnerPlayer;
+	if(word_owner!==undefined){//mouse up on a word 
+	    if(e.target.xPickup!==undefined){//coordinates were stored for the object (exludes the case of moving mouse onto word then lifting, for what that's worth).
+		snDraw.moveSwitchable(e.target, true, snDraw.ani.sty_Anag,{
+		    left: e.target.xPickup,
+		    top: e.target.yPickup
+		});
+	    }
 	}
     },
 
@@ -129,14 +156,14 @@ snDraw.Game.Mouse = {
 
     },
 
-    recordDragStartCoords: function(MyTile){
+    recordDragStartCoords: function(MyFabricObj){
 	//assigning new attributes...
-	MyTile.xPickup = MyTile.getLeft();
-	MyTile.yPickup = MyTile.getTop();
+	MyFabricObj.xPickup = MyFabricObj.getLeft();
+	MyFabricObj.yPickup = MyFabricObj.getTop();
 	//log its old board coordinates in case it is to be returned
-	if(MyTile.visual=="flipped"){
-	    MyTile.x_availableSpace = MyTile.getLeft();
-	    MyTile.y_availableSpace = MyTile.getTop();
+	if(MyFabricObj.visual=="flipped"){
+	    MyFabricObj.x_availableSpace = MyFabricObj.getLeft();
+	    MyFabricObj.y_availableSpace = MyFabricObj.getTop();
 	}
     },
 

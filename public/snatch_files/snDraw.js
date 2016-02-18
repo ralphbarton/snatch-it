@@ -73,13 +73,13 @@ var snDraw = {
 	}
     },
 
-    moveSwitchable: function(TileObject,animate,animation_style,properties){
+    moveSwitchable: function(FabricObject,animate,animation_style,properties){
 	if(animate){
-	    TileObject.animate(properties, animation_style);
+	    FabricObject.animate(properties, animation_style);
 	    this.setFrameRenderingTimeout(animation_style.duration);
 	}
 	else{
-	    TileObject.set(properties);
+	    FabricObject.set(properties);
 	    canvas.renderAll();
 	}
     },

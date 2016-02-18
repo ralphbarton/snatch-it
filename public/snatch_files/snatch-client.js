@@ -47,6 +47,12 @@ socket.on('full game state transmission', function(gameState){
     tileset = GameStateObject.tileSet;
     players = GameStateObject.playerSet;
 
+    for(i=0; i<players.length; i++){
+	players[i].index = i;
+	snDraw.Game.TileGroupsArray[i]=[];//correctly create empty container
+    }
+    
+
     //draws the entire game state on the canvas from the data supplied
     snDraw.Game.initialDrawEntireGame();
 
@@ -106,7 +112,8 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     var myplayer = players[PI];//please note that in this case object 'myplayer' is the snatching player... 
     myplayer.words.push(tile_indices);
     var client_is_snatcher = client_player_index == PI;
-
+    
+    //Clear the current spell before rearranging letters for an opponent's snatch
     if(client_is_snatcher){//only clear the speller for the snatching player...
 	snDraw.Game.Spell.ClearWordFromSpeller(false);//remove it from the speller (clears up the speller)
     }else{
