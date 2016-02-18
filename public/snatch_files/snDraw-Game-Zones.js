@@ -8,10 +8,16 @@ snDraw.Game.Zones = {
     drawEntirePlayerZone: function(){
 
 	// Populate 'this.PlayerZone' with a subset of players...
-	this.PlayerZone[0] = {player: players[client_player_index]};
+	this.PlayerZone[0] = {
+	    player: players[client_player_index],
+	    is_client: true
+	};
 	for (var i=0; i<players.length; i++){
 	    if(i!=client_player_index){
-	    this.PlayerZone.push({player: players[i]});
+		this.PlayerZone.push({
+		    player: players[i],
+		    is_client: false
+		});
 	    }
 	}
 
@@ -21,26 +27,26 @@ snDraw.Game.Zones = {
 	var plr_top_cumulator = this.playersZoneTopPx;// the starting value for this variable is the lower edge of the tile zone...
 
 	for (var i=0; i<this.PlayerZone.length; i++){
-	    this.PlayerZone[i].player.zone_top = plr_top_cumulator;
+	    this.PlayerZone[i].zone_top = plr_top_cumulator;
 	    this.drawPlayerZoneBox(this.PlayerZone[i]);// Draws the BOX
 	    this.drawAllPlayerWords(this.PlayerZone[i].player);//Draws all the WORDS
-	    plr_top_cumulator += this.PlayerZone[i].player.zone_height + snDraw.Game.textMarginUnit + snDraw.Game.stroke_px;
+	    plr_top_cumulator += this.PlayerZone[i].zone_height + snDraw.Game.textMarginUnit + snDraw.Game.stroke_px;
 	}
     },
 
 
     calculatePlayerZoneSizes: function(){
 	var nZones = this.PlayerZone.length;
-	nLettersPlayer = [];
-	nLettersTotPlayed = 0;
+	n_letters_in_zone = [];
+	n_letters_played = 0;
 	
 	//count the number of letters each player has, and total letters used within words
 	for(i=0; i<nZones; i++){
-	    nLettersPlayer[i] = 0;
+	    n_letters_in_zone[i] = 0;
 	    for(j=0; j<this.PlayerZone[i].player.words.length; j++){
-		nLettersPlayer[i] += this.PlayerZone[i].player.words[j].length;
+		n_letters_in_zone[i] += this.PlayerZone[i].player.words[j].length;
 	    }
-	    nLettersTotPlayed += nLettersPlayer[i];
+	    n_letters_played += n_letters_in_zone[i];
 	}
 
 	//determine total amount of height contained within players' zone boxes
@@ -52,8 +58,8 @@ snDraw.Game.Zones = {
 	for(i=0; i<nZones; i++){
 	    //now, we don't want to go dividing by zero if it's a new game with nothing played!!
 	    var hRatio = 0;
-	    if(nLettersTotPlayed){
-		hRatio = nLettersPlayer[i]/nLettersTotPlayed;
+	    if(n_letters_played){
+		hRatio = n_letters_in_zone[i] / n_letters_played;
 	    }else{
 		hRatio = 1 / nZones;
 	    }
@@ -64,27 +70,61 @@ snDraw.Game.Zones = {
     },
 
 
-    drawPlayerZoneBox: function(myplayer){
+    drawPlayerZoneBox: function(pZone){
+
+	var boxLeft   = snDraw.Game.marginUnit;
+	var boxTop    = pZone.zone_top;
+	var boxWidth  = myZoneWidth - 2 * snDraw.Game.marginUnit - snDraw.Game.stroke_px;
+	var boxHeight = pZone.zone_height;
 
 	var zoneBox = new fabric.Rect({
-	    left: snDraw.Game.marginUnit,
-	    top: myplayer.zone_top,
+	    left: boxLeft,
+	    top: boxTop,
+	    width: boxWidth,
+	    height: boxHeight,
 	    fill: snDraw.Game.bg_col,
-	    stroke: myplayer.color,
+	    stroke: pZone.player.color,
 	    strokeWidth: snDraw.Game.stroke_px,
-	    width: myZoneWidth - 2 * snDraw.Game.marginUnit - snDraw.Game.stroke_px,
-	    height: myplayer.zone_height,
 	});
 
-	var plrName = new fabric.Text(myplayer.name,{
+	var plrName = new fabric.Text(pZone.player.name,{
 	    left: 4 * snDraw.Game.marginUnit,
-	    top: myplayer.zone_top - snDraw.Game.textMarginUnit,
+	    top: boxTop - snDraw.Game.textMarginUnit,
 	    fontSize: 2 * snDraw.Game.textMarginUnit,
 	    textBackgroundColor: snDraw.Game.bg_col,
-	    fill: myplayer.color,
+	    fill: pZone.player.color,
 	});
 
-	var plrZone = new fabric.Group([zoneBox,plrName],{
+	var ObjectArray = [zoneBox,plrName];
+
+	//label if YOU
+	if(pZone.is_client){
+	    
+	    var cell = snDraw.Game.tileSize * 1.4;
+	    var font_size = cell * 0.5;
+	    var labelLeft = boxLeft + boxWidth;
+	    var labelTop  = boxTop + boxHeight;
+
+	    var youBlock = new fabric.Rect({
+		left: labelLeft - cell,
+		top: labelTop - cell * 0.5,
+		width: cell + snDraw.Game.stroke_px*0.5,
+		height: cell * 0.5 + snDraw.Game.stroke_px*0.5,
+		fill: pZone.player.color
+	    });
+
+	    var youText = new fabric.Text("You",{
+	    	left: labelLeft - cell* 0.87,
+		top: labelTop - cell * 0.5,
+		fill: snDraw.Game.bg_col,
+		fontSize: font_size,
+		fontWeight: 'bold',
+	    });
+
+	    ObjectArray.push(youBlock,youText);
+	}
+
+	var plrZone = new fabric.Group(ObjectArray,{
 	    hasControls: false,
 	    hasBorders: false,
 	    lockMovementX: true,
@@ -93,7 +133,7 @@ snDraw.Game.Zones = {
 
 	canvas.sendToBack(plrZone);
 
-	//this.PlayerZone[myplayer.index] = {BoundingBoxGRP: plrZone};
+	pZone.BoundingBoxGRP = plrZone;
 	var origX = plrZone.getLeft();
 	var origY = plrZone.getTop();
 
