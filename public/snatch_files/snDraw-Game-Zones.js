@@ -7,13 +7,15 @@ snDraw.Game.Zones = {
     //member functions
     drawEntirePlayerZone: function(){
 
+
+	this.PlayerZone = [];//clear the array TODO: this should not be necessary, this function should only ever be called once.
 	// Populate 'this.PlayerZone' with a subset of players...
 	this.PlayerZone[0] = {
 	    player: players[client_player_index],
 	    is_client: true
 	};
 	for (var i=0; i<players.length; i++){
-	    if(i!=client_player_index){
+	    if((i!=client_player_index)&&(players[i].words.length>0)){//not the Client Player AND Player has at least 1 word...
 		this.PlayerZone.push({
 		    player: players[i],
 		    is_client: false
@@ -21,15 +23,13 @@ snDraw.Game.Zones = {
 	    }
 	}
 
-	// 
-
 	this.calculatePlayerZoneSizes();//this sets attributes within the player objects
 	var plr_top_cumulator = this.playersZoneTopPx;// the starting value for this variable is the lower edge of the tile zone...
 
 	for (var i=0; i<this.PlayerZone.length; i++){
 	    this.PlayerZone[i].zone_top = plr_top_cumulator;
 	    this.drawPlayerZoneBox(this.PlayerZone[i]);// Draws the BOX
-	    this.drawAllPlayerWords(this.PlayerZone[i].player);//Draws all the WORDS
+	    this.drawAllPlayerWords(this.PlayerZone[i]);//Draws all the WORDS
 	    plr_top_cumulator += this.PlayerZone[i].zone_height + snDraw.Game.textMarginUnit + snDraw.Game.stroke_px;
 	}
     },
@@ -151,14 +151,14 @@ snDraw.Game.Zones = {
 
 
     // for example player.words : [[23,14,11],[44,12,13,19,4]]
-    drawAllPlayerWords: function(myplayer){
+    drawAllPlayerWords: function(pZone){
 	//since this function is only invoked when first drawing the game for each player, this is the time to set the base coordinates:
-	myplayer.x_next_word = snDraw.Game.x_plotter_R;
-	myplayer.y_next_word = myplayer.zone_top + 1.8 * snDraw.Game.marginUnit;
+	pZone.player.x_next_word = snDraw.Game.x_plotter_R;
+	pZone.player.y_next_word = pZone.zone_top + 1.8 * snDraw.Game.marginUnit;
 	//LOOP thru all the player's words...
 	// draw them onscreen
-	for (var i=0; i<myplayer.words.length; i++){
-	    snDraw.Game.drawSingleCapturedWord(myplayer, i);	
+	for (var i=0; i<pZone.player.words.length; i++){
+	    snDraw.Game.drawSingleCapturedWord(pZone.player, i);	
 	}
 
 	//this prep's the SPELL class to place letters in the right location
