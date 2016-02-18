@@ -21,10 +21,18 @@ var snDraw = {
 	    easing: fabric.util.ease.easeOutQuart,
 	    duration: 200
 	},
-	sty_Outl: {
-	    easing: fabric.util.ease.easeOutQuad,
+	sty_Resize: {
+	    easing: fabric.util.ease.easeInOutCubic,
 	    duration: 2000
 	},
+	sty_Boot: {
+	    easing: fabric.util.ease.easeInCubic,
+	    duration: 1000
+	},
+	sty_Join: {
+	    easing: fabric.util.ease.easeOutCubic,
+	    duration: 1000
+	}
     },
     
     //methods
