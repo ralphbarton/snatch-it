@@ -109,6 +109,12 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
 
     if(client_is_snatcher){//only clear the speller for the snatching player...
 	snDraw.Game.Spell.ClearWordFromSpeller(false);//remove it from the speller (clears up the speller)
+    }else{
+	//condition here
+	var overlap = commonElements(tile_indices,snDraw.Game.Spell.ActiveLetters_tile_ids()).length != 0;
+	if(overlap){//there is some overlap between speller and snatched word
+	    snDraw.Game.Spell.ClearWordFromSpeller(true,tile_indices);//division of letters in the speller between the snatched word and the spare letters area
+	}
     }
 
     //TODO: in actual fact, a good feature here would be to clear the speller for any player sharing a letter in the now-snatched word...
@@ -123,7 +129,7 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     //draw the new word into the player zone...
     //for the case of the Snatcher being the Client player here, this is still necessary as it has the effect of grouping the letters, even if not moving them
     //the final parameter of this function call determines if animation is required; not required if client is snatcher.
-    snDraw.Game.drawSingleCapturedWord(myplayer,myplayer.words.length - 1, (!client_is_snatcher));
+    snDraw.Game.drawSingleCapturedWord(myplayer,myplayer.words.length - 1, true); //TODO shouldn't that 'true' be a (!client_is_snatcher)
 
     //resize the player zones
 
@@ -154,3 +160,27 @@ Array.prototype.move = function (old_index, new_index) {
     return this; // for testing purposes
 };
 
+
+function contains(a, obj) {
+    for (var i = 0; i < a.length; i++) {
+        if (a[i] === obj) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function commonElements(arr1, arr2){
+    var clone1 = arr1.slice(0);
+    var clone2 = arr2.slice(0);
+    
+    var ret = [];
+    clone1.sort();
+    clone2.sort();
+    for(var i = 0; i < clone1.length; i += 1) {
+        if(clone2.indexOf( clone1[i] ) > -1){
+            ret.push( clone1[i] );
+        }
+    }
+    return ret;
+}

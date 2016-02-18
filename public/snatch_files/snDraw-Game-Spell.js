@@ -188,19 +188,22 @@ snDraw.Game.Spell = {
 	return tile_indeces_of_word;
     },
 
-    //send a candidate word to the server
-    ClearWordFromSpeller: function(replace_tiles_on_grid){
+    //clear the speller (the letters animate back into position)
+    //optional 2nd parameter excludes letters from animation (their animation is handled by the new word formation)
+    ClearWordFromSpeller: function(replace_tiles_on_grid,mid_spell_snatch){
     	
-	//setInterval(function(){ canvas.renderAll(); console.log("rendering all");}, 1/50);
-
 	for(var i=0; i<this.nActiveLetters; i++){//for each TILE making up the word...
 	    //run through the Letter objects to extract the word's tile indeces into an array
 	    var MyTile = this.ActiveLetterSet[i];
-	    if(replace_tiles_on_grid){
+	    var letter_in_other_snatch = false;//default value, is parameter not provided.
+	    if(mid_spell_snatch){
+		letter_in_other_snatch = contains(mid_spell_snatch,MyTile.tileID);
+	    }
+	    if((replace_tiles_on_grid)&&(!letter_in_other_snatch)){
 
 		//case animation spec and add render
 		
-		snDraw.moveSwitchable(MyTile, true, snDraw.ani.sty_Sing,{
+		snDraw.moveSwitchable(MyTile, true, snDraw.ani.sty_Sing, {
 		    left: MyTile.x_availableSpace,
 		    top: MyTile.y_availableSpace
 		});
@@ -237,5 +240,13 @@ snDraw.Game.Spell = {
     //server accepted the candidate word, mutate the client side data and display...
     wordAccepted: function(){
 	//do something...
+    },
+
+    ActiveLetters_tile_ids: function(){
+	var ret = [];
+	for(var i=0; i<this.nActiveLetters; i++){
+	    ret.push(this.ActiveLetterSet[i].tileID);	
+	}
+	return ret;
     }
 };

@@ -340,7 +340,6 @@ snDraw.Game = {
 		x_plotter += snDraw.Game.h_space_word;
 
 		//finally, always at the end of writing a word, record the coordinates for writing a new word...
-		console.log(x_plotter);
 		myplayer.x_next_word = x_plotter;
 		myplayer.y_next_word = y_plotter;
 
