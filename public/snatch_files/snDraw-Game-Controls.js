@@ -84,7 +84,11 @@ snDraw.Game.Controls = {
     //submit word to server
     snatchItButtonHandler: function(myWordStr){
 	//confirm("Submit the word"+myWordStr+"?");
-	snDraw.Game.Spell.SubmitWord();
+	if(snDraw.Game.Spell.nActiveLetters>0){
+	    snDraw.Game.Spell.SubmitWord();
+	}else{
+	    snDraw.Game.Spell.dialogueWordEntry();
+	}
     },
 
 

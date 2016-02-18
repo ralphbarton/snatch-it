@@ -248,5 +248,41 @@ snDraw.Game.Spell = {
 	    ret.push(this.ActiveLetterSet[i].tileID);	
 	}
 	return ret;
-    }
+    },
+
+    dialogueWordEntry: function(){
+	var snatch_string = prompt("Enter Word:");
+	snatch_string = snatch_string.toUpperCase();
+
+	//For each letter in the user's string, find it (starting at final) in the tile set
+	//At this stage, only consider unused tiles as includable
+
+	var snatch_tile_ids = [];
+
+	for(var i=0; i<snatch_string.length; i++){
+	    //use a crude method for ensuring double letters in the word get matched to double letters (or more) present amoung the tiles:
+	    //this is: for each new tile ID included, ensure that it is not already included
+	    for(var j=tileset.length-1; j>=0; j--){
+		if((tileset[j].letter == snatch_string[i])&&(tileset[j].status == "turned")){
+		    // matching letter found among tiles
+		    var used_already = false;
+		    for(var k=0; k<snatch_tile_ids.length; k++){
+			used_already = (used_already || (snatch_tile_ids[k] == j));
+		    }
+		    if(!used_already){
+			snatch_tile_ids[i] = j;
+			j=-1;//break out of the tile search string;
+		    }
+		    
+		}//loop k
+	    }//loop j
+	}//loop i
+	if(snatch_tile_ids.length!=snatch_string.length){
+	    alert("Free letters are not available to make the word \""+snatch_string+"\".");
+	}else{
+	    PLAYER_SUBMITS_WORD(JSON.stringify(snatch_tile_ids));
+	}
+    //console.log(snatch_tile_ids);
+    
+    }//fn
 };

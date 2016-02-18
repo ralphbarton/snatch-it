@@ -186,7 +186,6 @@ snDraw.Game.KB = {
 		//
 		var TargetTile = snDraw.Game.TileArray[grabit_tile_index];
 		snDraw.Game.Mouse.recordDragStartCoords(TargetTile);
-		console.log("checkpoint Q");
 		snDraw.Game.Spell.addLetter(TargetTile); 
 	    }
 	    else{
