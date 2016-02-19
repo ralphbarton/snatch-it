@@ -151,16 +151,14 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     }
 
     // (unconditionally) animate the resizing of the zones 
-    snDraw.Game.Zones.updatePlayerZones(player_first_word);
+    snDraw.Game.Zones.updatePlayerZones(new_zone == true);//don't attempt to resize-animate a zone which is just appeared out of nowhere.
 
     // does the player box need to be inserted onto the screen?
     if(new_zone){
 	//create new zone box...
 	var PZ = snDraw.Game.Zones.PlayerZone;
 	var FinalZone = PZ[PZ.length-1];
-	console.log("draw command for zone defined by:",FinalZone);
 	snDraw.Game.Zones.drawPlayerZoneBox(FinalZone);// Draws the BOX	
-	console.log("Draw word coords  = ",FinalZone.player.x_next_word,FinalZone.player.y_next_word);
     }
     
     //update the tiles data structure:

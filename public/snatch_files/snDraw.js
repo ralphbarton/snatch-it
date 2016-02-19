@@ -23,7 +23,7 @@ var snDraw = {
 	},
 	sty_Resize: {
 	    easing: fabric.util.ease.easeInOutCubic,
-	    duration: 2000
+	    duration: 1000
 	},
 	sty_Boot: {
 	    easing: fabric.util.ease.easeInCubic,
@@ -60,7 +60,7 @@ var snDraw = {
 	if(already_running){
 	    clearTimeout(this.frame_rendering_timeout);
 	}
-	this.frame_rendering_timeout = setTimeout(function(){snDraw.frame_rendering_timeout = undefined;}, duration * 1.5);//fudge factor
+	this.frame_rendering_timeout = setTimeout(function(){snDraw.frame_rendering_timeout = undefined;}, duration * 4);//fudge factor
 	if(!already_running){
 	    this.startScreenFrameDrawing();//this ensures another chain of recusive function calls will not happen but timeout can still be adjusted.
 	}

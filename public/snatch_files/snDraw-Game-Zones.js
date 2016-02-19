@@ -80,7 +80,7 @@ snDraw.Game.Zones = {
 	    top: boxTop,
 	    width: boxWidth,
 	    height: boxHeight,
-	    fill: snDraw.Game.bg_col,
+	    fill: 'rgba(0, 0, 0, 0)',//transparent fill - does this speed up rendering? I think no (observation test)
 	    stroke: pZone.player.color,
 	    strokeWidth: snDraw.Game.stroke_px,
 	});
@@ -132,7 +132,8 @@ snDraw.Game.Zones = {
 		lockMovementY: true,
 		selectable: false
 	    });
-	    canvas.sendToBack(OB);
+	    canvas.add(OB);
+	    canvas.sendToBack(OB);//TODO: determine if this command with the one above represents duplication?
 	    pZone.FabObjects[i] = OB;
 
 	}
@@ -167,13 +168,13 @@ snDraw.Game.Zones = {
 
     },
 
-    updatePlayerZones: function(new_zone_bottom){
+    updatePlayerZones: function(final_zone_is_newly_introduced){
 
 	//update the data structures via its own references. Note that this may include the additional zone.
 	this.calculatePlayerZoneSizes();
 	
 	var nZones = this.PlayerZone.length;
-	if (new_zone_bottom){nZones--;}//don't make adjustment animations to the final zone which is new...
+	if (final_zone_is_newly_introduced){nZones--;}//don't make adjustment animations to the final zone which is new...
 
 	for(var i=0; i<nZones; i++){
 
@@ -217,15 +218,16 @@ snDraw.Game.Zones = {
 	    var MyWordGrp = snDraw.Game.TileGroupsArray[myZone.player.index];
 	    if(MyWordGrp.length > 0){
 		//re-determine height shift by considering first word...
-		var DY = (myZone.zone_top + 1.8 * snDraw.Game.marginUnit) - MyWordGrp.getTop();
 
-		snDraw.moveSwitchable(MyWordGrp, true, snDraw.ani.sty_Resize,{
-		    top: '+='+DY
-		});
+		var DY = (myZone.zone_top + 1.8 * snDraw.Game.marginUnit) - MyWordGrp[0].getTop();
+		// j index used below, note the nested loop...
+		for (var j=0; j<MyWordGrp.length; j++){//loop through the player's words
+		    snDraw.moveSwitchable(MyWordGrp[j], true, snDraw.ani.sty_Resize,{
+			top: MyWordGrp[j].getTop() + DY
+		    });
+		}
 	    }
-
-	    
-	}
+	}//loop
     },
 
 

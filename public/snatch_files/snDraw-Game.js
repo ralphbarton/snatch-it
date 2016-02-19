@@ -266,17 +266,14 @@ snDraw.Game = {
 	    hasBorders: false
 	});
 
-	console.log("makeTilesDraggableGroup called upon",myplayer);
 	PlayerWordGRP.OwnerPlayer = myplayer;
 	PlayerWordGRP.Player_word_index = word_index;
-	console.log("Linking Tile Group",this.TileGroupsArray,myplayer.index);
 	this.TileGroupsArray[myplayer.index].push(PlayerWordGRP);
 
 	PlayerWordGRP.set({
 	    left: grp_left,
 	    top: grp_top
 	});
-
 
 	canvas.add(PlayerWordGRP);
 	canvas.renderAll();
