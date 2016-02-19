@@ -59,6 +59,19 @@ socket.on('full game state transmission', function(gameState){
 
 });//end of function to load game data
 
+socket.on('player has joined game', function(playerObjStr){
+    
+    var newPlayer = JSON.parse(playerObjStr);
+    newPlayer.index = players.length;//take the length prior to pushing incorporates -1
+
+    //DO NOT FORGET, upon addition of a new player, to modify their data structure accordingly.
+    snDraw.Game.TileGroupsArray[newPlayer.index]=[];//correctly create empty container
+    players.push(newPlayer);
+
+    //Don't need to redraw screen here. New player won't actually have any words (makes no visible difference)
+    console.log("TOAST: " + newPlayer.name + " has joined the game");
+
+});
 
 
 
@@ -99,15 +112,6 @@ socket.on('give client their player index', function(myIndex){
 });
 
 
-socket.on('player has joined game', function(playerObjStr){
-    
-    var newPlayer = JSON.parse(playerObjStr);
-    players.push(newPlayer);
-    //Don't need to redraw screen here. New player won't actually have any words (makes no visible difference)
-    console.log("TOAST: " + newPlayer.name + " has joined the game");
-
-});
-
 
 socket.on('snatch assert', function(SnatchUpdateMsg){
 
@@ -122,6 +126,7 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     //update the players data structure:
     myplayer.words.push(tile_indices);
 
+    //Generate a new zone if required.
     if(new_zone){
 	//create new zone box...
 	snDraw.Game.Zones.PlayerZone.push({
@@ -153,7 +158,9 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
 	//create new zone box...
 	var PZ = snDraw.Game.Zones.PlayerZone;
 	var FinalZone = PZ[PZ.length-1];
+	console.log("draw command for zone defined by:",FinalZone);
 	snDraw.Game.Zones.drawPlayerZoneBox(FinalZone);// Draws the BOX	
+	console.log("Draw word coords  = ",FinalZone.player.x_next_word,FinalZone.player.y_next_word);
     }
     
     //update the tiles data structure:

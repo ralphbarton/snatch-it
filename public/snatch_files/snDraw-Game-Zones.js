@@ -129,7 +129,8 @@ snDraw.Game.Zones = {
 		hasControls: false,
 		hasBorders: false,
 		lockMovementX: true,
-		lockMovementY: true
+		lockMovementY: true,
+		selectable: false
 	    });
 	    canvas.sendToBack(OB);
 	    pZone.FabObjects[i] = OB;
@@ -159,6 +160,11 @@ snDraw.Game.Zones = {
 	    top: origY
 	});
 */
+
+	//since this function is only invoked when first creating the zone box for each player, this is the time to set the base coordinates:
+	pZone.player.x_next_word = snDraw.Game.x_plotter_R;
+	pZone.player.y_next_word = boxTop + 1.8 * snDraw.Game.marginUnit;
+
     },
 
     updatePlayerZones: function(new_zone_bottom){
@@ -171,6 +177,7 @@ snDraw.Game.Zones = {
 
 	for(var i=0; i<nZones; i++){
 
+	    //animate the name and the box outline
 	    var myZone = this.PlayerZone[i]; 
 	    var bxFab = myZone.FabObjects;
 	    
@@ -189,6 +196,7 @@ snDraw.Game.Zones = {
 		top: boxTop - snDraw.Game.textMarginUnit
 	    });
 
+	    //if present, animate the 'YOU'
 	    if(i==0){
 		var youBlock  = bxFab[2];
 		var youText   = bxFab[3];
@@ -204,15 +212,25 @@ snDraw.Game.Zones = {
 		});
 
 	    }
+
+	    //animate the words, if present...
+	    var MyWordGrp = snDraw.Game.TileGroupsArray[myZone.player.index];
+	    if(MyWordGrp.length > 0){
+		//re-determine height shift by considering first word...
+		var DY = (myZone.zone_top + 1.8 * snDraw.Game.marginUnit) - MyWordGrp.getTop();
+
+		snDraw.moveSwitchable(MyWordGrp, true, snDraw.ani.sty_Resize,{
+		    top: '+='+DY
+		});
+	    }
+
+	    
 	}
     },
 
 
     // for example player.words : [[23,14,11],[44,12,13,19,4]]
     drawAllPlayerWords: function(pZone){
-	//since this function is only invoked when first drawing the game for each player, this is the time to set the base coordinates:
-	pZone.player.x_next_word = snDraw.Game.x_plotter_R;
-	pZone.player.y_next_word = pZone.zone_top + 1.8 * snDraw.Game.marginUnit;
 	//LOOP thru all the player's words...
 	// draw them onscreen
 	for (var i=0; i<pZone.player.words.length; i++){
