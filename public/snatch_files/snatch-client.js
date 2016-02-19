@@ -71,19 +71,25 @@ socket.on('tile turn assert', function(tileDetailsObjStr){
     snDraw.Game.animateTileFlip(flipping_player_i, tile_id);
 });
 
-socket.on('player wants reset', function(playerName){
-    var resetAssent = confirm(playerName + " has requested to reset the game. Do you want to reset the game?");
+socket.on('player wants reset', function(player_index){
+    var player_name = players[player_index].name;
+    var resetAssent = confirm(player_name + " has requested to reset the game. Do you want to reset the game?");
     socket.emit('agree to reset', resetAssent);	
 });
 
 
+socket.on('player disconnected', function(player_index){
+    var player_name = players[player_index].name;
+    console.log("TOAST: " + player_name + " disconnected");
+    console.log("this message needs to be replace with additional code to handle this event...");
+});
+
 //this is message to Tell me that Alex has said "Reset" - inform of another players decision
 socket.on('player response to reset request', function(responseObj){
-    //it would be too much to generate a prompt for each, but a toast would be good
     var abcd = JSON.parse(responseObj);
-    a = abcd.playerName;
-    b = abcd.response;
-    
+    var p_name = players[abcd.player_index].name;
+    var p_a = abcd.response;
+    console.log("TOAST: " + p_name + " responded to reset request with the answer: " + p_a);
 });
 
 socket.on('give client their player index', function(myIndex){
@@ -94,39 +100,62 @@ socket.on('give client their player index', function(myIndex){
 
 
 socket.on('player has joined game', function(playerObjStr){
-    //var newPlayer = JSON.parse(playerObjStr);
-    //players.push(newPlayer);
-    //won't necessarily need to redraw screen here, since player hasn't necessarily got words
+    
+    var newPlayer = JSON.parse(playerObjStr);
+    players.push(newPlayer);
+    //Don't need to redraw screen here. New player won't actually have any words (makes no visible difference)
+    console.log("TOAST: " + newPlayer.name + " has joined the game");
+
 });
 
 
 socket.on('snatch assert', function(SnatchUpdateMsg){
 
-    //this needs to trigger the following:
-
-    //a toast
-    
-    //update the players data structure:
+    //Process the incoming data: 
     var tile_indices = SnatchUpdateMsg.tile_id_array
     var PI = SnatchUpdateMsg.player_index;
     var myplayer = players[PI];//please note that in this case object 'myplayer' is the snatching player... 
-    myplayer.words.push(tile_indices);
     var client_is_snatcher = client_player_index == PI;
-    
-    //Clear the current spell before rearranging letters for an opponent's snatch
-    if(client_is_snatcher){//only clear the speller for the snatching player...
+    var player_first_word = myplayer.words.length == 0;
+    var new_zone = (!client_is_snatcher) && (player_first_word);
+
+    //update the players data structure:
+    myplayer.words.push(tile_indices);
+
+    if(new_zone){
+	//create new zone box...
+	snDraw.Game.Zones.PlayerZone.push({
+	    player: players[PI],
+	    is_client: false
+	});
+    }
+
+    //a toast
+    console.log("TOAST: " + myplayer.name + " has snatched a word, tile indices are:", tile_indices);    
+
+    //The snatch will potentially impact on the 'speller' of all players
+    if(client_is_snatcher){
+	//clear the speller of the snatching player (clear those yellow letters)
 	snDraw.Game.Spell.ClearWordFromSpeller(false);//remove it from the speller (clears up the speller)
     }else{
-	//condition here
+	//determine if the other player's snatch affects the client player's spell (are letters consumed?)
 	var overlap = commonElements(tile_indices,snDraw.Game.Spell.ActiveLetters_tile_ids()).length != 0;
 	if(overlap){//there is some overlap between speller and snatched word
 	    snDraw.Game.Spell.ClearWordFromSpeller(true,tile_indices);//division of letters in the speller between the snatched word and the spare letters area
 	}
     }
 
-    //TODO: in actual fact, a good feature here would be to clear the speller for any player sharing a letter in the now-snatched word...
-    /// the comment above is in fact necessary to avoid glitches and is Issue 077
+    // (unconditionally) animate the resizing of the zones 
+    snDraw.Game.Zones.updatePlayerZones(player_first_word);
 
+    // does the player box need to be inserted onto the screen?
+    if(new_zone){
+	//create new zone box...
+	var PZ = snDraw.Game.Zones.PlayerZone;
+	var FinalZone = PZ[PZ.length-1];
+	snDraw.Game.Zones.drawPlayerZoneBox(FinalZone);// Draws the BOX	
+    }
+    
     //update the tiles data structure:
     for(i=0; i<tile_indices.length; i++){
 	var TID = tile_indices[i];

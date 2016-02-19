@@ -20,8 +20,8 @@ io.on('connection', function(socket){
     socket.on('disconnect', function(){
 	//does a player with this socket ID still exist in the server's list anyway?
 	if(myGame.playerWithSocketExists(socket.id)){
-	    var disconnectedPlrName = myGame.getPlayerNameBySocket(socket.id);
-	    socket.broadcast.emit('player disconnected',disconnectedPlrName);
+	    var dis_pl_i = myGame.playerIndexFromSocket(socket.id);
+	    socket.broadcast.emit('player disconnected',dis_pl_i);
 	    myGame.removePlayer(socket.id);
 
 	    //TODO: this is duplication of the intent of the message above. Rethink this a little and neaten
@@ -45,15 +45,17 @@ io.on('connection', function(socket){
     socket.on('player joined with details', function (details_obj){
 	//this newly joined player can be added to the game...
 	console.log('player joined with details : ' + details_obj);
-	//first send the player their ID (required to fully interpret the gameState Data
 	myGame.addPlayer(details_obj,socket.id);
+
+	//index to the new joiner
 	var pl_i = myGame.playerIndexFromSocket(socket.id);
 	socket.emit('give client their player index', pl_i);
 
+	//gamestate to the new joiner
 	var gameObj = myGame.getGameObjectAsStr();
-	//socket.emit('full game state transmission', gameObj);//not just transmit to the new player
-	io.emit('full game state transmission', gameObj);//TODO: this is inefficient. Transmit entire gamestate to everyone to include new player
-	console.log('the full game state was transmitted');
+	socket.emit('full game state transmission', gameObj);//not just transmit to the new player
+	
+	//new joiner to the rest of the players
 	var playerAsStr = myGame.getPlayerObjectAsStr(socket.id);
 	socket.broadcast.emit('player has joined game', playerAsStr);
     });
@@ -67,15 +69,15 @@ io.on('connection', function(socket){
 	    io.emit('full game state transmission', gameObj);
 	}
 	else{//in the case where there are other players...
-	    var playerName = myGame.getPlayerNameBySocket(socket.id);
-	    socket.broadcast.emit('player wants reset', playerName);
+	    var pl_i = myGame.playerIndexFromSocket(socket.id);
+	    socket.broadcast.emit('player wants reset', pl_i);
 	}
     });
 
     //client requests to turn over a tile
     socket.on('agree to reset', function(agrees){
-	var playerName = myGame.getPlayerNameBySocket(socket.id);
-	var responseObjStr = JSON.stringify({playerName: playerName,response: agrees});
+	var pl_i = myGame.playerIndexFromSocket(socket.id);
+	var responseObjStr = JSON.stringify({player_index: pl_i, response: agrees});
 	socket.broadcast.emit('player response to reset request', responseObjStr);
 	if(agrees){
 	    var reset_agreement = myGame.playerAgreesToReset(socket.id);//the return value indicates whether all players agree to the reset

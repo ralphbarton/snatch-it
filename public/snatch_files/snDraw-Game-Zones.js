@@ -7,7 +7,6 @@ snDraw.Game.Zones = {
     //member functions
     drawEntirePlayerZone: function(){
 
-
 	this.PlayerZone = [];//clear the array TODO: this should not be necessary, this function should only ever be called once.
 	// Populate 'this.PlayerZone' with a subset of players...
 	this.PlayerZone[0] = {
@@ -24,13 +23,10 @@ snDraw.Game.Zones = {
 	}
 
 	this.calculatePlayerZoneSizes();//this sets attributes within the player objects
-	var plr_top_cumulator = this.playersZoneTopPx;// the starting value for this variable is the lower edge of the tile zone...
 
 	for (var i=0; i<this.PlayerZone.length; i++){
-	    this.PlayerZone[i].zone_top = plr_top_cumulator;
 	    this.drawPlayerZoneBox(this.PlayerZone[i]);// Draws the BOX
 	    this.drawAllPlayerWords(this.PlayerZone[i]);//Draws all the WORDS
-	    plr_top_cumulator += this.PlayerZone[i].zone_height + snDraw.Game.textMarginUnit + snDraw.Game.stroke_px;
 	}
     },
 
@@ -41,7 +37,7 @@ snDraw.Game.Zones = {
 	n_letters_played = 0;
 	
 	//count the number of letters each player has, and total letters used within words
-	for(i=0; i<nZones; i++){
+	for(var i=0; i<nZones; i++){
 	    n_letters_in_zone[i] = 0;
 	    for(j=0; j<this.PlayerZone[i].player.words.length; j++){
 		n_letters_in_zone[i] += this.PlayerZone[i].player.words[j].length;
@@ -55,7 +51,8 @@ snDraw.Game.Zones = {
 	basic_height = snDraw.Game.tileSize + 4*snDraw.Game.marginUnit;
 	shareable_height = zones_sum_height - nZones * basic_height;
 
-	for(i=0; i<nZones; i++){
+	var plr_top_cumulator = this.playersZoneTopPx;// the starting value for this variable is the lower edge of the tile zone...
+	for(var i=0; i<nZones; i++){
 	    //now, we don't want to go dividing by zero if it's a new game with nothing played!!
 	    var hRatio = 0;
 	    if(n_letters_played){
@@ -66,9 +63,10 @@ snDraw.Game.Zones = {
 
 	    //this line of code adds the attribute calculated to the relevant player object within the array...
 	    this.PlayerZone[i].zone_height = basic_height + Math.round( hRatio * shareable_height );
+	    this.PlayerZone[i].zone_top = plr_top_cumulator;
+	    plr_top_cumulator += this.PlayerZone[i].zone_height + snDraw.Game.textMarginUnit + snDraw.Game.stroke_px;
 	}
     },
-
 
     drawPlayerZoneBox: function(pZone){
 
@@ -124,16 +122,29 @@ snDraw.Game.Zones = {
 	    ObjectArray.push(youBlock,youText);
 	}
 
+	pZone.FabObjects = [];
+	for(var i=ObjectArray.length-1; i>=0; i--){
+	    var OB = ObjectArray[i];
+	    OB.set({
+		hasControls: false,
+		hasBorders: false,
+		lockMovementX: true,
+		lockMovementY: true
+	    });
+	    canvas.sendToBack(OB);
+	    pZone.FabObjects[i] = OB;
+
+	}
+
+/*
 	var plrZone = new fabric.Group(ObjectArray,{
 	    hasControls: false,
 	    hasBorders: false,
 	    lockMovementX: true,
 	    lockMovementY: true
 	});
-
-	canvas.sendToBack(plrZone);
-
-	pZone.BoundingBoxGRP = plrZone;
+*/
+/*
 	var origX = plrZone.getLeft();
 	var origY = plrZone.getTop();
 
@@ -147,6 +158,53 @@ snDraw.Game.Zones = {
 	    left: origX,
 	    top: origY
 	});
+*/
+    },
+
+    updatePlayerZones: function(new_zone_bottom){
+
+	//update the data structures via its own references. Note that this may include the additional zone.
+	this.calculatePlayerZoneSizes();
+	
+	var nZones = this.PlayerZone.length;
+	if (new_zone_bottom){nZones--;}//don't make adjustment animations to the final zone which is new...
+
+	for(var i=0; i<nZones; i++){
+
+	    var myZone = this.PlayerZone[i]; 
+	    var bxFab = myZone.FabObjects;
+	    
+	    var boxTop    = myZone.zone_top;
+	    var boxHeight = myZone.zone_height;
+
+	    var zoneBox   = bxFab[0];
+	    var plrName   = bxFab[1];
+
+	    snDraw.moveSwitchable(zoneBox, true, snDraw.ani.sty_Resize,{
+		top: boxTop,
+		height: boxHeight
+	    });
+
+	    snDraw.moveSwitchable(plrName, true, snDraw.ani.sty_Resize,{
+		top: boxTop - snDraw.Game.textMarginUnit
+	    });
+
+	    if(i==0){
+		var youBlock  = bxFab[2];
+		var youText   = bxFab[3];
+		var labelTop  = boxTop + boxHeight;
+		var cell = snDraw.Game.tileSize * 1.4;
+
+		snDraw.moveSwitchable(youBlock, true, snDraw.ani.sty_Resize,{
+		    top: labelTop - cell * 0.5
+		});
+
+		snDraw.moveSwitchable(youText, true, snDraw.ani.sty_Resize,{
+		    top: labelTop - cell * 0.5
+		});
+
+	    }
+	}
     },
 
 
