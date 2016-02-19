@@ -68,7 +68,7 @@ snDraw.Game.Zones = {
 	}
     },
 
-    drawPlayerZoneBox: function(pZone){
+    drawPlayerZoneBox: function(pZone,animate_from_left){
 
 	var boxLeft   = snDraw.Game.marginUnit;
 	var boxTop    = pZone.zone_top;
@@ -136,7 +136,22 @@ snDraw.Game.Zones = {
 	    canvas.sendToBack(OB);//TODO: determine if this command with the one above represents duplication?
 	    pZone.FabObjects[i] = OB;
 
+	    if(animate_from_left){
+		var origX = OB.getLeft();
+
+		//move away (non animated)
+		snDraw.moveSwitchable(OB, false, null,{
+		    left: origX - myZoneWidth,
+		});
+
+		//move in (animated)
+		snDraw.moveSwitchable(OB, true, snDraw.ani.sty_Join,{
+		    left: origX,
+		});
+	    }
+
 	}
+
 
 /*
 	var plrZone = new fabric.Group(ObjectArray,{
@@ -146,21 +161,9 @@ snDraw.Game.Zones = {
 	    lockMovementY: true
 	});
 */
-/*
-	var origX = plrZone.getLeft();
-	var origY = plrZone.getTop();
 
-	//move away (non animated)
-	snDraw.moveSwitchable(plrZone, false, null,{
-	    left: origX - myZoneWidth,
-	    top: origY
-	});
 
-	snDraw.moveSwitchable(plrZone, true, snDraw.ani.sty_Join,{
-	    left: origX,
-	    top: origY
-	});
-*/
+
 
 	//since this function is only invoked when first creating the zone box for each player, this is the time to set the base coordinates:
 	pZone.player.x_next_word = snDraw.Game.x_plotter_R;

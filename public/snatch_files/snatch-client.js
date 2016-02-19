@@ -158,7 +158,7 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
 	//create new zone box...
 	var PZ = snDraw.Game.Zones.PlayerZone;
 	var FinalZone = PZ[PZ.length-1];
-	snDraw.Game.Zones.drawPlayerZoneBox(FinalZone);// Draws the BOX	
+	snDraw.Game.Zones.drawPlayerZoneBox(FinalZone,true);// Draws the BOX, second parameter is for animation.	
     }
     
     //update the tiles data structure:

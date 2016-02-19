@@ -198,12 +198,17 @@ snDraw.Game.KB = {
 	if(myKeycode == 32){//space bar
 	    // let this be turn a letter
 	    var target_tile_index = this.getLargestUnturnedTileIndex();
-	    tileTurnObj = {
-		playerIndex: client_player_index,
-		tileID: target_tile_index
+	    if(target_tile_index !== undefined){
+		tileTurnObj = {
+		    playerIndex: client_player_index,
+		    tileID: target_tile_index
+		}
+		var ObjStr = JSON.stringify(tileTurnObj);
+		TILE_TURN_REQUEST(ObjStr);//for an unturned tile, always message to flip
+	    }else{
+	        console.log("TOAST: there are no more unturned tiles for turning over");    
 	    }
-	    var ObjStr = JSON.stringify(tileTurnObj);
-	    TILE_TURN_REQUEST(ObjStr);//for an unturned tile, always message to flip
+
 	}
 
 	if((myKeycode == 8)||(keyPressed == '3')){//delete key
