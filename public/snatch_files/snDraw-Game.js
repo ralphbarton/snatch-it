@@ -190,7 +190,7 @@ snDraw.Game = {
 	}
     },
 
-
+    //this is my most complex function, it uses recursion to achieve a letter-by-letter animation.
     drawSingleCapturedWord: function(myplayer, word_index, animate){
 	var x_plotter = myplayer.x_next_word;
 	var y_plotter = myplayer.y_next_word;

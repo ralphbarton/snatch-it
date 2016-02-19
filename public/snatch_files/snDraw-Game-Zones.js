@@ -220,6 +220,9 @@ snDraw.Game.Zones = {
 		//re-determine height shift by considering first word...
 
 		var DY = (myZone.zone_top + 1.8 * snDraw.Game.marginUnit) - MyWordGrp[0].getTop();
+		//hack to adjust the location for upcoming animation:
+		myZone.player.y_next_word += DY;
+
 		// j index used below, note the nested loop...
 		for (var j=0; j<MyWordGrp.length; j++){//loop through the player's words
 		    snDraw.moveSwitchable(MyWordGrp[j], true, snDraw.ani.sty_Resize,{
