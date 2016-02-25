@@ -77,7 +77,7 @@ snDraw.Game = {
 	//now create a fabric object for every tile...
 	for (var i=0; i<tileset.length; i++){
 	    
-	    var myTile = this.generateTileObject(tileset[i],i);//here is the BUSINESS code to create the Fabric object for a tile
+	    var myTile = this.generateTileObject(tileset[i], i);//here is the BUSINESS code to create the Fabric object for a tile
 	    
 	    myTile.set({top:y_plotter,left:x_plotter});
 	    this.TileArray[i]=myTile;
@@ -140,6 +140,9 @@ snDraw.Game = {
 
 	if(tile.status == "turned"){this.modifyTileObject(myNewTileObj,"flipped");}
 	if(tile.status == "inword"){this.modifyTileObject(myNewTileObj,"flipped");}
+	if(tile.status == "skeletal"){this.modifyTileObject(myNewTileObj,"skeletal");}
+	if(tile.status == "partial"){this.modifyTileObject(myNewTileObj,"partial");}
+	if(tile.status == "shadow"){this.modifyTileObject(myNewTileObj,"shadow");}
 
 	return myNewTileObj;
     },
@@ -175,19 +178,42 @@ snDraw.Game = {
 	    });
 	    snDraw.setFrameRenderingTimeout (3000);//the correspondence is not exact, but this should allow the custom animation to ply through...
 	}
-	if(to_state=="flipped"){//only to be called from within the function
-	    myTile.item(1).setFill('yellow');
-	    myTile.item(0).setFill('rgb(54,161,235)');
+
+	var ObjFlip = function(){
 	    myTile.item(1).setText(myTile.letter);
-	    myTile.item(0).setStroke('#666');
 	    myTile.set({selectable:true});
-	    canvas.renderAll();
+	};
+
+	if(to_state=="flipped"){//only to be called from within the function
+	    myTile.item(0).setFill('rgb(54,161,235)');
+	    myTile.item(1).setFill('yellow');
+	    myTile.item(0).setStroke('#666');
+	    ObjFlip();
 	}
 	else if(to_state=="ACTIVE"){
 	    myTile.item(1).setFill('red');
 	    myTile.item(0).setFill('yellow');
-	    canvas.renderAll();
 	}
+	else if(to_state=="skeletal"){
+	    myTile.item(0).setFill('#383838');
+	    myTile.item(1).setFill('#8ec2e8');
+	    myTile.item(0).setStroke('#8ec2e8');
+	    ObjFlip();
+	}
+	else if(to_state=="partial"){
+	    myTile.item(0).setFill('#75b8c9');
+	    myTile.item(1).setFill('#c77a00');
+	    myTile.item(0).setStroke('#c77a00');
+	    ObjFlip();
+	}
+	else if(to_state=="shadow"){
+	    myTile.item(0).setFill('#70855c');
+	    myTile.item(1).setFill('#682424');
+	    myTile.item(0).setStroke('#682424');
+	    ObjFlip();
+	}
+	//TODO - can we remove this, a backlog of these may cause a delay in animation?
+	canvas.renderAll();
     },
 
     //this is my most complex function, it uses recursion to achieve a letter-by-letter animation.

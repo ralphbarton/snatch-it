@@ -185,6 +185,7 @@ snDraw.Game.KB = {
 	    if (grabit_tile_index !== undefined){
 		//
 		var TargetTile = snDraw.Game.TileArray[grabit_tile_index];
+		//note that in the case of mouse
 		snDraw.Game.Mouse.recordDragStartCoords(TargetTile);
 		snDraw.Game.Spell.addLetter(TargetTile); 
 	    }

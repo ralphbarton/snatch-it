@@ -101,7 +101,7 @@ snDraw.Game.Spell = {
     },
 
     //include a new letter in the ActiveLetterSet
-    addLetter: function(MyTile){
+    addLetter_OLD: function(MyTile){
 	this.ActiveLetterSet.push(MyTile);
 	MyTile.activeGrpIndex=this.nActiveLetters;
 	this.nActiveLetters++;
@@ -122,6 +122,16 @@ snDraw.Game.Spell = {
 	    });
 	}
 	snDraw.Game.modifyTileObject(MyTile,"ACTIVE");
+    },
+
+    //Advanced_Speller - data
+    SkeletalLetters: [],
+
+    //Advanced_Speller - method
+    addLetter: function(MyTile){
+	var NewSkeletal = snDraw.Game.generateTileObject({letter:'A',status:"skeletal"},-1);
+	this.SkeletalLetters.push(NewSkeletal);
+	this.
     },
 
 
