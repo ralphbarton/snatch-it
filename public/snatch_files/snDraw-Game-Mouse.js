@@ -180,12 +180,16 @@ snDraw.Game.KB = {
 	var keyPressed = String.fromCharCode(myKeycode);//note that this is non-case sensitive.
 
 	if( (myKeycode >= 65) && (myKeycode <= 90) ){//any letter key
-	    //
+	    
+	    snDraw.Game.Spell.addLetter(keyPressed); 
+	    //this is the old CODE TODO:delete
+	    /*
 	    var grabit_tile_index = this.seachForTurnedTileOfLetter(keyPressed);
 	    if (grabit_tile_index !== undefined){
 		//
 		var TargetTile = snDraw.Game.TileArray[grabit_tile_index];
-		//note that in the case of mouse
+		//note that in the case of mouse, the two function calls below are not coincident in time.
+		//coordinates recorded on mouse-down, letter added on mouse-up.
 		snDraw.Game.Mouse.recordDragStartCoords(TargetTile);
 		snDraw.Game.Spell.addLetter(TargetTile); 
 	    }
@@ -193,7 +197,7 @@ snDraw.Game.KB = {
 		//take action if the user hits a letter and its not available.
 		
 		//TODO concider the detail and graphics for various scenarious of subsets of letters from word sources... (i.e. other peoples' words)
-	    }
+	    }*/
 	}
 
 	if(myKeycode == 32){//space bar
@@ -214,9 +218,13 @@ snDraw.Game.KB = {
 
 	if((myKeycode == 8)||(keyPressed == '3')){//delete key
 	    // let this be remove the final letter of the spell (if present)
+	    snDraw.Game.Spell.backspace();
+	    //this is the old CODE TODO:delete
+	    /*
 	    var SpellArray = snDraw.Game.Spell.ActiveLetterSet;
 	    var LastTile = SpellArray[SpellArray.length-1];
 	    snDraw.Game.Spell.removeLetter(LastTile);
+	    */
 	}
 
 	if((myKeycode == 13)||(keyPressed == '2')){//enter key

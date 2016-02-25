@@ -101,6 +101,7 @@ snDraw.Game.Spell = {
     },
 
     //include a new letter in the ActiveLetterSet
+    //TODO: delete this function (just keep for now for reference)
     addLetter_OLD: function(MyTile){
 	this.ActiveLetterSet.push(MyTile);
 	MyTile.activeGrpIndex=this.nActiveLetters;
@@ -126,21 +127,87 @@ snDraw.Game.Spell = {
 
     //Advanced_Speller - data
     SkeletalLetters: [],
+    SpellUsageCounter: {},
 
     //Advanced_Speller - method
-    addLetter: function(MyTile){
-	var NewSkeletal = snDraw.Game.generateTileObject({letter:'A',status:"skeletal"},-1);
-	this.SkeletalLetters.push(NewSkeletal);
-	this.
+    addLetter: function(letter){
+	if(this.allowLetter(letter)){
+	    var NewSkeletal = snDraw.Game.generateTileObject({letter:letter, status:"skeletal"},-1);
+	    this.SkeletalLetters.push(NewSkeletal);
+	    var spell_len = this.SkeletalLetters.length;
+	    x_loco = this.x_next_letter + (spell_len-1) * snDraw.Game.h_spacer;
+
+	    //TODO: add wrap condition...
+
+	    NewSkeletal.set({
+		left: x_loco,
+		top: this.y_next_letter
+	    });
+
+	    canvas.add(NewSkeletal);
+	    canvas.renderAll();
+	}
     },
 
+    allowLetter: function(letter){
+	
+	var MyLetters = this.createAvailableArrayOf(letter);
+
+	//data struture maintenance only
+	if(this.SpellUsageCounter[letter]==undefined){
+	    this.SpellUsageCounter[letter]=0;
+	}
+
+	//use Strictly greater than, implies that there an additional letter that can be added to the spell
+	var allow;
+	if(MyLetters.length > this.SpellUsageCounter[letter]){
+	    this.SpellUsageCounter[letter]++;
+	    allow = true;
+	}else{
+	    allow = false;
+	}
+	
+	this.recolourAll(MyLetters);
+
+	return allow;
+    },
+
+    backspace: function(){
+	var RemSkeletal = this.SkeletalLetters.pop();
+	if(RemSkeletal){
+	    canvas.remove(RemSkeletal);
+	    var letter = RemSkeletal.letter;
+	    this.SpellUsageCounter[letter]--;
+	    this.recolourAll(this.createAvailableArrayOf(letter));
+	}
+    },
+
+    createAvailableArrayOf: function(letter){
+	var Objs_letter = [];
+	//determine how many instances of 'letter' are in play (i.e. visible, whether in word or free)
+	for (var i=0; i<tileset.length; i++){
+	    if ((tileset[i].status != 'unturned')&&(tileset[i].letter==letter)){
+		Objs_letter.push(snDraw.Game.TileArray[i]);
+	    } 
+	}
+	return Objs_letter;
+    },
+
+    recolourAll: function(MyLetters){
+	var n_letter_in_spell = this.SpellUsageCounter[MyLetters[0].letter];
+	var visual = (MyLetters.length > n_letter_in_spell) ? "partial" : "shadow";
+	if(n_letter_in_spell==0){visual = "flipped";}
+	for (var i=0; i<MyLetters.length; i++){
+	    snDraw.Game.modifyTileObject(MyLetters[i],visual);    
+	}
+    },
 
     //remove a letter from the ActiveLetterSet
-    removeLetter: function(MyTile){
+    removeLetter_OLD: function(MyTile){
 
 	this.nActiveLetters--;
 
-	//TODO: must remove it from the arry ACTIVELETTERSET 
+	//TODO: must remove it from the array ActiveLetterSet
 	this.ActiveLetterSet.splice(MyTile.activeGrpIndex,1);
 	MyTile.activeGrpIndex = undefined;//it no longer has such an index.
 
