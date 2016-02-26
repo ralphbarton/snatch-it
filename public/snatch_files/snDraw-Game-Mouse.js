@@ -111,6 +111,16 @@ snDraw.Game.Mouse = {
 		    top: e.target.yPickup
 		});
 	    }
+	    //This is to trigger an "add letter to speller" for mouse-up upon a word...
+	    //determine the letter...
+	    var pointer = canvas.getPointer(e.e);
+	    var x_extent = pointer.x - e.target.getLeft();
+	    var index = Math.floor(x_extent/snDraw.Game.tileSize);
+	    var index_upper = e.target._objects.length;
+	    index = Math.min(index, index_upper-1);
+	    var hit_letter = e.target.item(index).letter;
+	    //this ought to be conditional upon the word not having been dragged - TODO!
+	    snDraw.Game.Spell.addLetter(hit_letter);
 	}
     },
 
@@ -176,6 +186,16 @@ snDraw.Game.Mouse = {
 	return MyTile.getTop() > snDraw.Game.Zones.playersZoneTopPx - (snDraw.Game.tileSize * 0.9);
     }
 };
+
+
+
+
+
+
+
+
+
+
 
 
 snDraw.Game.KB = {
@@ -283,23 +303,3 @@ snDraw.Game.KB = {
 
 
 
-var Assembler = {
-    synthesiseSnatch: function(letters_array){
-	var tileID_array = [];
-	
-//	for (var i=0; i<letters_array.length, i++){//work through the word from the beginning
-	    for (var j=tileset.length-1; j>=0; j--){//work through the unused tiles from the end
-		/*
-		if ((tileset[j].status == 'turned')&&(tileset[j].letter==letters_array[i])){
-		    if(!contains(tileID_array,j)){
-			tileID_array.push(j);
-		    }
-		} 
-		*/
-	    }
-//	}
-
-	return tileID_array;
-    }
-
-};

@@ -138,6 +138,9 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     //a toast
     console.log("TOAST: " + myplayer.name + " has snatched a word, tile indices are:", tile_indices);    
 
+    snDraw.Game.Spell.CancelWord();
+    //This code is no longer relevant with the skeletal spell...
+    /*
     //The snatch will potentially impact on the 'speller' of all players
     if(client_is_snatcher){
 	//clear the speller of the snatching player (clear those yellow letters)
@@ -149,6 +152,7 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
 	    snDraw.Game.Spell.ClearWordFromSpeller(true,tile_indices);//division of letters in the speller between the snatched word and the spare letters area
 	}
     }
+    */
 
     // (unconditionally) animate the resizing of the zones 
     snDraw.Game.Zones.updatePlayerZones(new_zone == true);//don't attempt to resize-animate a zone which is just appeared out of nowhere.
