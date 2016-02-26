@@ -176,12 +176,12 @@ snDraw.Game = {
 		    }
 		}
 	    });
-	    snDraw.setFrameRenderingTimeout (3000);//the correspondence is not exact, but this should allow the custom animation to ply through...
+	    snDraw.setFrameRenderingTimeout (3000);//the correspondence is not exact, but this should allow the custom animation to play through...
 	}
 
 	var ObjFlip = function(){
 	    myTile.item(1).setText(myTile.letter);
-	    myTile.set({selectable:true});
+	    //myTile.set({selectable:true});
 	};
 
 	if(to_state=="flipped"){//only to be called from within the function
@@ -212,8 +212,8 @@ snDraw.Game = {
 	    myTile.item(0).setStroke('#682424');
 	    ObjFlip();
 	}
-	//TODO - can we remove this, a backlog of these may cause a delay in animation?
-	canvas.renderAll();
+
+	snDraw.setFrameRenderingTimeout (100);//as an alternative to canvas.renderAll()
     },
 
     //this is my most complex function, it uses recursion to achieve a letter-by-letter animation.

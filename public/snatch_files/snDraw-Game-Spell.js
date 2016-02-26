@@ -132,7 +132,7 @@ snDraw.Game.Spell = {
     //Advanced_Speller - method
     addLetter: function(letter){
 	if(this.allowLetter(letter)){
-	    var NewSkeletal = snDraw.Game.generateTileObject({letter:letter, status:"skeletal"},-1);
+	    var NewSkeletal = snDraw.Game.generateTileObject({letter:letter, status:"skeletal"}, -100 + this.SkeletalLetters.length);
 	    this.SkeletalLetters.push(NewSkeletal);
 	    var spell_len = this.SkeletalLetters.length;
 	    x_loco = this.x_next_letter + (spell_len-1) * snDraw.Game.h_spacer;
@@ -145,41 +145,39 @@ snDraw.Game.Spell = {
 	    });
 
 	    canvas.add(NewSkeletal);
-	    canvas.renderAll();
+	    snDraw.setFrameRenderingTimeout (100);//as an alternative to canvas.renderAll()
 	}
     },
 
     allowLetter: function(letter){
-	
 	var MyLetters = this.createAvailableArrayOf(letter);
-
 	//data struture maintenance only
 	if(this.SpellUsageCounter[letter]==undefined){
 	    this.SpellUsageCounter[letter]=0;
 	}
-
 	//use Strictly greater than, implies that there an additional letter that can be added to the spell
-	var allow;
-	if(MyLetters.length > this.SpellUsageCounter[letter]){
+	var allow = MyLetters.length > this.SpellUsageCounter[letter];
+	if(allow){
 	    this.SpellUsageCounter[letter]++;
-	    allow = true;
-	}else{
-	    allow = false;
+	    this.recolourAll(MyLetters);
 	}
-	
-	this.recolourAll(MyLetters);
-
 	return allow;
     },
 
-    backspace: function(){
-	var RemSkeletal = this.SkeletalLetters.pop();
-	if(RemSkeletal){
+    //cancel word
+    CancelWord: function(){
+	//OLD CODE...
+	//this.ClearWordFromSpeller(true);
+	
+	//new code...
+	for (var i=0; i<this.SkeletalLetters.length; i++){
+	    var RemSkeletal = this.SkeletalLetters[i];
 	    canvas.remove(RemSkeletal);
 	    var letter = RemSkeletal.letter;
 	    this.SpellUsageCounter[letter]--;
 	    this.recolourAll(this.createAvailableArrayOf(letter));
 	}
+	this.SkeletalLetters = [];//clear the array (lose the references to the Fabric objects. Hope they get deleted.
     },
 
     createAvailableArrayOf: function(letter){
@@ -202,6 +200,33 @@ snDraw.Game.Spell = {
 	}
     },
 
+
+    removeLetter: function(spell_index){
+	var RemSkeletal;
+	if(spell_index!==undefined){
+	    RemSkeletal = this.SkeletalLetters.splice(spell_index,1)[0];
+	}else{
+	    RemSkeletal = this.SkeletalLetters.pop();
+	}
+	if(RemSkeletal){
+	    //handle removal of the letter
+	    canvas.remove(RemSkeletal);
+	    var letter = RemSkeletal.letter;
+	    this.SpellUsageCounter[letter]--;
+	    this.recolourAll(this.createAvailableArrayOf(letter));
+	    //handle shifting of other letters...
+	    var rem_i = RemSkeletal.tileID + 100;
+	    for (var i=rem_i; i<this.SkeletalLetters.length; i++){
+		var ShiftMeSkeletal = this.SkeletalLetters[i];
+		ShiftMeSkeletal.tileID = i - 100;
+		x_loco = this.x_next_letter + i * snDraw.Game.h_spacer;
+		snDraw.moveSwitchable(ShiftMeSkeletal, true, snDraw.ani.sty_Sing,{
+		    left: x_loco
+		});
+	    }
+	}
+    },
+    
     //remove a letter from the ActiveLetterSet
     removeLetter_OLD: function(MyTile){
 
@@ -255,7 +280,10 @@ snDraw.Game.Spell = {
 	}
     },
 
-    getTileIndecesFromSpeller: function(){
+    //OLD code - to be deleted...
+    //the concept of this function is no longer relevant...
+    /*
+    getTileIndecesFromSpeller_OLD: function(){
 	var tile_indeces_of_word = [];
 	for(var i=0; i<this.nActiveLetters; i++){//for each TILE making up the word...
 	    //run through the Letter objects to extract the word's tile indeces into an array
@@ -264,6 +292,7 @@ snDraw.Game.Spell = {
 	}
 	return tile_indeces_of_word;
     },
+    */
 
     //clear the speller (the letters animate back into position)
     //optional 2nd parameter excludes letters from animation (their animation is handled by the new word formation)
@@ -304,19 +333,16 @@ snDraw.Game.Spell = {
 
     //send a candidate word to the server
     SubmitWord: function(){
-	var word_by_tile_indeces = this.getTileIndecesFromSpeller();
+	
+	//OLD CODE:
+	//var word_by_tile_indeces = this.getTileIndecesFromSpeller();
+	var letters_array = [];
+	for(var i=0; i<this.SkeletalLetters.length; i++){
+	    letters_array.push(this.SkeletalLetters[i].letter);
+	}
+	var word_by_tile_indeces = Assembler.synthesiseSnatch(letters_array);
+	console.log("Sending...",word_by_tile_indeces);
 	PLAYER_SUBMITS_WORD(JSON.stringify(word_by_tile_indeces));
-    },
-
-    //cancel word
-    CancelWord: function(){
-	this.ClearWordFromSpeller(true);
-    },
-
-
-    //server accepted the candidate word, mutate the client side data and display...
-    wordAccepted: function(){
-	//do something...
     },
 
     ActiveLetters_tile_ids: function(){

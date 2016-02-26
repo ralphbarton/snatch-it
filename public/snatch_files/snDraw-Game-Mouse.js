@@ -7,7 +7,10 @@ snDraw.Game.Mouse = {
     mDown: function (e) {
 	my_tile_index = e.target.tileID;
 	if(my_tile_index !== undefined){//for when a click landed on a tile...
-	    if(tileset[my_tile_index].status=="unturned"){
+	    if(my_tile_index < 0){//this means that the click landed on a skeletal tile!
+		snDraw.Game.Spell.removeLetter(100 + my_tile_index);
+	    }
+	    else if(tileset[my_tile_index].status=="unturned"){
 		tileTurnObj = {
 		    playerIndex: client_player_index,
 		    tileID: my_tile_index
@@ -15,7 +18,7 @@ snDraw.Game.Mouse = {
 		var ObjStr = JSON.stringify(tileTurnObj);
 		TILE_TURN_REQUEST(ObjStr);//for an unturned tile, always message to flip
 	    }
-	    if(tileset[my_tile_index].status=="turned"){//click on a turned tile. Log coords of start of drag
+	    else if(tileset[my_tile_index].status=="turned"){//click on a turned tile. Log coords of start of drag
 		this.recordDragStartCoords(e.target);
 		//Actually upon pickup of an active tile, add the event listener to potentially move other tiles around beneath...
 		// this is really only for the fresh word create case?
@@ -60,26 +63,26 @@ snDraw.Game.Mouse = {
 
 	    //this is for RELEASES that land on a blue tile in the free tiles area
 	    if(tileset[my_tile_index].status=="turned"){
-		if(e.target.visual=="flipped"){
-		    if((!this.significantMovement(e.target)) ||
-		       (this.draggedIntoPlayZone(e.target))){
-			//move the tile into the ActiveGroup
-			snDraw.Game.Spell.addLetter(e.target);
-		    }else{//tile has been dragged to a different location within tile zone
-			//as per Josh's suggestion, drop it back where it was before. Animation.
+		if((e.target.visual=="flipped")||(e.target.visual=="partial")||(e.target.visual=="shadow")){
 
-			//move the tile to be removed back to wherever it was before
-			snDraw.moveSwitchable(e.target, true, snDraw.ani.sty_Anag,{
-			    left: e.target.x_availableSpace,
-			    top: e.target.y_availableSpace
-			});
-
-			//TODO implement alternative, which is to lock to nearest grid location.
-		    
+		    //for certain types of drag, add the letter...
+		    if((!this.significantMovement(e.target))||(this.draggedIntoPlayZone(e.target))){
+			var moved = snDraw.Game.Spell.addLetter(e.target.letter);
 		    }
+		
+		    // restore old position:
+		    snDraw.moveSwitchable(e.target, true, snDraw.ani.sty_Anag,{
+			left: e.target.x_availableSpace,
+			top: e.target.y_availableSpace
+		    });
+		    
+		    //TODO implement alternative, which is to lock to nearest grid location.
 		}
+		//TODO: the code below is only relevant to the anagram drag stuff. Refactor/remove
+		
 		//ELSE is really important, because the first statement mutates data such that  that the second condition might then be met
 		//this is for RELEASES that land on active tiles...
+		/*
 		else if(e.target.visual=="ACTIVE"){
 		    if(this.verticalMovement(e.target) ||  //if the yellow letter is dragged up/down, remove it
 		       (!this.significant_drag)){//if a click is released without a significant move, remove it
@@ -89,6 +92,8 @@ snDraw.Game.Mouse = {
 			snDraw.Game.Spell.shuffleAnagramRelease(e.target);
 		    }
 		}
+		*/
+
 	    }
 	}
 
@@ -168,7 +173,7 @@ snDraw.Game.Mouse = {
     },
 
     draggedIntoPlayZone: function(MyTile){
-	return MyTile.getTop() > snDraw.Game.playersZoneTopPx - (snDraw.Game.tileSize * 0.9);
+	return MyTile.getTop() > snDraw.Game.Zones.playersZoneTopPx - (snDraw.Game.tileSize * 0.9);
     }
 };
 
@@ -218,7 +223,7 @@ snDraw.Game.KB = {
 
 	if((myKeycode == 8)||(keyPressed == '3')){//delete key
 	    // let this be remove the final letter of the spell (if present)
-	    snDraw.Game.Spell.backspace();
+	    snDraw.Game.Spell.removeLetter();
 	    //this is the old CODE TODO:delete
 	    /*
 	    var SpellArray = snDraw.Game.Spell.ActiveLetterSet;
@@ -272,4 +277,29 @@ snDraw.Game.KB = {
 	}
 	return tile_index_matching_letter;
     }
+};
+
+
+
+
+
+var Assembler = {
+    synthesiseSnatch: function(letters_array){
+	var tileID_array = [];
+	
+//	for (var i=0; i<letters_array.length, i++){//work through the word from the beginning
+	    for (var j=tileset.length-1; j>=0; j--){//work through the unused tiles from the end
+		/*
+		if ((tileset[j].status == 'turned')&&(tileset[j].letter==letters_array[i])){
+		    if(!contains(tileID_array,j)){
+			tileID_array.push(j);
+		    }
+		} 
+		*/
+	    }
+//	}
+
+	return tileID_array;
+    }
+
 };
