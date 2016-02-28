@@ -1,34 +1,34 @@
 var Assembler = {
 
     Assemblies: [],
-    ASSEMBLE: function(made, to_make, subset_words){
+    ASSEMBLE: function(words_consumed, target_tally, words_for_consumption){
 	//function calls upon global data structures assumed to be up to date:
-	if(subset_words.length==0){//implies there are no words left to demand attempted inclusion of.
+	if(words_for_consumption.length==0){//there are no words left to try including...
 	    var A = this.freeLettersTally;
-	    var B = to_make;
-	    if(isSubset_Tally(A,B)){// [CASE 1] implies the target word can be created by including some of the free letters
-		 this.Assemblies.push(XXXXXXX);//determine the letter indices of etc.
+	    var B = target_tally;
+	    if(this.isSubset_Tally(A,B)){// [CASE 1] implies the target word can be created by including some of the free letters
+		this.Assemblies.push({
+		    words_used:words_consumed,
+		    free_letters:target_tally//determine the letter indices of etc. - this to be done later
+		});
 	    }else{// [CASE 2] implies the word cannot be finished off using the free letters
-		//
+		//this was a dead end of search. no data logged.
 	    }
-	}else{// must attempt to include at least one word in creating the target word
-	    var next_subset_words = subset_words.slice(1);
-	    var A = to_make;
-	    var B = subset_words[0];
-	    if(isSubset_Tally(A,B)){// implies inclusion of this word can generate the target word
-		    var next_made = made.slice(0);
-		    next_made.push(B);
-
-		if(isEqual_Tally(A,B)){// [CASE 3] implies inclusion of this word completes the target word
-		    this.Assemblies.push({words_used:next_made});
-
-		}else{// [CASE 4] implies that after inclusion of this word, more letters still needed to complete the target word
-		    var next_to_make = subractWordTallies(A,B);
-		    this.ASSEMBLE(next_made, next_to_make, next_subset_words);
-		}
-	    }else{// [CASE 5] implies inclusion of this word can't generate the target word. Skip it.
-		this.ASSEMBLE(made, to_make, next_subset_words);
+	}else{// there are words left. Try both not including and including the next word in the overall creation
+	    var next_words_for_consumption = words_for_consumption.slice(1);
+	    //FIRST recursive call, which attempts to exclude the next word along
+	    this.ASSEMBLE(words_consumed.slice(0), target_tally, next_words_for_consumption);
+	    
+	    //inclusion of the next word along...
+	    var A = target_tally;
+	    var B = words_for_consumption[0].tally;
+	    if(this.isSubset_Tally(A,B)){// implies inclusion of this word can generate the target word
+		var next_words_consumed = words_consumed.slice(0);//shallow copy the data
+		next_words_consumed.push(words_for_consumption[0]);//add the extra element...
+		var next_target_tally = this.subractWordTallies(A,B);
+		this.ASSEMBLE(next_words_consumed, next_target_tally, next_words_for_consumption);
 	    }
+	    //if inclusion can't generate the target word, then no recusive call => no entry into data structure i.e. Terminate
 	}
     },
 
@@ -37,10 +37,12 @@ var Assembler = {
 
 	this.regenerateAllWordTallies();
 	this.subsetWordListOf(letters_array);
+	this.regenerateFreeLettersTally();
 
-
-	console.log("WordData",this.WordData);
-	console.log("SubsetWordList",this.SubsetWordList);
+	//here is the big recursive function call:
+	var snatch_tally = this.wordTally(letters_array);
+	this.Assemblies = [];
+	this.ASSEMBLE([],snatch_tally,this.SubsetWordList);
 
 
 	//this code is simple and only assembles the SNATCH out of the free letters. To be updated.
@@ -101,7 +103,7 @@ var Assembler = {
 		"N":0, "O":0, "P":0, "Q":0, "R":0, "S":0, "T":0, "U":0, "V":0, "W":0, "X":0, "Y":0, "Z":0};
     },
 
-    freeLettersTally: [],
+    freeLettersTally: {},
     regenerateFreeLettersTally: function(){
 	var free_letters_array = [];
 	//determine how many instances of 'letter' are in play (i.e. visible, whether in word or free)
