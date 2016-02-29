@@ -32,32 +32,38 @@ var Assembler = {
 	}
     },
 
-    synthesiseSnatch: function(letters_array){
+    synthesiseSnatch: function(letter_array){
 	var tileID_array = [];
 
 	this.regenerateAllWordTallies();
-	this.subsetWordListOf(letters_array);
+	this.subsetWordListOf(letter_array);
 	this.regenerateFreeLettersTally();
 
 	//here is the big recursive function call:
-	var snatch_tally = this.wordTally(letters_array);
+	var snatch_tally = this.wordTally(letter_array);
 	this.Assemblies = [];
 	this.ASSEMBLE([],snatch_tally,this.SubsetWordList);
 
+	var index_arb = getRandomInt(0,this.Assemblies.length-1);
+	var AnArbitraryAssembly = this.Assemblies[index_arb];
+	var word_tileID_array = this.Assembly_to_TileSequence(letter_array, AnArbitraryAssembly);
+	console.log("Proposed word_tileID_array = ", word_tileID_array);
 
+	//this simplistic code puts the word together out of the turned letters pool only
+	/*
 	//this code is simple and only assembles the SNATCH out of the free letters. To be updated.
-	for (var i=0; i<letters_array.length; i++){//work through the word from the beginning
+	for (var i=0; i<letter_array.length; i++){//work through the word from the beginning
 	    for (var j=tileset.length-1; j>=0; j--){//work through the unused tiles from the end
-		if ((tileset[j].status == 'turned')&&(tileset[j].letter==letters_array[i])){
+		if ((tileset[j].status == 'turned')&&(tileset[j].letter==letter_array[i])){
 		    if(!contains(tileID_array,j)){
 			tileID_array.push(j);
 			j=-1;//this is to break the inner loop
 		    }
 		} 
 	    }
-	}
+	}*/
 
-	return tileID_array;
+	return word_tileID_array;
     },
 
 
@@ -105,14 +111,14 @@ var Assembler = {
 
     freeLettersTally: {},
     regenerateFreeLettersTally: function(){
-	var free_letters_array = [];
+	var free_letter_array = [];
 	//determine how many instances of 'letter' are in play (i.e. visible, whether in word or free)
 	for (var i=0; i<tileset.length; i++){
 	    if (tileset[i].status == 'turned'){
-		free_letters_array.push(tileset[i].letter);
+		free_letter_array.push(tileset[i].letter);
 	    } 
 	}
-	this.freeLettersTally = this.wordTally(free_letters_array);
+	this.freeLettersTally = this.wordTally(free_letter_array);
     },
 
 
@@ -122,6 +128,48 @@ var Assembler = {
 	    word_tally[letter_array[i]]++;
 	}
 	return word_tally;
+    },
+
+    //this will destroy the assembly object...
+    Assembly_to_TileSequence: function(letter_array, MyAssembly){
+	var word_tileID_array = [];
+	//for each letter in the letter array, determine a tile...
+	for (var i=0; i<letter_array.length; i++){
+	    var LETR = letter_array[i];
+	    var j; //word index within the constituent words provided by the assembly object
+	    var donor_word_found = false;
+	    get_donor_word:
+	    for (j=0; j<MyAssembly.words_used.length; j++){
+		if (MyAssembly.words_used[j].tally[LETR] > 0){
+		    donor_word_found = true;
+		    break get_donor_word;
+		}
+	    }
+	    
+	    if(donor_word_found){//extracting the desired tile from a word...
+		var player_index = MyAssembly.words_used[j].player;
+		var word_index   = MyAssembly.words_used[j].word;
+		var word_tally   = MyAssembly.words_used[j].tally;
+
+		//we now use the tally as a counter, and decrement from its keys...
+		word_tally[LETR]--;
+
+		//now find the tile with the required letter in this word
+		var MyTiles = snDraw.Game.TileGroupsArray[player_index][word_index]._objects;
+		var k; //index of tile within word
+		get_tile:
+		for (k=0; k<MyTiles.length; k++){
+		    if(MyTiles[k].letter==LETR){
+			break get_tile;
+		    }
+		}
+		word_tileID_array.push(MyTiles[k].tileID);
+	    }else{//extracting the desired tile from the pool of turned tiles...
+		word_tileID_array.push(this.seachForTurnedTileOfLetter(LETR));
+	    }
+	}
+
+	return word_tileID_array;
     },
 
     tileIDs_to_letters: function(word_tileID_array){
@@ -161,6 +209,18 @@ var Assembler = {
 	    if(B[key] > A[key]){return false;}
 	}
 	return true;//if none were not equal
+    },
+
+    seachForTurnedTileOfLetter: function(myletter){
+	var tile_index_matching_letter = undefined;
+	for (var i=0; i<tileset.length; i++){
+	    if ((tileset[i].status == 'turned')&&(tileset[i].letter==myletter)){
+		if(snDraw.Game.TileArray[i].visual != "ACTIVE"){
+		    tile_index_matching_letter = i;
+		}
+	    } 
+	}
+	return tile_index_matching_letter;
     }
 
 };

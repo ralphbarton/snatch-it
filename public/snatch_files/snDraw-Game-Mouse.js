@@ -284,18 +284,6 @@ snDraw.Game.KB = {
 	    } 
 	}
 	return highest_unturned;
-    },
-
-    seachForTurnedTileOfLetter: function(myletter){
-	var tile_index_matching_letter = undefined;
-	for (var i=0; i<tileset.length; i++){
-	    if ((tileset[i].status == 'turned')&&(tileset[i].letter==myletter)){
-		if(snDraw.Game.TileArray[i].visual != "ACTIVE"){
-		    tile_index_matching_letter = i;
-		}
-	    } 
-	}
-	return tile_index_matching_letter;
     }
 };
 

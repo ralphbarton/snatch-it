@@ -229,3 +229,8 @@ function commonElements(arr1, arr2){
     }
     return ret;
 }
+
+//integer between upper and lower bounds...
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}

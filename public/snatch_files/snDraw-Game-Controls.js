@@ -142,10 +142,6 @@ snDraw.Game.Controls = {
 		fontSize: font_size * 1.5
 	    });
 
-	    function getRandomInt(min, max) {
-		return Math.floor(Math.random() * (max - min)) + min;
-	    }
-
 	    var playerScoreText = new fabric.Text(getRandomInt(1,18).toString(), {
 		left: myZoneSmaller * 0.40,
 		stroke: 'black',
