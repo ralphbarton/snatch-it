@@ -10,10 +10,10 @@ var client_player_index = undefined;
 
 socket.emit('player joining game', 0);
 
-socket.on('player color choices', function(colorSetObjStr){
+socket.on('player color choices', function(colorSet){
     snDraw.initialiseCanvas();
     //probably need to decode colorSet here... ToDO - wtf does this comment mean?
-    snDraw.Game.Splash.identityPrompt(colorSetObjStr);
+    snDraw.Splash.identityPrompt(colorSet);
 });
 
 
@@ -43,13 +43,12 @@ socket.on('full game state transmission', function(gameState){
 
     }
 
-    var GameStateObject = JSON.parse(gameState);
-    tileset = GameStateObject.tileSet;
-    players = GameStateObject.playerSet;
+    tileset = gameState.tileSet;
+    players = gameState.playerSet;
 
     for(i=0; i<players.length; i++){
 	players[i].index = i;
-	snDraw.Game.TileGroupsArray[i]=[];//correctly create empty container
+	snDraw.Game.TileGroupsArray[i] = [];//correctly create empty container
     }
     
 
@@ -59,9 +58,8 @@ socket.on('full game state transmission', function(gameState){
 
 });//end of function to load game data
 
-socket.on('player has joined game', function(playerObjStr){
+socket.on('player has joined game', function(newPlayer){
     
-    var newPlayer = JSON.parse(playerObjStr);
     newPlayer.index = players.length;//take the length prior to pushing incorporates -1
 
     //DO NOT FORGET, upon addition of a new player, to modify their data structure accordingly.
@@ -76,10 +74,9 @@ socket.on('player has joined game', function(playerObjStr){
 
 
 ///upon server assertion that a letter is turned over
-socket.on('tile turn assert', function(tileDetailsObjStr){
-    var detailsObj = JSON.parse(tileDetailsObjStr);
-    var flipping_player_i = detailsObj.playerIndex;
-    var tile_id = detailsObj.tileID;
+socket.on('tile turn assert', function(tileDetailsObj){
+    var flipping_player_i = tileDetailsObj.playerIndex;
+    var tile_id = tileDetailsObj.tileID;
 
     snDraw.Game.animateTileFlip(flipping_player_i, tile_id);
 });
@@ -99,9 +96,8 @@ socket.on('player disconnected', function(player_index){
 
 //this is message to Tell me that Alex has said "Reset" - inform of another players decision
 socket.on('player response to reset request', function(responseObj){
-    var abcd = JSON.parse(responseObj);
-    var p_name = players[abcd.player_index].name;
-    var p_a = abcd.response;
+    var p_name = players[responseObj.player_index].name;
+    var p_a = responseObj.response;
     console.log("TOAST: " + p_name + " responded to reset request with the answer: " + p_a);
 });
 
@@ -188,9 +184,12 @@ socket.on('snatch rejected', function(rejection_reason){
     console.log("The snatch was rejected by the server for the following reason: " + rejection_reason);
 });
 
-function PLAYER_SUBMITS_WORD(p){socket.emit('player submits word', p);}
-function RESET_REQUEST()       {socket.emit('reset request', 0);}
-function TILE_TURN_REQUEST(p)  {socket.emit('tile turn request', p);}
+function PLAYER_SUBMITS_WORD(p)       {socket.emit('player submits word', p);}
+function RESET_REQUEST()              {socket.emit('reset request', 0);}
+function TILE_TURN_REQUEST(p)         {socket.emit('tile turn request', p);}
+function PLAYER_JOINED_WITH_DETAILS(p){socket.emit('player joined with details', p);}
+
+
 
 ///Todo what uses this function? Can it be placed elsewhere in the code?
 // Answer: used within snDraw.Game.Spell.shuffleAnagramRelease

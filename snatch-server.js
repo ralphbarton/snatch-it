@@ -20,10 +20,9 @@ module.exports = function (nTiles){
 
     //this is the collection of externally callable functions
     return{
-	addPlayer: function(playerDetailsStr,socket_key) {//todo implement this
-	    var receivedPlayerObj = JSON.parse(playerDetailsStr); 
-	    var nm = receivedPlayerObj.name;
-	    var ci = receivedPlayerObj.color_index;
+	addPlayer: function(playerDetails,socket_key) {//todo implement this
+	    var nm = playerDetails.name;
+	    var ci = playerDetails.color_index;
 	    var col = bound_palette[socket_key][ci];
 	    
 	    //return the unused colours to the list...
@@ -52,9 +51,11 @@ module.exports = function (nTiles){
 	    delete player_index_from_socketKey_lkup[socket_key];
 	},
 
-	getGameObjectAsStr: function() {
+	getGameObject: function() {
+	    //this is where the game object is defined, serverside. It is just the tileset and the playerset, packaged into an object.
 	    var gameObject = {tileSet:tileSet, playerSet:playerSet}; 
 	    
+	    //in this case we are performing a deep copy of data, hence the use of the JSON function
 	    var gameObj_clone = JSON.parse(JSON.stringify(gameObject));
 	    var cc_plr = gameObj_clone.playerSet
 	    
@@ -63,11 +64,11 @@ module.exports = function (nTiles){
 		delete cc_plr[i].agrees_to_reset;
 		delete cc_plr[i].socket_key;
 	    }
-	    return JSON.stringify(gameObj_clone);
+	    return gameObj_clone;
 	},
-	getPlayerObjectAsStr: function(socket_key) {
+	getPlayerObject: function(socket_key) {
 	    var PI = player_index_from_socketKey_lkup[socket_key];
-	    return JSON.stringify(playerSet[PI]);
+	    return playerSet[PI];
 	},
 	playerWithSocketExists: function(socket_key) {
 	    return player_index_from_socketKey_lkup[socket_key] != undefined;
@@ -175,9 +176,8 @@ module.exports = function (nTiles){
 
 	},
 
-	playerSnatches: function(letterArrayStr,socket_key) {
+	playerSnatches: function(tile_id_array,socket_key) {
 	    var PI = player_index_from_socketKey_lkup[socket_key];
-	    var tile_id_array = JSON.parse(letterArrayStr);
 	    var Response = {};
 	    Response.val_check = this.snatchWordValidation(tile_id_array);
 
@@ -213,7 +213,7 @@ module.exports = function (nTiles){
 	    return Response;
 	},
 	//we could make this an embedded class and be snazzy! Is there time??
-	provideColorChoiceAsStr: function(socket_key) {
+	provideColorChoice: function(socket_key) {
 
 	    var mySet = [];
 	    if(color_palette.length>=5){
@@ -228,9 +228,11 @@ module.exports = function (nTiles){
 		}
 		emergency_colors = emergency_colors.concat(emergency_colors.splice(0,5));
 	    }
-	    strColors = JSON.stringify(mySet);
-	    return strColors;
+
+	    return mySet;
 	},
+
+
 	randomfunc: function(){
 	    //add 4 back to available
 	}

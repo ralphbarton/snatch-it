@@ -15,8 +15,7 @@ snDraw.Game.Mouse = {
 		    playerIndex: client_player_index,
 		    tileID: my_tile_index
 		}
-		var ObjStr = JSON.stringify(tileTurnObj);
-		TILE_TURN_REQUEST(ObjStr);//for an unturned tile, always message to flip
+		TILE_TURN_REQUEST(tileTurnObj);//for an unturned tile, always message to flip
 	    }
 	    else if(tileset[my_tile_index].status=="turned"){//click on a turned tile. Log coords of start of drag
 		this.recordDragStartCoords(e.target);
@@ -233,8 +232,7 @@ snDraw.Game.KB = {
 		    playerIndex: client_player_index,
 		    tileID: target_tile_index
 		}
-		var ObjStr = JSON.stringify(tileTurnObj);
-		TILE_TURN_REQUEST(ObjStr);//for an unturned tile, always message to flip
+		TILE_TURN_REQUEST(tileTurnObj);//for an unturned tile, always message to flip
 	    }else{
 	        console.log("TOAST: there are no more unturned tiles for turning over");    
 	    }

@@ -1,9 +1,8 @@
-snDraw.Game.Splash = {
+snDraw.Splash = {
     //TODO: splot this big function into smaller functions (even though there's no point...) there is: hierarchical sequence
-    identityPrompt: function(colorSetObjStr){
+    identityPrompt: function(colorChoices){
 
 	var playerName = prompt("What is your name?");
-	var colorChoices = JSON.parse(colorSetObjStr);
 
 	ts_px = myZoneWidth * 0.070;
 	
@@ -135,10 +134,10 @@ snDraw.Game.Splash = {
 			name: playerName,
 			color_index: colorChoices[BB_hit].index
 		    };
-		    var encodedObj = JSON.stringify(playerDetailsObj);
+		    PLAYER_JOINED_WITH_DETAILS(playerDetailsObj);
+
 
 		    //after details are supplied, load the latest game state (timing is important here...)
-		    socket.emit('player joined with details', encodedObj);
 		    canvas.off('mouse:down');
 		    canvas.off('mouse:up');
 		}

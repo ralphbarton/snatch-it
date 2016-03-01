@@ -342,7 +342,7 @@ snDraw.Game.Spell = {
 	}
 	var word_by_tile_indeces = Assembler.synthesiseSnatch(letters_array);
 	console.log("Sending...",word_by_tile_indeces);
-	PLAYER_SUBMITS_WORD(JSON.stringify(word_by_tile_indeces));
+	PLAYER_SUBMITS_WORD(word_by_tile_indeces);
     },
 
     ActiveLetters_tile_ids: function(){
@@ -383,7 +383,7 @@ snDraw.Game.Spell = {
 	if(snatch_tile_ids.length!=snatch_string.length){
 	    alert("Free letters are not available to make the word \""+snatch_string+"\".");
 	}else{
-	    PLAYER_SUBMITS_WORD(JSON.stringify(snatch_tile_ids));
+	    PLAYER_SUBMITS_WORD(snatch_tile_ids);
 	}
     //console.log(snatch_tile_ids);
     
