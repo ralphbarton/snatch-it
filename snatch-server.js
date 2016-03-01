@@ -43,6 +43,7 @@ module.exports = function (nTiles){
 	    playerSet.push(newPlayer);
 	    player_index_from_socketKey_lkup[socket_key] = playerSet.length-1;
 	},
+
 	removePlayer: function(socket_key) {
 	    var PI = player_index_from_socketKey_lkup[socket_key];
 	    playerSet[PI].socket_key = false;//never use this key again...
@@ -66,20 +67,25 @@ module.exports = function (nTiles){
 	    }
 	    return gameObj_clone;
 	},
+
 	getPlayerObject: function(socket_key) {
 	    var PI = player_index_from_socketKey_lkup[socket_key];
 	    return playerSet[PI];
 	},
+
 	playerWithSocketExists: function(socket_key) {
 	    return player_index_from_socketKey_lkup[socket_key] != undefined;
 	},
+
 	getPlayerNameBySocket: function(socket_key) {
 	    var PI = player_index_from_socketKey_lkup[socket_key];
 	    return playerSet[PI].name;
 	},
+
 	flipLetter: function(tileID) {
 	    tileSet[tileID].status="turned";
 	},
+
 	resetGame: function(nTiles) {
 	    tileSet = generateNewRandomTileSet(nTiles);
 	    color_palette = shuffle(color_palette);
@@ -95,9 +101,11 @@ module.exports = function (nTiles){
 	    }
 
 	},
+
 	playerIndexFromSocket: function(socket_key) {
 	    return player_index_from_socketKey_lkup[socket_key];
 	},
+
 	playerAgreesToReset: function(socket_key) {
 	    // this function takes as input the socket_key of a player who wishes to reset.
 	    // it returns true iff every player is willing to reset.
@@ -110,10 +118,11 @@ module.exports = function (nTiles){
 	    console.log(playerSet.length,lets_reset);
 	    return lets_reset;
 	},
+
 	snatchWordValidation: function(tile_id_array){
 	    // the most basic check is that it is over 3 letters
 	    if(tile_id_array.length < 3){
-		return 'insufficient length';
+		return {validity: 'insufficient length'};
 	    }
 
 	    //another basic check for non-duplicates...
@@ -121,7 +130,7 @@ module.exports = function (nTiles){
 	    tile_id_array_clone.sort();//is sorting the most efficient way to search for duplicates?
 	    for(var i=1; i<tile_id_array.length; i++){
 		if( tile_id_array_clone[i] == tile_id_array_clone[i-1] ){
-		    return 'invalid: multiple instances of same tile usage within a word';
+		    return {validity: 'invalid: multiple instances of same tile usage within a word'};
 		}
 	    }
 
@@ -131,6 +140,7 @@ module.exports = function (nTiles){
 	    //Run through each letter of the SNATCH submission, and look at its origin.
 	    var WordsInvolved = {};
 	    var KeysList = [];
+	    var WordsInvolvedList = [];
 	    for(var i=0; i<tile_id_array.length; i++){
 		var TID = tile_id_array[i];
 
@@ -150,68 +160,90 @@ module.exports = function (nTiles){
 		    
 		    //add the key to the list if not there already...
 		    if(!contains(KeysList,key)){
-			KeysList.push(key)
-			WordsInvolved[key].OldUsage = {
+			KeysList.push(key);
+			var WordRef = {
 			    PI: old_PI,
 			    WI: old_WI			
 			};
+			WordsInvolved[key].OldUsage = WordRef;
+			WordsInvolvedList.push(WordRef);
 		    }
 		}
 	    }
 
+	    //by this point, we have run through all the letters of the word. Here, we look at every word utilised, and determine if it is fully utilised.
 	    //keylists will have zero length if the SNATCH is a fresh word...
 	    for(var i=0; i<KeysList.length; i++){
 		var key_i = KeysList[i];
-		var PI_i = WordsInvolved[key].OldUsage.PI;
-		var WI_i = WordsInvolved[key].OldUsage.WI;
+		var PI_i = WordsInvolved[key_i].OldUsage.PI;
+		var WI_i = WordsInvolved[key_i].OldUsage.WI;
+		console.log("At key " + key_i + ", we consider player " + PI_i + " word " + WI_i);
+		console.log("the word is: " + playerSet[PI_i].words[WI_i]);
 		var wordlength_i = playerSet[PI_i].words[WI_i].length;
 		if(wordlength_i != WordsInvolved[key_i].letter_usage_count){
-		    return 'invalid letters: partial usage of word ' + key_i;
+		    return {validity: 'invalid letters: partial usage of word ' + key_i};
 		}
 	    }
 
 	    // also check is it a valid word
 	    //dictionary comparison, still TODO!!
-	    return 'accepted';
+	    return {validity: 'accepted', words_consumed: WordsInvolvedList};
 
 	},
 
 	playerSnatches: function(tile_id_array,socket_key) {
 	    var PI = player_index_from_socketKey_lkup[socket_key];
 	    var Response = {};
-	    Response.val_check = this.snatchWordValidation(tile_id_array);
+	    var validation_results = this.snatchWordValidation(tile_id_array);
+	    Response.val_check = validation_results.validity;
 
 	    //check the snatch is valid:
 	    if( Response.val_check == 'accepted'){// snatch accepted
 	    	console.log("Player " + PI + " SNATCH accepted.");
+		var words_consumed = validation_results.words_consumed;
 
-		//update all letters so that they cannot be claimed again as status 'turned' single letters
-		for(i=0; i<tile_id_array.length; i++){
+		
+		//BUSINESS LOGIC: UPDATE SERVER-SIDE GAME REPRESENTATION
+
+		//[step 1] remove any consumed words
+		for(var i=0; i<words_consumed.length; i++){
+		    var old_PI = words_consumed[i].PI;
+		    var old_WI = words_consumed[i].WI;
+		    var lost_word = playerSet[old_PI].words.splice(old_WI,1);
+		    console.log("Player " + old_PI + "'s word (" + lost_word + ") was taken");
+		}
+
+		//[step 2] update all letters so that they cannot be claimed again as status 'turned' single letters
+		for(var i=0; i<tile_id_array.length; i++){
 		    var TID = tile_id_array[i];
+		    //update status
 		    tileSet[TID].status = 'inword';
+		    //hold a back-reference (Tile objects back-references from player/word index)
 		    //the length attribute will increment when the new word is added, which happens subsequently, and so it (now) represents its index
 		    tile_ownership[TID] = {
 			player_index: PI,
 			word_index: playerSet[PI].words.length
 		    };
 		}
-		//BUSINESS LOGIC: puts the snatched word into the server's data structure
+	
+		//[step 3] - puts the snatched word into the server's data structure
 		playerSet[PI].words.push(tile_id_array);
 		
+		//COMMUNICATION LOGIC: SENDING THE CHANGE TO ALL CLIENTS...
+
 		Response.SnatchUpdateMsg = {
 		    player_index: PI,
-		    tile_id_array: tile_id_array
+		    tile_id_array: tile_id_array,
+		    words_consumed: words_consumed
 		}
-
-
 	    }else{ // snatch rejected
-	    	    console.log("Player " + PI + " SNATCH rejected : " + Response.val_check);
-
+	    	console.log("Player " + PI + " SNATCH rejected : " + Response.val_check);
 	    }
 
 	    console.log("Word set now: " + playerSet[PI].words);
 	    return Response;
 	},
+
 	//we could make this an embedded class and be snazzy! Is there time??
 	provideColorChoice: function(socket_key) {
 
