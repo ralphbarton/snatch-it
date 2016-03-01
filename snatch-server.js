@@ -13,6 +13,8 @@ module.exports = function (nTiles){
 //    tileSet = modifyTileSetForTurned(tileSet);
 
     var disconnectedPlayerRefs = [];
+    var tile_ownership = [];
+
 
     console.log("created snatch game instance on server");
 
@@ -112,16 +114,58 @@ module.exports = function (nTiles){
 	    if(tile_id_array.length < 3){
 		return 'insufficient length';
 	    }
+
+	    //another basic check for non-duplicates...
+	    var tile_id_array_clone = tile_id_array.slice(0);
+	    tile_id_array_clone.sort();//is sorting the most efficient way to search for duplicates?
+	    for(var i=1; i<tile_id_array.length; i++){
+		if( tile_id_array_clone[i] == tile_id_array_clone[i-1] ){
+		    return 'invalid: multiple instances of same tile usage within a word';
+		}
+	    }
+
 	    // also check that it is made of letters which are available among the free letters on-server
 	    // issues here may arise due to latency of the free letters due to one client's snatch not reaching the other client fast enough
 	    
-	    //TODO this check needs modification (loosening) so that it handles valid snatches of other peoples words, where status will be 'inword'
-	    //for now, let it only handle fully new snatches.
-	    for(i=0; i<tile_id_array.length; i++){
+	    //Run through each letter of the SNATCH submission, and look at its origin.
+	    var WordsInvolved = {};
+	    var KeysList = [];
+	    for(var i=0; i<tile_id_array.length; i++){
 		var TID = tile_id_array[i];
-		if(tileSet[TID].status!='turned'){
-		    console.log("a letter had status" + tileSet[TID].status);
-		    return 'letters unavailable';
+
+		//letter usage counting within all the words which get used
+		if(tileSet[TID].status=='inword'){
+		    var old_PI = tile_ownership[TID].player_index;
+		    var old_WI = tile_ownership[TID].word_index;
+		    var key = 'p' + old_PI + 'w' + old_WI;
+		    
+		    //count the letter usage within that word
+		    if(WordsInvolved[key]==undefined){
+			WordsInvolved[key] = {};
+			WordsInvolved[key].letter_usage_count = 1;//first occurance.
+		    }else{
+			WordsInvolved[key].letter_usage_count++;
+		    }
+		    
+		    //add the key to the list if not there already...
+		    if(!contains(KeysList,key)){
+			KeysList.push(key)
+			WordsInvolved[key].OldUsage = {
+			    PI: old_PI,
+			    WI: old_WI			
+			};
+		    }
+		}
+	    }
+
+	    //keylists will have zero length if the SNATCH is a fresh word...
+	    for(var i=0; i<KeysList.length; i++){
+		var key_i = KeysList[i];
+		var PI_i = WordsInvolved[key].OldUsage.PI;
+		var WI_i = WordsInvolved[key].OldUsage.WI;
+		var wordlength_i = playerSet[PI_i].words[WI_i].length;
+		if(wordlength_i != WordsInvolved[key_i].letter_usage_count){
+		    return 'invalid letters: partial usage of word ' + key_i;
 		}
 	    }
 
@@ -130,6 +174,7 @@ module.exports = function (nTiles){
 	    return 'accepted';
 
 	},
+
 	playerSnatches: function(letterArrayStr,socket_key) {
 	    var PI = player_index_from_socketKey_lkup[socket_key];
 	    var tile_id_array = JSON.parse(letterArrayStr);
@@ -138,12 +183,17 @@ module.exports = function (nTiles){
 
 	    //check the snatch is valid:
 	    if( Response.val_check == 'accepted'){// snatch accepted
-	    	    console.log("Player " + PI + " SNATCH accepted.");
+	    	console.log("Player " + PI + " SNATCH accepted.");
 
 		//update all letters so that they cannot be claimed again as status 'turned' single letters
 		for(i=0; i<tile_id_array.length; i++){
 		    var TID = tile_id_array[i];
 		    tileSet[TID].status = 'inword';
+		    //the length attribute will increment when the new word is added, which happens subsequently, and so it (now) represents its index
+		    tile_ownership[TID] = {
+			player_index: PI,
+			word_index: playerSet[PI].words.length
+		    };
 		}
 		//BUSINESS LOGIC: puts the snatched word into the server's data structure
 		playerSet[PI].words.push(tile_id_array);
@@ -342,4 +392,16 @@ function modifyTileSetForTurned(ts){
     ts[1].status='turned'
     ts[2].status='turned'
     return ts;
+}
+
+
+//TODO - set up shared code better.
+////////this code is duplicate - also present on clientside...
+function contains(a, obj) {
+    for (var i = 0; i < a.length; i++) {
+        if (a[i] === obj) {
+            return true;
+        }
+    }
+    return false;
 }
