@@ -49,20 +49,6 @@ var Assembler = {
 	var word_tileID_array = this.Assembly_to_TileSequence(letter_array, AnArbitraryAssembly);
 	console.log("Proposed word_tileID_array = ", word_tileID_array);
 
-	//this simplistic code puts the word together out of the turned letters pool only
-	/*
-	//this code is simple and only assembles the SNATCH out of the free letters. To be updated.
-	for (var i=0; i<letter_array.length; i++){//work through the word from the beginning
-	    for (var j=tileset.length-1; j>=0; j--){//work through the unused tiles from the end
-		if ((tileset[j].status == 'turned')&&(tileset[j].letter==letter_array[i])){
-		    if(!contains(tileID_array,j)){
-			tileID_array.push(j);
-			j=-1;//this is to break the inner loop
-		    }
-		} 
-	    }
-	}*/
-
 	return word_tileID_array;
     },
 
@@ -133,20 +119,26 @@ var Assembler = {
     //this will destroy the assembly object...
     Assembly_to_TileSequence: function(letter_array, MyAssembly){
 	var word_tileID_array = [];
+	var free_letter_usage_tally = this.blankLetterTally();
 	//for each letter in the letter array, determine a tile...
+	talliedLettersUsedFromWord = [];
 	for (var i=0; i<letter_array.length; i++){
 	    var LETR = letter_array[i];
 	    var j; //word index within the constituent words provided by the assembly object
 	    var donor_word_found = false;
 	    get_donor_word:
 	    for (j=0; j<MyAssembly.words_used.length; j++){
-		if (MyAssembly.words_used[j].tally[LETR] > 0){
+		if (MyAssembly.words_used[j].tally[LETR] > 0){//this check determines if some of the required letter is present
 		    donor_word_found = true;
 		    break get_donor_word;
 		}
 	    }
+
+	    if(talliedLettersUsedFromWord[j]==undefined){
+		talliedLettersUsedFromWord[j] = this.blankLetterTally();
+	    }
 	    
-	    if(donor_word_found){//extracting the desired tile from a word...
+	    if(donor_word_found){//extracting the desired tile from a word... Bear in mind the possiblity of duplicate tiles of the same letter within a word
 		var player_index = MyAssembly.words_used[j].player;
 		var word_index   = MyAssembly.words_used[j].word;
 		var word_tally   = MyAssembly.words_used[j].tally;
@@ -155,17 +147,25 @@ var Assembler = {
 		word_tally[LETR]--;
 
 		//now find the tile with the required letter in this word
-		var MyTiles = snDraw.Game.TileGroupsArray[player_index][word_index]._objects;
+		var MyWordsTiles = snDraw.Game.TileGroupsArray[player_index][word_index]._objects;
 		var k; //index of tile within word
-		get_tile:
-		for (k=0; k<MyTiles.length; k++){
-		    if(MyTiles[k].letter==LETR){
-			break get_tile;
+		var skip_count=0;
+		get_correct_letter_tile_from_word:
+		for (k = 0; k<MyWordsTiles.length; k++){
+		    if(MyWordsTiles[k].letter==LETR){
+			if(skip_count == talliedLettersUsedFromWord[j][LETR]){
+			    talliedLettersUsedFromWord[j][LETR]++;
+			    break get_correct_letter_tile_from_word;
+			}else{
+			    skip_count++;
+			}
 		    }
 		}
-		word_tileID_array.push(MyTiles[k].tileID);
-	    }else{//extracting the desired tile from the pool of turned tiles...
-		word_tileID_array.push(this.seachForTurnedTileOfLetter(LETR));
+		word_tileID_array.push(MyWordsTiles[k].tileID);
+	    }else{//extracting the desired tile from the pool of turned tiles. This needs not to include duplicates.
+		var n_skip = free_letter_usage_tally[LETR];
+		word_tileID_array.push(this.seachForTurnedTileOfLetter(LETR,n_skip));
+		free_letter_usage_tally[LETR]++;
 	    }
 	}
 
@@ -211,12 +211,18 @@ var Assembler = {
 	return true;//if none were not equal
     },
 
-    seachForTurnedTileOfLetter: function(myletter){
+    seachForTurnedTileOfLetter: function(myletter,n_skips){
 	var tile_index_matching_letter = undefined;
-	for (var i=0; i<tileset.length; i++){
+	find_tile_index:
+	for (var i = tileset.length-1; i>=0; i--){
 	    if ((tileset[i].status == 'turned')&&(tileset[i].letter==myletter)){
 		if(snDraw.Game.TileArray[i].visual != "ACTIVE"){
-		    tile_index_matching_letter = i;
+		    if(n_skips == 0){
+			tile_index_matching_letter = i;
+			break find_tile_index;
+		    }else{
+			n_skips--;
+		    }
 		}
 	    } 
 	}
