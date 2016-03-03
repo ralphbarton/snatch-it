@@ -114,7 +114,8 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     //Process the incoming data: 
     var tile_indices = SnatchUpdateMsg.tile_id_array
     var PI = SnatchUpdateMsg.player_index;
-    console.log("word usage : " + JSON.stringify(SnatchUpdateMsg.words_consumed));
+    var word_usage = SnatchUpdateMsg.words_consumed;
+    console.log("word usage : " + JSON.stringify(word_usage));
     var myplayer = players[PI];//please note that in this case object 'myplayer' is the snatching player... 
     var client_is_snatcher = client_player_index == PI;
     var player_first_word = myplayer.words.length == 0;
