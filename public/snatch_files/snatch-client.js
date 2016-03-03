@@ -115,45 +115,32 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     var tile_indices = SnatchUpdateMsg.tile_id_array
     var PI = SnatchUpdateMsg.player_index;
     var word_usage = SnatchUpdateMsg.words_consumed;
-    console.log("word usage : " + JSON.stringify(word_usage));
+
     var myplayer = players[PI];//please note that in this case object 'myplayer' is the snatching player... 
     var client_is_snatcher = client_player_index == PI;
     var player_first_word = myplayer.words.length == 0;
     var new_zone = (!client_is_snatcher) && (player_first_word);
+
+    //clear the spell only if client is snatcher
+    if(client_is_snatcher){snDraw.Game.Spell.CancelWord();}
 
     //update the players data structure:
     myplayer.words.push(tile_indices);
 
     //Generate a new zone if required.
     if(new_zone){
-	//create new zone box...
 	snDraw.Game.Zones.PlayerZone.push({
 	    player: players[PI],
 	    is_client: false
 	});
     }
 
-    //a toast
-    console.log("TOAST: " + myplayer.name + " has snatched a word, tile indices are:", tile_indices);    
-
-    snDraw.Game.Spell.CancelWord();
-    //This code is no longer relevant with the skeletal spell...
-    /*
-    //The snatch will potentially impact on the 'speller' of all players
-    if(client_is_snatcher){
-	//clear the speller of the snatching player (clear those yellow letters)
-	snDraw.Game.Spell.ClearWordFromSpeller(false);//remove it from the speller (clears up the speller)
-    }else{
-	//determine if the other player's snatch affects the client player's spell (are letters consumed?)
-	var overlap = commonElements(tile_indices,snDraw.Game.Spell.ActiveLetters_tile_ids()).length != 0;
-	if(overlap){//there is some overlap between speller and snatched word
-	    snDraw.Game.Spell.ClearWordFromSpeller(true,tile_indices);//division of letters in the speller between the snatched word and the spare letters area
-	}
-    }
-    */
-
     // (unconditionally) animate the resizing of the zones 
     snDraw.Game.Zones.updatePlayerZones(new_zone == true);//don't attempt to resize-animate a zone which is just appeared out of nowhere.
+
+    //a toast
+    console.log("TOAST: " + myplayer.name + " has snatched a word, tile indices are:", tile_indices);    
+    console.log("word usage : " + JSON.stringify(word_usage));
 
     // does the player box need to be inserted onto the screen?
     if(new_zone){
@@ -173,9 +160,6 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     //for the case of the Snatcher being the Client player here, this is still necessary as it has the effect of grouping the letters, even if not moving them
     //the final parameter of this function call determines if animation is required; not required if client is snatcher.
     snDraw.Game.drawSingleCapturedWord(myplayer,myplayer.words.length - 1, true); //TODO shouldn't that 'true' be a (!client_is_snatcher)
-
-    //resize the player zones
-
 
 });
 

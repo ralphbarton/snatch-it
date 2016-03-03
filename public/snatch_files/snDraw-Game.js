@@ -150,7 +150,6 @@ snDraw.Game = {
 
     modifyTileObject: function(myTile,to_state,options){
 	myTile.visual = to_state;
-	var anon_modifyTileObject = arguments.callee;
 	if(to_state=="flipping"){//this will animate the tile...
 
 	    pl_col = players[options.player_i].color;
@@ -168,8 +167,9 @@ snDraw.Game = {
 		    var s = (this.count/f_tot)*l_tot;
 		    this.R.setStrokeDashArray([s, l_tot-s]);
 		    if(this.count > f_tot){//animation completed...
-			//anon_modifyTileObject(myTile,"flipped");// this is a recursive call of my modifyTileObject function
-			snDraw.Game.modifyTileObject(myTile,"flipped");
+			//TODO: this may be inefficient. Actually, I think it is necessary, as whose to say when a single flipevent will happen.
+			snDraw.Game.Spell.recolourAll(snDraw.Game.Spell.ListAllVisibleTilesOf(myTile.letter));
+
 			return true;
 		    }else{
 			return false;
@@ -214,6 +214,14 @@ snDraw.Game = {
 	}
 
 	snDraw.setFrameRenderingTimeout (100);//as an alternative to canvas.renderAll()
+    },
+
+    //wrapper for the function above (is it actually necessary?)
+    animateTileFlip: function(flipping_player_i, tile_id){
+	var TargetTile = this.TileArray[tile_id];
+	var targetTileData = tileset[tile_id];
+	targetTileData.status="turned";//whilst the status change is immediate, the animation causes delay
+	this.modifyTileObject(TargetTile, "flipping",{player_i:flipping_player_i,time:2});
     },
 
     //this is my most complex function, it uses recursion to achieve a letter-by-letter animation.
@@ -309,13 +317,6 @@ snDraw.Game = {
 
     xCoordExceedsWrapThreshold: function(x_coord){
 	return (x_coord > myZoneWidth - this.marginUnit);
-    },
-
-    animateTileFlip: function(flipping_player_i, tile_id){
-	var TargetTile = this.TileArray[tile_id];
-	var targetTileData = tileset[tile_id];
-	targetTileData.status="turned";//whilst the status change is immediate, the animation causes delay
-	this.modifyTileObject(TargetTile, "flipping",{player_i:flipping_player_i,time:2});
     }
 
 };

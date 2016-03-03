@@ -53,6 +53,7 @@ snDraw.Game.Spell = {
 
     //cancel word
     CancelWord: function(){
+	this.SpellUsageCounter = {};//clear the tally - important to do this before the recolor
 	for (var i=0; i<this.SkeletalLetters.length; i++){
 	    var RemSkeletal = this.SkeletalLetters[i];
 	    var letter = RemSkeletal.letter;
@@ -60,7 +61,6 @@ snDraw.Game.Spell = {
 	    this.recolourAll(this.ListAllVisibleTilesOf(letter));//to ensure all the letter types that were involved get restored in colour.
 	}
 	this.SkeletalLetters = [];//clear the array (lose the references to the Fabric objects. Hope they get deleted
-	this.SpellUsageCounter = {};//clear the tally
     },
 
     ListAllVisibleTilesOf: function(letter){
@@ -77,7 +77,7 @@ snDraw.Game.Spell = {
     recolourAll: function(MyLetters){
 	var n_letter_in_spell = this.SpellUsageCounter[MyLetters[0].letter];
 	var visual = (MyLetters.length > n_letter_in_spell) ? "partial" : "shadow";
-	if(n_letter_in_spell==0){visual = "flipped";}
+	if((n_letter_in_spell==0)||(n_letter_in_spell==undefined)){visual = "flipped";}
 	for (var i=0; i<MyLetters.length; i++){
 	    snDraw.Game.modifyTileObject(MyLetters[i],visual);    
 	}

@@ -1,3 +1,8 @@
+
+<"taken from snDraw-Game-Spell.js">
+
+
+
     nActiveLetters: 0,
     n_letters_unwrap: undefined,
 
@@ -270,3 +275,28 @@
 	}
 	return ret;
     },
+
+
+
+
+
+
+
+
+
+<"taken from snatch-client.js">
+
+    //This code is no longer relevant with the skeletal spell...
+
+    //The snatch will potentially impact on the 'speller' of all players
+    if(client_is_snatcher){
+	//clear the speller of the snatching player (clear those yellow letters)
+	snDraw.Game.Spell.ClearWordFromSpeller(false);//remove it from the speller (clears up the speller)
+    }else{
+	//determine if the other player's snatch affects the client player's spell (are letters consumed?)
+	var overlap = commonElements(tile_indices,snDraw.Game.Spell.ActiveLetters_tile_ids()).length != 0;
+	if(overlap){//there is some overlap between speller and snatched word
+	    snDraw.Game.Spell.ClearWordFromSpeller(true,tile_indices);//division of letters in the speller between the snatched word and the spare letters area
+	}
+    }
+
