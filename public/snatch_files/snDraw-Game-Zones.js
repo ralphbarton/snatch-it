@@ -244,10 +244,6 @@ snDraw.Game.Zones = {
 	for (var i=0; i<pZone.player.words.length; i++){
 	    snDraw.Game.drawSingleCapturedWord(pZone.player, i);	
 	}
-
-	//this prep's the SPELL class to place letters in the right location
-	// it is needed within this function call because the player won't necessarily have any words at the start...
-	snDraw.Game.Spell.restoreBasePosition();
     }
 
 };

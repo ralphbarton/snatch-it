@@ -1,20 +1,9 @@
 //this is a container for functions and data for Word creation (the generally yellow bit)...
 snDraw.Game.Spell = {
 
-    // a note about players[i].saved_x_plotter // TODO write the note...
-    x_next_letter: undefined,
-    y_next_letter: undefined,
-
     //Advanced_Speller - data
     SkeletalLetters: [],
     SpellUsageCounter: {},
-
-
-    restoreBasePosition: function(){
-	var ClientPlayer = players[client_player_index];
-	this.x_next_letter = ClientPlayer.x_next_word;
-	this.y_next_letter = ClientPlayer.y_next_word;
-    },
 
     //Advanced_Speller - method
     addLetter: function(letter){
@@ -22,13 +11,13 @@ snDraw.Game.Spell = {
 	    var NewSkeletal = snDraw.Game.generateTileObject({letter:letter, status:"skeletal"}, -100 + this.SkeletalLetters.length);
 	    this.SkeletalLetters.push(NewSkeletal);
 	    var spell_len = this.SkeletalLetters.length;
-	    x_loco = this.x_next_letter + (spell_len-1) * snDraw.Game.h_spacer;
+	    x_loco = players[client_player_index].x_next_word + (spell_len-1) * snDraw.Game.h_spacer;
 
 	    //TODO: add wrap condition...
 
 	    NewSkeletal.set({
 		left: x_loco,
-		top: this.y_next_letter
+		top: players[client_player_index].y_next_word
 	    });
 
 	    canvas.add(NewSkeletal);
@@ -102,7 +91,7 @@ snDraw.Game.Spell = {
 	    for (var i=rem_i; i<this.SkeletalLetters.length; i++){
 		var ShiftMeSkeletal = this.SkeletalLetters[i];
 		ShiftMeSkeletal.tileID = i - 100;
-		x_loco = this.x_next_letter + i * snDraw.Game.h_spacer;
+		x_loco = players[client_player_index].x_next_word + i * snDraw.Game.h_spacer;
 		snDraw.moveSwitchable(ShiftMeSkeletal, true, snDraw.ani.sty_Sing,{
 		    left: x_loco
 		});
