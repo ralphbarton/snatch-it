@@ -141,8 +141,7 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     }
 
     // (unconditionally) animate the resizing of the zones 
-    snDraw.Game.Zones.updatePlayerZones(new_zone == true);//don't attempt to resize-animate a zone which is just appeared out of nowhere.
-
+    snDraw.Game.Zones.animateResizeRewrapAllPlayerZones(new_zone == true);//don't attempt to resize-animate a zone which is just appeared out of nowhere.
 
     // does the player box need to be inserted onto the screen?
     if(new_zone){

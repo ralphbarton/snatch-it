@@ -61,9 +61,17 @@ snDraw.Game.Zones = {
 		hRatio = 1 / nZones;
 	    }
 
+	    var zone_i = this.PlayerZone[i];
+
 	    //this line of code adds the attribute calculated to the relevant player object within the array...
-	    this.PlayerZone[i].zone_height = basic_height + Math.round( hRatio * shareable_height );
-	    this.PlayerZone[i].zone_top = plr_top_cumulator;
+	    zone_i.zone_height = basic_height + Math.round( hRatio * shareable_height );
+	    zone_i.zone_top = plr_top_cumulator;
+
+	    //set the base coordinates:
+	    zone_i.player.x_next_word = snDraw.Game.x_plotter_R;
+	    zone_i.player.y_first_word = zone_i.zone_top + 1.8 * snDraw.Game.marginUnit;
+	    zone_i.player.y_next_word = zone_i.player.y_first_word;
+
 	    plr_top_cumulator += this.PlayerZone[i].zone_height + snDraw.Game.textMarginUnit + snDraw.Game.stroke_px;
 	}
     },
@@ -152,27 +160,17 @@ snDraw.Game.Zones = {
 
 	}
 
-
-/*
-	var plrZone = new fabric.Group(ObjectArray,{
-	    hasControls: false,
-	    hasBorders: false,
-	    lockMovementX: true,
-	    lockMovementY: true
-	});
-*/
-
-
-
-
-	//since this function is only invoked when first creating the zone box for each player, this is the time to set the base coordinates:
-	pZone.player.x_next_word = snDraw.Game.x_plotter_R;
-	pZone.player.y_first_word = boxTop + 1.8 * snDraw.Game.marginUnit;
-	pZone.player.y_next_word = pZone.player.y_first_word;
-
+	/*
+	  var plrZone = new fabric.Group(ObjectArray,{
+	  hasControls: false,
+	  hasBorders: false,
+	  lockMovementX: true,
+	  lockMovementY: true
+	  });
+	*/
     },
 
-    updatePlayerZones: function(final_zone_is_newly_introduced){
+    animateResizeRewrapAllPlayerZones: function(final_zone_is_newly_introduced){
 
 	//update the data structures via its own references. Note that this may include the additional zone.
 	this.calculatePlayerZoneSizes();
@@ -215,26 +213,14 @@ snDraw.Game.Zones = {
 		snDraw.moveSwitchable(youText, true, snDraw.ani.sty_Resize,{
 		    top: labelTop - cell * 0.5
 		});
-
 	    }
 
 	    //animate the words, if present...
 	    var MyWordGrp = snDraw.Game.TileGroupsArray[myZone.player.index];
 	    if(MyWordGrp.length > 0){
-		//re-determine height shift by considering first word...
-
-		var DY = (myZone.zone_top + 1.8 * snDraw.Game.marginUnit) - MyWordGrp[0].getTop();
-		//hack to adjust the location for upcoming animation:
-		myZone.player.y_first_word += DY;
-		myZone.player.y_next_word += DY;
-
-		// j index used below, note the nested loop...
-		for (var j=0; j<MyWordGrp.length; j++){//loop through the player's words
-		    snDraw.moveSwitchable(MyWordGrp[j], true, snDraw.ani.sty_Resize,{
-			top: MyWordGrp[j].getTop() + DY
-		    });
-		}
+		snDraw.Game.animateRepositionPlayerWords(this.PlayerZone[i].player);
 	    }
+
 	}//loop
     },
 
