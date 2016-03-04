@@ -115,41 +115,22 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     var tile_indices = SnatchUpdateMsg.tile_id_array
     var PI = SnatchUpdateMsg.player_index;
     var word_usage = SnatchUpdateMsg.words_consumed;
-
-    var myplayer = players[PI];//please note that in this case object 'myplayer' is the snatching player... 
+    var snatching_player = players[PI];
     var client_is_snatcher = client_player_index == PI;
-    var player_first_word = myplayer.words.length == 0;
-    var new_zone = (!client_is_snatcher) && (player_first_word);
 
     //a toast
-    console.log("TOAST: " + myplayer.name + " has snatched a word, tile indices are:", tile_indices);    
+    console.log("TOAST: " + snatching_player.name + " has snatched a word, tile indices are:", tile_indices);    
     console.log("word usage : " + JSON.stringify(word_usage));
 
     //clear the spell only if client is snatcher
     if(client_is_snatcher){snDraw.Game.Spell.CancelWord();}
 
     //update the players data structure:
-    snDraw.Game.removeWordsAndRewrap(word_usage);
-    myplayer.words.push(tile_indices);
+    snDraw.Game.removeWordsAndUngroup(word_usage);
+    snatching_player.words.push(tile_indices);
 
-    //Generate a new zone if required.
-    if(new_zone){
-	snDraw.Game.Zones.PlayerZone.push({
-	    player: players[PI],
-	    is_client: false
-	});
-    }
-
-    // (unconditionally) animate the resizing of the zones 
-    snDraw.Game.Zones.animateResizeRewrapAllPlayerZones(new_zone == true);//don't attempt to resize-animate a zone which is just appeared out of nowhere.
-
-    // does the player box need to be inserted onto the screen?
-    if(new_zone){
-	//create new zone box...
-	var PZ = snDraw.Game.Zones.PlayerZone;
-	var FinalZone = PZ[PZ.length-1];
-	snDraw.Game.Zones.drawPlayerZoneBox(FinalZone,true);// Draws the BOX, second parameter is for animation.	
-    }
+    //most of the Zone reshaping work happens here
+    snDraw.Game.Zones.ZoneHandlingUponSnatch(snatching_player);
     
     //update the tiles data structure:
     for(i=0; i<tile_indices.length; i++){
@@ -160,9 +141,11 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     //draw the new word into the player zone...
     //for the case of the Snatcher being the Client player here, this is still necessary as it has the effect of grouping the letters, even if not moving them
     //the final parameter of this function call determines if animation is required; not required if client is snatcher.
-    snDraw.Game.drawSingleCapturedWord(myplayer,myplayer.words.length - 1, true); //TODO shouldn't that 'true' be a (!client_is_snatcher)
+    snDraw.Game.drawSingleCapturedWord(snatching_player,snatching_player.words.length - 1, true); //TODO shouldn't that 'true' be a (!client_is_snatcher)
 
 });
+
+
 
 socket.on('snatch rejected', function(rejection_reason){
     

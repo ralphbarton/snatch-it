@@ -312,9 +312,7 @@ snDraw.Game = {
     },
 
     //this function removes an arbitrary set of words, indexed by player and within that by word index.
-    removeWordsAndRewrap: function(RemovalWordList){
-
-	console.log("call of removeWordsAndRewrap", JSON.stringify(RemovalWordList));
+    removeWordsAndUngroup: function(RemovalWordList){
 	
 	//LOOP through all stolen words
 	for (var i=0; i<RemovalWordList.length; i++){
@@ -350,7 +348,6 @@ snDraw.Game = {
 	for (var i=0; i<players.length; i++){
 	    this.TileGroupsArray[i].clean(undefined);
 	    players[i].words.clean(undefined);
-	    console.log("The state of the data structures of player "+ i +" is:", players[i].words, this.TileGroupsArray[i]);
 	}
 
 	//at this point, it should be possible to see a word converted to consituent letters
@@ -358,14 +355,17 @@ snDraw.Game = {
     },
 
     //this function removes an arbitrary set of words, indexed by player and within that by word index.
-    animateRepositionPlayerWords: function(player){
+    animateRepositionPlayerWords: function(player,exclude_final_word_reposition){
 
 	var x_plotter = this.x_plotter_R;
 	var y_plotter = player.y_first_word;
 	var word_set = player.words;
 	var word_GRPs = this.TileGroupsArray[player.index];
 
-	for (var i=0; i<word_set.length; i++){
+	var n_words = word_set.length;
+	if(exclude_final_word_reposition){n_words--;}
+
+	for (var i = 0; i < n_words; i++){
 
 	    var x_span_word = this.h_spacer * word_set[i].length;
 
@@ -376,41 +376,24 @@ snDraw.Game = {
 	    }
 	    
 	    //now its position is determined; animate it into position.
-	    console.log("Attempting to animate ", word_GRPs[i], " from ", word_GRPs ,"(element "+i+")");
 	    snDraw.moveSwitchable(word_GRPs[i], true, snDraw.ani.sty_Resize,{
 		left: x_plotter,
 		top: y_plotter
 	    });
 
 	    //move the plotter along, given the placing of the word...
-	    x_plotter = this.h_space_word + x_span_word;
+	    x_plotter += this.h_space_word + x_span_word;
 	}
+
+	//set the saved coordinates back as modified...
+	player.x_next_word = x_plotter;
+	player.y_next_word = y_plotter;
 
 	//interate through all player words, applying the rewrapping. This should be animated
 	// CONSIDER that the rewrapping animation should be much slower than the SNATCH animation.
 	// consider how this relates to the above purge (before or after??)
 	// consider conflicting (overlapping) animating commands from both zone resizeing and wrap handling. These need to be consolidated.
 
-	/*
-	//CODE taken from elsewhere
-	//animate the words, if present...
-	var MyWordGrp = snDraw.Game.TileGroupsArray[myZone.player.index];
-	if(MyWordGrp.length > 0){
-	//re-determine height shift by considering first word...
-
-	var DY = (myZone.zone_top + 1.8 * snDraw.Game.marginUnit) - MyWordGrp[0].getTop();
-	//hack to adjust the location for upcoming animation:
-	myZone.player.y_first_word += DY;
-	myZone.player.y_next_word += DY;
-
-	// j index used below, note the nested loop...
-	for (var j=0; j<MyWordGrp.length; j++){//loop through the player's words
-	snDraw.moveSwitchable(MyWordGrp[j], true, snDraw.ani.sty_Resize,{
-	top: MyWordGrp[j].getTop() + DY
-	});
-	}
-	}
-	*/ 
     },
 
     xCoordExceedsWrapThreshold: function(x_coord){

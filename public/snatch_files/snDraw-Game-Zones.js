@@ -31,6 +31,16 @@ snDraw.Game.Zones = {
     },
 
 
+    // for example player.words : [[23,14,11],[44,12,13,19,4]]
+    drawAllPlayerWords: function(pZone){
+	//LOOP thru all the player's words...
+	// draw them onscreen
+	for (var i=0; i<pZone.player.words.length; i++){
+	    snDraw.Game.drawSingleCapturedWord(pZone.player, i);	
+	}
+    },
+
+
     calculatePlayerZoneSizes: function(){
 	var nZones = this.PlayerZone.length;
 	n_letters_in_zone = [];
@@ -170,68 +180,75 @@ snDraw.Game.Zones = {
 	*/
     },
 
-    animateResizeRewrapAllPlayerZones: function(final_zone_is_newly_introduced){
 
-	//update the data structures via its own references. Note that this may include the additional zone.
+    ZoneHandlingUponSnatch: function(snatching_player){
+
+	var client_is_snatcher = client_player_index == snatching_player.index;
+	var snatcher_first_word = snatching_player.words.length == 1;// by the point the function is called the word is added...
+	var new_zone = (!client_is_snatcher) && (snatcher_first_word);
+
+	//Generate a new zone if required.
+	if(new_zone){
+	    snDraw.Game.Zones.PlayerZone.push({
+		player: snatching_player,
+		is_client: false
+	    });
+	}
+
+	// Animate the resizing of the zones 
 	this.calculatePlayerZoneSizes();
-	
 	var nZones = this.PlayerZone.length;
-	if (final_zone_is_newly_introduced){nZones--;}//don't make adjustment animations to the final zone which is new...
+	if (new_zone){nZones--;}//don't make adjustment animations to any new final zone...
 
 	for(var i=0; i<nZones; i++){
-
-	    //animate the name and the box outline
-	    var myZone = this.PlayerZone[i]; 
-	    var bxFab = myZone.FabObjects;
-	    
-	    var boxTop    = myZone.zone_top;
-	    var boxHeight = myZone.zone_height;
-
-	    var zoneBox   = bxFab[0];
-	    var plrName   = bxFab[1];
-
-	    snDraw.moveSwitchable(zoneBox, true, snDraw.ani.sty_Resize,{
-		top: boxTop,
-		height: boxHeight
-	    });
-
-	    snDraw.moveSwitchable(plrName, true, snDraw.ani.sty_Resize,{
-		top: boxTop - snDraw.Game.textMarginUnit
-	    });
-
-	    //if present, animate the 'YOU'
-	    if(i==0){
-		var youBlock  = bxFab[2];
-		var youText   = bxFab[3];
-		var labelTop  = boxTop + boxHeight;
-		var cell = snDraw.Game.tileSize * 1.4;
-
-		snDraw.moveSwitchable(youBlock, true, snDraw.ani.sty_Resize,{
-		    top: labelTop - cell * 0.5
-		});
-
-		snDraw.moveSwitchable(youText, true, snDraw.ani.sty_Resize,{
-		    top: labelTop - cell * 0.5
-		});
-	    }
-
-	    //animate the words, if present...
-	    var MyWordGrp = snDraw.Game.TileGroupsArray[myZone.player.index];
-	    if(MyWordGrp.length > 0){
-		snDraw.Game.animateRepositionPlayerWords(this.PlayerZone[i].player);
-	    }
-
+	    //second parameter true prevents it from attempting to shuffle the final word (already present as data), as it will not yet be existant as a fabric group 
+	    var zone_i = this.PlayerZone[i];
+	    var snatched_word_here = zone_i.player.index == snatching_player.index;
+	    this.animateResizeRewrapZone(zone_i, snatched_word_here);
 	}//loop
+
+	// does the player box need to be inserted onto the screen?
+	if(new_zone){
+	    //create new zone box...
+	    var PZ = snDraw.Game.Zones.PlayerZone;
+	    var FinalZone = PZ[PZ.length-1];
+	    snDraw.Game.Zones.drawPlayerZoneBox(FinalZone,true);// Draws the BOX, second parameter is for animation.	
+	}
     },
 
 
-    // for example player.words : [[23,14,11],[44,12,13,19,4]]
-    drawAllPlayerWords: function(pZone){
-	//LOOP thru all the player's words...
-	// draw them onscreen
-	for (var i=0; i<pZone.player.words.length; i++){
-	    snDraw.Game.drawSingleCapturedWord(pZone.player, i);	
+    animateResizeRewrapZone: function(myZone, snatched_word_here){
+
+	//animate the name and the box outline
+	var bxFab = myZone.FabObjects;
+	var boxTop    = myZone.zone_top;
+	var boxHeight = myZone.zone_height;
+	var zoneBox   = bxFab[0];
+	var plrName   = bxFab[1];
+
+	snDraw.moveSwitchable(zoneBox, true, snDraw.ani.sty_Resize,{
+	    top: boxTop,
+	    height: boxHeight
+	});
+	snDraw.moveSwitchable(plrName, true, snDraw.ani.sty_Resize,{
+	    top: boxTop - snDraw.Game.textMarginUnit
+	});
+	//if present, animate the 'YOU'
+	if(myZone.player.index == client_player_index){
+	    var youBlock  = bxFab[2];
+	    var youText   = bxFab[3];
+	    var labelTop  = boxTop + boxHeight;
+	    var cell = snDraw.Game.tileSize * 1.4;
+
+	    snDraw.moveSwitchable(youBlock, true, snDraw.ani.sty_Resize,{
+		top: labelTop - cell * 0.5
+	    });
+	    snDraw.moveSwitchable(youText, true, snDraw.ani.sty_Resize,{
+		top: labelTop - cell * 0.5
+	    });
 	}
+	//animate the words, if present...
+	snDraw.Game.animateRepositionPlayerWords(myZone.player, snatched_word_here);
     }
 
 };
