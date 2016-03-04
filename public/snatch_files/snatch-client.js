@@ -125,6 +125,7 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     if(client_is_snatcher){snDraw.Game.Spell.CancelWord();}
 
     //update the players data structure:
+    snDraw.Game.removeWordsAndRewrap(word_usage);
     myplayer.words.push(tile_indices);
 
     //Generate a new zone if required.
@@ -188,6 +189,19 @@ Array.prototype.move = function (old_index, new_index) {
     }
     this.splice(new_index, 0, this.splice(old_index, 1)[0]);
     return this; // for testing purposes
+};
+
+
+//What uses this function?
+//Answer: used by removeWordsAndRewrap to prevent changing indices during clearing...
+Array.prototype.clean = function(deleteValue) {
+  for (var i = 0; i < this.length; i++) {
+    if (this[i] == deleteValue) {         
+      this.splice(i, 1);
+      i--;
+    }
+  }
+  return this;
 };
 
 

@@ -224,6 +224,7 @@ snDraw.Game = {
 	this.modifyTileObject(TargetTile, "flipping",{player_i:flipping_player_i,time:2});
     },
 
+
     //this is my most complex function, it uses recursion to achieve a letter-by-letter animation.
     drawSingleCapturedWord: function(myplayer, word_index, animate){
 	var x_plotter = myplayer.x_next_word;
@@ -283,6 +284,7 @@ snDraw.Game = {
 	Recursive_Letters_Loop(0);
     },
 
+
     makeTilesDraggableGroup: function(LettersOfThisWord, myplayer, word_index){
 	var grp_left = LettersOfThisWord[0].getLeft() - 0.5;
 	var grp_top = LettersOfThisWord[0].getTop() - 0.5;
@@ -307,8 +309,64 @@ snDraw.Game = {
 
 	canvas.add(PlayerWordGRP);
 	canvas.renderAll();
+    },
 
+    //this function removes an arbitrary set of words, indexed by player and within that by word index.
+    removeWordsAndRewrap: function(RemovalWordList){
 
+	var affected_players = [];
+	
+	//LOOP through all stolen words
+	for (var i=0; i<RemovalWordList.length; i++){
+	    var PIi = RemovalWordList[i].PI;
+	    var WIi = RemovalWordList[i].WI;
+
+	    //maintain the list of players who've lost a word...
+	    if(!contains(affected_players, WIi)){
+		affected_players.push(PIi);
+	    }
+
+	    //modify the players data structure:
+	    var removed_word_tileIDs = players[PIi].words[WIi];
+	    delete players[PIi].words[WIi];//just delete the array element now, purge the array of empy elements later
+
+	    //determine the group coordinates...
+	    var StolenGRP = this.TileGroupsArray[PIi][WIi];	    
+	    var Stolen_x_base = StolenGRP.getLeft(); 
+	    var Stolen_y_base = StolenGRP.getTop(); 
+
+	    //remove tiles from Group, and place in position as individual tiles:
+	    for (var j=0; j<removed_word_tileIDs.length; j++){
+		var StolenTile = this.TileArray[removed_word_tileIDs[j]];
+		this.TileGroupsArray[PIi][WIi].remove(StolenTile);		
+		//place individual tiles back on the canvas in location
+		StolenTile.set({
+		    left: Stolen_x_base + this.h_spacer * j,
+		    top: Stolen_y_base
+		});
+		canvas.add(StolenTile);
+	    }
+	    
+	    //remove the now empy group itself
+	    canvas.remove(StolenGRP);
+	    delete this.TileGroupsArray[PIi][WIi];
+	}
+
+	//at this point, it should be possible to see a word converted to consituent letters
+
+	//LOOP through all affected players
+	for (var i=0; i<affected_players.length; i++){
+	    //purge the data structures of the deleted objects:
+	    var PIi = affected_players[i];
+	    this.TileGroupsArray[PIi].clean(undefined);
+	    players[PIi].words.clean(undefined);
+	       
+	    //interate through all player words, applying the rewrapping. This should be animated
+	    // CONSIDER that the rewrapping animation should be much slower than the SNATCH animation.
+	    // consider how this relates to the above purge (before or after??)
+	}
+
+	canvas.renderAll();
     },
 
     xCoordExceedsWrapThreshold: function(x_coord){
