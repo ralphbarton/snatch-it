@@ -167,7 +167,8 @@ snDraw.Game.Zones = {
 
 	//since this function is only invoked when first creating the zone box for each player, this is the time to set the base coordinates:
 	pZone.player.x_next_word = snDraw.Game.x_plotter_R;
-	pZone.player.y_next_word = boxTop + 1.8 * snDraw.Game.marginUnit;
+	pZone.player.y_first_word = boxTop + 1.8 * snDraw.Game.marginUnit;
+	pZone.player.y_next_word = pZone.player.y_first_word;
 
     },
 
@@ -224,6 +225,7 @@ snDraw.Game.Zones = {
 
 		var DY = (myZone.zone_top + 1.8 * snDraw.Game.marginUnit) - MyWordGrp[0].getTop();
 		//hack to adjust the location for upcoming animation:
+		myZone.player.y_first_word += DY;
 		myZone.player.y_next_word += DY;
 
 		// j index used below, note the nested loop...

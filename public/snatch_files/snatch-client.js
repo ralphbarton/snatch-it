@@ -121,6 +121,10 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     var player_first_word = myplayer.words.length == 0;
     var new_zone = (!client_is_snatcher) && (player_first_word);
 
+    //a toast
+    console.log("TOAST: " + myplayer.name + " has snatched a word, tile indices are:", tile_indices);    
+    console.log("word usage : " + JSON.stringify(word_usage));
+
     //clear the spell only if client is snatcher
     if(client_is_snatcher){snDraw.Game.Spell.CancelWord();}
 
@@ -139,9 +143,6 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     // (unconditionally) animate the resizing of the zones 
     snDraw.Game.Zones.updatePlayerZones(new_zone == true);//don't attempt to resize-animate a zone which is just appeared out of nowhere.
 
-    //a toast
-    console.log("TOAST: " + myplayer.name + " has snatched a word, tile indices are:", tile_indices);    
-    console.log("word usage : " + JSON.stringify(word_usage));
 
     // does the player box need to be inserted onto the screen?
     if(new_zone){

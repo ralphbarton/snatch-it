@@ -240,7 +240,7 @@ module.exports = function (nTiles){
 	    	console.log("Player " + PI + " SNATCH rejected : " + Response.val_check);
 	    }
 
-	    console.log("Word set now: " + playerSet[PI].words);
+	    console.log("Words of player " + PI + "  now: " + JSON.stringify(playerSet[PI].words));
 	    return Response;
 	},
 

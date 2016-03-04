@@ -315,6 +315,9 @@ snDraw.Game = {
     removeWordsAndRewrap: function(RemovalWordList){
 
 	var affected_players = [];
+	var wrap_from_word = {};
+
+	console.log("call of removeWordsAndRewrap", JSON.stringify(RemovalWordList));
 	
 	//LOOP through all stolen words
 	for (var i=0; i<RemovalWordList.length; i++){
@@ -322,8 +325,12 @@ snDraw.Game = {
 	    var WIi = RemovalWordList[i].WI;
 
 	    //maintain the list of players who've lost a word...
-	    if(!contains(affected_players, WIi)){
+	    if(!contains(affected_players, PIi)){
 		affected_players.push(PIi);
+	    }
+
+	    if((wrap_from_word[PIi] == undefined)||(wrap_from_word[PIi] > WIi)){
+		wrap_from_word[PIi] = WIi;
 	    }
 
 	    //modify the players data structure:
@@ -354,16 +361,51 @@ snDraw.Game = {
 
 	//at this point, it should be possible to see a word converted to consituent letters
 
+	console.log("affected_players",affected_players);
+
 	//LOOP through all affected players
 	for (var i=0; i<affected_players.length; i++){
-	    //purge the data structures of the deleted objects:
-	    var PIi = affected_players[i];
+	    //purge this player's data structures of the deleted objects:
+	    var PIi = affected_players[i];//this is an (integer) index of an affected player...
 	    this.TileGroupsArray[PIi].clean(undefined);
 	    players[PIi].words.clean(undefined);
-	       
+
+	    var x_plotter = this.x_plotter_R;
+	    var y_plotter = players[PIi].y_first_word;
+	    var player_i_words = players[PIi].words;
+
+	    //var just_done_carriage_return = true;//can't ever do 2 carriage returns one after the other.
+	    for (var j=0; j<player_i_words.length; j++){
+
+		//this is the word we are considering placement of
+		var Pi_Wj_tileIDs = player_i_words[j];
+		var Pi_Wj_GRP = this.TileGroupsArray[PIi][j];
+		var x_span_word = this.h_spacer * Pi_Wj_tileIDs.length;
+
+		//if this word will run over the end of the line, do a carriage return...
+		if( this.xCoordExceedsWrapThreshold(x_plotter + x_span_word)){
+		    y_plotter += this.v_spacer;
+		    x_plotter = this.x_plotter_R;
+		}
+		
+		//now its position is determined; animate it into position.
+		snDraw.moveSwitchable(Pi_Wj_GRP, true, snDraw.ani.sty_Resize,{
+		    left: x_plotter,
+		    top: y_plotter
+		});
+
+		//move the plotter along, given the placing of the word...
+		x_plotter = this.h_space_word + x_span_word;
+
+		//wrap_from_word[PIi]
+	    }   
+
+	    console.log("The state of the data structures of player "+PIi+" is:",players[PIi].words,this.TileGroupsArray[PIi]);
+
 	    //interate through all player words, applying the rewrapping. This should be animated
 	    // CONSIDER that the rewrapping animation should be much slower than the SNATCH animation.
 	    // consider how this relates to the above purge (before or after??)
+	    // consider conflicting (overlapping) animating commands from both zone resizeing and wrap handling. These need to be consolidated.
 	}
 
 	canvas.renderAll();
