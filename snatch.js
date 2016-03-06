@@ -111,7 +111,7 @@ io.on('connection', function(socket){
 	myGame.flipLetter(tileTurnDetails.tileID);//note that in this handler we discard the knowledge of the player ID, as it stands.
 	//however, in reflecting the message back to all clients, we do pass on that data
 	io.emit('tile turn assert', tileTurnDetails);
-	console.log("<handler> Recieved from a client: " + JSON.stringify(tileTurnDetails) + " - data broadcast back to all clients...");
+	console.log("PI=" + tileTurnDetails.playerIndex + " flips tileID=" + tileTurnDetails.tileID);
     });
 
 });

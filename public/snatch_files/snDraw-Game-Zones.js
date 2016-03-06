@@ -181,10 +181,10 @@ snDraw.Game.Zones = {
     },
 
 
-    ZoneHandlingUponSnatch: function(snatching_player){
+    ZoneHandlingUponSnatch: function(snatching_player, n_words_prior2S){
 
 	var client_is_snatcher = client_player_index == snatching_player.index;
-	var snatcher_first_word = snatching_player.words.length == 1;// by the point the function is called the word is added...
+	var snatcher_first_word = n_words_prior2S == 0;
 	var new_zone = (!client_is_snatcher) && (snatcher_first_word);
 
 	//Generate a new zone if required.

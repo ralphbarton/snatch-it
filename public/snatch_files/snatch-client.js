@@ -125,12 +125,15 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     //clear the spell only if client is snatcher
     if(client_is_snatcher){snDraw.Game.Spell.CancelWord();}
 
+    //record how many words
+    var n_words_prior2S = snatching_player.words.length;
+
     //update the players data structure:
     snDraw.Game.removeWordsAndUngroup(word_usage);
     snatching_player.words.push(tile_indices);
 
     //most of the Zone reshaping work happens here
-    snDraw.Game.Zones.ZoneHandlingUponSnatch(snatching_player);
+    snDraw.Game.Zones.ZoneHandlingUponSnatch(snatching_player,n_words_prior2S);
     
     //update the tiles data structure:
     for(i=0; i<tile_indices.length; i++){
