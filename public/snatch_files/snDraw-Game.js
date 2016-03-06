@@ -16,7 +16,7 @@ snDraw.Game = {
     v_spacer: undefined,
     x_plotter_R: undefined, // x-coordinate of "carriage return"
 
-    Ratio_tile: 0.15, //Tuneable
+    Ratio_tile: 0.35, //Tuneable
 
     //member variables - dynamic, for rendering...
     unusedTilesBottomPx: undefined,
@@ -42,7 +42,7 @@ snDraw.Game = {
 	canvas.clear();	    
 	snDraw.Game.Controls.createControls();//draw buttons on the top of the screen
 	this.createEveryTileObject_inGridAtTop();//next draw all the unturned tiles underneath
-	snDraw.Game.Zones.drawEntirePlayerZone();//next draw all the players word zones
+	snDraw.Game.Zones.CreatePlayerZoneListAndDraw();//next draw all the players word zones
 	canvas.renderAll();
 	TA = this.TileArray;//this is to enable faster debugging
     },
@@ -212,8 +212,6 @@ snDraw.Game = {
 	    myTile.item(0).setStroke('#682424');
 	    ObjFlip();
 	}
-
-	snDraw.setFrameRenderingTimeout (100);//as an alternative to canvas.renderAll()
     },
 
     //wrapper for the function above (is it actually necessary?)

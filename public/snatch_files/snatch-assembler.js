@@ -46,8 +46,12 @@ var Assembler = {
 
 	var index_arb = getRandomInt(0,this.Assemblies.length-1);
 	var AnArbitraryAssembly = this.Assemblies[index_arb];
+	if(AnArbitraryAssembly){
 	var word_tileID_array = this.Assembly_to_TileSequence(letter_array, AnArbitraryAssembly);
-	console.log("Proposed word_tileID_array = ", word_tileID_array);
+	    console.log("Proposed word_tileID_array = ", word_tileID_array);
+	}else{
+	    console.log("Assembly failed for the word. The list of assemblies is:", this.Assemblies);
+	}
 
 	return word_tileID_array;
     },

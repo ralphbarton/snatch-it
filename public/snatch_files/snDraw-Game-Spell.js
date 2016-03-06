@@ -96,6 +96,7 @@ snDraw.Game.Spell = {
 		    left: x_loco
 		});
 	    }
+	    snDraw.setFrameRenderingTimeout(100);//as an alternative to canvas.renderAll()
 	}
     },
 

@@ -5,7 +5,7 @@ snDraw.Game.Zones = {
     playersZoneTopPx: undefined,
 
     //member functions
-    drawEntirePlayerZone: function(){
+    CreatePlayerZoneListAndDraw: function(){
 
 	this.PlayerZone = [];//clear the array TODO: this should not be necessary, this function should only ever be called once.
 	// Populate 'this.PlayerZone' with a subset of players...
@@ -25,7 +25,7 @@ snDraw.Game.Zones = {
 	this.calculatePlayerZoneSizes();//this sets attributes within the player objects
 
 	for (var i=0; i<this.PlayerZone.length; i++){
-	    this.drawPlayerZoneBox(this.PlayerZone[i]);// Draws the BOX
+	    this.createZoneBox(this.PlayerZone[i]);// Draws the BOX
 	    this.drawAllPlayerWords(this.PlayerZone[i]);//Draws all the WORDS
 	}
     },
@@ -49,7 +49,7 @@ snDraw.Game.Zones = {
 	//count the number of letters each player has, and total letters used within words
 	for(var i=0; i<nZones; i++){
 	    n_letters_in_zone[i] = 0;
-	    for(j=0; j<this.PlayerZone[i].player.words.length; j++){
+	    for(var j=0; j < this.PlayerZone[i].player.words.length; j++){
 		n_letters_in_zone[i] += this.PlayerZone[i].player.words[j].length;
 	    }
 	    n_letters_played += n_letters_in_zone[i];
@@ -86,7 +86,7 @@ snDraw.Game.Zones = {
 	}
     },
 
-    drawPlayerZoneBox: function(pZone,animate_from_left){
+    createZoneBox: function(pZone,animate_from_left){
 
 	var boxLeft   = snDraw.Game.marginUnit;
 	var boxTop    = pZone.zone_top;
@@ -181,6 +181,31 @@ snDraw.Game.Zones = {
     },
 
 
+    removeZoneBox: function(empty_zone){
+	var bxFab = empty_zone.FabObjects;
+	var LOW_px = myZoneHeight + snDraw.Game.tileSize;
+	var zoneBox   = bxFab[0];
+	var plrName   = bxFab[1];
+
+	//generates a new animation properties object which includes a callback to group the relevant set of letter tiles upon completion of the animation
+	var ani_withDELcallback = jQuery.extend({
+	    onComplete: function(){
+		canvas.remove(zoneBox);
+		canvas.remove(plrName);
+	    }
+	}, snDraw.ani.sty_Resize);
+
+
+	snDraw.moveSwitchable(zoneBox, true, snDraw.ani.sty_Resize,{
+	    top: LOW_px
+	});
+	snDraw.moveSwitchable(plrName, true, ani_withDELcallback,{// only need to use the ani_withDELcallback variant once...
+	    top: LOW_px - snDraw.Game.textMarginUnit
+	});
+
+    },
+
+
     ZoneHandlingUponSnatch: function(snatching_player, n_words_prior2S){
 
 	var client_is_snatcher = client_player_index == snatching_player.index;
@@ -195,16 +220,24 @@ snDraw.Game.Zones = {
 	    });
 	}
 
+	//delete zones if required
+	for(var i=0; i < this.PlayerZone.length; i++){
+	    var zone_i = this.PlayerZone[i];
+	    if((zone_i.player.words.length == 0)&&(!zone_i.is_client)){//there are no words in the zone, and it's a non-client player. 
+		var empty_zone = this.PlayerZone.splice(i,1)[0];
+		this.removeZoneBox(empty_zone);
+	    }
+	}
 	// Animate the resizing of the zones 
+	var nZones = this.PlayerZone.length; //note that the immediately preceeding code may remove zones and change the length.
 	this.calculatePlayerZoneSizes();
-	var nZones = this.PlayerZone.length;
 	if (new_zone){nZones--;}//don't make adjustment animations to any new final zone...
 
 	for(var i=0; i<nZones; i++){
 	    //second parameter true prevents it from attempting to shuffle the final word (already present as data), as it will not yet be existant as a fabric group 
 	    var zone_i = this.PlayerZone[i];
-	    var snatched_word_here = zone_i.player.index == snatching_player.index;
-	    this.animateResizeRewrapZone(zone_i, snatched_word_here);
+	    var snatched_word_in_this_zone = zone_i.player.index == snatching_player.index;
+	    this.animateResizeRewrapZone(zone_i, snatched_word_in_this_zone);
 	}//loop
 
 	// does the player box need to be inserted onto the screen?
@@ -212,7 +245,7 @@ snDraw.Game.Zones = {
 	    //create new zone box...
 	    var PZ = snDraw.Game.Zones.PlayerZone;
 	    var FinalZone = PZ[PZ.length-1];
-	    snDraw.Game.Zones.drawPlayerZoneBox(FinalZone,true);// Draws the BOX, second parameter is for animation.	
+	    snDraw.Game.Zones.createZoneBox(FinalZone,true);// Draws the BOX, second parameter is for animation.	
 	}
     },
 
@@ -233,6 +266,7 @@ snDraw.Game.Zones = {
 	snDraw.moveSwitchable(plrName, true, snDraw.ani.sty_Resize,{
 	    top: boxTop - snDraw.Game.textMarginUnit
 	});
+
 	//if present, animate the 'YOU'
 	if(myZone.player.index == client_player_index){
 	    var youBlock  = bxFab[2];

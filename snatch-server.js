@@ -120,6 +120,11 @@ module.exports = function (nTiles){
 	},
 
 	snatchWordValidation: function(tile_id_array){
+
+	    if(tile_id_array == null){
+		return {validity: 'null word sent...'};
+	    }
+
 	    // the most basic check is that it is over 3 letters
 	    if(tile_id_array.length < 3){
 		return {validity: 'insufficient length'};
@@ -201,16 +206,28 @@ module.exports = function (nTiles){
 	    if( Response.val_check == 'accepted'){// snatch accepted
 	    	console.log("Player " + PI + " SNATCH accepted.");
 		var words_consumed = validation_results.words_consumed;
-
 		
 		//BUSINESS LOGIC: UPDATE SERVER-SIDE GAME REPRESENTATION
 
-		//[step 1] remove any consumed words
+		//[step 1] remove any consumed words. This also includes updating the tile_ownership[] array, as indexes shift...
 		for(var i=0; i<words_consumed.length; i++){
 		    var old_PI = words_consumed[i].PI;
 		    var old_WI = words_consumed[i].WI;
-		    var lost_word = playerSet[old_PI].words.splice(old_WI,1);
-		    console.log("Player " + old_PI + "'s word (" + lost_word + ") was taken");
+		    var lost_word = playerSet[old_PI].words.splice(old_WI,1)[0];
+		    
+		    //(consider if the tile_ownership[TID] array actually saves time overall...)
+		    //corrections for word shift...
+		    var PI_wordset = playerSet[old_PI].words;
+		    for(var j=old_WI; j<PI_wordset.length; j++){
+			for(var k=0; k<PI_wordset[j].length; k++){
+			    var TID = PI_wordset[j][k];
+			    tile_ownership[TID] = {
+				player_index: old_PI,
+				word_index: j
+			    };
+			}
+		    }
+		    console.log("Player " + old_PI + "'s word (" + JSON.stringify(lost_word) + ") was taken");
 		}
 
 		//[step 2] update all letters so that they cannot be claimed again as status 'turned' single letters
@@ -240,7 +257,12 @@ module.exports = function (nTiles){
 	    	console.log("Player " + PI + " SNATCH rejected : " + Response.val_check);
 	    }
 
-	    console.log("Words of player " + PI + "  now: " + JSON.stringify(playerSet[PI].words));
+	    //log status at this point...
+	    console.log("Words in player are now:");
+	    for(var i=0; i<playerSet.length; i++){
+		console.log("Player " + i + "  has: " + JSON.stringify(playerSet[i].words));
+	    }
+	    console.log("--------\n");
 	    return Response;
 	},
 
@@ -249,13 +271,13 @@ module.exports = function (nTiles){
 
 	    var mySet = [];
 	    if(color_palette.length>=5){
-		for(i=0;i<5;i++){
+		for(i=0; i<5; i++){
 		    mySet.push({index: i, color: color_palette[i]});
 		}
 		bound_palette[socket_key] = color_palette.splice(0,5);//remove 5 colours from the palette
 		}
 	    else{
-		for(i=0;i<5;i++){
+		for(i=0; i<5; i++){
 		    mySet.push({index: i, color: emergency_colors[i]});
 		}
 		emergency_colors = emergency_colors.concat(emergency_colors.splice(0,5));
