@@ -226,7 +226,7 @@ snDraw.Game.KB = {
 
 	if(myKeycode == 32){//space bar
 	    // let this be turn a letter
-	    var target_tile_index = this.getLargestUnturnedTileIndex();
+	    var target_tile_index = this.autoNextUnturnedTileIndex();
 	    if(target_tile_index !== undefined){
 		tileTurnObj = {
 		    playerIndex: client_player_index,
@@ -242,12 +242,6 @@ snDraw.Game.KB = {
 	if((myKeycode == 8)||(keyPressed == '3')){//delete key
 	    // let this be remove the final letter of the spell (if present)
 	    snDraw.Game.Spell.removeLetter();
-	    //this is the old CODE TODO:delete
-	    /*
-	    var SpellArray = snDraw.Game.Spell.ActiveLetterSet;
-	    var LastTile = SpellArray[SpellArray.length-1];
-	    snDraw.Game.Spell.removeLetter(LastTile);
-	    */
 	}
 
 	if((myKeycode == 13)||(keyPressed == '2')){//enter key
@@ -274,14 +268,20 @@ snDraw.Game.KB = {
 */
     },
 
-    getLargestUnturnedTileIndex: function(){
-	var highest_unturned = undefined;
-	for (var i=0; i<tileset.length; i++){
-	    if (tileset[i].status == 'unturned'){
-		highest_unturned = i;
-	    } 
+    autoNextUnturnedTileIndex: function(){
+	var grid = snDraw.Game.TileGrid;
+	for (var r=grid.length-1; r>=0; r--){
+	    for (var c=grid[r].length-1; c>=0; c--){
+		if(grid[r][c]!=undefined){
+		    if(grid[r][c].TileObj!=null){
+			var TID = grid[r][c].TileObj.tileID;
+			if (tileset[TID].status == 'unturned'){
+			    return TID;
+			}
+		    }
+		}
+	    }
 	}
-	return highest_unturned;
     }
 };
 
