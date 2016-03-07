@@ -50,6 +50,7 @@ snDraw.Game.Spell = {
 	    this.recolourAll(this.ListAllVisibleTilesOf(letter));//to ensure all the letter types that were involved get restored in colour.
 	}
 	this.SkeletalLetters = [];//clear the array (lose the references to the Fabric objects. Hope they get deleted
+	snDraw.setFrameRenderingTimeout(100);//as an alternative to canvas.renderAll()
     },
 
     ListAllVisibleTilesOf: function(letter){

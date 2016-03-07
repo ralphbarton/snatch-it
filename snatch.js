@@ -11,7 +11,7 @@ app.use(express.static('public'));
 
 var snatchSvr = require('./snatch-server.js');
 
-var myGame = snatchSvr(100);//create a snatch game instance with 50 tiles...
+var myGame = snatchSvr(70);//create a snatch game instance with 50 tiles...
 
 io.on('connection', function(socket){
 

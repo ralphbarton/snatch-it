@@ -132,6 +132,9 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     snDraw.Game.removeWordsAndUngroup(word_usage);
     snatching_player.words.push(tile_indices);
 
+    //mark the locations of any snatched tiles on grid as empty
+    snDraw.Game.shiftTilesUpGrid(tile_indices);
+
     //most of the Zone reshaping work happens here
     snDraw.Game.Zones.ZoneHandlingUponSnatch(snatching_player,n_words_prior2S);
     
