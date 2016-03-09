@@ -1,4 +1,3 @@
-
 //this file contains the functions that render the game onto the screen
 
 var TA = [];//this is to enable faster debugging
@@ -68,7 +67,8 @@ snDraw.Game = {
 
     },
 
-
+    Grid_xPx: [],
+    Grid_yPx: [],
     createEveryTileObject_inGridAtTop: function (){
 
 	//parameters controlling tile spacing in the tile grid
@@ -79,30 +79,28 @@ snDraw.Game = {
 
 	//now create a fabric object for every tile...
 	this.TileGrid.push([]);//contents of the first ROW (it's empty).
+	this.Grid_yPx.push(y_plotter);//y-coordinate of a row of the grid...
 	var grid_row_counter = 0;
 	for (var i=0; i<tileset.length; i++){
-	    
-	    var myTile = this.generateTileObject(tileset[i], i);//here is the BUSINESS code to create the Fabric object for a tile
+	    //here is the BUSINESS code to create the Fabric object for a tile
+	    var myTile = this.generateTileObject(tileset[i], i);
 
 	    //add flat-array reference to the object
-	    this.TileArray[i]=myTile;
+	    this.TileArray[i] = myTile;
 
 	    var refTile = null;
 	    var refGrid_row = null;
 	    var refGrid_col = null;
 
 	    if(tileset[i].status!="inword"){
-		var refTile = myTile;
-		var refGrid_row = grid_row_counter;
-		var refGrid_col = this.TileGrid[grid_row_counter].length;
+		var refTileID = myTile.tileID;//forward reference to go into the grid
+		var refGrid_row = grid_row_counter;//backward reference to go into the tile
+		var refGrid_col = this.TileGrid[grid_row_counter].length;//backward reference
 	    }
 
 	    //add the Grid reference to the object
-	    this.TileGrid[grid_row_counter].push({
-		x: x_plotter,
-		y: y_plotter,
-		TileObj: refTile
-	    });
+	    this.TileGrid[grid_row_counter].push(refTileID);
+
 	    //add the tile reference to the grid
 	    myTile.Grid_row = refGrid_row;
 	    myTile.Grid_col = refGrid_col;
@@ -110,6 +108,11 @@ snDraw.Game = {
 	    //move the tile (ok, but this is kinda duplication of code, this one next line...)
 	    myTile.set({top:y_plotter,left:x_plotter});
 	    canvas.add(myTile);
+
+	    //capture all the x_coordinates of the colums of the grid (only needs to be done for one row)
+	    if(grid_row_counter == 0){
+		this.Grid_xPx.push(x_plotter);//x-coordinate of a column of the grid...
+	    }
 
 	    //modify the plot coordinates, ready to place the next tile alongside...
 	    x_plotter += xy_incr;
@@ -120,17 +123,19 @@ snDraw.Game = {
 		x_plotter = XPD;
 		y_plotter += xy_incr;
 		//additional row:
-		this.TileGrid.push([]);//contents of the first ROW (it's empty).
+		this.TileGrid.push([]);//contents another, lower row (empty at the point of starting new line).
+		this.Grid_yPx.push(y_plotter);//y-coordinate of a row of the grid...
 		grid_row_counter++;
 	    }
 	}
-
-	this.shiftTilesUpGrid();//tidy up in case of missing tiles. This also has the (necessary) effect of setting variable playersZoneTopPx
+	//tidy up in case of missing tiles. This also has the (necessary) effect of setting variable playersZoneTopPx
+	this.shiftTilesUpGrid();
     },
 
 
     shiftTilesUpGrid: function(tile_IDs_moved_off_grid){
 
+	//where no tileIDs are supplied, it is presumed to be the intital screen-rendering call which does not require animation
 	var animate = false;
 	if(tile_IDs_moved_off_grid){
 	    this.remove_Tile_references_from_grid(tile_IDs_moved_off_grid);
@@ -139,58 +144,63 @@ snDraw.Game = {
 
 	var max_col_height = 0;
 	var max_height_col = undefined;
-	for (var c=0; c<this.TileGrid[0].length; c++){
-	    var n_tiles_in_col = 0; //counts the highest (in position on-screen) empty row space in this column
+	for (var c=0; c<this.TileGrid[0].length; c++){//loop through all COLUMNS
+	    var n_tiles_in_col = 0; //counts tiles in this column
 	    work_down_row:
-	    for (var r=0; r<this.TileGrid.length; r++){
+	    for (var r=0; r<this.TileGrid.length; r++){//loop through all ROWS
 		
 		//The grid is not a perfect rectangle; the lowest row isn't necessarily complete
 		if(this.TileGrid[r][c]==undefined){break work_down_row;}
 
 		//Tile shifting logic
-		if(this.TileGrid[r][c].TileObj){
+		if(this.TileGrid[r][c]!=null){//is there a tile here in the grid?
 		    n_tiles_in_col++;
 		    var min_row_index = n_tiles_in_col - 1;
-		    if(min_row_index<r){
-			this.moveTileOnGrid(this.TileGrid[r][c].TileObj, min_row_index, c, animate);
+		    if(min_row_index<r){//could it be shifted up?
+			this.moveTileOnGrid(this.TileGrid[r][c], min_row_index, c, animate);
 		    }
 		}
 	    }
+	    //record the height of the heighest column (in order to adjust player zone size)
 	    if(n_tiles_in_col > max_col_height){
 		max_col_height = n_tiles_in_col;
 		max_height_col = c;
 	    }
 	}
 
-	var unusedTilesBottomPx = this.TileGrid[max_col_height-1][max_height_col].y + (this.tile_space_px + this.tileSize);//added term is one tile height
-	//it's only upon determining the bottom of the unsed tiles that we can set this variable (and it's done once, right now...)
+	//added term is one tile height
+	var unusedTilesBottomPx = this.TileGrid[max_col_height-1][max_height_col].y + (this.tile_space_px + this.tileSize);
+
+	//it's only upon determining the bottom of the unsed tiles that we can set the variable "playersZoneTopPx"
 	snDraw.Game.Zones.playersZoneTopPx = Math.round(unusedTilesBottomPx + this.marginUnit);
     },
 
-    moveTileOnGrid: function(TileObj, row, col, animate){
+    //it is important that the destination grid location is empty
+    moveTileOnGrid: function(tile_ID, row, col, animate){
+	var myTile = this.TileArray[tile_ID];
 	//animate and move the tile on the canvas
-	snDraw.moveSwitchable(TileObj, animate, snDraw.ani.sty_Resize,{
+	snDraw.moveSwitchable(myTile, animate, snDraw.ani.sty_Resize,{
 	    left: this.TileGrid[row][col].x,
 	    top: this.TileGrid[row][col].y
 	});
 
 	//update the GRID -> TILE references
-	this.TileGrid[TileObj.Grid_row][TileObj.Grid_col].TileObj = null;
-	this.TileGrid[row][col] = TileObj;
+	this.TileGrid[myTile.Grid_row][myTile.Grid_col] = null;
+	this.TileGrid[row][col] = tile_ID;
 
 	//update the TILE -> GRID references
-	TileObj.Grid_row = row;
-	TileObj.Grid_col = col;
+	myTile.Grid_row = row;
+	myTile.Grid_col = col;
     },
 
     remove_Tile_references_from_grid: function(tileIDs){
 	for (var i=0; i<tileIDs.length; i++){
 	    var TID = tileIDs[i];
 	    var TileObj = this.TileArray[TID];
-	    //if present, remove references
+	    //if present, remove references (i.e. follow the tile's reference to its grid location)
 	    if(TileObj.Grid_row !== null){
-		this.TileGrid[TileObj.Grid_row][TileObj.Grid_col].TileObj = null;
-		TileObj.Grid_row = null;
+		this.TileGrid[TileObj.Grid_row][TileObj.Grid_col] = null;//now nullify forward ref
+		TileObj.Grid_row = null;//nullify back-refs:
 		TileObj.Grid_col = null;
 	    }
 	}
@@ -445,9 +455,6 @@ snDraw.Game = {
 	    this.TileGroupsArray[i].clean(undefined);
 	    players[i].words.clean(undefined);
 	}
-
-	//at this point, it should be possible to see a word converted to consituent letters
-
     },
 
     //this function removes an arbitrary set of words, indexed by player and within that by word index.
@@ -484,12 +491,6 @@ snDraw.Game = {
 	//set the saved coordinates back as modified...
 	player.x_next_word = x_plotter;
 	player.y_next_word = y_plotter;
-
-	//interate through all player words, applying the rewrapping. This should be animated
-	// CONSIDER that the rewrapping animation should be much slower than the SNATCH animation.
-	// consider how this relates to the above purge (before or after??)
-	// consider conflicting (overlapping) animating commands from both zone resizeing and wrap handling. These need to be consolidated.
-
     },
 
     xCoordExceedsWrapThreshold: function(x_coord){

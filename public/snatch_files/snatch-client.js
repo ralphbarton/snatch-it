@@ -156,7 +156,7 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
 socket.on('snatch rejected', function(rejection_reason){
     
     //a toast here
-    snDraw.Game.Spell.ClearWordFromSpeller(true);
+    snDraw.Game.Spell.CancelWord();
     console.log("The snatch was rejected by the server for the following reason: " + rejection_reason);
 });
 
