@@ -23,11 +23,6 @@ io.on('connection', function(socket){
 	    var dis_pl_i = myGame.playerIndexFromSocket(socket.id);
 	    socket.broadcast.emit('player disconnected',dis_pl_i);
 	    myGame.removePlayer(socket.id);
-
-	    //TODO: this is duplication of the intent of the message above. Rethink this a little and neaten
-	    //Transmit entire gamestate to everyone to inform them of the player who has left the game...
-	    var gameObj = myGame.getGameObject();
-	    socket.broadcast.emit('full game state transmission', gameObj);
 	}
 	console.log('user disconnected with ID: '+socket.id);
     });

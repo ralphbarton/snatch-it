@@ -88,6 +88,10 @@ var snDraw = {
 	}
 	else{
 	    FabricObject.set(properties);
+	    //these two lines are the trick for ensuring click detection zones are moved...
+	    canvas.remove(FabricObject);
+	    canvas.add(FabricObject);
+	    
 	    canvas.renderAll();
 	}
     },

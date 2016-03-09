@@ -22,12 +22,10 @@ socket.on('player color choices', function(colorSet){
 socket.on('full game state transmission', function(gameState){
 
     /*
-      there is a design decision to be made whether a full game state transmission
-      is always crudely used when a snatch occurs etc, or whether to send a more specific
-      update message to clients instead. The latter seems more efficient but more work.
-      
       For now, receipt of the first ever game state message (compared with others) is detected
       by looking at the global tileset, which is initially [].
+
+      In any case, there should only ever be one transmission of this message, so the check should not be necessary.
     */
 
     if(tileset.length<1){//RECIEVE THE MESSAGE FOR THE FIRST time - in this case need to add the listeners...
@@ -41,20 +39,17 @@ socket.on('full game state transmission', function(gameState){
 	//keyboard event listeners
 	document.addEventListener("keydown",function(e){snDraw.Game.KB.kDown(e); }, false);
 
+	tileset = gameState.tileSet;
+	players = gameState.playerSet;
+
+	for(i=0; i<players.length; i++){
+	    players[i].index = i;
+	    snDraw.Game.TileGroupsArray[i] = [];//correctly create empty container
+	}
+
+	//draws the entire game state on the canvas from the data supplied
+	snDraw.Game.initialDrawEntireGame();
     }
-
-    tileset = gameState.tileSet;
-    players = gameState.playerSet;
-
-    for(i=0; i<players.length; i++){
-	players[i].index = i;
-	snDraw.Game.TileGroupsArray[i] = [];//correctly create empty container
-    }
-    
-
-    //draws the entire game state on the canvas from the data supplied
-    snDraw.Game.initialDrawEntireGame();
-
 
 });//end of function to load game data
 
