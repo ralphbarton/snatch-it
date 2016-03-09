@@ -226,7 +226,7 @@ snDraw.Game.KB = {
 
 	if(myKeycode == 32){//space bar
 	    // let this be turn a letter
-	    var target_tile_index = this.autoNextUnturnedTileIndex();
+	    var target_tile_index = snDraw.Game.visuallyNextUnturnedTileIndex();
 	    if(target_tile_index !== undefined){
 		tileTurnObj = {
 		    playerIndex: client_player_index,
@@ -266,22 +266,6 @@ snDraw.Game.KB = {
 	
 	}
 */
-    },
-
-    autoNextUnturnedTileIndex: function(){
-	var grid = snDraw.Game.TileGrid;
-	for (var r=grid.length-1; r>=0; r--){
-	    for (var c=grid[r].length-1; c>=0; c--){
-		if(grid[r][c]!=undefined){
-		    if(grid[r][c].TileObj!=null){
-			var TID = grid[r][c].TileObj.tileID;
-			if (tileset[TID].status == 'unturned'){
-			    return TID;
-			}
-		    }
-		}
-	    }
-	}
     }
 };
 

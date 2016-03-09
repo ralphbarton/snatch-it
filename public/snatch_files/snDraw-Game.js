@@ -16,7 +16,7 @@ snDraw.Game = {
     x_plotter_R: undefined, // x-coordinate of "carriage return"
     tile_space_px: undefined,
 
-    Ratio_tile: 0.42, //Tuneable
+    Ratio_tile: 0.37, //Tuneable
 
     //member variables - dynamic, for rendering...
     dark_background: undefined,
@@ -26,6 +26,8 @@ snDraw.Game = {
     //member objects (the point with these is that they contain fabric objects and are not native variables):
     TileArray: [],
     TileGrid: [],
+    Grid_xPx: [],
+    Grid_yPx: [],
     TileGroupsArray: [],//not convinced we need this...
 
     //methods:
@@ -67,8 +69,6 @@ snDraw.Game = {
 
     },
 
-    Grid_xPx: [],
-    Grid_yPx: [],
     createEveryTileObject_inGridAtTop: function (){
 
 	//parameters controlling tile spacing in the tile grid
@@ -88,14 +88,14 @@ snDraw.Game = {
 	    //add flat-array reference to the object
 	    this.TileArray[i] = myTile;
 
-	    var refTile = null;
+	    var refTileID = null;
 	    var refGrid_row = null;
 	    var refGrid_col = null;
 
 	    if(tileset[i].status!="inword"){
-		var refTileID = myTile.tileID;//forward reference to go into the grid
-		var refGrid_row = grid_row_counter;//backward reference to go into the tile
-		var refGrid_col = this.TileGrid[grid_row_counter].length;//backward reference
+		refTileID = myTile.tileID;//forward reference to go into the grid
+		refGrid_row = grid_row_counter;//backward reference to go into the tile
+		refGrid_col = this.TileGrid[grid_row_counter].length;//backward reference
 	    }
 
 	    //add the Grid reference to the object
@@ -144,14 +144,9 @@ snDraw.Game = {
 
 	var max_col_height = 0;
 	var max_height_col = undefined;
-	for (var c=0; c<this.TileGrid[0].length; c++){//loop through all COLUMNS
+	for (var c = 0; c < this.Grid_xPx.length; c++){//loop through all COLUMNS
 	    var n_tiles_in_col = 0; //counts tiles in this column
-	    work_down_row:
-	    for (var r=0; r<this.TileGrid.length; r++){//loop through all ROWS
-		
-		//The grid is not a perfect rectangle; the lowest row isn't necessarily complete
-		if(this.TileGrid[r][c]==undefined){break work_down_row;}
-
+	    for (var r = 0; r < this.Grid_yPx.length; r++){//loop through all ROWS
 		//Tile shifting logic
 		if(this.TileGrid[r][c]!=null){//is there a tile here in the grid?
 		    n_tiles_in_col++;
@@ -169,7 +164,7 @@ snDraw.Game = {
 	}
 
 	//added term is one tile height
-	var unusedTilesBottomPx = this.TileGrid[max_col_height-1][max_height_col].y + (this.tile_space_px + this.tileSize);
+	var unusedTilesBottomPx = this.Grid_yPx[max_col_height-1] + (this.tile_space_px + this.tileSize);
 
 	//it's only upon determining the bottom of the unsed tiles that we can set the variable "playersZoneTopPx"
 	snDraw.Game.Zones.playersZoneTopPx = Math.round(unusedTilesBottomPx + this.marginUnit);
@@ -180,8 +175,8 @@ snDraw.Game = {
 	var myTile = this.TileArray[tile_ID];
 	//animate and move the tile on the canvas
 	snDraw.moveSwitchable(myTile, animate, snDraw.ani.sty_Resize,{
-	    left: this.TileGrid[row][col].x,
-	    top: this.TileGrid[row][col].y
+	    left: this.Grid_xPx[col],
+	    top: this.Grid_yPx[row]
 	});
 
 	//update the GRID -> TILE references
@@ -202,6 +197,22 @@ snDraw.Game = {
 		this.TileGrid[TileObj.Grid_row][TileObj.Grid_col] = null;//now nullify forward ref
 		TileObj.Grid_row = null;//nullify back-refs:
 		TileObj.Grid_col = null;
+	    }
+	}
+    },
+
+    visuallyNextUnturnedTileIndex: function(){
+	var grid = snDraw.Game.TileGrid;
+	for (var r=this.Grid_yPx.length-1; r>=0; r--){
+	    for (var c=this.Grid_xPx.length-1; c>=0; c--){
+		if(grid[r][c]!=undefined){
+		    if(grid[r][c]!=null){
+			var TID = grid[r][c];
+			if (tileset[TID].status == 'unturned'){
+			    return TID;
+			}
+		    }
+		}
 	    }
 	}
     },
