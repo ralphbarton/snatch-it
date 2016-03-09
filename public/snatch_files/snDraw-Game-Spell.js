@@ -4,6 +4,7 @@ snDraw.Game.Spell = {
     //Advanced_Speller - data
     SkeletalLetters: [],
     SpellUsageCounter: {},
+    n_letters_unwrap: undefined,
 
     //Advanced_Speller - method
     addLetter: function(letter){
@@ -11,16 +12,34 @@ snDraw.Game.Spell = {
 	    var NewSkeletal = snDraw.Game.generateTileObject({letter:letter, status:"skeletal"}, -100 + this.SkeletalLetters.length);
 	    this.SkeletalLetters.push(NewSkeletal);
 	    var spell_len = this.SkeletalLetters.length;
-	    x_loco = players[client_player_index].x_next_word + (spell_len-1) * snDraw.Game.h_spacer;
+	    var B_wrap = this.n_letters_unwrap == undefined;
+	    var CP = players[client_player_index];
+	    var x_loco = (B_wrap ? snDraw.Game.x_plotter_R : CP.x_next_word) + (spell_len-1) * snDraw.Game.h_spacer;
+	    var y_loco = (B_wrap ? snDraw.Game.v_spacer : 0) + CP.y_next_word;
 
 	    //TODO: add wrap condition...
 
 	    NewSkeletal.set({
 		left: x_loco,
-		top: players[client_player_index].y_next_word
+		top: y_loco
 	    });
 
 	    canvas.add(NewSkeletal);
+
+	    if((B_wrap) && snDraw.Game.xCoordExceedsWrapThreshold(x_loco)){ // adding this letter has trigged wrap
+		//this means the word is wrapped, and records how short it needs to become to unwrap...
+		this.n_letters_unwrap = spell_len-2;
+		//now move all those letter tiles
+		for (var i=0; i<this.SkeletalLetters.length; i++){
+
+		    snDraw.moveSwitchable(this.SkeletalLetters[i], true, snDraw.ani.sty_Sing,{
+			left: (snDraw.Game.x_plotter_R + i * snDraw.Game.h_spacer),
+			top: CP.y_next_word + snDraw.Game.v_spacer
+		    });
+
+		}
+	    }
+
 	    snDraw.setFrameRenderingTimeout (100);//as an alternative to canvas.renderAll()
 	}
     },
@@ -92,7 +111,13 @@ snDraw.Game.Spell = {
 	    for (var i=rem_i; i<this.SkeletalLetters.length; i++){
 		var ShiftMeSkeletal = this.SkeletalLetters[i];
 		ShiftMeSkeletal.tileID = i - 100;
-		x_loco = players[client_player_index].x_next_word + i * snDraw.Game.h_spacer;
+
+
+		//TODO unwraping here......
+
+
+
+		var x_loco = players[client_player_index].x_next_word + i * snDraw.Game.h_spacer;
 		snDraw.moveSwitchable(ShiftMeSkeletal, true, snDraw.ani.sty_Sing,{
 		    left: x_loco
 		});
