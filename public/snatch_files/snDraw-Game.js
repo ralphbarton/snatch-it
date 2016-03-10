@@ -143,7 +143,6 @@ snDraw.Game = {
 	}
 
 	var max_col_height = 0;
-	var max_height_col = undefined;
 	for (var c = 0; c < this.Grid_xPx.length; c++){//loop through all COLUMNS
 	    var n_tiles_in_col = 0; //counts tiles in this column
 	    for (var r = 0; r < this.Grid_yPx.length; r++){//loop through all ROWS
@@ -159,7 +158,6 @@ snDraw.Game = {
 	    //record the height of the heighest column (in order to adjust player zone size)
 	    if(n_tiles_in_col > max_col_height){
 		max_col_height = n_tiles_in_col;
-		max_height_col = c;
 	    }
 	}
 
