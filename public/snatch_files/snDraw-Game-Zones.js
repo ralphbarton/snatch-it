@@ -116,8 +116,8 @@ snDraw.Game.Zones = {
 	//label if YOU
 	if(pZone.is_client){
 	    
-	    var cell = snDraw.Game.tileSize * 1.4;
-	    var font_size = cell * 0.5;
+	    var cell = snDraw.Game.tileSize * 1.5;
+	    var font_size = snDraw.Game.tileSize * 0.7;
 	    var labelLeft = boxLeft + boxWidth;
 	    var labelTop  = boxTop + boxHeight;
 
@@ -125,12 +125,12 @@ snDraw.Game.Zones = {
 		left: labelLeft - cell,
 		top: labelTop - cell * 0.5,
 		width: cell + snDraw.Game.stroke_px*0.5,
-		height: cell * 0.5 + snDraw.Game.stroke_px*0.5,
+		height: cell * 0.49 + snDraw.Game.stroke_px*0.5,
 		fill: pZone.player.color
 	    });
 
 	    var youText = new fabric.Text("You",{
-	    	left: labelLeft - cell* 0.87,
+	    	left: labelLeft - cell * 0.9,
 		top: labelTop - cell * 0.5,
 		fill: snDraw.Game.bg_col,
 		fontSize: font_size,

@@ -3,8 +3,11 @@ snDraw.Splash = {
     identityPrompt: function(colorChoices){
 
 	var playerName = prompt("What is your name?");
+	while((playerName==null)||(playerName.length == 0)){
+	    playerName = prompt("Please enter an actual name for yourself:");
+	}
 
-	ts_px = myZoneWidth * 0.070;
+	var ts_px = myZoneWidth * 0.070;
 	
 	var mytext = "Welcome, " + playerName + "!\nSelect your color:";
 	
