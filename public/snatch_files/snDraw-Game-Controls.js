@@ -133,21 +133,41 @@ snDraw.Game.Controls = {
 	});
 
 	var playerObjList = [];
-	for(i=0; i<players.length; i++){
-	    //run through all players...
-	    var myName = players[i].name;
+	var player_scores_list = [];
+	//extact scores from players stat structure:
+	for(var i = 0; i < players.length; i++){
+	    var player_i_score = 0;
+	    for(var j = 0; j < players[i].words.length; j++){
+		player_i_score += Math.max(1,players[i].words[j].length-2);
+	    }
+	    player_scores_list.push({
+		p_index: i,
+		score: player_i_score
+	    });
+	}
 
-	    var playerText = new fabric.Text((i+1)+ ". " + myName,{
+	function comparePlayers(a, b) {
+	    return a.score - b.score;
+	}
+	player_scores_list.sort(comparePlayers);
+	player_scores_list.reverse();
+
+	//use the scores list to generate the visuals
+	for(var i=0; i<player_scores_list.length; i++){
+	    //run through all players...
+	    var Plr = players[player_scores_list[i].p_index];
+
+	    var playerText = new fabric.Text((i+1)+ ". " + Plr.name,{
 		fill: 'black',
 		fontSize: font_size * 1.5
 	    });
 
-	    var playerScoreText = new fabric.Text(getRandomInt(1,18).toString(), {
+	    var playerScoreText = new fabric.Text(player_scores_list[i].score.toString(), {
 		left: myZoneSmaller * 0.40,
 		stroke: 'black',
-		fontWeight: 'bold',
+		fontWeight: (i<3?800:100),
 		strokeWidth: font_size * 0.05,
-		fill: players[i].color,
+		fill: (i<3? Plr.color : 'black'),//only the high scoring players get their colour, top 3.
 		fontSize: font_size * 1.8
 	    });
 
