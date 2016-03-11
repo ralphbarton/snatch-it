@@ -138,47 +138,27 @@ snDraw.Game.Spell = {
 	}
     },
 
-    dialogueWordEntry: function(){
-	var snatch_string = prompt("Enter Word:");
-	snatch_string = snatch_string.toUpperCase();
-
-	//For each letter in the user's string, find it (starting at final) in the tile set
-	//At this stage, only consider unused tiles as includable
-
-	var snatch_tile_ids = [];
-
-	for(var i=0; i<snatch_string.length; i++){
-	    //use a crude method for ensuring double letters in the word get matched to double letters (or more) present amoung the tiles:
-	    //this is: for each new tile ID included, ensure that it is not already included
-	    for(var j=tileset.length-1; j>=0; j--){
-		if((tileset[j].letter == snatch_string[i])&&(tileset[j].status == "turned")){
-		    // matching letter found among tiles
-		    var used_already = false;
-		    for(var k=0; k<snatch_tile_ids.length; k++){
-			used_already = (used_already || (snatch_tile_ids[k] == j));
-		    }
-		    if(!used_already){
-			snatch_tile_ids[i] = j;
-			j=-1;//break out of the tile search string;
-		    }
-		    
-		}//loop k
-	    }//loop j
-	}//loop i
-	if(snatch_tile_ids.length!=snatch_string.length){
-	    alert("Free letters are not available to make the word \""+snatch_string+"\".");
-	}else{
-	    PLAYER_SUBMITS_WORD(snatch_tile_ids);
-	}
-    },
 
     //send a candidate word to the server
     SubmitWord: function(){
 	var letters_array = [];
-	for(var i=0; i < this.SkeletalLetters.length; i++){
-	    letters_array.push(this.SkeletalLetters[i].letter);
+	if(this.SkeletalLetters.length>0){//construct the letters array using the skeletal letters.
+	    for(var i=0; i < this.SkeletalLetters.length; i++){
+		letters_array.push(this.SkeletalLetters[i].letter);
+	    }
+	}else{//construct the letters array from user prompt...
+	    var snatch_string = prompt("Enter Word:");
+	    snatch_string = snatch_string.toUpperCase();
+	    for(var i=0; i < snatch_string.length; i++){
+		letters_array.push(snatch_string[i]);
+	    }
 	}
+
 	var word_by_tile_indeces = Assembler.synthesiseSnatch(letters_array);
+	if(false){//what happens for a unsuitable word??
+	    alert("Free letters are not available to make the word \""+snatch_string+"\".");
+	}
+	
 	console.log("Sending...",word_by_tile_indeces);
 	PLAYER_SUBMITS_WORD(word_by_tile_indeces);
     }

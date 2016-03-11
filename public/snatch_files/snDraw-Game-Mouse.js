@@ -40,14 +40,30 @@ snDraw.Game.Mouse = {
 	if(snDraw.Game.Controls.playersListWindowVisible){
 	    snDraw.Game.Controls.removePlayersListWindow();
 	}
+
+
 	//for handling mouse down on the row of buttons accross the top.
 	GCindex = e.target.gameButtonID;
 	if(GCindex!==undefined){ //implies the click landed on a button...
 	    snDraw.Game.Controls.buttonRecolor(e.target,"press"); // visual
-	    if(GCindex == 0){  snDraw.Game.Controls.cancelWordButtonHandler();   }
-	    if(GCindex == 1){  snDraw.Game.Controls.snatchItButtonHandler();     }	    
-	    if(GCindex == 2){  snDraw.Game.Controls.playersListButtonHandler();  }	    
-	    if(GCindex == 3){  snDraw.Game.Controls.resetGameButtonHandler();    }
+	    if(GCindex == 0){
+		// Actions for "Cancel Word" Button click
+		snDraw.Game.Spell.CancelWord();
+	    }
+	    if(GCindex == 1){
+		// Actions for "SNATCH IT" Button click
+		snDraw.Game.Spell.SubmitWord();
+	    }	    
+	    if(GCindex == 2){
+		// Actions for "View Scores" Button click
+		snDraw.Game.Controls.createPlayersListWindow();
+		snDraw.Game.Controls.playersListWindowVisible = true;
+	    }
+	    if(GCindex == 3){
+		// Actions for "Reset Game" Button click
+		var really = confirm("Do you really want to reset this game?");
+		if(really){RESET_REQUEST();}
+	    }
 	}
 
 	var word_owner = e.target.OwnerPlayer;

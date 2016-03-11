@@ -8,7 +8,7 @@ snDraw.Game.Controls = {
 	
 	this.createGenericButton("Cancel Word",0,4);
 	this.createGenericButton("SNATCH IT",1,4);
-	this.createGenericButton("Players List",2,4);
+	this.createGenericButton("View Scores",2,4);
 	this.createGenericButton("Reset Game",3,4);
 
     },
@@ -73,36 +73,6 @@ snDraw.Game.Controls = {
     	    myButtonGrp.item(0).setFill('#AAA');
 	}
 	canvas.renderAll();
-    },
-
-    //deals with the resetting of the game (lots of confirmation steps)
-    resetGameButtonHandler: function(){
-	var really = confirm("Do you really want to reset this game?");
-	if(really){RESET_REQUEST();}
-    },
-
-    //submit word to server
-    snatchItButtonHandler: function(myWordStr){
-	//confirm("Submit the word"+myWordStr+"?");
-	if(snDraw.Game.Spell.SkeletalLetters.length>0){
-	    snDraw.Game.Spell.SubmitWord();
-	}else{
-	    snDraw.Game.Spell.dialogueWordEntry();
-	}
-    },
-
-
-    cancelWordButtonHandler: function(){
-	//alert("cancel word...");
-	snDraw.Game.Spell.CancelWord();
-    },
-
-
-    //Here is the function that will draw the "scores" box onto the screen
-    playersListButtonHandler: function(){
-	this.createPlayersListWindow();
-	this.playersListWindowVisible = true;
-
     },
 
 
