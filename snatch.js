@@ -11,20 +11,23 @@ app.use(express.static('public'));
 
 var snatchSvr = require('./snatch-server.js');
 
-var myGame = snatchSvr(70);//create a snatch game instance with 50 tiles...
+var qty_tiles = 70;
+var myGame = snatchSvr(qty_tiles);//create a snatch game instance with 50 tiles...
 
 io.on('connection', function(socket){
 
     //basic logging
     console.log('a user connected, with ID: '+socket.id);
     socket.on('disconnect', function(){
+	var dis_pl_i = myGame.playerIndexFromSocket(socket.id);
 	//does a player with this socket ID still exist in the server's list anyway?
+
 	if(myGame.playerWithSocketExists(socket.id)){
-	    var dis_pl_i = myGame.playerIndexFromSocket(socket.id);
+
 	    socket.broadcast.emit('player disconnected',dis_pl_i);
 	    myGame.removePlayer(socket.id);
 	}
-	console.log('user disconnected with ID: '+socket.id);
+	console.log('Player ' + dis_pl_i + ' disconnected (socket.id = ' + socket.id + ')');
     });
 
     //this is the first message a client will send...
@@ -75,7 +78,7 @@ io.on('connection', function(socket){
 	if(agrees){
 	    var reset_agreement = myGame.playerAgreesToReset(socket.id);//the return value indicates whether all players agree to the reset
 	    if (reset_agreement){
-		myGame.resetGame(50);
+		myGame.resetGame(qty_tiles);
 		//now sent out the new game object:
 		var gameObj = myGame.getGameObject();
 		io.emit('full game state transmission', gameObj);

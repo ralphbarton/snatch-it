@@ -214,9 +214,17 @@ module.exports = function (nTiles){
 		    var old_PI = words_consumed[i].PI;
 		    var old_WI = words_consumed[i].WI;
 		    var lost_word = playerSet[old_PI].words.splice(old_WI,1)[0];
-		    
-		    //(consider if the tile_ownership[TID] array actually saves time overall...)
-		    //corrections for word shift...
+
+		    //maintain validity of words_consumed[i] given word index shift due to splice operation...
+		    for(var j=i+1; j<words_consumed.length; j++){
+			if(words_consumed[j].PI == old_PI){//other word consumed is from this same player...
+			    if(words_consumed[j].WI > old_WI){//this word comsumed is later on in the list...
+				words_consumed[j].WI--;//decrement the index...
+			    }
+			}
+		    }
+
+		    //maintain validity of tile_ownership[TID] given word index shift due to splice operation...
 		    var PI_wordset = playerSet[old_PI].words;
 		    for(var j=old_WI; j<PI_wordset.length; j++){
 			for(var k=0; k<PI_wordset[j].length; k++){
