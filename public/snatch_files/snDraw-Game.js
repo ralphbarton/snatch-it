@@ -1,4 +1,5 @@
 //this file contains the functions that render the game onto the screen
+var dev = false;
 
 var TA = [];//this is to enable faster debugging
 
@@ -230,6 +231,17 @@ snDraw.Game = {
 	    selectable: false
 	});
 
+	
+	var myTileNumberObj = new fabric.Text(tile_id.toString(),{
+	    left: this.tileSize/2 * 0.4,
+	    top: this.tileSize/2 * 0.4,
+	    fill: 'black',
+	    fontWeight: 'bold',
+	    fontSize: tile_letter_prop * this.tileSize * 0.32,
+	    selectable: false
+	});
+
+
 	var myTileRectObj = new fabric.Rect({
 	    originX: 'center',
 	    originY: 'center',
@@ -242,7 +254,10 @@ snDraw.Game = {
 	    ry: 0.12 * this.tileSize
 	});
 
-	var myNewTileObj = new fabric.Group( [myTileRectObj, myTileLetterObj], {
+	var TileObjCollection = [myTileRectObj, myTileLetterObj];
+	if(dev){TileObjCollection.push(myTileNumberObj);}
+
+	var myNewTileObj = new fabric.Group(TileObjCollection, {
 	    hasControls: false,
 	    hasBorders: false,
 	    selectable: false
