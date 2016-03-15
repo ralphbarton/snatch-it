@@ -17,8 +17,6 @@ snDraw.Game.Spell = {
 	    var x_loco = (B_wrap ? snDraw.Game.x_plotter_R : CP.x_next_word) + (spell_len-1) * snDraw.Game.h_spacer;
 	    var y_loco = (B_wrap ? snDraw.Game.v_spacer : 0) + CP.y_next_word;
 
-	    //TODO: add wrap condition...
-
 	    NewSkeletal.set({
 		left: x_loco,
 		top: y_loco
@@ -27,6 +25,7 @@ snDraw.Game.Spell = {
 	    canvas.add(NewSkeletal);
 
 	    // detect if adding this letter triggers wrap
+	    //note that "snDraw.Game.h_spacer" is the horizontal pixel separation of adjacent tiles in words 1.04 * tileSize
 	    if((!B_wrap) && snDraw.Game.xCoordExceedsWrapThreshold(x_loco + snDraw.Game.h_spacer)){
 		//this means the word is wrapped, and records how short it needs to become to unwrap...
 		this.n_letters_unwrap = spell_len-2;
@@ -42,6 +41,31 @@ snDraw.Game.Spell = {
 	}
     },
 
+    repositionSkeletal: function(){
+	//determine if wrap is required using the new coordinates...
+	var CP = players[client_player_index];
+	var spell_len = this.SkeletalLetters.length;
+	var B_wrap = snDraw.Game.xCoordExceedsWrapThreshold(CP.x_next_word + spell_len * snDraw.Game.h_spacer);
+	
+	//now unconditionally move (with animation) all letters...
+	var x_start = B_wrap ? snDraw.Game.x_plotter_R : CP.x_next_word;
+	var y_word = (B_wrap ? snDraw.Game.v_spacer : 0) + CP.y_next_word;
+	for (var i=0; i<this.SkeletalLetters.length; i++){
+	    snDraw.moveSwitchable(this.SkeletalLetters[i], true, snDraw.ani.sty_Resize,{
+		left: (x_start + i * snDraw.Game.h_spacer),
+		top: y_word
+	    });
+	}
+
+	if(B_wrap){
+	    //this is somewhat crude, but the effect is to disable unwrap in the (fairly rare) case of wrap after an opponent snatch.
+	    this.n_letters_unwrap = 0;
+	}else{
+	    this.n_letters_unwrap = undefined;
+	}
+
+
+    },
 
     removeLetter: function(spell_index){
 	var RemSkeletal;

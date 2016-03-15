@@ -140,9 +140,9 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     }
     
     //draw the new word into the player zone...
-    //for the case of the Snatcher being the Client player here, this is still necessary as it has the effect of grouping the letters, even if not moving them
-    //the final parameter of this function call determines if animation is required; not required if client is snatcher.
-    snDraw.Game.drawSingleCapturedWord(snatching_player,snatching_player.words.length - 1, true); //TODO shouldn't that 'true' be a (!client_is_snatcher)
+    //the final parameter of this function call determines if animation is required (which we always have)
+    snDraw.Game.drawSingleCapturedWord(snatching_player,snatching_player.words.length - 1, true);
+    snDraw.Game.Spell.repositionSkeletal();
 
 });
 
