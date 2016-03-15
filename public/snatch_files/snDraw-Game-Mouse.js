@@ -51,15 +51,19 @@ snDraw.Game.Mouse = {
 		snDraw.Game.Spell.CancelWord();
 	    }
 	    if(GCindex == 1){
+		// Actions for "Tile Turn" Button click
+		alert("request to turn a tile... Muchos coding to follow.");
+	    }	    
+	    if(GCindex == 2){
 		// Actions for "SNATCH IT" Button click
 		snDraw.Game.Spell.SubmitWord();
 	    }	    
-	    if(GCindex == 2){
+	    if(GCindex == 3){
 		// Actions for "View Scores" Button click
 		snDraw.Game.Controls.createPlayersListWindow();
 		snDraw.Game.Controls.playersListWindowVisible = true;
 	    }
-	    if(GCindex == 3){
+	    if(GCindex == 4){
 		// Actions for "Reset Game" Button click
 		var really = confirm("Do you really want to reset this game?");
 		if(really){RESET_REQUEST();}

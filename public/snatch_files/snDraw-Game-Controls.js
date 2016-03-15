@@ -3,31 +3,53 @@ snDraw.Game.Controls = {
     //member variables
     playersListWindowVisible: false,
     ScoresWindow: undefined,
+    button_widths: [],
+    button_widths_cumulated: [],
 
     createControls: function(){
 	
-	this.createGenericButton("Cancel Word",0,4);
-	this.createGenericButton("SNATCH IT",1,4);
-	this.createGenericButton("View Scores",2,4);
-	this.createGenericButton("Reset Game",3,4);
+	this.button_widths =  [10,20,20,10,5];
+
+	//some preprocessing from the widths list...
+	this.button_widths_cumulated[0] = this.button_widths[0];
+
+	for (var i=1; i<this.button_widths.length; i++){
+	    this.button_widths_cumulated[i] = this.button_widths_cumulated[i-1] + this.button_widths[i];
+	}
+
+	this.createGenericButton("Cancel",0);
+	this.createGenericButton("Letters* Turn",1);
+	this.createGenericButton("SNATCH IT",2);
+	this.createGenericButton("Scores",3);
+	this.createGenericButton("Opt",4);
 
     },
 
-    createGenericButton: function(text,n_ind,N_but){
+    createGenericButton: function(text,n_ind){
 
 	var tile_DIM = snDraw.Game.tileSize;
-	var gap_width = tile_DIM*0.3;
+	var gap_width = tile_DIM*0.2;
 	var font_size = myZoneWidth * 0.030;
 	var line_thickness = tile_DIM * 0.06;
 	var corners_rounding = tile_DIM * 0.12;
 
-	var button_width = (myZoneWidth - (N_but+1) * gap_width)/N_but;
+	var N_but = this.button_widths.length;
 
-	var button_left = n_ind * (button_width + gap_width) +0.5*gap_width+6;
+	var button_w_px = [];
+	var button_l_px = [gap_width/2];
+	for (var i=0; i<N_but; i++){
+	    button_w_px[i] = (myZoneWidth - N_but * gap_width) * (this.button_widths[i] / this.button_widths_cumulated[N_but-1]);
+	    button_l_px[i+1] = button_l_px[i] + gap_width + button_w_px[i] ;
+	}
+
+	var button_width = button_w_px[n_ind];
+	var button_left = button_l_px[n_ind];
+	
+	console.log(n_ind,button_width,button_left);
 
 	var buttonText = new fabric.Text(text,{
 	    originX: 'center',
-	    top: (tile_DIM - font_size)*0.5,
+	    top: (tile_DIM - font_size)*0.3,
 	    fill: 'black',
 	    fontWeight: 'bold',
 	    fontSize: font_size
@@ -40,7 +62,7 @@ snDraw.Game.Controls = {
 	    stroke: snDraw.Game.fg_col,
 	    strokeWidth: line_thickness,
 	    width: button_width,
-	    height: tile_DIM,
+	    height: tile_DIM*0.7,
 	    rx: corners_rounding,
 	    ry: corners_rounding
 	});
