@@ -206,7 +206,8 @@ module.exports = function (nTiles){
 	    if( Response.val_check == 'accepted'){// snatch accepted
 	    	console.log("Player " + PI + " SNATCH accepted.");
 		var words_consumed = validation_results.words_consumed;
-		
+		var words_consumed_orig = JSON.parse(JSON.stringify(words_consumed));
+
 		//BUSINESS LOGIC: UPDATE SERVER-SIDE GAME REPRESENTATION
 
 		//[step 1] remove any consumed words. This also includes updating the tile_ownership[] array, as indexes shift...
@@ -259,7 +260,7 @@ module.exports = function (nTiles){
 		Response.SnatchUpdateMsg = {
 		    player_index: PI,
 		    tile_id_array: tile_id_array,
-		    words_consumed: words_consumed
+		    words_consumed: words_consumed_orig
 		}
 	    }else{ // snatch rejected
 	    	console.log("Player " + PI + " SNATCH rejected : " + Response.val_check);
