@@ -163,7 +163,8 @@ snDraw.Game = {
 	}
 
 	//added term is one tile height
-	var unusedTilesBottomPx = this.Grid_yPx[max_col_height-1] + (this.tile_space_px + this.tileSize);
+	var grid_height = (max_col_height==0? this.marginUnit : this.Grid_yPx[max_col_height-1]);
+	var unusedTilesBottomPx = grid_height + (this.tile_space_px + this.tileSize);
 
 	//it's only upon determining the bottom of the unsed tiles that we can set the variable "playersZoneTopPx"
 	snDraw.Game.Zones.playersZoneTopPx = Math.round(unusedTilesBottomPx + this.marginUnit);
