@@ -237,7 +237,9 @@ snDraw.Game.Zones = {
 	    //second parameter true prevents it from attempting to shuffle the final word (already present as data), as it will not yet be existant as a fabric group 
 	    var zone_i = this.PlayerZone[i];
 	    var snatched_word_in_this_zone = zone_i.player.index == snatching_player.index;
-	    this.animateResizeRewrapZone(zone_i, snatched_word_in_this_zone);
+	    this.animateResizeRewrapZone(zone_i);
+	    //shuffle the player's words to back fill the gap, in case one of their words was just snatched away.
+	    snDraw.Game.animateRepositionPlayerWords(zone_i.player, snatched_word_in_this_zone);
 	}//loop
 
 	// does the player box need to be inserted onto the screen?
@@ -249,8 +251,17 @@ snDraw.Game.Zones = {
 	}
     },
 
+    // Animate the resizing of the zones 
+    updateAllZoneSizes: function(){
+	this.calculatePlayerZoneSizes();
+	for(var i=0; i < this.PlayerZone.length; i++){
+	    var ZOi = this.PlayerZone[i];
+	    this.animateResizeRewrapZone(ZOi);
+	    snDraw.Game.animateRepositionPlayerWords(ZOi.player, false);
+	}
+    },
 
-    animateResizeRewrapZone: function(myZone, snatched_word_here){
+    animateResizeRewrapZone: function(myZone){
 
 	//animate the name and the box outline
 	var bxFab = myZone.FabObjects;
@@ -281,8 +292,6 @@ snDraw.Game.Zones = {
 		top: labelTop - cell * 0.5
 	    });
 	}
-	//animate the words, if present...
-	snDraw.Game.animateRepositionPlayerWords(myZone.player, snatched_word_here);
     }
 
 };

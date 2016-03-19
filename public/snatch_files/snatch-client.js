@@ -82,6 +82,8 @@ socket.on('new turned tile', function(newTile_info){
 	status: "turned"
     };
     snDraw.Game.addNewTurnedTile(TI);
+    snDraw.Game.shiftTilesUpGrid();//function call is extravagant (inefficient) as it will never cause a shift. We're just using it to correctly set playersZoneTopPx
+    snDraw.Game.Zones.updateAllZoneSizes();//unconditional function call is extravagant (inefficient) as shift will only be in a minority of cases...
 });
 
 socket.on('player wants reset', function(player_index){

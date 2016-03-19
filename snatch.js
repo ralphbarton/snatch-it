@@ -106,7 +106,11 @@ io.on('connection', function(socket){
     socket.on('tile turn request', function(blank_msg){
 	var newTile_info = myGame.flipNextTile(socket.id);
 	io.emit('new turned tile', newTile_info);
-	console.log("PI=" + newTile_info.flipping_player + " flips tileID=" + newTile_info.tile_index + " (" + newTile_info.letter_index + ")");
+	if(newTile_info){
+	    console.log("PI=" + newTile_info.flipping_player + " flips tileID=" + newTile_info.tile_index + " (" + newTile_info.letter_index + ")");
+	}else{
+	    console.log("All tiles turned - flip message recieved...");
+	}
     });
 
 });

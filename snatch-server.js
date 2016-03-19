@@ -86,14 +86,18 @@ module.exports = function (nTiles){
 
 	flipNextTile: function(socket_key) {
 	    var TI = next_unturned_tile_i;
-	    var PI = player_index_from_socketKey_lkup[socket_key];
-	    next_unturned_tile_i++;
-	    tileSet[TI].status="turned";
-	    return {
-		tile_index: TI,
-		tile_letter: tileSet[TI].letter,
-		flipping_player: PI
-	    };
+	    if(TI<tileSet.length){
+		var PI = player_index_from_socketKey_lkup[socket_key];
+		next_unturned_tile_i++;
+		tileSet[TI].status="turned";
+		return {
+		    tile_index: TI,
+		    tile_letter: tileSet[TI].letter,
+		    flipping_player: PI
+		};
+	    }else{
+		return null;
+	    }
 	},
 	
 	resetGame: function(nTiles) {

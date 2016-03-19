@@ -63,7 +63,7 @@ snDraw.Game = {
 
     calculateRenderingDimentionConstants: function(){    //this function relies upon a defined number of tiles, which is only after game state is loaded...
 	var N_pixels = myZoneWidth * myZoneHeight;
-	var Tile_pixels = N_pixels * this.Ratio_tile / tileset.length;
+	var Tile_pixels = N_pixels * this.Ratio_tile / tilestats.n_tiles;
 	var tile_dim = Math.sqrt(Tile_pixels);
 	var grid_letter_spacing = 0.14;
 
@@ -227,7 +227,7 @@ snDraw.Game = {
     findNextEmptyGridSlot: function(){
 	for (var r=0; r<this.Grid_yPx.length; r++){
 	    for (var c=0; c<this.Grid_xPx.length; c++){
-		if(!snDraw.Game.TileGrid[r][c]){//an empty slot in the grid!
+		if(snDraw.Game.TileGrid[r][c]===null){//an empty slot in the grid!
 		    return {r:r, c:c}
 		}
 	    }
@@ -462,7 +462,10 @@ snDraw.Game = {
 	}
     },
 
-    //this function removes an arbitrary set of words, indexed by player and within that by word index.
+    //given the possibility that snatching a word from a player will leave a gap, this function runs through the words
+    //drawing them one after another to avoid any gap.
+    //in the case where this player has just snatched a word, the final word in their list will be animating into place.
+    //Thus function should not attempt to animate it (which would be duplication), hence the flag...
     animateRepositionPlayerWords: function(player,exclude_final_word_reposition){
 
 	var x_plotter = this.x_plotter_R;
