@@ -5,6 +5,7 @@ snDraw.Game.Controls = {
     ScoresWindow: undefined,
     button_widths: [],
     button_widths_cumulated: [],
+    Button_Objs: [],
 
     createControls: function(){
 	
@@ -17,12 +18,21 @@ snDraw.Game.Controls = {
 	    this.button_widths_cumulated[i] = this.button_widths_cumulated[i-1] + this.button_widths[i];
 	}
 
-	this.createGenericButton("Cancel",0);
-	this.createGenericButton("Letters* Turn",1);
-	this.createGenericButton("SNATCH IT",2);
-	this.createGenericButton("Scores",3);
-	this.createGenericButton("Opt",4);
+	this.Button_Objs[0] = this.createGenericButton("Cancel",0);
+	this.Button_Objs[1] = this.createGenericButton("Turn Letter",1);
+	this.Button_Objs[2] = this.createGenericButton("SNATCH IT",2);
+	this.Button_Objs[3] = this.createGenericButton("Scores",3);
+	this.Button_Objs[4] = this.createGenericButton("Opt",4);
 
+	this.updateTurnLetter_number();
+    },
+
+    updateTurnLetter_number: function(){
+	var n_tiles_remaining = tilestats.n_tiles-tileset.length;
+	console.log(n_tiles_remaining);
+
+	var TurnButton = this.Button_Objs[1];
+	TurnButton.item(1).setText("Turn Letter (" + n_tiles_remaining + ")");
     },
 
     createGenericButton: function(text,n_ind){
@@ -44,8 +54,6 @@ snDraw.Game.Controls = {
 
 	var button_width = button_w_px[n_ind];
 	var button_left = button_l_px[n_ind];
-	
-	console.log(n_ind,button_width,button_left);
 
 	var buttonText = new fabric.Text(text,{
 	    originX: 'center',
@@ -76,8 +84,8 @@ snDraw.Game.Controls = {
 	});
 	
 	buttonGrp.gameButtonID = n_ind;
-
 	canvas.add(buttonGrp);
+	return buttonGrp;
     },
 
 
