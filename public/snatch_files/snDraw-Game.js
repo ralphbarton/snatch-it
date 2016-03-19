@@ -26,7 +26,7 @@ snDraw.Game = {
 
     //member objects (the point with these is that they contain fabric objects and are not native variables):
     TileArray: [],
-    TileGrid: [],
+    TileGrid: undefined,
     Grid_xPx: [],
     Grid_yPx: [],
     TileGroupsArray: [],//not convinced we need this...
@@ -95,10 +95,13 @@ snDraw.Game = {
 	var x_plotter = XPD;
 	var y_plotter = 6 + xy_incr;
 
-	//now create a fabric object for every tile...
-	this.TileGrid.push([]);//contents of the first ROW (it's empty).
+	//initialise reference arrays, in case of past usage...
+	this.TileGrid = [[]];//contents of the first ROW (it's empty).
+	this.Grid_yPx = [];
+	this.Grid_xPx = [];
 	this.Grid_yPx.push(y_plotter);//y-coordinate of a row of the grid...
 	var grid_row_counter = 0;
+
 	for (var i=0; i < tilestats.n_tiles; i++){
 
 	    //in this loop, we have an 'i' for every tile there will be.
@@ -169,7 +172,6 @@ snDraw.Game = {
 	for (var c = 0; c < this.Grid_xPx.length; c++){//loop through all COLUMNS
 	    var n_tiles_in_col = 0; //counts tiles in this column
 	    for (var r = 0; r < this.Grid_yPx.length; r++){//loop through all ROWS
-		//Tile shifting logic
 		if(this.TileGrid[r][c]!=null){//is there a tile here in the grid?
 		    n_tiles_in_col++;
 		    var min_row_index = n_tiles_in_col - 1;

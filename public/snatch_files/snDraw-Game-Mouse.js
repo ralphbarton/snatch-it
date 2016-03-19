@@ -45,8 +45,8 @@ snDraw.Game.Mouse = {
 		snDraw.Game.Spell.CancelWord();
 	    }
 	    if(GCindex == 1){
-		// Actions for "Tile Turn" Button click
-		TILE_TURN_REQUEST(); //request another tile...
+		// Actions for "Turn Letter" Button click
+		snDraw.Game.Controls.turnLetterClickHandler();
 	    }	    
 	    if(GCindex == 2){
 		// Actions for "SNATCH IT" Button click
@@ -239,7 +239,7 @@ snDraw.Game.KB = {
 	}
 
 	if(myKeycode == 32){//space bar
-	    TILE_TURN_REQUEST(); //request another tile...
+	    snDraw.Game.Controls.turnLetterClickHandler();
 	}
 
 	if((myKeycode == 8)||(keyPressed == '3')){//delete key

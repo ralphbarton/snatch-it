@@ -23,7 +23,6 @@ snDraw.Game.Controls = {
 	this.Button_Objs[2] = this.createGenericButton("SNATCH IT",2);
 	this.Button_Objs[3] = this.createGenericButton("Scores",3);
 	this.Button_Objs[4] = this.createGenericButton("Opt",4);
-
 	this.updateTurnLetter_number();
     },
 
@@ -32,7 +31,11 @@ snDraw.Game.Controls = {
 	console.log(n_tiles_remaining);
 
 	var TurnButton = this.Button_Objs[1];
-	TurnButton.item(1).setText("Turn Letter (" + n_tiles_remaining + ")");
+	if(n_tiles_remaining>0){
+	    TurnButton.item(1).setText("Turn Letter (" + n_tiles_remaining + ")");
+	}else{
+	    TurnButton.item(1).setText("Finish Game");
+	}
     },
 
     createGenericButton: function(text,n_ind){
@@ -103,6 +106,17 @@ snDraw.Game.Controls = {
     	    myButtonGrp.item(0).setFill('#AAA');
 	}
 	canvas.renderAll();
+    },
+
+
+    turnLetterClickHandler: function(){
+	var n_tiles_remaining = tilestats.n_tiles-tileset.length;
+	if(n_tiles_remaining>0){
+	    TILE_TURN_REQUEST(); //request another tile...
+	}else{
+	    var really = confirm("Do you really want to finish the game?");
+	    if(really){RESET_REQUEST();}
+	}
     },
 
 

@@ -104,6 +104,10 @@ module.exports = function (nTiles){
 	    tileSet = generateNewRandomTileSet(nTiles);
 	    color_palette = shuffle(color_palette);
 
+	    //reset some game variables...
+	    tile_ownership = [];
+	    next_unturned_tile_i = 0;
+
 	    //remove all words from all players
 	    for (i=0; i<playerSet.length; i++){
 		playerSet[i].words = [];//empty...
@@ -201,6 +205,10 @@ module.exports = function (nTiles){
 		var wordlength_i = playerSet[PI_i].words[WI_i].length;
 		if(wordlength_i != WordsInvolved[key_i].letter_usage_count){
 		    return {validity: 'invalid letters: partial usage of word ' + key_i};
+		}
+		//just tagging in this extra check: reject if length is not increased...
+		if(wordlength_i == tile_id_array.length){
+		    return {validity: 'invalid: word length unchanged (at ' + wordlength_i + ' letters)'};
 		}
 	    }
 

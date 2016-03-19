@@ -32,6 +32,8 @@ socket.on('full game state transmission', function(gameState){
     //RECIEVE THE MESSAGE FOR THE FIRST time - in this case need to add the listeners...
     if(tileset.length<1){
 	snDraw.Game.addListeners_kb_mouse();
+    }else{//clear old data ready for the new...
+	snDraw.Game.TileArray = [];
     }
 
     //the message is sent on the following events:
@@ -41,6 +43,7 @@ socket.on('full game state transmission', function(gameState){
 
     players = gameState.playerSet;
     tileset = gameState.turned_tiles;
+    console.log("TILESET RECIEVED LENGTH = " + tileset.length);
     tilestats = gameState.tile_stats;
 
     for(i=0; i<players.length; i++){
