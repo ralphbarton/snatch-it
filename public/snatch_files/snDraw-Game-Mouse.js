@@ -10,13 +10,7 @@ snDraw.Game.Mouse = {
 	    if(my_tile_index < 0){//this means that the click landed on a skeletal tile!
 		snDraw.Game.Spell.removeLetter(100 + my_tile_index);
 	    }
-	    else if(tileset[my_tile_index].status=="unturned"){
-		tileTurnObj = {
-		    playerIndex: client_player_index,
-		    tileID: my_tile_index
-		}
-		TILE_TURN_REQUEST(tileTurnObj);//for an unturned tile, always message to flip
-	    }
+
 	    else if(tileset[my_tile_index].status=="turned"){//click on a turned tile. Log coords of start of drag
 		this.recordDragStartCoords(e.target);
 		//Actually upon pickup of an active tile, add the event listener to potentially move other tiles around beneath...
@@ -52,7 +46,7 @@ snDraw.Game.Mouse = {
 	    }
 	    if(GCindex == 1){
 		// Actions for "Tile Turn" Button click
-		alert("request to turn a tile... Muchos coding to follow.");
+		TILE_TURN_REQUEST(); //request another tile...
 	    }	    
 	    if(GCindex == 2){
 		// Actions for "SNATCH IT" Button click
@@ -245,18 +239,7 @@ snDraw.Game.KB = {
 	}
 
 	if(myKeycode == 32){//space bar
-	    // let this be turn a letter
-	    var target_tile_index = snDraw.Game.visuallyNextUnturnedTileIndex();
-	    if(target_tile_index !== undefined){
-		tileTurnObj = {
-		    playerIndex: client_player_index,
-		    tileID: target_tile_index
-		}
-		TILE_TURN_REQUEST(tileTurnObj);//for an unturned tile, always message to flip
-	    }else{
-	        console.log("TOAST: there are no more unturned tiles for turning over");    
-	    }
-
+	    TILE_TURN_REQUEST(); //request another tile...
 	}
 
 	if((myKeycode == 8)||(keyPressed == '3')){//delete key

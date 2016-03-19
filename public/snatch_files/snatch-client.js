@@ -3,6 +3,7 @@ var socket = io();
 
 var tileset = [];//global reference - for server data...
 var players = [];//global reference - for server data...
+var tilestats = {};//global reference - for server data...
 
 var client_player_index = undefined;
 
@@ -28,28 +29,27 @@ socket.on('full game state transmission', function(gameState){
       In any case, there should only ever be one transmission of this message, so the check should not be necessary.
     */
 
-    if(tileset.length<1){//RECIEVE THE MESSAGE FOR THE FIRST time - in this case need to add the listeners...
-
-	//mouse event listeners
-	canvas.on('mouse:down', function(e){snDraw.Game.Mouse.mDown(e); });
-	canvas.on('mouse:up',   function(e){snDraw.Game.Mouse.mUp(e);   });
-	canvas.on('mouse:over', function(e){snDraw.Game.Mouse.mOver(e); });
-	canvas.on('mouse:out',  function(e){snDraw.Game.Mouse.mOut(e);  });
-
-	//keyboard event listeners
-	document.addEventListener("keydown",function(e){snDraw.Game.KB.kDown(e); }, false);
-
-	tileset = gameState.tileSet;
-	players = gameState.playerSet;
-
-	for(i=0; i<players.length; i++){
-	    players[i].index = i;
-	    snDraw.Game.TileGroupsArray[i] = [];//correctly create empty container
-	}
-
-	//draws the entire game state on the canvas from the data supplied
-	snDraw.Game.initialDrawEntireGame();
+    //RECIEVE THE MESSAGE FOR THE FIRST time - in this case need to add the listeners...
+    if(tileset.length<1){
+	snDraw.Game.addListeners_kb_mouse();
     }
+
+    //the message is sent on the following events:
+    // (1) a player has just joined the game (they just chose a color)
+    // (2) a player has requested reset and they are the only player
+    // (3) a player has agreed to a reset request, and now everyone agrees...
+
+    players = gameState.playerSet;
+    tileset = gameState.turned_tiles;
+    tilestats = gameState.tile_stats;
+
+    for(i=0; i<players.length; i++){
+	players[i].index = i;
+	snDraw.Game.TileGroupsArray[i] = [];//correctly create empty container
+    }
+
+    //draws the entire game state on the canvas from the data supplied
+    snDraw.Game.initialDrawEntireGame();
 
 });//end of function to load game data
 
@@ -68,12 +68,20 @@ socket.on('player has joined game', function(newPlayer){
 
 
 
-///upon server assertion that a letter is turned over
-socket.on('tile turn assert', function(tileDetailsObj){
-    var flipping_player_i = tileDetailsObj.playerIndex;
-    var tile_id = tileDetailsObj.tileID;
+//when a new tile is sent from the server...
+socket.on('new turned tile', function(newTile_info){
 
-    snDraw.Game.animateTileFlip(flipping_player_i, tile_id);
+    var PI = newTile_info.flipping_player;
+    var TI = newTile_info.tile_index;
+    var LET = newTile_info.tile_letter;
+
+    var player_name = players[PI].name;
+    console.log("TOAST: " + player_name + " flipped a tile...");
+    tileset[TI] = {
+	letter: LET,
+	status: "turned"
+    };
+    snDraw.Game.addNewTurnedTile(TI);
 });
 
 socket.on('player wants reset', function(player_index){
@@ -157,7 +165,7 @@ socket.on('snatch rejected', function(rejection_reason){
 
 function PLAYER_SUBMITS_WORD(p)       {socket.emit('player submits word', p);}
 function RESET_REQUEST()              {socket.emit('reset request', 0);}
-function TILE_TURN_REQUEST(p)         {socket.emit('tile turn request', p);}
+function TILE_TURN_REQUEST()          {socket.emit('tile turn request', 0);}
 function PLAYER_JOINED_WITH_DETAILS(p){socket.emit('player joined with details', p);}
 
 

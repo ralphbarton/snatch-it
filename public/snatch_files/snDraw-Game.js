@@ -39,6 +39,17 @@ snDraw.Game = {
 
     },
 
+    addListeners_kb_mouse: function(){
+	//mouse event listeners
+	canvas.on('mouse:down', function(e){snDraw.Game.Mouse.mDown(e); });
+	canvas.on('mouse:up',   function(e){snDraw.Game.Mouse.mUp(e);   });
+	canvas.on('mouse:over', function(e){snDraw.Game.Mouse.mOver(e); });
+	canvas.on('mouse:out',  function(e){snDraw.Game.Mouse.mOut(e);  });
+
+	//keyboard event listeners
+	document.addEventListener("keydown",function(e){snDraw.Game.KB.kDown(e); }, false);
+    },
+
     initialDrawEntireGame: function(){
 	this.calculateRenderingDimentionConstants();
 	canvas.setBackgroundColor(this.bg_col);
@@ -70,6 +81,12 @@ snDraw.Game = {
 
     },
 
+    addNewTurnedTile: function (tile_index){
+	var newTile = this.generateTileObject(tileset[tile_index], tile_index);
+	var loc = this.findNextEmptyGridSlot();
+	this.moveTileOnGrid(tile_index, loc.r, loc.c, false);
+    },
+
     createEveryTileObject_inGridAtTop: function (){
 
 	//parameters controlling tile spacing in the tile grid
@@ -82,33 +99,38 @@ snDraw.Game = {
 	this.TileGrid.push([]);//contents of the first ROW (it's empty).
 	this.Grid_yPx.push(y_plotter);//y-coordinate of a row of the grid...
 	var grid_row_counter = 0;
-	for (var i=0; i<tileset.length; i++){
-	    //here is the BUSINESS code to create the Fabric object for a tile
-	    var myTile = this.generateTileObject(tileset[i], i);
+	for (var i=0; i < tilestats.n_tiles; i++){
 
-	    //add flat-array reference to the object
-	    this.TileArray[i] = myTile;
-
+	    //in this loop, we have an 'i' for every tile there will be.
+	    //We create and iterate through all grid positions, creating references as appropriate
 	    var refTileID = null;
 	    var refGrid_row = null;
 	    var refGrid_col = null;
 
-	    if(tileset[i].status!="inword"){
-		refTileID = myTile.tileID;//forward reference to go into the grid
-		refGrid_row = grid_row_counter;//backward reference to go into the tile
-		refGrid_col = this.TileGrid[grid_row_counter].length;//backward reference
+	    //is there a tile at this position?
+	    if(tileset[i]!=undefined){
+		//here is the BUSINESS code to create the Fabric object for a tile
+		var myTile = this.generateTileObject(tileset[i], i);
+
+		//shall we leave the tile here?
+		if(tileset[i].status!="inword"){
+		    refTileID = myTile.tileID; //forward reference to go into the grid
+		    refGrid_row = grid_row_counter; //backward reference to go into the tile
+		    refGrid_col = this.TileGrid[grid_row_counter].length; //backward reference
+		}
+
+		//add the tile reference to the grid
+		myTile.Grid_row = refGrid_row;
+		myTile.Grid_col = refGrid_col;
+
+		//move the tile (ok, but this is kinda duplication of code, this one next line...)
+		myTile.set({top:y_plotter,left:x_plotter});
+		canvas.add(myTile);
+
 	    }
 
 	    //add the Grid reference to the object
 	    this.TileGrid[grid_row_counter].push(refTileID);
-
-	    //add the tile reference to the grid
-	    myTile.Grid_row = refGrid_row;
-	    myTile.Grid_col = refGrid_col;
-
-	    //move the tile (ok, but this is kinda duplication of code, this one next line...)
-	    myTile.set({top:y_plotter,left:x_plotter});
-	    canvas.add(myTile);
 
 	    //capture all the x_coordinates of the colums of the grid (only needs to be done for one row)
 	    if(grid_row_counter == 0){
@@ -171,6 +193,7 @@ snDraw.Game = {
     },
 
     //it is important that the destination grid location is empty
+    //it is not important that the tile is on the Grid to begin with.
     moveTileOnGrid: function(tile_ID, row, col, animate){
 	var myTile = this.TileArray[tile_ID];
 	//animate and move the tile on the canvas
@@ -180,7 +203,7 @@ snDraw.Game = {
 	});
 
 	//update the GRID -> TILE references
-	this.TileGrid[myTile.Grid_row][myTile.Grid_col] = null;
+	if(myTile.Grid_row!=undefined){this.TileGrid[myTile.Grid_row][myTile.Grid_col] = null;}//only happens if tile already on grid.
 	this.TileGrid[row][col] = tile_ID;
 
 	//update the TILE -> GRID references
@@ -201,21 +224,16 @@ snDraw.Game = {
 	}
     },
 
-    visuallyNextUnturnedTileIndex: function(){
-	var grid = snDraw.Game.TileGrid;
-	for (var r=this.Grid_yPx.length-1; r>=0; r--){
-	    for (var c=this.Grid_xPx.length-1; c>=0; c--){
-		if(grid[r][c]!=undefined){
-		    if(grid[r][c]!=null){
-			var TID = grid[r][c];
-			if (tileset[TID].status == 'unturned'){
-			    return TID;
-			}
-		    }
+    findNextEmptyGridSlot: function(){
+	for (var r=0; r<this.Grid_yPx.length; r++){
+	    for (var c=0; c<this.Grid_xPx.length; c++){
+		if(!snDraw.Game.TileGrid[r][c]){//an empty slot in the grid!
+		    return {r:r, c:c}
 		}
 	    }
 	}
     },
+
 
     generateTileObject: function(tile,tile_id){
 
@@ -274,40 +292,15 @@ snDraw.Game = {
 	if(tile.status == "partial"){this.modifyTileObject(myNewTileObj,"partial");}
 	if(tile.status == "shadow"){this.modifyTileObject(myNewTileObj,"shadow");}
 
+	//add flat-array reference to the object
+	this.TileArray[tile_id] = myNewTileObj;
+
 	return myNewTileObj;
     },
 
 
     modifyTileObject: function(myTile,to_state,options){
 	myTile.visual = to_state;
-	if(to_state=="flipping"){//this will animate the tile...
-
-	    pl_col = players[options.player_i].color;
-	    myTile.item(0).setStroke(pl_col);
-	    var l_tot = snDraw.Game.tileSize*3.9;
-	    myTile.item(0).setStrokeDashArray([0, l_tot]);
-	    var fps = 25;
-	    var dur = 2;
-	    var f_tot = dur*fps;
-	    snDraw.AnimationFunction.push({
-		R: myTile.item(0),
-		count:0,
-		frame: function(){
-		    this.count++;
-		    var s = (this.count/f_tot)*l_tot;
-		    this.R.setStrokeDashArray([s, l_tot-s]);
-		    if(this.count > f_tot){//animation completed...
-			//TODO: this may be inefficient. Actually, I think it is necessary, as whose to say when a single flipevent will happen.
-			snDraw.Game.Spell.recolourAll(snDraw.Game.Spell.ListAllVisibleTilesOf(myTile.letter));
-
-			return true;
-		    }else{
-			return false;
-		    }
-		}
-	    });
-	    snDraw.setFrameRenderingTimeout (3000);//the correspondence is not exact, but this should allow the custom animation to play through...
-	}
 
 	var ObjFlip = function(){
 	    myTile.item(1).setText(myTile.letter);
@@ -319,10 +312,6 @@ snDraw.Game = {
 	    myTile.item(1).setFill('yellow');
 	    myTile.item(0).setStroke('#666');
 	    ObjFlip();
-	}
-	else if(to_state=="ACTIVE"){
-	    myTile.item(1).setFill('red');
-	    myTile.item(0).setFill('yellow');
 	}
 	else if(to_state=="skeletal"){
 	    myTile.item(0).setFill('#383838');
@@ -343,15 +332,6 @@ snDraw.Game = {
 	    ObjFlip();
 	}
     },
-
-    //wrapper for the function above (is it actually necessary?)
-    animateTileFlip: function(flipping_player_i, tile_id){
-	var TargetTile = this.TileArray[tile_id];
-	var targetTileData = tileset[tile_id];
-	targetTileData.status="turned";//whilst the status change is immediate, the animation causes delay
-	this.modifyTileObject(TargetTile, "flipping",{player_i:flipping_player_i,time:2});
-    },
-
 
     //this is my most complex function, it uses recursion to achieve a letter-by-letter animation.
     drawSingleCapturedWord: function(myplayer, word_index, animate){

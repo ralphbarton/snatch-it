@@ -102,14 +102,11 @@ io.on('connection', function(socket){
     });
 
 
-
-
     //client requests to turn over a tile
-    socket.on('tile turn request', function(tileTurnDetails){
-	myGame.flipLetter(tileTurnDetails.tileID);//note that in this handler we discard the knowledge of the player ID, as it stands.
-	//however, in reflecting the message back to all clients, we do pass on that data
-	io.emit('tile turn assert', tileTurnDetails);
-	console.log("PI=" + tileTurnDetails.playerIndex + " flips tileID=" + tileTurnDetails.tileID);
+    socket.on('tile turn request', function(blank_msg){
+	var newTile_info = myGame.flipNextTile(socket.id);
+	io.emit('new turned tile', newTile_info);
+	console.log("PI=" + newTile_info.flipping_player + " flips tileID=" + newTile_info.tile_index + " (" + newTile_info.letter_index + ")");
     });
 
 });

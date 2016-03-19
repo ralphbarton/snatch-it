@@ -14,7 +14,7 @@ module.exports = function (nTiles){
 
     var disconnectedPlayerRefs = [];
     var tile_ownership = [];
-
+    var next_unturned_tile_i = 0;
 
     console.log("created snatch game instance on server");
 
@@ -53,19 +53,21 @@ module.exports = function (nTiles){
 	},
 
 	getGameObject: function() {
-	    //this is where the game object is defined, serverside. It is just the tileset and the playerset, packaged into an object.
-	    var gameObject = {tileSet:tileSet, playerSet:playerSet}; 
-	    
 	    //in this case we are performing a deep copy of data, hence the use of the JSON function
-	    var gameObj_clone = JSON.parse(JSON.stringify(gameObject));
-	    var cc_plr = gameObj_clone.playerSet
-	    
+	    var playerSet_clone = JSON.parse(JSON.stringify(playerSet));
+
 	    //remove some server-side only attributes of the player objects before transmission...
-	    for (i=0; i < cc_plr.length; i++){
-		delete cc_plr[i].agrees_to_reset;
-		delete cc_plr[i].socket_key;
+	    for (var i=0; i < playerSet_clone.length; i++){
+		delete playerSet_clone[i].agrees_to_reset;
+		delete playerSet_clone[i].socket_key;
 	    }
-	    return gameObj_clone;
+	    var turned_tiles = tileSet.slice(0,next_unturned_tile_i);
+	    var tile_stats = {n_tiles: tileSet.length, n_turned: next_unturned_tile_i};
+	    return {
+		playerSet: playerSet_clone,
+		turned_tiles: turned_tiles,
+		tile_stats: tile_stats
+	    }; 
 	},
 
 	getPlayerObject: function(socket_key) {
@@ -82,10 +84,18 @@ module.exports = function (nTiles){
 	    return playerSet[PI].name;
 	},
 
-	flipLetter: function(tileID) {
-	    tileSet[tileID].status="turned";
+	flipNextTile: function(socket_key) {
+	    var TI = next_unturned_tile_i;
+	    var PI = player_index_from_socketKey_lkup[socket_key];
+	    next_unturned_tile_i++;
+	    tileSet[TI].status="turned";
+	    return {
+		tile_index: TI,
+		tile_letter: tileSet[TI].letter,
+		flipping_player: PI
+	    };
 	},
-
+	
 	resetGame: function(nTiles) {
 	    tileSet = generateNewRandomTileSet(nTiles);
 	    color_palette = shuffle(color_palette);

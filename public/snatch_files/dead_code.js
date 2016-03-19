@@ -300,3 +300,110 @@
 	}
     }
 
+
+
+<"taken from snDraw-Game-Mouse.js">
+{
+    // let this be turn a letter
+    var target_tile_index = snDraw.Game.visuallyNextUnturnedTileIndex();
+    if(target_tile_index !== undefined){
+	tileTurnObj = {
+	    playerIndex: client_player_index,
+	    tileID: target_tile_index
+	}
+    }else{
+	console.log("TOAST: there are no more unturned tiles for turning over");    
+    }
+}
+
+	    else if(tileset[my_tile_index].status=="unturned"){
+		tileTurnObj = {
+		    playerIndex: client_player_index,
+		    tileID: my_tile_index
+		}
+		TILE_TURN_REQUEST(tileTurnObj);//for an unturned tile, always message to flip
+	    }
+
+
+
+
+<"taken from snDraw-Game.js">
+
+
+    visuallyNextUnturnedTileIndex: function(){
+	var grid = snDraw.Game.TileGrid;
+	for (var r=this.Grid_yPx.length-1; r>=0; r--){
+	    for (var c=this.Grid_xPx.length-1; c>=0; c--){
+		if(grid[r][c]!=undefined){
+		    if(grid[r][c]!=null){
+			var TID = grid[r][c];
+			if (tileset[TID].status == 'unturned'){
+			    return TID;
+			}
+		    }
+		}
+	    }
+	}
+    },
+
+
+	if(to_state=="flipping"){//this will animate the tile...
+
+	    pl_col = players[options.player_i].color;
+	    myTile.item(0).setStroke(pl_col);
+	    var l_tot = snDraw.Game.tileSize*3.9;
+	    myTile.item(0).setStrokeDashArray([0, l_tot]);
+	    var fps = 25;
+	    var dur = 2;
+	    var f_tot = dur*fps;
+	    snDraw.AnimationFunction.push({
+		R: myTile.item(0),
+		count:0,
+		frame: function(){
+		    this.count++;
+		    var s = (this.count/f_tot)*l_tot;
+		    this.R.setStrokeDashArray([s, l_tot-s]);
+		    if(this.count > f_tot){//animation completed...
+			//TODO: this may be inefficient. Actually, I think it is necessary, as whose to say when a single flipevent will happen.
+			snDraw.Game.Spell.recolourAll(snDraw.Game.Spell.ListAllVisibleTilesOf(myTile.letter));
+
+			return true;
+		    }else{
+			return false;
+		    }
+		}
+	    });
+	    snDraw.setFrameRenderingTimeout (3000);//the correspondence is not exact, but this should allow the custom animation to play through...
+	}
+
+    //wrapper for the function above (is it actually necessary?)
+    animateTileFlip: function(flipping_player_i, tile_id){
+	var TargetTile = this.TileArray[tile_id];
+	var targetTileData = tileset[tile_id];
+	targetTileData.status="turned";//whilst the status change is immediate, the animation causes delay
+	this.modifyTileObject(TargetTile, "flipping",{player_i:flipping_player_i,time:2});
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+///upon server assertion that a letter is turned over
+socket.on('tile turn assert', function(tileDetailsObj){
+    var flipping_player_i = tileDetailsObj.playerIndex;
+    var tile_id = tileDetailsObj.tileID;
+
+    snDraw.Game.animateTileFlip(flipping_player_i, tile_id);
+});
+
