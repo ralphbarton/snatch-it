@@ -58,6 +58,7 @@ snDraw.Game = {
 	this.createEveryTileObject_inGridAtTop();//next draw all the unturned tiles underneath
 	snDraw.Game.Zones.CreatePlayerZoneListAndDraw();//next draw all the players word zones
 	canvas.renderAll();
+	snDraw.measureFramePeriod();
 	TA = this.TileArray;//this is to enable faster debugging
     },
 

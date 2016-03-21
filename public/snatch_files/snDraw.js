@@ -5,8 +5,13 @@ var canvas = undefined;//OK let's at least keep the canvas object as a global...
 var snDraw = {
 
     //member variables (native types)
+    //todo: either delete this non-global data or replace all the global references in the code with this
     myZoneWidth: undefined,
     myZoneHeight: undefined,
+
+    frameperiod_measured: undefined,
+    
+
 
     //for animation
     AnimationFunction: [],
@@ -52,6 +57,26 @@ var snDraw = {
 	//speedup?
 	canvas.renderOnAddRemove = false;
 	canvas.stateful = false;
+    },
+
+    measureFramePeriod: function(){
+	var N_frames = 200;
+	snDraw.AnimationFunction.push({
+	    N:0,
+	    d_start: undefined,
+	    frame: function(){
+		if(this.N==0){this.d_start = new Date();}
+		this.N++;
+		var terminate = this.N >= N_frames;
+		if(terminate){
+		    var d_end = new Date();
+		    snDraw.frameperiod_measured = (d_end.getTime() - this.d_start.getTime())/N_frames;
+		    console.log("Frame Period for this environment measured as (ms): " + snDraw.frameperiod_measured);
+		}
+		return terminate;
+	    }
+	});
+	this.setFrameRenderingTimeout (N_frames*300);//the value is in milliseconds - assume frame period won't exceed 300 ms
     },
 
     frame_rendering_timeout: undefined,
