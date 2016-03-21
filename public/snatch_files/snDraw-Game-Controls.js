@@ -38,6 +38,66 @@ snDraw.Game.Controls = {
 	}
     },
 
+    turnDisabled: false,
+    cancelTurnDisabled: false,
+    setTurnDisabled: function(disable){
+	this.turnDisabled = disable;
+	var TurnTextObj = this.Button_Objs[1].item(1);
+	var TurnRectObj = this.Button_Objs[1].item(0);
+    	TurnRectObj.setFill('#AAA');
+	//change the button text colour
+	if(disable){
+	    TurnTextObj.setFill('#75746E');
+	}else{
+	    TurnTextObj.setFill('black');
+	    TurnRectObj.setStroke(snDraw.Game.fg_col);
+	}
+    },
+
+    startTurnDiableTimeout: function(){
+
+	//make the outline of the button coloured.
+	var RoundedRec = this.Button_Objs[1].item(0);
+	clientCol = players[client_player_index].color;
+	RoundedRec.setStroke(clientCol);
+
+	//todo: this values ought only be calculated once as they are constant w.r.t. a game instance
+
+	var corners_r = snDraw.Game.tileSize * 0.12;
+
+	//this is the exact number of pixels of the perimeter of the rounded cornered rectangle (test by making the 1.0 slightly smaller!)
+	var l_tot = ((RoundedRec.getWidth() + RoundedRec.getHeight()) * 2 + 2*corners_r*(Math.PI-4.0))* 1.0;
+	var fps = 30;//TODO: fps is not fixed for different platforms. It needs to be measured upon page load.
+	var dur = 10;
+	var f_tot = dur*fps;
+	
+	RoundedRec.setStrokeDashArray([0, l_tot]);
+
+	this.cancelTurnDisabled=false;
+	snDraw.AnimationFunction.push({
+	    //these persistant data are set for the lifespan of the function below.
+	    count:0,
+	    frame: function(){
+		this.count++;
+		var solid_len = (this.count/f_tot)*l_tot;
+		RoundedRec.setStrokeDashArray([solid_len, l_tot-solid_len]);
+		if((this.count > f_tot)||(snDraw.Game.Controls.cancelTurnDisabled)){//animation completed...
+		    //restore the visual state of the button to normal
+		    RoundedRec.setStrokeDashArray(null);
+		    snDraw.Game.Controls.setTurnDisabled(false);
+		    return true; //this means the function call chain shall terminate
+		}else{
+		    return false; // function call chain to continue
+		}
+	    }
+	});
+	snDraw.setFrameRenderingTimeout (dur*1000);//the correspondence is not exact, but this should allow the custom animation to play through...
+	
+
+
+
+    },
+
     createGenericButton: function(text,n_ind){
 
 	var tile_DIM = snDraw.Game.tileSize;
@@ -93,29 +153,38 @@ snDraw.Game.Controls = {
 
 
     buttonRecolor: function(myButtonGrp,style){
-	if (style=="hover"){
-    	    myButtonGrp.item(0).setStroke('#FF0');
-    	    myButtonGrp.item(0).setFill('#AAA');
+	if((myButtonGrp.gameButtonID!=1)||(!this.turnDisabled)){//condition prevents interference with the animating Turn button (ID =1 for Turn button)
+	    var ButtonRect = myButtonGrp.item(0);
+
+	    if (style=="hover"){
+    		ButtonRect.setStroke('#FF0');
+    		ButtonRect.setFill('#AAA');
+	    }
+	    else if (style=="press"){
+		ButtonRect.setStroke('#FF0');
+    		ButtonRect.setFill(snDraw.Game.fg_col);
+	    }
+	    else{
+    		ButtonRect.setStroke(snDraw.Game.fg_col);
+    		ButtonRect.setFill('#AAA');
+	    }
+	    canvas.renderAll();
 	}
-	else if (style=="press"){
-            myButtonGrp.item(0).setStroke('#FF0');
-    	    myButtonGrp.item(0).setFill(snDraw.Game.fg_col);
-	}
-	else{
-    	    myButtonGrp.item(0).setStroke(snDraw.Game.fg_col);
-    	    myButtonGrp.item(0).setFill('#AAA');
-	}
-	canvas.renderAll();
     },
 
 
     turnLetterClickHandler: function(){
-	var n_tiles_remaining = tilestats.n_tiles-tileset.length;
-	if(n_tiles_remaining>0){
-	    TILE_TURN_REQUEST(); //request another tile...
+	if(this.turnDisabled){
+	    console.log("TOAST: you must wait before you are allowed to take another turn. Number of seconds = [todo]");
 	}else{
-	    var really = confirm("Do you really want to finish the game?");
-	    if(really){RESET_REQUEST();}
+	    this.setTurnDisabled(true);
+	    var n_tiles_remaining = tilestats.n_tiles-tileset.length;
+	    if(n_tiles_remaining>0){
+		TILE_TURN_REQUEST(); //request another tile...
+	    }else{
+		var really = confirm("Do you really want to finish the game?");
+		if(really){RESET_REQUEST();}
+	    }
 	}
     },
 

@@ -77,8 +77,9 @@ socket.on('new turned tile', function(newTile_info){
     var PI = newTile_info.flipping_player;
     var TI = newTile_info.tile_index;
     var LET = newTile_info.tile_letter;
+    var client_is_flipper = PI == client_player_index;
 
-    var player_name = players[PI].name;
+    var player_name = client_is_flipper ? "You" : players[PI].name;
     console.log("TOAST: " + player_name + " flipped a tile...");
     tileset[TI] = {
 	letter: LET,
@@ -88,6 +89,12 @@ socket.on('new turned tile', function(newTile_info){
     snDraw.Game.shiftTilesUpGrid();//function call is extravagant (inefficient) as it will never cause a shift. We're just using it to correctly set playersZoneTopPx
     snDraw.Game.Controls.updateTurnLetter_number();
     snDraw.Game.Zones.updateAllZoneSizes();//unconditional function call is extravagant (inefficient) as shift will only be in a minority of cases...
+    if(client_is_flipper){
+	snDraw.Game.Controls.startTurnDiableTimeout();
+    }else{
+	//the simple effect of this is that any non-client player flip resets the timer to re-allow client flip.
+	snDraw.Game.Controls.cancelTurnDisabled = true;
+    }
 });
 
 socket.on('player wants reset', function(player_index){
