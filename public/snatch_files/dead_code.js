@@ -364,7 +364,7 @@
 		    var s = (this.count/f_tot)*l_tot;
 		    this.R.setStrokeDashArray([s, l_tot-s]);
 		    if(this.count > f_tot){//animation completed...
-			//TODO: this may be inefficient. Actually, I think it is necessary, as whose to say when a single flipevent will happen.
+			//TODO: this may be inefficient. Actually, I think it is necessary, as who'se to say when a single flip event will happen.
 			snDraw.Game.Spell.recolourAll(snDraw.Game.Spell.ListAllVisibleTilesOf(myTile.letter));
 
 			return true;
@@ -406,4 +406,24 @@ socket.on('tile turn assert', function(tileDetailsObj){
 
     snDraw.Game.animateTileFlip(flipping_player_i, tile_id);
 });
+
+
+
+
+
+<"from snDraw.js">
+
+    frame_rendering_timeout: undefined,
+    setFrameRenderingTimeout: function(duration){
+	var already_running = this.frame_rendering_timeout !== undefined;
+	
+	if(already_running){
+	    clearTimeout(this.frame_rendering_timeout);
+	}
+	this.frame_rendering_timeout = setTimeout(function(){snDraw.frame_rendering_timeout = undefined;}, duration*4);//fudge factor
+
+	if(!already_running){
+	    this.startScreenFrameDrawing();//this ensures another chain of recusive function calls will not happen but timeout can still be adjusted.
+	}
+    },
 

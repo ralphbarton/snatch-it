@@ -357,11 +357,9 @@ snDraw.Game = {
 	var LettersOfThisWord = [];//this is an array of Fabric objects (the tiles)
 
 	//generates a new animation properties object which includes a callback to group the relevant set of letter tiles upon completion of the animation
-	var ani_withGRPcallback = jQuery.extend({
-	    onComplete: function(){
-		snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord, myplayer, word_index);
-	    }
-	}, snDraw.ani.sty_Sing);
+	var onComplete_groupLetters = function(){
+	    snDraw.Game.makeTilesDraggableGroup(LettersOfThisWord, myplayer, word_index);
+	};
 
 	function Recursive_Letters_Loop(i){
 	    var this_tile_index = word_as_tile_index_array[i];
@@ -369,7 +367,8 @@ snDraw.Game = {
 	    LettersOfThisWord[i]=ThisTile;
 
 	    //move the relevant tile (already existing on the canvas) to location...
-	    snDraw.moveSwitchable(ThisTile, animate, (i == word_length-1) ? ani_withGRPcallback : snDraw.ani.sty_Sing,{
+	    var my_animate_onComplete = animate ? ((i == word_length-1) ? onComplete_groupLetters : true) : false;
+	    snDraw.moveSwitchable(ThisTile, my_animate_onComplete, snDraw.ani.sty_Sing,{
 		left: x_plotter,
 		top: y_plotter
 	    });

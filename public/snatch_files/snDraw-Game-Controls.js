@@ -74,7 +74,7 @@ snDraw.Game.Controls = {
 	RoundedRec.setStrokeDashArray([0, l_tot]);
 
 	this.cancelTurnDisabled=false;
-	snDraw.AnimationFunction.push({
+	snDraw.FrameTargetsArray.push({
 	    //these persistant data are set for the lifespan of the function below.
 	    count:0,
 	    frame: function(){
@@ -91,11 +91,6 @@ snDraw.Game.Controls = {
 		}
 	    }
 	});
-	snDraw.setFrameRenderingTimeout (dur*1000);//the correspondence is not exact, but this should allow the custom animation to play through...
-	
-
-
-
     },
 
     createGenericButton: function(text,n_ind){

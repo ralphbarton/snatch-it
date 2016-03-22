@@ -188,18 +188,15 @@ snDraw.Game.Zones = {
 	var plrName   = bxFab[1];
 
 	//generates a new animation properties object which includes a callback to group the relevant set of letter tiles upon completion of the animation
-	var ani_withDELcallback = jQuery.extend({
-	    onComplete: function(){
-		canvas.remove(zoneBox);
-		canvas.remove(plrName);
-	    }
-	}, snDraw.ani.sty_Resize);
-
+	var onComplete_deleteLostZone = function(){
+	    canvas.remove(zoneBox);
+	    canvas.remove(plrName);
+	};
 
 	snDraw.moveSwitchable(zoneBox, true, snDraw.ani.sty_Resize,{
 	    top: LOW_px
 	});
-	snDraw.moveSwitchable(plrName, true, ani_withDELcallback,{// only need to use the ani_withDELcallback variant once...
+	snDraw.moveSwitchable(plrName, onComplete_deleteLostZone, snDraw.ani.sty_Resize,{// only need to use the onComplete_deleteLostZone callback once...
 	    top: LOW_px - snDraw.Game.textMarginUnit
 	});
 

@@ -14,7 +14,7 @@ var snDraw = {
 
 
     //for animation
-    AnimationFunction: [],
+    FrameTargetsArray: [],
 
     //define animation styles data here...
     ani: {
@@ -60,8 +60,11 @@ var snDraw = {
     },
 
     measureFramePeriod: function(){
+
+//example code...
+//	this.frame_rendering_timeout = setTimeout(function(){snDraw.frame_rendering_timeout = undefined;}, duration*4);//fudge factor
 	var N_frames = 200;
-	snDraw.AnimationFunction.push({
+	snDraw.FrameTargetsArray.push({
 	    N:0,
 	    d_start: undefined,
 	    frame: function(){
@@ -76,42 +79,72 @@ var snDraw = {
 		return terminate;
 	    }
 	});
-	this.setFrameRenderingTimeout (N_frames*300);//the value is in milliseconds - assume frame period won't exceed 300 ms
+	//TODO - function defunct until work on this...
+	//this.setFrameRenderingTimeout (N_frames*300);//the value is in milliseconds - assume frame period won't exceed 300 ms
     },
 
-    frame_rendering_timeout: undefined,
-    setFrameRenderingTimeout: function(duration){
-	var already_running = this.frame_rendering_timeout !== undefined;
-	if(already_running){
-	    clearTimeout(this.frame_rendering_timeout);
-	}
-	this.frame_rendering_timeout = setTimeout(function(){snDraw.frame_rendering_timeout = undefined;}, duration*4);//fudge factor
-	if(!already_running){
-	    this.startScreenFrameDrawing();//this ensures another chain of recusive function calls will not happen but timeout can still be adjusted.
-	}
-    },
 
+    frame_drawing_running: false,
+    nAnimations: 0,
+    literal_frame_countdown: 0,
     startScreenFrameDrawing: function(){
 
-	//this extra bit is for my custom animation processing...
-	for (var i=0; i<this.AnimationFunction.length; i++){
-	    var complete = this.AnimationFunction[i].frame();
+	this.literal_frame_countdown--;
+	// custom animation processing (locked to frame rate)
+	for (var i=0; i<this.FrameTargetsArray.length; i++){
+	    var complete = this.FrameTargetsArray[i].frame();
 	    if (complete){
-		this.AnimationFunction.splice(i,1);
+		this.FrameTargetsArray.splice(i,1);
 	    }
 	}
-	if(this.frame_rendering_timeout!==undefined){
-	    canvas.renderAll();
+	canvas.renderAll();
+
+	if((this.FrameTargetsArray.length<=0)&&(this.nAnimations<=0)&&(this.literal_frame_countdown<=0)){
+	    this.frame_drawing_running = false;
+	}else{
 	    window.requestAnimationFrame(function(){snDraw.startScreenFrameDrawing();});
 	}
     },
 
-    moveSwitchable: function(FabricObject,animate,animation_style,properties){
-	if(animate){
-	    FabricObject.animate(properties, animation_style);
-	    this.setFrameRenderingTimeout(animation_style.duration);
+    more_animation_frames_at_least: function(N){
+	this.literal_frame_countdown = Math.max(this.literal_frame_countdown, N);
+	if(!this.frame_drawing_running){
+	    this.startScreenFrameDrawing();
+	    this.frame_drawing_running = true;
 	}
-	else{
+    },
+
+    animation_started: function(){
+	if(!this.frame_drawing_running){
+	    this.startScreenFrameDrawing();
+	    this.frame_drawing_running = true;
+	}
+	this.nAnimations++;
+    },
+
+    animation_completed: function(){
+	this.nAnimations--;
+    },
+
+    moveSwitchable: function(FabricObject,animate_onComplete,animation_style,properties){
+	var my_onComplete = undefined;
+
+	if(typeof(animate_onComplete)=='function'){//a custom on-complete function has been supplied
+	    my_onComplete = function(){
+		animate_onComplete();
+		snDraw.animation_completed();
+	    };
+	}else if(animate_onComplete === true){
+	    my_onComplete = function(){
+		snDraw.animation_completed();
+	    };
+	}
+
+	if(my_onComplete !== undefined){
+	    var animation_style_with_onComplete = jQuery.extend( {onComplete: my_onComplete}, animation_style);
+	    FabricObject.animate(properties, animation_style_with_onComplete);
+	    this.animation_started();
+	}else{
 	    FabricObject.set(properties);
 	    //these two lines are the trick for ensuring click detection zones are moved...
 	    canvas.remove(FabricObject);

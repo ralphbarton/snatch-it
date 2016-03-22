@@ -43,7 +43,6 @@ socket.on('full game state transmission', function(gameState){
 
     players = gameState.playerSet;
     tileset = gameState.turned_tiles;
-    console.log("TILESET RECIEVED LENGTH = " + tileset.length);
     tilestats = gameState.tile_stats;
 
     for(i=0; i<players.length; i++){
@@ -118,9 +117,7 @@ socket.on('player response to reset request', function(responseObj){
 });
 
 socket.on('give client their player index', function(myIndex){
-    console.log("player index of " + myIndex + " recieved");
     client_player_index = myIndex;
-    
 });
 
 
