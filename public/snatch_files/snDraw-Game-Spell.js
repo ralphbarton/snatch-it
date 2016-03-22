@@ -37,7 +37,7 @@ snDraw.Game.Spell = {
 		    });
 		}
 	    }
-	    snDraw.more_animation_frames_at_least(1);//as an alternative to canvas.renderAll()
+	    snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
 	}
     },
 
@@ -108,7 +108,7 @@ snDraw.Game.Spell = {
 		    });
 		}
 	    }
-	    snDraw.more_animation_frames_at_least(1);//as an alternative to canvas.renderAll()
+	    snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
 	}
     },
 
@@ -139,7 +139,7 @@ snDraw.Game.Spell = {
 	}
 	this.SkeletalLetters = [];//clear the array (lose the references to the Fabric objects. Hope they get deleted
 	this.n_letters_unwrap = undefined;
-	snDraw.more_animation_frames_at_least(1);//as an alternative to canvas.renderAll()
+	snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
     },
 
     ListAllVisibleTilesOf: function(letter){

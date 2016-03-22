@@ -88,6 +88,12 @@ socket.on('new turned tile', function(newTile_info){
     snDraw.Game.shiftTilesUpGrid();//function call is extravagant (inefficient) as it will never cause a shift. We're just using it to correctly set playersZoneTopPx
     snDraw.Game.Controls.updateTurnLetter_number();
     snDraw.Game.Zones.updateAllZoneSizes();//unconditional function call is extravagant (inefficient) as shift will only be in a minority of cases...
+
+    //This is a little expensive, but any new tile has the potential to change letter availability
+    if(snDraw.Game.Spell.SkeletalLetters.length>0){ // irrelivant if the speller is empty
+	    snDraw.Game.Spell.recolourAll(snDraw.Game.Spell.ListAllVisibleTilesOf(LET));
+    }
+
     if(client_is_flipper){
 	snDraw.Game.Controls.startTurnDiableTimeout();
     }else{

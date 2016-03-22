@@ -84,11 +84,12 @@ var snDraw = {
     },
 
 
-    frame_drawing_running: false,
+    animation_frame_requests_exist: false,
     nAnimations: 0,
     literal_frame_countdown: 0,
     startScreenFrameDrawing: function(){
-
+	this.animation_frame_requests_exist = false;
+	
 	this.literal_frame_countdown--;
 	// custom animation processing (locked to frame rate)
 	for (var i=0; i<this.FrameTargetsArray.length; i++){
@@ -99,25 +100,23 @@ var snDraw = {
 	}
 	canvas.renderAll();
 
-	if((this.FrameTargetsArray.length<=0)&&(this.nAnimations<=0)&&(this.literal_frame_countdown<=0)){
-	    this.frame_drawing_running = false;
-	}else{
+	if((this.FrameTargetsArray.length>0)||(this.nAnimations>0)||(this.literal_frame_countdown>0)){
+	    //this may not guarentee a recursive call, which may cause animation bugs where frames aren't drawn?
 	    window.requestAnimationFrame(function(){snDraw.startScreenFrameDrawing();});
+	    this.animation_frame_requests_exist = true;
 	}
     },
 
     more_animation_frames_at_least: function(N){
 	this.literal_frame_countdown = Math.max(this.literal_frame_countdown, N);
-	if(!this.frame_drawing_running){
+	if(!this.animation_frame_requests_exist){
 	    this.startScreenFrameDrawing();
-	    this.frame_drawing_running = true;
 	}
     },
 
     animation_started: function(){
-	if(!this.frame_drawing_running){
+	if(!this.animation_frame_requests_exist){
 	    this.startScreenFrameDrawing();
-	    this.frame_drawing_running = true;
 	}
 	this.nAnimations++;
     },
@@ -140,17 +139,16 @@ var snDraw = {
 	    };
 	}
 
-	if(my_onComplete !== undefined){
+	if(my_onComplete !== undefined){//this means animation was requested
 	    var animation_style_with_onComplete = jQuery.extend( {onComplete: my_onComplete}, animation_style);
 	    FabricObject.animate(properties, animation_style_with_onComplete);
 	    this.animation_started();
-	}else{
+	}else{//this means movement without animation
 	    FabricObject.set(properties);
 	    //these two lines are the trick for ensuring click detection zones are moved...
 	    canvas.remove(FabricObject);
 	    canvas.add(FabricObject);
-	    
-	    canvas.renderAll();
+	    snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
 	}
     },
 
