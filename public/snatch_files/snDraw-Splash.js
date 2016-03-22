@@ -1,5 +1,5 @@
 snDraw.Splash = {
-    //TODO: splot this big function into smaller functions (even though there's no point...) there is: hierarchical sequence
+    //TODO: split this big function into smaller functions (even though there's no point...) there is: hierarchical sequence
     identityPrompt: function(colorChoices){
 
 	var playerName = prompt("What is your name?");
@@ -96,57 +96,68 @@ snDraw.Splash = {
 
 	//TODO: set whether background is dark or light
 	snDraw.Game.setDarkBackground(true);
-	
-	//now add canvas mouse events...
-	canvas.on('mouse:down',function(e){
-	    //right, so on mousedown shrink all the other circles to nothing then delete
-	    if(e.target){
-		BB_hit = e.target.BBindex;
-		if(BB_hit!==undefined){
 
-		    for (i=0; i<5; i++){
-			if(i==BB_hit){continue;}//don't vanish the BB we just hit!
-			shrinkBB(BlipBlop[i]);
-		    }
+	var removeUnselectedBBs = function(i_selected){
+	    if(i_selected!==undefined){
+		for (i=0; i<5; i++){
+		    if(i==i_selected){continue;}//don't vanish the BB we just hit!
+		    shrinkBB(BlipBlop[i]);
 		}
+	    }
+	};
+
+	var onComplete_finalBBshrink = function(i_selected){
+	    for (i=0; i<5; i++){
+		canvas.remove(BlipBlop[i]);
+	    }
+	    canvas.remove(prompt_text_obj);
+	    
+	    snDraw.gameMessage("Waiting for server\nto send the state of the ongoing\n\
+SNATCH-IT game...",myZoneWidth * 0.065,'rgb(230,0,40)'); 
+
+	    //send the data to the server
+	    var playerDetailsObj = {
+		name: playerName,
+		color_index: colorChoices[i_selected].index
+	    };
+	    PLAYER_JOINED_WITH_DETAILS(playerDetailsObj);
+
+
+	    //after details are supplied, load the latest game state (timing is important here...)
+	    canvas.off('mouse:down');
+	    canvas.off('mouse:up');
+	    document.removeEventListener("keydown", KBlistenerSplash, false);
+
+	};
+
+	canvas.on('mouse:down',function(e){
+	    if(e.target){
+		var BB_hit_i = e.target.BBindex;
+		removeUnselectedBBs(BB_hit_i);
 	    }
 	}); 
 
-
-
 	canvas.on('mouse:up',function(e){
-	    //and on mouse UP, this is when we transmit to the server and move things along
-	    
 	    if(e.target){
 		shrinkBB(e.target);
-		BB_hit = e.target.BBindex;
-		
-
-		function finalBBanimationComplete(){
-
-
-		    for (i=0; i<5; i++){
-			canvas.remove(BlipBlop[i]);
-		    }
-		    canvas.remove(prompt_text_obj);
-		    
-		    snDraw.gameMessage("Waiting for server\nto send the state of the ongoing\nSNATCH-IT game...",myZoneWidth * 0.065,'rgb(230,0,40)'); 
-
-		    //send the data to the server
-		    var playerDetailsObj = {
-			name: playerName,
-			color_index: colorChoices[BB_hit].index
-		    };
-		    PLAYER_JOINED_WITH_DETAILS(playerDetailsObj);
-
-
-		    //after details are supplied, load the latest game state (timing is important here...)
-		    canvas.off('mouse:down');
-		    canvas.off('mouse:up');
-		}
-
-		setTimeout(function(){finalBBanimationComplete();},myDur);
+		var BB_hit_i = e.target.BBindex;
+		setTimeout(function(){onComplete_finalBBshrink(BB_hit_i);},myDur);
 	    }
 	});
+
+	//define and add code to respond to keystrokes.
+	var KBlistenerSplash = function(e){
+	    var myKeycode = e.keyCode;
+	    var keyPressed = String.fromCharCode(myKeycode);//note that this is non-case sensitive.
+	    if(myKeycode == 32){//space bar
+		var rand_BB_i = getRandomInt(0,4);
+		removeUnselectedBBs(rand_BB_i);
+		setTimeout(function(){shrinkBB(BlipBlop[rand_BB_i]);},myDur*0.5);		
+		setTimeout(function(){onComplete_finalBBshrink(rand_BB_i);},myDur*1.5);
+	    }
+	};
+
+	document.addEventListener("keydown", KBlistenerSplash, false);
+
     }
 };
