@@ -76,7 +76,6 @@ var snDraw = {
 		if(completion_flag){
 		    var d_end = new Date();
 		    snDraw.frameperiod_measured = (d_end.getTime() - this.d_start.getTime())/this.framesCount;
-		    console.log("Frame Period for this environment measured as (ms): " + snDraw.frameperiod_measured);
 		    return true;
 		}
 		return false;

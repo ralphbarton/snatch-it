@@ -91,7 +91,8 @@ snDraw.Game.Controls = {
 		    snDraw.Game.Controls.setTurnDisabled(false);
 		    //instrumentation....
 		    var end_time = new Date();
-		    console.log("The animation was meant to take " + dur + " seconds; measured as " + (end_time.getTime() - this.start_time.getTime())/1000);
+		    //TODO: make the animation duration more accurate...
+		    //console.log("The animation was meant to take " + dur + " seconds; measured as " + (end_time.getTime() - this.start_time.getTime())/1000);
 		    return true; //this means the function call chain shall terminate
 		}else{
 		    return false; // function call chain to continue

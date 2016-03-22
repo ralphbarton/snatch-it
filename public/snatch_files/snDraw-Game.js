@@ -90,39 +90,27 @@ snDraw.Game = {
 	var Br1 = HH;
 	var Br2 = Br1 + WW;
 	var Br3 = Br2 + HH;
-	var Br4 = Br3 + WW;
 
 	var Sr = 0.25 * myZoneWidth;
 
-	var perim_pos = Math.random() * Br4;
+	var perim_pos = Math.random() * Br3;
 	var x_orig = undefined;
 	var y_orig = undefined;
-	console.log("Br1", Br1," Br2", Br2," Br3", Br3," Br4", Br4);
-	console.log("perim_pos", perim_pos);
 
 	//coordinate transform from (1) a position along a line to (2) pixel (x,y) coords
 	if(perim_pos < Br1){//left bar
-	    console.log("left bar");
 	    x_orig = -Sr;
 	    y_orig = -Sr + perim_pos;
 	}else if(perim_pos < Br2){//top
-	    console.log("top");
 	    var perim_remain = perim_pos - Br1;
-	    x_orig = -Sr + perim_pos;
+	    x_orig = -Sr + perim_remain;
 	    y_orig = -Sr;
-	}else if(perim_pos < Br3){//right bar
-	    console.log("right bar");
+	}else {//right bar
 	    var perim_remain = perim_pos - Br2;
 	    x_orig = myZoneWidth + Sr;
-	    y_orig = -Sr + perim_pos;
-	}else{//top
-	    console.log("top");
-	    var perim_remain = perim_pos - Br3;
-	    x_orig = -Sr + perim_pos;
-	    y_orig = -Sr;
+	    y_orig = -Sr + perim_remain;
 	}
 
-	console.log("XY_1=",x_orig,y_orig);
 	//fuzz that position a little.
 	x_orig += (Math.random()-0.5) * 2 * Sr * 0.8;
 	y_orig += (Math.random()-0.5) * 2 * Sr * 0.8;
