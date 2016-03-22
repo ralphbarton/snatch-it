@@ -57,7 +57,7 @@ snDraw.Game.Controls = {
     startTurnDiableTimeout: function(){
 
 	//How long (in seconds) should it take for the button to become available again?
-	var dur = 10;
+	var dur = dev ? 1 : 10;//minimise wait in development mode...
 
 	//make the outline of the button coloured.
 	var RoundedRec = this.Button_Objs[1].item(0);

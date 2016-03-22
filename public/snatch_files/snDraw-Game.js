@@ -1,5 +1,5 @@
 //this file contains the functions that render the game onto the screen
-var dev = false;
+var dev = true;
 
 var TA = [];//this is to enable faster debugging
 
@@ -84,8 +84,61 @@ snDraw.Game = {
 
     addNewTurnedTile: function (tile_index){
 	var newTile = this.generateTileObject(tileset[tile_index], tile_index);
-	var loc = this.findNextEmptyGridSlot();
-	this.moveTileOnGrid(tile_index, loc.r, loc.c, false);
+
+	var WW = 1.5 * myZoneWidth; 
+	var HH = 0.25 * (myZoneWidth + myZoneHeight);
+	var Br1 = HH;
+	var Br2 = Br1 + WW;
+	var Br3 = Br2 + HH;
+	var Br4 = Br3 + WW;
+
+	var Sr = 0.25 * myZoneWidth;
+
+	var perim_pos = Math.random() * Br4;
+	var x_orig = undefined;
+	var y_orig = undefined;
+	console.log("Br1", Br1," Br2", Br2," Br3", Br3," Br4", Br4);
+	console.log("perim_pos", perim_pos);
+
+	//coordinate transform from (1) a position along a line to (2) pixel (x,y) coords
+	if(perim_pos < Br1){//left bar
+	    console.log("left bar");
+	    x_orig = -Sr;
+	    y_orig = -Sr + perim_pos;
+	}else if(perim_pos < Br2){//top
+	    console.log("top");
+	    var perim_remain = perim_pos - Br1;
+	    x_orig = -Sr + perim_pos;
+	    y_orig = -Sr;
+	}else if(perim_pos < Br3){//right bar
+	    console.log("right bar");
+	    var perim_remain = perim_pos - Br2;
+	    x_orig = myZoneWidth + Sr;
+	    y_orig = -Sr + perim_pos;
+	}else{//top
+	    console.log("top");
+	    var perim_remain = perim_pos - Br3;
+	    x_orig = -Sr + perim_pos;
+	    y_orig = -Sr;
+	}
+
+	console.log("XY_1=",x_orig,y_orig);
+	//fuzz that position a little.
+	x_orig += (Math.random()-0.5) * 2 * Sr * 0.8;
+	y_orig += (Math.random()-0.5) * 2 * Sr * 0.8;
+
+	//and make it a tile plot coordinate (shift by half width and height)
+	x_orig -= snDraw.Game.tileSize/2;
+	y_orig -= snDraw.Game.tileSize/2;
+
+	//move the tile onto the boundary line
+	snDraw.moveSwitchable(newTile, false, null,{
+	    left: x_orig,
+	    top: y_orig
+	});
+
+	var loc = this.findNextEmptyGridSlot();	
+	this.moveTileOnGrid(tile_index, loc.r, loc.c, snDraw.ani.sty_Sing);
     },
 
     createEveryTileObject_inGridAtTop: function (){
@@ -197,10 +250,13 @@ snDraw.Game = {
 
     //it is important that the destination grid location is empty
     //it is not important that the tile is on the Grid to begin with.
-    moveTileOnGrid: function(tile_ID, row, col, animate){
+    moveTileOnGrid: function(tile_ID, row, col, animate_aniSty){
 	var myTile = this.TileArray[tile_ID];
+
+	var aniSty = typeof(animate_aniSty) == 'boolean' ? snDraw.ani.sty_Resize : animate_aniSty;
+	var animate = typeof(animate_aniSty) == 'boolean' ? animate_aniSty : true;
 	//animate and move the tile on the canvas
-	snDraw.moveSwitchable(myTile, animate, snDraw.ani.sty_Resize,{
+	snDraw.moveSwitchable(myTile, animate, aniSty,{
 	    left: this.Grid_xPx[col],
 	    top: this.Grid_yPx[row]
 	});
