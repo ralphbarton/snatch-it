@@ -57,7 +57,7 @@ snDraw.Game = {
 	snDraw.Game.Controls.createControls();//draw buttons on the top of the screen
 	this.createEveryTileObject_inGridAtTop();//next draw all the unturned tiles underneath
 	snDraw.Game.Zones.CreatePlayerZoneListAndDraw();//next draw all the players word zones
-	canvas.renderAll();
+	snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
 	snDraw.measureFramePeriod();
 	TA = this.TileArray;//this is to enable faster debugging
     },
@@ -421,7 +421,7 @@ snDraw.Game = {
 	});
 
 	canvas.add(PlayerWordGRP);
-	canvas.renderAll();
+	snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
     },
 
     //this function removes an arbitrary set of words, indexed by player and within that by word index.

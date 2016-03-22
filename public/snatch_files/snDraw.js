@@ -60,29 +60,29 @@ var snDraw = {
     },
 
     measureFramePeriod: function(){
-
-//example code...
-//	this.frame_rendering_timeout = setTimeout(function(){snDraw.frame_rendering_timeout = undefined;}, duration*4);//fudge factor
-	var N_frames = 200;
+	var completion_flag = false;
+	snDraw.more_animation_frames_at_least(3);// this sets animation going. It is sustained by the non-empty FrameTargetsArray
 	snDraw.FrameTargetsArray.push({
-	    N:0,
+	    framesCount: 0,
 	    d_start: undefined,
+
 	    frame: function(){
-		if(this.N==0){this.d_start = new Date();}
-		this.N++;
-		var terminate = this.N >= N_frames;
-		if(terminate){
-		    var d_end = new Date();
-		    snDraw.frameperiod_measured = (d_end.getTime() - this.d_start.getTime())/N_frames;
-		    console.log("Frame Period for this environment measured as (ms): " + snDraw.frameperiod_measured);
+		if(this.d_start===undefined){
+		    this.d_start = new Date();
+		    setTimeout(function(){completion_flag = true;}, 500); //measure the framerate over a 0.5 second period
+		}else{//think of the fence bars and posts problem. The first post can be excluded in the count
+		    this.framesCount++;
 		}
-		return terminate;
+		if(completion_flag){
+		    var d_end = new Date();
+		    snDraw.frameperiod_measured = (d_end.getTime() - this.d_start.getTime())/this.framesCount;
+		    console.log("Frame Period for this environment measured as (ms): " + snDraw.frameperiod_measured);
+		    return true;
+		}
+		return false;
 	    }
 	});
-	//TODO - function defunct until work on this...
-	//this.setFrameRenderingTimeout (N_frames*300);//the value is in milliseconds - assume frame period won't exceed 300 ms
     },
-
 
     animation_frame_requests_exist: false,
     nAnimations: 0,

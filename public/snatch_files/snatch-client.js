@@ -94,6 +94,8 @@ socket.on('new turned tile', function(newTile_info){
 	    snDraw.Game.Spell.recolourAll(snDraw.Game.Spell.ListAllVisibleTilesOf(LET));
     }
 
+    if(TI%5==0){snDraw.measureFramePeriod();}//every 5 tiles, remeasure frame rate
+
     if(client_is_flipper){
 	snDraw.Game.Controls.startTurnDiableTimeout();
     }else{

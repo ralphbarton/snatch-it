@@ -56,6 +56,9 @@ snDraw.Game.Controls = {
 
     startTurnDiableTimeout: function(){
 
+	//How long (in seconds) should it take for the button to become available again?
+	var dur = 10;
+
 	//make the outline of the button coloured.
 	var RoundedRec = this.Button_Objs[1].item(0);
 	clientCol = players[client_player_index].color;
@@ -67,9 +70,8 @@ snDraw.Game.Controls = {
 
 	//this is the exact number of pixels of the perimeter of the rounded cornered rectangle (test by making the 1.0 slightly smaller!)
 	var l_tot = ((RoundedRec.getWidth() + RoundedRec.getHeight()) * 2 + 2*corners_r*(Math.PI-4.0))* 1.0;
-	var fps = 30;//TODO: fps is not fixed for different platforms. It needs to be measured upon page load.
-	var dur = 10;
-	var f_tot = dur*fps;
+	var fps = (1000/snDraw.frameperiod_measured);//TODO: fps is not fixed for different platforms. It needs to be measured upon page load.
+	var f_tot = Math.round(dur*fps,0);//whole number of frames...
 	
 	RoundedRec.setStrokeDashArray([0, l_tot]);
 
@@ -77,7 +79,9 @@ snDraw.Game.Controls = {
 	snDraw.FrameTargetsArray.push({
 	    //these persistant data are set for the lifespan of the function below.
 	    count:0,
+	    start_time: undefined, // this is just code instrumentation...
 	    frame: function(){
+		if(this.count==0){this.start_time = new Date();}
 		this.count++;
 		var solid_len = (this.count/f_tot)*l_tot;
 		RoundedRec.setStrokeDashArray([solid_len, l_tot-solid_len]);
@@ -85,6 +89,9 @@ snDraw.Game.Controls = {
 		    //restore the visual state of the button to normal
 		    RoundedRec.setStrokeDashArray(null);
 		    snDraw.Game.Controls.setTurnDisabled(false);
+		    //instrumentation....
+		    var end_time = new Date();
+		    console.log("The animation was meant to take " + dur + " seconds; measured as " + (end_time.getTime() - this.start_time.getTime())/1000);
 		    return true; //this means the function call chain shall terminate
 		}else{
 		    return false; // function call chain to continue
