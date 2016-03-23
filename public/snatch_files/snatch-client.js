@@ -84,14 +84,19 @@ socket.on('new turned tile', function(newTile_info){
 	letter: LET,
 	status: "turned"
     };
+    var old_zones_top_coord = snDraw.Game.Zones.playersZoneTopPx;
     snDraw.Game.addNewTurnedTile(TI);
     snDraw.Game.shiftTilesUpGrid();//function call is extravagant (inefficient) as it will never cause a shift. We're just using it to correctly set playersZoneTopPx
+    var zone_resize_necesary = snDraw.Game.Zones.playersZoneTopPx != old_zones_top_coord;
     snDraw.Game.Controls.updateTurnLetter_number();
-    snDraw.Game.Zones.updateAllZoneSizes();//unconditional function call is extravagant (inefficient) as shift will only be in a minority of cases...
+    if(zone_resize_necesary){
+	snDraw.Game.Zones.updateAllZoneSizes();
+	snDraw.Game.Spell.repositionSkeletal();
+    }
 
     //This is a little expensive, but any new tile has the potential to change letter availability
     if(snDraw.Game.Spell.SkeletalLetters.length>0){ // irrelivant if the speller is empty
-	    snDraw.Game.Spell.recolourAll(snDraw.Game.Spell.ListAllVisibleTilesOf(LET));
+	snDraw.Game.Spell.recolourAll(snDraw.Game.Spell.ListAllVisibleTilesOf(LET));
     }
 
     if(TI%5==0){snDraw.measureFramePeriod();}//every 5 tiles, remeasure frame rate

@@ -1,5 +1,5 @@
 //this file contains the functions that render the game onto the screen
-var dev = true;
+var dev = false;
 
 var TA = [];//this is to enable faster debugging
 

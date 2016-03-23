@@ -36,7 +36,7 @@ snDraw.Splash = {
 
 	canvas.setBackgroundColor('white');
 
-	for (i=0; i<5; i++){
+	for (var i=0; i<5; i++){
 
 	    var mcLeft_c = circleCenterX + circleRadius * Math.cos(radSF*placement_angle);
 	    var mcTop_c = circleCenterY - circleRadius * Math.sin(radSF*placement_angle);
