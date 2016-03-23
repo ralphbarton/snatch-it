@@ -18,6 +18,10 @@ var snDraw = {
 
     //define animation styles data here...
     ani: {
+	sty_BBshrink: {
+	    easing: fabric.util.ease.easeOutCubic,
+	    duration: 400
+	},
 	sty_Anag: {
 	    easing: fabric.util.ease.easeOutBounce,
 	    duration: 150
@@ -114,10 +118,10 @@ var snDraw = {
     },
 
     animation_started: function(){
+	this.nAnimations++;//v. important to call this before, or the chain may not kick off...
 	if(!this.animation_frame_requests_exist){
 	    this.startScreenFrameDrawing();
 	}
-	this.nAnimations++;
     },
 
     animation_completed: function(){

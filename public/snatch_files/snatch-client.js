@@ -13,8 +13,8 @@ socket.emit('player joining game', 0);
 
 socket.on('player color choices', function(colorSet){
     snDraw.initialiseCanvas();
-    //probably need to decode colorSet here... ToDO - wtf does this comment mean?
-    snDraw.Splash.identityPrompt(colorSet);
+    //the colour set is an array with objects {color: <fabric color>, index: <integer>}
+    snDraw.Splash.renderPromptScreen(colorSet);
 });
 
 

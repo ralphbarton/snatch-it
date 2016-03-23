@@ -1,163 +1,192 @@
 snDraw.Splash = {
-    //TODO: split this big function into smaller functions (even though there's no point...) there is: hierarchical sequence
-    identityPrompt: function(colorChoices){
 
-	var playerName = prompt("What is your name?");
-	while((playerName==null)||(playerName.length == 0)){
-	    playerName = prompt("Please enter an actual name for yourself:");
+    player_name: null,
+    myFiveColors: undefined,
+    myFiveBBs: [],
+    welcome_sel_color_text_obj: undefined,
+    ringZoneTopPx: undefined,
+
+    renderPromptScreen: function(colorChoices){
+
+	this.myFiveColors = colorChoices;
+
+	//get the name via browser prompt box...
+	this.player_name = prompt("What is your name?");
+	while((this.player_name == null)||(this.player_name.length == 0)){
+	    this.player_name = prompt("Please enter an actual name for yourself:");
 	}
 
+	//Draw the "Welcome Joe Blogs" message quite big on the canvas...
+	canvas.setBackgroundColor('white');//is this superfluous?
 	var ts_px = myZoneWidth * 0.070;
-	
-	var mytext = "Welcome, " + playerName + "!\nSelect your color:";
-	
-	var prompt_text_obj = new fabric.Text(mytext, {
+	var mytext = "Welcome, " + this.player_name + "!\nSelect your color:";
+	this.welcome_sel_color_text_obj = new fabric.Text(mytext, {
 	    textAlign: 'left',
 	    fontWeight: 'bold',
 	    fontSize: ts_px,
 	    left: 20,
 	    top: 20
 	});
+	canvas.add(this.welcome_sel_color_text_obj);
+	this.ringZoneTopPx = this.welcome_sel_color_text_obj.getHeight()*0.9;
 
-	top_btm_px = prompt_text_obj.getHeight()*0.9;
-
-	canvas.add(prompt_text_obj);
-
-	var circleCenterX = myZoneWidth/2;
-	var effectiveHeight = myZoneHeight - top_btm_px;
-	var circleCenterY = top_btm_px + effectiveHeight / 2;
-	var circleRadius = Math.min(myZoneWidth, effectiveHeight)*0.5*0.6;
-	var blipBlopRadius = circleRadius*0.4;
-
-	var placement_angle = 18 + 36;
-	var radSF = Math.PI*2 / 360;
-
-	var BlipBlop = [];//this is the array of coloured circles
-
-	canvas.setBackgroundColor('white');
-
-	for (var i=0; i<5; i++){
-
-	    var mcLeft_c = circleCenterX + circleRadius * Math.cos(radSF*placement_angle);
-	    var mcTop_c = circleCenterY - circleRadius * Math.sin(radSF*placement_angle);
-	    var mcLeft = mcLeft_c - blipBlopRadius;
-	    var mcTop = mcTop_c - blipBlopRadius;
-
-	    var myBB = new fabric.Circle({
-		radius: blipBlopRadius,
-		stroke: 'black',
-		strokeWidth:blipBlopRadius*0.2,
-		fill: colorChoices[i].color,
-		left: mcLeft,
-		top: mcTop,
-		hasControls: false,
-		hasBorders: false
-	    });
-
-	    myBB.BBindex = i;
-
-	    
-	    BlipBlop.push(myBB);
-	    canvas.add(myBB);
-	    placement_angle += 72;
-
-	}
-	
-	canvas.renderAll();
-
-
-	var myDur = 400;
-	function shrinkBB(myBB){
-	    var newLeft = myBB.getLeft()+blipBlopRadius; 
-	    var newTop = myBB.getTop()+blipBlopRadius;
-	    
-	    var myEas = fabric.util.ease.easeOutCubic;
-	    myBB.animate('left',newLeft, {
-		onChange: function() {
-		    canvas.renderAll();
-		},
-		easing: myEas,
-		duration: myDur
-	    });
-	    myBB.animate('top',newTop, {
-		easing: myEas,
-		duration: myDur
-	    });
-	    myBB.animate('strokeWidth',0, {
-		easing: myEas,
-		duration: myDur
-	    });
-	    myBB.animate('radius', 0, {
-		easing: myEas,
-		duration: myDur
-	    });
-
-	}
+	//draw the ring of BB's
+	this.drawBBring();
+	this.addKBmouseListeners();
 
 	//TODO: set whether background is dark or light
 	snDraw.Game.setDarkBackground(true);
+    },
 
-	var removeUnselectedBBs = function(i_selected){
-	    if(i_selected!==undefined){
-		for (i=0; i<5; i++){
-		    if(i==i_selected){continue;}//don't vanish the BB we just hit!
-		    shrinkBB(BlipBlop[i]);
-		}
+    effectiveHeight: undefined,
+    ringCenterX: undefined,
+    ringCenterY: undefined,
+    ringRadius: undefined,
+    blipBlopRadius: undefined,
+    radSF: undefined,
+
+    drawBBring: function(){
+
+	//set a load of parameters / dimentions that are constants using to draw the BBs
+	this.ringCenterX = myZoneWidth/2;
+	this.effectiveHeight = myZoneHeight - this.ringZoneTopPx;
+	this.ringCenterY = this.ringZoneTopPx + this.effectiveHeight / 2;
+	this.ringRadius = Math.min(myZoneWidth, this.effectiveHeight)*0.5*0.6;
+	this.blipBlopRadius = this.ringRadius*0.4;
+	this.radSF = Math.PI*2 / 360;
+
+	//now draw the BBs
+	for (var i=0; i<5; i++){
+	    this.drawBBwithIndex(i);
+	}
+	canvas.renderAll();
+    },
+
+    drawBBwithIndex: function(index){
+	
+	var placement_angle = 18 + 36 + 72 * index;
+	var mcLeft_c = this.ringCenterX + this.ringRadius * Math.cos(this.radSF*placement_angle);
+	var mcTop_c = this.ringCenterY - this.ringRadius * Math.sin(this.radSF*placement_angle);
+	var mcLeft = mcLeft_c - this.blipBlopRadius;
+	var mcTop = mcTop_c - this.blipBlopRadius;
+
+	var myBB = new fabric.Circle({
+	    radius: this.blipBlopRadius,
+	    stroke: 'black',
+	    strokeWidth: this.blipBlopRadius*0.2,
+	    fill: this.myFiveColors[index].color,
+	    left: mcLeft,
+	    top: mcTop,
+	    hasControls: false,
+	    hasBorders: false
+	});
+
+	//set forwards and backwards linking
+	myBB.BBindex = index;
+	this.myFiveBBs[index] = myBB;
+	canvas.add(myBB);
+
+    },
+
+    shrinkAndRemoveBBwithIndex: function(index,extra_onComplete_function){
+	var shrinkMeBB = this.myFiveBBs[index];
+	var newLeft = shrinkMeBB.getLeft() + this.blipBlopRadius; 
+	var newTop = shrinkMeBB.getTop() + this.blipBlopRadius;
+
+	var onComplete_deleteBB = function(){
+	    canvas.remove(shrinkMeBB);
+	    if(extra_onComplete_function!==undefined){
+		extra_onComplete_function();
 	    }
 	};
+	
+	snDraw.moveSwitchable(shrinkMeBB, onComplete_deleteBB, snDraw.ani.sty_BBshrink,{
+	    left: newLeft,
+	    top: newTop,
+	    strokeWidth: 0,
+	    radius: 0
+	});
+    },
 
-	var onComplete_finalBBshrink = function(i_selected){
-	    for (i=0; i<5; i++){
-		canvas.remove(BlipBlop[i]);
-	    }
-	    canvas.remove(prompt_text_obj);
-	    
-	    snDraw.gameMessage("Waiting for server\nto send the state of the ongoing\n\
-SNATCH-IT game...",myZoneWidth * 0.065,'rgb(230,0,40)'); 
+    BB_chosen_was: undefined,
+    handleBBchosen: function(i_chosen){
+	this.BB_chosen_was = i_chosen;
+	for (var i=0; i < 5; i++){
+	    if(i == i_chosen){continue;}//don't vanish the BB we just hit!
+	    this.shrinkAndRemoveBBwithIndex(i);
+	}
+    },
+
+    handleBBchosenReleased: function(){
+
+	var onComplete_BBchosenReleased_animation = function(){
+	    canvas.remove(snDraw.Splash.welcome_sel_color_text_obj);
+	    snDraw.Splash.removeKBmouseListeners();	    
+
+	    var wait_str = "Waiting for server\nto send the state of the ongoing\nSNATCH-IT game...";
+	    snDraw.gameMessage(wait_str, myZoneWidth * 0.065,'rgb(230,0,40)'); 
 
 	    //send the data to the server
 	    var playerDetailsObj = {
-		name: playerName,
-		color_index: colorChoices[i_selected].index
+		name: snDraw.Splash.player_name,
+		color_index: snDraw.Splash.myFiveColors[snDraw.Splash.BB_chosen_was].index
 	    };
 	    PLAYER_JOINED_WITH_DETAILS(playerDetailsObj);
-
-
-	    //after details are supplied, load the latest game state (timing is important here...)
-	    canvas.off('mouse:down');
-	    canvas.off('mouse:up');
-	    document.removeEventListener("keydown", KBlistenerSplash, false);
-
 	};
 
+	// I have changed two instances of 'this' to 'snDraw.Splash' in the code below. I think it's harmless
+	// and it prevents problems with the keyboad handler. Damn the keyboard handler: rewrite it!!
+	snDraw.Splash.shrinkAndRemoveBBwithIndex(snDraw.Splash.BB_chosen_was, onComplete_BBchosenReleased_animation);
+    },
+
+    KBListener_ref: undefined,
+    addKBmouseListeners: function(){
+	//respond to mouse down on a BB
 	canvas.on('mouse:down',function(e){
 	    if(e.target){
 		var BB_hit_i = e.target.BBindex;
-		removeUnselectedBBs(BB_hit_i);
+		if(BB_hit_i != undefined){
+		    snDraw.Splash.handleBBchosen(BB_hit_i);
+		}
 	    }
 	}); 
-
+	//respond to mouse up if a mouse-down has landed on a BB
 	canvas.on('mouse:up',function(e){
-	    if(e.target){
-		shrinkBB(e.target);
-		var BB_hit_i = e.target.BBindex;
-		setTimeout(function(){onComplete_finalBBshrink(BB_hit_i);},myDur);
+	    if(snDraw.Splash.BB_chosen_was !== undefined){
+		snDraw.Splash.handleBBchosenReleased();
 	    }
 	});
 
-	//define and add code to respond to keystrokes.
+	//because the keyboard listener function has to be removed by name, we cannot define and pass it anonymously
+	//there appear to be subtle differnces based upon the context in which the function is defined
+	//(hence not directly defining 'KBlistenerSplash' as a member of snDraw.Splash), but inside another
 	var KBlistenerSplash = function(e){
 	    var myKeycode = e.keyCode;
 	    var keyPressed = String.fromCharCode(myKeycode);//note that this is non-case sensitive.
+
 	    if(myKeycode == 32){//space bar
-		var rand_BB_i = getRandomInt(0,4);
-		removeUnselectedBBs(rand_BB_i);
-		setTimeout(function(){shrinkBB(BlipBlop[rand_BB_i]);},myDur*0.5);		
-		setTimeout(function(){onComplete_finalBBshrink(rand_BB_i);},myDur*1.5);
+
+		if(snDraw.Splash.BB_chosen_was === undefined){ //action only if mouse stuff hasn't happened
+		    //apply the "chosen function"
+		    var rand_BB_i = getRandomInt(0,4);
+		    snDraw.Splash.handleBBchosen(rand_BB_i);
+
+		    //...and halfway through that animation, also apply the released function.
+		    var shrink_dur = snDraw.ani.sty_BBshrink.duration;
+		    setTimeout(snDraw.Splash.handleBBchosenReleased, shrink_dur * 0.5);		
+		}
 	    }
 	};
+	this.KBListener_ref = KBlistenerSplash;
 
-	document.addEventListener("keydown", KBlistenerSplash, false);
+	//respond to keydown events
+	document.addEventListener("keydown", this.KBListener_ref, false);
 
+    },
+
+    removeKBmouseListeners: function(){
+	    canvas.off('mouse:down');
+	    canvas.off('mouse:up');
+	    document.removeEventListener("keydown", this.KBListener_ref, false);
     }
 };
