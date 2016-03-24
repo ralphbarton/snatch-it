@@ -6,8 +6,8 @@ var snDraw = {
 
     //member variables (native types)
     //todo: either delete this non-global data or replace all the global references in the code with this
-    myZoneWidth: undefined,
-    myZoneHeight: undefined,
+    canv_W: undefined,
+    canv_H: undefined,
 
     frameperiod_measured: undefined,
     
@@ -51,10 +51,10 @@ var snDraw = {
 	
 	//take the window dimentions at time of page load, and use these to draw on
 	// the screen of the device at the correct scaling
-	myZoneWidth = window.innerWidth;
-	myZoneHeight = window.innerHeight;
-	canvas.setHeight(myZoneHeight);
-	canvas.setWidth(myZoneWidth);
+	this.canv_W = window.innerWidth;
+	this.canv_H = window.innerHeight;
+	canvas.setWidth(this.canv_W);
+	canvas.setHeight(this.canv_H);
 
 	//we don't want to select a group of objects with the mouse
 	canvas.selection = false;

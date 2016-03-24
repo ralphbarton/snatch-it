@@ -63,7 +63,7 @@ snDraw.Game = {
     },
 
     calculateRenderingDimentionConstants: function(){    //this function relies upon a defined number of tiles, which is only after game state is loaded...
-	var N_pixels = myZoneWidth * myZoneHeight;
+	var N_pixels = snDraw.canv_W * snDraw.canv_H;
 	var Tile_pixels = N_pixels * this.Ratio_tile / tilestats.n_tiles;
 	var tile_dim = Math.sqrt(Tile_pixels);
 	var grid_letter_spacing = 0.14;
@@ -85,13 +85,13 @@ snDraw.Game = {
     addNewTurnedTile: function (tile_index){
 	var newTile = this.generateTileObject(tileset[tile_index], tile_index);
 
-	var WW = 1.5 * myZoneWidth; 
-	var HH = 0.25 * (myZoneWidth + myZoneHeight);
+	var WW = 1.5 * snDraw.canv_W; 
+	var HH = 0.25 * (snDraw.canv_H + snDraw.canv_W);
 	var Br1 = HH;
 	var Br2 = Br1 + WW;
 	var Br3 = Br2 + HH;
 
-	var Sr = 0.25 * myZoneWidth;
+	var Sr = 0.25 * snDraw.canv_W;
 
 	var perim_pos = Math.random() * Br3;
 	var x_orig = undefined;
@@ -107,7 +107,7 @@ snDraw.Game = {
 	    y_orig = -Sr;
 	}else {//right bar
 	    var perim_remain = perim_pos - Br2;
-	    x_orig = myZoneWidth + Sr;
+	    x_orig = snDraw.canv_W + Sr;
 	    y_orig = -Sr + perim_remain;
 	}
 
@@ -186,7 +186,7 @@ snDraw.Game = {
 	    x_plotter += xy_incr;
 
 	    //rule to wrap around at end of line:
-	    if(x_plotter + xy_incr > myZoneWidth){
+	    if(x_plotter + xy_incr > snDraw.canv_W){
 		//plotting coordinates calculation
 		x_plotter = XPD;
 		y_plotter += xy_incr;
@@ -548,7 +548,7 @@ snDraw.Game = {
     },
 
     xCoordExceedsWrapThreshold: function(x_coord){
-	return (x_coord > myZoneWidth - this.marginUnit);
+	return (x_coord > snDraw.canv_W - this.marginUnit);
     }
 
 };

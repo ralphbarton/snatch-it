@@ -105,7 +105,7 @@ snDraw.Game.Controls = {
 
 	var tile_DIM = snDraw.Game.tileSize;
 	var gap_width = tile_DIM*0.2;
-	var font_size = myZoneWidth * 0.030;
+	var font_size = snDraw.canv_W * 0.030;
 	var line_thickness = tile_DIM * 0.06;
 	var corners_rounding = tile_DIM * 0.12;
 
@@ -114,7 +114,7 @@ snDraw.Game.Controls = {
 	var button_w_px = [];
 	var button_l_px = [gap_width/2];
 	for (var i=0; i<N_but; i++){
-	    button_w_px[i] = (myZoneWidth - N_but * gap_width) * (this.button_widths[i] / this.button_widths_cumulated[N_but-1]);
+	    button_w_px[i] = (snDraw.canv_W - N_but * gap_width) * (this.button_widths[i] / this.button_widths_cumulated[N_but-1]);
 	    button_l_px[i+1] = button_l_px[i] + gap_width + button_w_px[i] ;
 	}
 
@@ -195,14 +195,14 @@ snDraw.Game.Controls = {
     createPlayersListWindow: function(){
 	var DIM = snDraw.Game.tileSize * 1.35;
 	var stroke_px = DIM * 0.1;
-	var myZoneSmaller = Math.min(myZoneWidth,myZoneHeight); 
+	var myZoneSmaller = Math.min(snDraw.canv_W,snDraw.canv_H); 
 	var font_size =  myZoneSmaller * 0.030;
 
 	var windowWidth = myZoneSmaller*0.8;
 
 	var windowBox = new fabric.Rect({
 	    width: windowWidth,
-	    height: myZoneHeight - DIM * 0.7,
+	    height: snDraw.canv_H - DIM * 0.7,
 	    fill: '#AAA',
 	    stroke: snDraw.Game.fg_col,
 	    strokeWidth: stroke_px,
@@ -275,7 +275,7 @@ snDraw.Game.Controls = {
 	    hasBorders: false,
 	    selectable: false,
 	    top: DIM * 0.3,
-	    left: (myZoneWidth - windowWidth)/2
+	    left: (snDraw.canv_W - windowWidth)/2
 	});
 
 	canvas.add(ScoresWindow);

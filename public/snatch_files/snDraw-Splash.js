@@ -18,7 +18,7 @@ snDraw.Splash = {
 
 	//Draw the "Welcome Joe Blogs" message quite big on the canvas...
 	canvas.setBackgroundColor('white');//is this superfluous?
-	var ts_px = myZoneWidth * 0.070;
+	var ts_px = snDraw.canv_W * 0.070;
 	var mytext = "Welcome, " + this.player_name + "!\nSelect your color:";
 	this.welcome_sel_color_text_obj = new fabric.Text(mytext, {
 	    textAlign: 'left',
@@ -48,10 +48,10 @@ snDraw.Splash = {
     drawBBring: function(){
 
 	//set a load of parameters / dimentions that are constants using to draw the BBs
-	this.ringCenterX = myZoneWidth/2;
-	this.effectiveHeight = myZoneHeight - this.ringZoneTopPx;
+	this.ringCenterX = snDraw.canv_W/2;
+	this.effectiveHeight = snDraw.canv_H - this.ringZoneTopPx;
 	this.ringCenterY = this.ringZoneTopPx + this.effectiveHeight / 2;
-	this.ringRadius = Math.min(myZoneWidth, this.effectiveHeight)*0.5*0.6;
+	this.ringRadius = Math.min(snDraw.canv_W, this.effectiveHeight)*0.5*0.6;
 	this.blipBlopRadius = this.ringRadius*0.4;
 	this.radSF = Math.PI*2 / 360;
 
@@ -124,7 +124,7 @@ snDraw.Splash = {
 	    snDraw.Splash.removeKBmouseListeners();	    
 
 	    var wait_str = "Waiting for server\nto send the state of the ongoing\nSNATCH-IT game...";
-	    snDraw.gameMessage(wait_str, myZoneWidth * 0.065,'rgb(230,0,40)'); 
+	    snDraw.gameMessage(wait_str, snDraw.canv_W * 0.065,'rgb(230,0,40)'); 
 
 	    //send the data to the server
 	    var playerDetailsObj = {

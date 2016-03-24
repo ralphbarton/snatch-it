@@ -56,7 +56,7 @@ snDraw.Game.Zones = {
 	}
 
 	//determine total amount of height contained within players' zone boxes
-	section_height = myZoneHeight - this.playersZoneTopPx;
+	section_height = snDraw.canv_H - this.playersZoneTopPx;
 	zones_sum_height = section_height - nZones * snDraw.Game.stroke_px - (nZones-1)*snDraw.Game.textMarginUnit - snDraw.Game.marginUnit;
 	basic_height = snDraw.Game.tileSize + 4*snDraw.Game.marginUnit;
 	shareable_height = zones_sum_height - nZones * basic_height;
@@ -90,7 +90,7 @@ snDraw.Game.Zones = {
 
 	var boxLeft   = snDraw.Game.marginUnit;
 	var boxTop    = pZone.zone_top;
-	var boxWidth  = myZoneWidth - 2 * snDraw.Game.marginUnit - snDraw.Game.stroke_px;
+	var boxWidth  = snDraw.canv_W - 2 * snDraw.Game.marginUnit - snDraw.Game.stroke_px;
 	var boxHeight = pZone.zone_height;
 
 	var zoneBox = new fabric.Rect({
@@ -159,7 +159,7 @@ snDraw.Game.Zones = {
 
 		//move away (non animated)
 		snDraw.moveSwitchable(OB, false, null,{
-		    left: origX - myZoneWidth,
+		    left: origX - snDraw.canv_W,
 		});
 
 		//move in (animated)
@@ -183,7 +183,7 @@ snDraw.Game.Zones = {
 
     removeZoneBox: function(empty_zone){
 	var bxFab = empty_zone.FabObjects;
-	var LOW_px = myZoneHeight + snDraw.Game.tileSize;
+	var LOW_px = snDraw.canv_H + snDraw.Game.tileSize;
 	var zoneBox   = bxFab[0];
 	var plrName   = bxFab[1];
 
