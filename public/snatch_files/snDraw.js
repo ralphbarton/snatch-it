@@ -51,8 +51,8 @@ var snDraw = {
 	
 	//take the window dimentions at time of page load, and use these to draw on
 	// the screen of the device at the correct scaling
-	myZoneWidth = window.innerWidth-20;
-	myZoneHeight = window.innerHeight-20;
+	myZoneWidth = window.innerWidth;
+	myZoneHeight = window.innerHeight;
 	canvas.setHeight(myZoneHeight);
 	canvas.setWidth(myZoneWidth);
 
