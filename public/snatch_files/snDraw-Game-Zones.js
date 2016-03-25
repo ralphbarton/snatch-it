@@ -36,7 +36,7 @@ snDraw.Game.Zones = {
 	//LOOP thru all the player's words...
 	// draw them onscreen
 	for (var i=0; i<pZone.player.words.length; i++){
-	    snDraw.Game.drawSingleCapturedWord(pZone.player, i);	
+	    snDraw.Game.Words.drawSingleCapturedWord(pZone.player, i);	
 	}
     },
 
@@ -236,7 +236,7 @@ snDraw.Game.Zones = {
 	    var snatched_word_in_this_zone = zone_i.player.index == snatching_player.index;
 	    this.animateResizeRewrapZone(zone_i);
 	    //shuffle the player's words to back fill the gap, in case one of their words was just snatched away.
-	    snDraw.Game.animateRepositionPlayerWords(zone_i.player, snatched_word_in_this_zone);
+	    snDraw.Game.Words.animateRepositionPlayerWords(zone_i.player, snatched_word_in_this_zone);
 	}//loop
 
 	// does the player box need to be inserted onto the screen?
@@ -254,7 +254,7 @@ snDraw.Game.Zones = {
 	for(var i=0; i < this.PlayerZone.length; i++){
 	    var ZOi = this.PlayerZone[i];
 	    this.animateResizeRewrapZone(ZOi);
-	    snDraw.Game.animateRepositionPlayerWords(ZOi.player, false);
+	    snDraw.Game.Words.animateRepositionPlayerWords(ZOi.player, false);
 	}
     },
 

@@ -47,7 +47,7 @@ socket.on('full game state transmission', function(gameState){
 
     for(i=0; i<players.length; i++){
 	players[i].index = i;
-	snDraw.Game.TileGroupsArray[i] = [];//correctly create empty container
+	snDraw.Game.Words.TileGroupsArray[i] = [];//correctly create empty container
     }
 
     //draws the entire game state on the canvas from the data supplied
@@ -60,7 +60,7 @@ socket.on('player has joined game', function(newPlayer){
     newPlayer.index = players.length;//take the length prior to pushing incorporates -1
 
     //DO NOT FORGET, upon addition of a new player, to modify their data structure accordingly.
-    snDraw.Game.TileGroupsArray[newPlayer.index]=[];//correctly create empty container
+    snDraw.Game.Words.TileGroupsArray[newPlayer.index]=[];//correctly create empty container
     players.push(newPlayer);
 
     //Don't need to redraw screen here. New player won't actually have any words (makes no visible difference)
@@ -85,8 +85,8 @@ socket.on('new turned tile', function(newTile_info){
 	status: "turned"
     };
     var old_zones_top_coord = snDraw.Game.Zones.playersZoneTopPx;
-    snDraw.Game.addNewTurnedTile(TI, PI);
-    snDraw.Game.shiftTilesUpGrid();//function call is extravagant (inefficient) as it will never cause a shift. We're just using it to correctly set playersZoneTopPx
+    snDraw.Game.Turn.addNewTurnedTile(TI, PI);
+    snDraw.Game.Grid.shiftTilesUpGrid();//function call is extravagant (inefficient) as it will never cause a shift. We're just using it to correctly set playersZoneTopPx
     var zone_resize_necesary = snDraw.Game.Zones.playersZoneTopPx != old_zones_top_coord;
     snDraw.Game.Controls.updateTurnLetter_number();
     if(zone_resize_necesary){
@@ -155,11 +155,11 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     var n_words_prior2S = snatching_player.words.length;
 
     //update the players data structure:
-    snDraw.Game.removeWordsAndUngroup(word_usage);
+    snDraw.Game.Words.removeWordsAndUngroup(word_usage);
     snatching_player.words.push(tile_indices);
 
     //mark the locations of any snatched tiles on grid as empty
-    snDraw.Game.shiftTilesUpGrid(tile_indices);
+    snDraw.Game.Grid.shiftTilesUpGrid(tile_indices);
 
     //most of the Zone reshaping work happens here
     snDraw.Game.Zones.ZoneHandlingUponSnatch(snatching_player,n_words_prior2S);
@@ -172,7 +172,7 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     
     //draw the new word into the player zone...
     //the final parameter of this function call determines if animation is required (which we always have)
-    snDraw.Game.drawSingleCapturedWord(snatching_player,snatching_player.words.length - 1, true);
+    snDraw.Game.Words.drawSingleCapturedWord(snatching_player,snatching_player.words.length - 1, true);
     snDraw.Game.Spell.repositionSkeletal();
 
 });

@@ -26,7 +26,7 @@ snDraw.Game.Spell = {
 
 	    // detect if adding this letter triggers wrap
 	    //note that "snDraw.Game.h_spacer" is the horizontal pixel separation of adjacent tiles in words 1.04 * tileSize
-	    if((!B_wrap) && snDraw.Game.xCoordExceedsWrapThreshold(x_loco + snDraw.Game.h_spacer)){
+	    if((!B_wrap) && snDraw.Game.Words.xCoordExceedsWrapThreshold(x_loco + snDraw.Game.h_spacer)){
 		//this means the word is wrapped, and records how short it needs to become to unwrap...
 		this.n_letters_unwrap = spell_len-2;
 		//now move all those letter tiles
@@ -45,7 +45,7 @@ snDraw.Game.Spell = {
 	//determine if wrap is required using the new coordinates...
 	var CP = players[client_player_index];
 	var spell_len = this.SkeletalLetters.length;
-	var B_wrap = snDraw.Game.xCoordExceedsWrapThreshold(CP.x_next_word + spell_len * snDraw.Game.h_spacer);
+	var B_wrap = snDraw.Game.Words.xCoordExceedsWrapThreshold(CP.x_next_word + spell_len * snDraw.Game.h_spacer);
 	
 	//now unconditionally move (with animation) all letters...
 	var x_start = B_wrap ? snDraw.Game.x_plotter_R : CP.x_next_word;

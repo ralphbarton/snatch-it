@@ -151,7 +151,7 @@ var Assembler = {
 		word_tally[LETR]--;
 
 		//now find the tile with the required letter in this word
-		var MyWordsTiles = snDraw.Game.TileGroupsArray[player_index][word_index]._objects;
+		var MyWordsTiles = snDraw.Game.Words.TileGroupsArray[player_index][word_index]._objects;
 		var k; //index of tile within word
 		var skip_count=0;
 		get_correct_letter_tile_from_word:
