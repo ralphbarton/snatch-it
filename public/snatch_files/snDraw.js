@@ -155,6 +155,26 @@ var snDraw = {
 	}
     },
 
+
+    unGroupAndPlaceSingly: function (markedFabricGrp){
+	// a 'markedFabricGrp' is a Fabric group where all of the _objects have a 'relObjCoords' member
+	var Objs = markedFabricGrp._objects;
+	var separates = [];
+	for (var i = Objs.length-1; i >= 0; i--){
+	    var take_o = Objs[i];
+	    markedFabricGrp.remove(take_o);
+	    take_o.set({
+		left: (take_o.relObjCoords.x + markedFabricGrp.grpCoords.x),
+		top: (take_o.relObjCoords.y + markedFabricGrp.grpCoords.y)
+	    });
+	    canvas.add(take_o);
+	    separates[i] = take_o;
+	}
+	canvas.renderAll();
+	return separates;
+    },
+
+
     gameMessage: function (message,size,text_color){
 	
 	toastText = new fabric.Text('null text', {

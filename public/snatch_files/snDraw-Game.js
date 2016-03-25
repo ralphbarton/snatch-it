@@ -82,7 +82,7 @@ snDraw.Game = {
 
     },
 
-    addNewTurnedTile: function (tile_index){
+    addNewTurnedTile: function (tile_index, player_index){
 	var newTile = this.generateTileObject(tileset[tile_index], tile_index);
 
 	var WW = 1.5 * snDraw.canv_W; 
@@ -119,23 +119,45 @@ snDraw.Game = {
 	x_orig -= snDraw.Game.tileSize/2;
 	y_orig -= snDraw.Game.tileSize/2;
 
-	//move the tile onto the boundary line
+	//move the tile onto the boundary line (this is a plot operation without animation
 	snDraw.moveSwitchable(newTile, false, null,{
 	    left: x_orig,
 	    top: y_orig
 	});
+	//also obscure the tile
+	var newTileObscurer = this.createObscurer(x_orig, y_orig, players[player_index].color);
 
-	var loc = this.findNextEmptyGridSlot();	
+	var loc = this.findNextEmptyGridSlot();
+	var loc_left = this.Grid_xPx[loc.c];
+	var loc_top = this.Grid_yPx[loc.r];
+	//ANIMATE the tile
 	this.moveTileOnGrid(tile_index, loc.r, loc.c, snDraw.ani.sty_Sing);
+
+
+	var onComplete_disperseThisObscurer = function(){
+	    var hts = snDraw.Game.tileSize / 2;
+
+	    //update object stored coordinates to the final animation position
+	    newTileObscurer.grpCoords = {x:loc_left, y:loc_top};
+	    newTileObscurer.centerCoords = {x: loc_left + hts, y: loc_top + hts};
+
+	    snDraw.Game.disperseObscurer(newTileObscurer);
+	};
+
+	//apply the SAME animation to the obscurer:
+	snDraw.moveSwitchable(newTileObscurer, onComplete_disperseThisObscurer, snDraw.ani.sty_Sing,{
+	    left: loc_left,
+	    top: loc_top
+	});
+
+
     },
 
     r_spark: undefined,
-    createObscurer: function (xx,yy){
+    createObscurer: function (xx,yy,pl_col){
 
 	var tsz = this.tileSize;
 	this.r_spark = tsz * 0.2;
-	this.obscurerCenter.x = xx + tsz/2;
-	this.obscurerCenter.y = yy + tsz/2;
 	var inset = 0.25;
 	var Q1 = tsz*inset - this.r_spark;
 	var Q3 = tsz*(1-inset) - this.r_spark;
@@ -171,7 +193,7 @@ snDraw.Game = {
 
 	    var mySpark = new fabric.Circle({
 		radius: this.r_spark,
-		fill: '#f0f',
+		fill: pl_col,
 		left: sparks_coords[i].x,
 		top: sparks_coords[i].y,
 		hasControls: false,
@@ -182,24 +204,21 @@ snDraw.Game = {
 	    sparkObjs.push(mySpark);
 	}
 
-	this.obscurerObj = new fabric.Group(sparkObjs, {
+ 	var sparkGrp = new fabric.Group(sparkObjs, {
 	    hasControls: false,
 	    hasBorders: false,
 	    selectable: false
 	});
 
-	var sparkGrp = this.obscurerObj;
 	sparkGrp.set({left: xx, top: yy});
-	sparkGrp.grpCoords = {x:xx, y:yy};
 	canvas.add(sparkGrp);
-	snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
-
+	return sparkGrp;
     },
 
 
-    disperseObscurer: function (){
+    disperseObscurer: function (obscurerObj){
 
-	var SingleSparks = this.unGroupAndPlaceSingly(this.obscurerObj);
+	var SingleSparks = snDraw.unGroupAndPlaceSingly(obscurerObj);
 	var radSF = Math.PI*2 / 360;
 	var fly_radius_px = this.tileSize * 1.2;
 	var fly_randomise_px = this.tileSize * 0.4;
@@ -212,8 +231,8 @@ snDraw.Game = {
 	    var placement_angle = 360 * (i / n_sparks);
 
 	    //values inlude offset to place to top left pixel of the enclosing box for the circle
-	    var raw_flyTo_x = this.obscurerCenter.x + fly_radius_px * Math.cos(radSF * placement_angle);
-	    var raw_flyTo_y = this.obscurerCenter.y - fly_radius_px * Math.sin(radSF * placement_angle);
+	    var raw_flyTo_x = obscurerObj.centerCoords.x + fly_radius_px * Math.cos(radSF * placement_angle);
+	    var raw_flyTo_y = obscurerObj.centerCoords.y - fly_radius_px * Math.sin(radSF * placement_angle);
 	    var flyTo_x = raw_flyTo_x - this.r_spark + fly_randomise_px * (Math.random()-0.5);
 	    var flyTo_y = raw_flyTo_y - this.r_spark + fly_randomise_px * (Math.random()-0.5);
 
@@ -229,26 +248,6 @@ snDraw.Game = {
 
 	}
 
-    },
-
-
-
-
-    unGroupAndPlaceSingly: function (markedFabricGrp){
-	// a 'markedFabricGrp' is a Fabric group where all of the _objects have a 'relObjCoords' member
-	var Objs = markedFabricGrp._objects;
-	var separates = [];
-	for (var i = Objs.length-1; i >= 0; i--){
-	    var take_o = Objs[i];
-	    markedFabricGrp.remove(take_o);
-	    take_o.set({
-		left: (take_o.relObjCoords.x + markedFabricGrp.grpCoords.x),
-		top: (take_o.relObjCoords.y + markedFabricGrp.grpCoords.y)
-	    });
-	    canvas.add(take_o);
-	    separates[i] = take_o;
-	}
-	return separates;
     },
 
 
