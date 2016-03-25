@@ -427,3 +427,116 @@ socket.on('tile turn assert', function(tileDetailsObj){
 	}
     },
 
+
+
+
+
+<"from word_check.js">
+
+
+var anagrams = {};
+
+var ValidatorTree = {};
+
+var putWordInValidtorTree = function(tree, ordered_letters_array){
+    var L = ordered_letters_array.splice(0,1);
+    if(tree[L]==undefined){
+	j++;
+	tree[L]={};
+    }
+    if(ordered_letters_array.length>0){
+	putWordInValidtorTree(tree[L],ordered_letters_array);
+    }else{
+	tree[L].isword = true;
+    }
+};
+
+
+var testValidtorTree = function(tree, ordered_letters_array){
+    var L = ordered_letters_array.splice(0,1);
+    if(tree[L]!=undefined){
+	if(ordered_letters_array.length>0){
+	    return testValidtorTree(tree[L],ordered_letters_array);
+	}else{
+	    return tree[L].isword == true;
+	}
+    }else{
+	return false;
+    }
+};
+
+
+
+
+exports.initialiseWordChecker = function(){
+    
+    var t_start = new Date();
+
+    fs = require('fs')
+    fs.readFile('./dictionaries/sowpods.txt', 'utf8', function (err,data) {
+	if (err) {
+	    return console.log(err);
+	}
+
+	//code to run when the file has been read into memory
+
+	var lines = data.split("\n");
+	var start_line = 2;
+	
+	var n_words = lines.length;
+	
+
+	for(var i=start_line; i < n_words; i++){
+	    var myWord = lines[i].toUpperCase();
+	    //determine a sorted letter array
+	    var SLA = lines[i].toUpperCase().split('').sort();
+	    var SLS = SLA.join('');
+
+	    if(anagrams[SLS]!==undefined){
+		anagrams[SLS].push(myWord);
+	    }else{
+		anagrams[SLS] = [myWord];
+	    }
+
+	}
+
+	var x = 0;
+	var anagrams_array = []
+	for (LL in anagrams) {
+	    var LL_array = LL.split('');
+
+	    anagrams_array.push({
+		letters: LL_array,
+		words: anagrams[LL]
+	    });
+
+	    putWordInValidtorTree(ValidatorTree, LL_array);
+	    var LL_array = LL.split('');
+	    
+	    x++;
+	    if(x<10){
+		console.log("At step " + x + " (j=" + j + ")adding LetterSet "+JSON.stringify(LL_array)+". Now tree = ");
+		console.log(JSON.stringify(ValidatorTree),'\n');
+	    }
+	    
+	}
+
+	//test it...
+	/*
+	putWordInValidtorTree(ValidatorTree,["A","E","R"]);
+	putWordInValidtorTree(ValidatorTree,["A","E","R","R"]);
+	putWordInValidtorTree(ValidatorTree,["A","E","T"]);
+	console.log(JSON.stringify(ValidatorTree));
+*/
+//	console.log(["A","E","T"],testValidtorTree(ValidatorTree,["A","E","T"]));
+//	console.log(["A","E","V"],testValidtorTree(ValidatorTree,["A","E","V"]));
+	console.log("anagrams_array.length",anagrams_array.length);
+	console.log("j : ", j);
+
+	var t_finish = new Date();
+	var dur = t_finish.getTime() - t_start.getTime(); 
+
+	console.log(n_words + " words loaded into memory for rapid checking in " + dur + " milliseconds");
+
+    });
+};

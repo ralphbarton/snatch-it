@@ -16,6 +16,9 @@ module.exports = function (nTiles){
     var tile_ownership = [];
     var next_unturned_tile_i = 0;
 
+    var WC_factory = require('./word_check.js');
+    var WordChecker = WC_factory('./dictionaries/sowpods.txt',0);
+
     console.log("created snatch game instance on server");
 
     //this is the collection of externally callable functions
@@ -147,6 +150,18 @@ module.exports = function (nTiles){
 	    if(tile_id_array.length < 3){
 		return {validity: 'insufficient length'};
 	    }
+
+	    //Dictionary check... (reconstruct word as string)
+	    var STR = "";
+	    for(var i=0; i<tile_id_array.length; i++){
+		var L = tileSet[tile_id_array[i]].letter;
+		STR = STR.concat(L);//build up the string...
+	    }
+
+	    if(!WordChecker(STR)){
+		return {validity: (STR + ' was not found in the Sowpods dictionary')};
+	    }
+
 
 	    //another basic check for non-duplicates...
 	    var tile_id_array_clone = tile_id_array.slice(0);
