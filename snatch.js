@@ -7,11 +7,17 @@ app.get('/', function(req, res){
     res.sendFile(__dirname + '/public/snatch_files/snatch.html');
 });
 
+app.get('/hardreset', function(req, res){
+    myGame = snatchSvr(qty_tiles);//create a snatch game instance with 50 tiles...
+    X = new Date();
+    res.send('Hard reset of the SNATCH server at ' + X);
+});
+
 app.use(express.static('public'));
 
 var snatchSvr = require('./snatch-server.js');
 
-var qty_tiles = 70;
+var qty_tiles = 100;
 var myGame = snatchSvr(qty_tiles);//create a snatch game instance with 50 tiles...
 
 
