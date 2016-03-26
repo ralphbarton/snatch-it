@@ -46,7 +46,7 @@ snDraw.Game.Turn = {
 	    top: y_orig
 	});
 	//also obscure the tile
-	var newTileObscurer = this.createObscurer(x_orig, y_orig, players[player_index].color);
+	var newTileObscurer = this.createObscurer(x_orig, y_orig, tile_index, players[player_index].color);
 
 	var loc = snDraw.Game.Grid.findNextEmptyGridSlot();
 	var loc_left = snDraw.Game.Grid.Grid_xPx[loc.c];
@@ -72,7 +72,7 @@ snDraw.Game.Turn = {
 
     },
 
-    createObscurer: function (xx,yy,pl_col){
+    createObscurer: function (xx, yy, tile_index, pl_col){
 
 	var tsz = snDraw.Game.tileSize;
 	this.r_spark = tsz * 0.2;
@@ -128,6 +128,7 @@ snDraw.Game.Turn = {
 	    selectable: false
 	});
 
+	sparkGrp.tileID = tile_index;
 	sparkGrp.set({left: xx, top: yy});
 	canvas.add(sparkGrp);
 	return sparkGrp;
@@ -136,6 +137,7 @@ snDraw.Game.Turn = {
 
     disperseObscurer: function (obscurerObj){
 
+	var uncovered_tileID = obscurerObj.tileID;
 	var SingleSparks = snDraw.unGroupAndPlaceSingly(obscurerObj);
 	var radSF = Math.PI*2 / 360;
 	var fly_radius_px = snDraw.Game.tileSize * 1.2;
@@ -155,6 +157,11 @@ snDraw.Game.Turn = {
 	    var flyTo_y = raw_flyTo_y - this.r_spark + fly_randomise_px * (Math.random()-0.5);
 
 	    var onComplete_deleteLostZone = function(){
+
+		//tile needs to be removed and re-added to restore touch sensitivity over obscurer
+		var myTile = snDraw.Game.TileArray[uncovered_tileID];
+		canvas.remove(myTile);
+		canvas.add(myTile);
 		canvas.remove(SingleSparks[i]);
 	    };
 	    

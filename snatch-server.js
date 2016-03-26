@@ -154,7 +154,11 @@ module.exports = function (nTiles){
 	    //Dictionary check... (reconstruct word as string)
 	    var STR = "";
 	    for(var i=0; i<tile_id_array.length; i++){
-		var L = tileSet[tile_id_array[i]].letter;
+		var myTile = tileSet[tile_id_array[i]];
+		if(myTile == undefined){
+		    return {validity: 'invalid: references to undefined tiles in recieved data'};
+		}
+		var L = myTile.letter;
 		STR = STR.concat(L);//build up the string...
 	    }
 

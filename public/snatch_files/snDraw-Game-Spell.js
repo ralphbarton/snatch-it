@@ -174,7 +174,10 @@ snDraw.Game.Spell = {
 	    var snatch_string = prompt("Enter Word:");
 	    snatch_string = snatch_string.toUpperCase();
 	    for(var i=0; i < snatch_string.length; i++){
-		letters_array.push(snatch_string[i]);
+		var some_char = snatch_string.charCodeAt(i);
+		if( (some_char >= 65) && (some_char <= 90) ){//any letter key
+		    letters_array.push(snatch_string[i]);//numerical checks on Charcode but push the actual "A" string
+		}
 	    }
 	}
 
