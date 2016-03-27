@@ -7,8 +7,25 @@ snDraw.Game.Controls = {
     button_widths_cumulated: [],
     Button_Objs: [],
 
+    //constants...
+    button_height: undefined,
+    gap_width: undefined,
+    button_font_size: undefined,
+    line_thickness: undefined,
+    corners_rounding: undefined,
+    underneath_buttons_px:  undefined,
+
     createControls: function(){
-	
+
+	//set the constants
+	this.button_height = snDraw.Game.tileSize * 0.7;
+	this.gap_width = snDraw.Game.tileSize*0.2;
+	this.button_font_size = Math.min(snDraw.canv_W, snDraw.canv_H * 1.8) * 0.030;//base font size on width, but with a har limit for extreme aspect ratios...
+	this.line_thickness = snDraw.Game.tileSize * 0.06;
+	this.corners_rounding = snDraw.Game.tileSize * 0.25;
+	this.underneath_buttons_px = this.button_height + this.gap_width * 1.5;// 1.5 is a reasonable gap...
+
+	//set the relative widths of the buttons (these numbers are only relative)
 	this.button_widths =  [10,20,20,10,5];
 
 	//some preprocessing from the widths list...
@@ -25,6 +42,55 @@ snDraw.Game.Controls = {
 	this.Button_Objs[4] = this.createGenericButton("Opt",4);
 	this.updateTurnLetter_number();
     },
+
+
+    createGenericButton: function(text,n_ind){
+
+	var N_but = this.button_widths.length;
+	var button_w_px = [];
+	var button_l_px = [this.gap_width/2];
+	var eff_width = snDraw.canv_W - this.line_thickness;
+	for (var i=0; i<N_but; i++){
+	    button_w_px[i] = (eff_width - N_but * this.gap_width) * (this.button_widths[i] / this.button_widths_cumulated[N_but-1]);
+	    button_l_px[i+1] = button_l_px[i] + this.gap_width + button_w_px[i] ;
+	}
+
+	var button_width = button_w_px[n_ind];
+	var button_left = button_l_px[n_ind];
+
+	var buttonText = new fabric.Text(text,{
+	    originX: 'center',
+	    top: (this.button_height - this.button_font_size) * 0.5,
+	    fill: 'black',
+	    fontWeight: 'bold',
+	    fontSize: this.button_font_size
+	});
+
+	var buttonRect = new fabric.Rect({
+	    originX: 'center',
+	    top: 0,
+	    fill: '#AAA',
+	    stroke: snDraw.Game.fg_col,
+	    strokeWidth: this.line_thickness,
+	    width: button_width,
+	    height: this.button_height,
+	    rx: this.corners_rounding,
+	    ry: this.corners_rounding
+	});
+
+	var buttonGrp = new fabric.Group( [buttonRect, buttonText], {
+	    hasControls: false,
+	    hasBorders: false,
+	    selectable: false,
+	    top: this.gap_width/2,
+	    left: button_left
+	});
+	
+	buttonGrp.gameButtonID = n_ind;
+	canvas.add(buttonGrp);
+	return buttonGrp;
+    },
+
 
     updateTurnLetter_number: function(){
 	var n_tiles_remaining = tilestats.n_tiles-tileset.length;
@@ -110,59 +176,6 @@ snDraw.Game.Controls = {
 		}
 	    });
 	}
-    },
-
-    createGenericButton: function(text,n_ind){
-
-	var tile_DIM = snDraw.Game.tileSize;
-	var gap_width = tile_DIM*0.2;
-	var font_size = snDraw.canv_W * 0.030;
-	var line_thickness = tile_DIM * 0.06;
-	var corners_rounding = tile_DIM * 0.12;
-
-	var N_but = this.button_widths.length;
-
-	var button_w_px = [];
-	var button_l_px = [gap_width/2];
-	for (var i=0; i<N_but; i++){
-	    button_w_px[i] = (snDraw.canv_W - N_but * gap_width) * (this.button_widths[i] / this.button_widths_cumulated[N_but-1]);
-	    button_l_px[i+1] = button_l_px[i] + gap_width + button_w_px[i] ;
-	}
-
-	var button_width = button_w_px[n_ind];
-	var button_left = button_l_px[n_ind];
-
-	var buttonText = new fabric.Text(text,{
-	    originX: 'center',
-	    top: (tile_DIM - font_size)*0.3,
-	    fill: 'black',
-	    fontWeight: 'bold',
-	    fontSize: font_size
-	});
-
-	var buttonRect = new fabric.Rect({
-	    originX: 'center',
-	    top: 0,
-	    fill: '#AAA',
-	    stroke: snDraw.Game.fg_col,
-	    strokeWidth: line_thickness,
-	    width: button_width,
-	    height: tile_DIM*0.7,
-	    rx: corners_rounding,
-	    ry: corners_rounding
-	});
-
-	var buttonGrp = new fabric.Group( [buttonRect, buttonText], {
-	    hasControls: false,
-	    hasBorders: false,
-	    selectable: false,
-	    top: 6,
-	    left: button_left
-	});
-	
-	buttonGrp.gameButtonID = n_ind;
-	canvas.add(buttonGrp);
-	return buttonGrp;
     },
 
 

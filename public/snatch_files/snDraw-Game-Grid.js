@@ -10,7 +10,7 @@ snDraw.Game.Grid = {
 	var XPD = 6;//this is the left-px for the tiles grid
 	var xy_incr = snDraw.Game.tileSize + snDraw.Game.tile_space_px;
 	var x_plotter = XPD;
-	var y_plotter = 6 + xy_incr;
+	var y_plotter = snDraw.Game.Controls.underneath_buttons_px;
 
 	//initialise reference arrays, in case of past usage...
 	this.TileGrid = [[]];//contents of the first ROW (it's empty).
