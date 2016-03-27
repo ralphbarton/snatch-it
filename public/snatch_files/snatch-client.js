@@ -13,7 +13,7 @@ socket.emit('player joining game', 0);
 
 socket.on('player color choices', function(colorSet){
     snDraw.initialiseCanvas();
-    //the colour set is an array with objects {color: <fabric color>, index: <integer>}
+    //the colour set is an array with objects <fabric color>, length 5
     snDraw.Splash.renderPromptScreen(colorSet);
 });
 

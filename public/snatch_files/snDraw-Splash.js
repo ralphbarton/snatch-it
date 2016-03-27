@@ -74,7 +74,7 @@ snDraw.Splash = {
 	    radius: this.blipBlopRadius,
 	    stroke: 'black',
 	    strokeWidth: this.blipBlopRadius*0.2,
-	    fill: this.myFiveColors[index].color,
+	    fill: this.myFiveColors[index],
 	    left: mcLeft,
 	    top: mcTop,
 	    hasControls: false,
@@ -129,7 +129,7 @@ snDraw.Splash = {
 	    //send the data to the server
 	    var playerDetailsObj = {
 		name: snDraw.Splash.player_name,
-		color_index: snDraw.Splash.myFiveColors[snDraw.Splash.BB_chosen_was].index
+		color_index: snDraw.Splash.BB_chosen_was
 	    };
 	    PLAYER_JOINED_WITH_DETAILS(playerDetailsObj);
 	};
