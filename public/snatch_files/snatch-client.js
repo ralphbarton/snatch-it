@@ -102,7 +102,7 @@ socket.on('new turned tile', function(newTile_info){
     if(TI%5==0){snDraw.measureFramePeriod();}//every 5 tiles, remeasure frame rate
 
     if(client_is_flipper){
-	snDraw.Game.Controls.startTurnDiableTimeout();
+	snDraw.Game.Controls.startTurnDisableTimeout();
     }else{
 	//the simple effect of this is that any non-client player flip resets the timer to re-allow client flip.
 	snDraw.Game.Controls.cancelTurnDisabled = true;
@@ -248,3 +248,32 @@ function commonElements(arr1, arr2){
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
+
+
+// Prevent the backspace key from navigating back.
+$(document).unbind('keydown').bind('keydown', function (event) {
+    var doPrevent = false;
+    if (event.keyCode === 8) {
+        var d = event.srcElement || event.target;
+        if ((d.tagName.toUpperCase() === 'INPUT' && 
+             (
+                 d.type.toUpperCase() === 'TEXT' ||
+                 d.type.toUpperCase() === 'PASSWORD' || 
+                 d.type.toUpperCase() === 'FILE' || 
+                 d.type.toUpperCase() === 'SEARCH' || 
+                 d.type.toUpperCase() === 'EMAIL' || 
+                 d.type.toUpperCase() === 'NUMBER' || 
+                 d.type.toUpperCase() === 'DATE' )
+             ) || 
+             d.tagName.toUpperCase() === 'TEXTAREA') {
+            doPrevent = d.readOnly || d.disabled;
+        }
+        else {
+            doPrevent = true;
+        }
+    }
+
+    if (doPrevent) {
+        event.preventDefault();
+    }
+});
