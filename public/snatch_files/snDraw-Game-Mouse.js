@@ -55,7 +55,6 @@ snDraw.Game.Mouse = {
 	    if(GCindex == 3){
 		// Actions for "View Scores" Button click
 		snDraw.Game.Controls.createPlayersListWindow();
-		snDraw.Game.Controls.playersListWindowVisible = true;
 	    }
 	    if(GCindex == 4){
 		// Actions for "Reset Game" Button click
@@ -217,58 +216,66 @@ snDraw.Game.KB = {
 	var myKeycode = e.keyCode;
 	var keyPressed = String.fromCharCode(myKeycode);//note that this is non-case sensitive.
 
-	if( (myKeycode >= 65) && (myKeycode <= 90) ){//any letter key
-	    
-	    snDraw.Game.Spell.addLetter(keyPressed); 
-	    //this is the old CODE TODO:delete
-	    /*
-	    var grabit_tile_index = this.seachForTurnedTileOfLetter(keyPressed);
-	    if (grabit_tile_index !== undefined){
-		//
-		var TargetTile = snDraw.Game.TileArray[grabit_tile_index];
-		//note that in the case of mouse, the two function calls below are not coincident in time.
-		//coordinates recorded on mouse-down, letter added on mouse-up.
-		snDraw.Game.Mouse.recordDragStartCoords(TargetTile);
-		snDraw.Game.Spell.addLetter(TargetTile); 
-	    }
-	    else{
-		//take action if the user hits a letter and its not available.
+	if(snDraw.Game.Controls.playersListWindowVisible){
+	    snDraw.Game.Controls.removePlayersListWindow();	    
+	}else{
+	    if( (myKeycode >= 65) && (myKeycode <= 90) ){//any letter key
 		
-		//TODO concider the detail and graphics for various scenarious of subsets of letters from word sources... (i.e. other peoples' words)
-	    }*/
-	}
+		snDraw.Game.Spell.addLetter(keyPressed); 
+		//this is the old CODE TODO:delete
+		/*
+		  var grabit_tile_index = this.seachForTurnedTileOfLetter(keyPressed);
+		  if (grabit_tile_index !== undefined){
+		  //
+		  var TargetTile = snDraw.Game.TileArray[grabit_tile_index];
+		  //note that in the case of mouse, the two function calls below are not coincident in time.
+		  //coordinates recorded on mouse-down, letter added on mouse-up.
+		  snDraw.Game.Mouse.recordDragStartCoords(TargetTile);
+		  snDraw.Game.Spell.addLetter(TargetTile); 
+		  }
+		  else{
+		  //take action if the user hits a letter and its not available.
+		  
+		  //TODO concider the detail and graphics for various scenarious of subsets of letters from word sources... (i.e. other peoples' words)
+		  }*/
+	    }
 
-	if(myKeycode == 32){//space bar
-	    snDraw.Game.Controls.turnLetterClickHandler();
-	}
+	    if(myKeycode == 32){//space bar
+		snDraw.Game.Controls.turnLetterClickHandler();
+	    }
 
-	if((myKeycode == 8)||(keyPressed == '3')){//delete key
-	    // let this be remove the final letter of the spell (if present)
-	    snDraw.Game.Spell.removeLetter();
-	}
+	    if((myKeycode == 8)||(keyPressed == '5')){//delete key
+		// let this be remove the final letter of the spell (if present)
+		snDraw.Game.Spell.removeLetter();
+	    }
 
-	if((myKeycode == 13)||(keyPressed == '2')){//enter key
-	    // let this be submit word
-	    snDraw.Game.Spell.SubmitWord();
-	}
+	    if((myKeycode == 13)||(keyPressed == '3')){//enter key
+		// let this be submit word
+		snDraw.Game.Spell.SubmitWord();
+	    }
 
-	if((myKeycode == 27)||(keyPressed == '1')){//escape key
-	    // let this be cancel word
-	    snDraw.Game.Spell.CancelWord();
-	}
+	    if((myKeycode == 27)||(keyPressed == '1')){//escape key or number 1
+		// let this be cancel word
+		snDraw.Game.Spell.CancelWord();
+	    }
 
-	if(keyPressed == '4'){
-	    //alert("hit 1");
-	}
-/*
-	if(myKeycode == 16){//shift key
-	
-	}
+	    if(keyPressed == '2'){
+		snDraw.Game.Controls.turnLetterClickHandler();
+	    }
 
-	if(myKeycode == 17){//control key
-	
+	    if(keyPressed == '4'){
+		snDraw.Game.Controls.createPlayersListWindow();
+	    }
+	    /*
+	      if(myKeycode == 16){//shift key
+	      
+	      }
+
+	      if(myKeycode == 17){//control key
+	      
+	      }
+	    */
 	}
-*/
     }
 };
 

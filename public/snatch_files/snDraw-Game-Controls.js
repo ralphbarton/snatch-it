@@ -26,7 +26,7 @@ snDraw.Game.Controls = {
 	this.underneath_buttons_px = this.button_height + this.gap_width * 1.5;// 1.5 is a reasonable gap...
 
 	//set the relative widths of the buttons (these numbers are only relative)
-	this.button_widths =  [10,20,20,10,5];
+	this.button_widths =  [10,20,15,10,4];
 
 	//some preprocessing from the widths list...
 	this.button_widths_cumulated[0] = this.button_widths[0];
@@ -35,16 +35,16 @@ snDraw.Game.Controls = {
 	    this.button_widths_cumulated[i] = this.button_widths_cumulated[i-1] + this.button_widths[i];
 	}
 
-	this.Button_Objs[0] = this.createGenericButton("Cancel",0);
-	this.Button_Objs[1] = this.createGenericButton("Turn Letter",1);
-	this.Button_Objs[2] = this.createGenericButton("SNATCH IT",2);
-	this.Button_Objs[3] = this.createGenericButton("Scores",3);
-	this.Button_Objs[4] = this.createGenericButton("Opt",4);
+	this.Button_Objs[0] = this.createGenericButton("Cancel",0,"1");
+	this.Button_Objs[1] = this.createGenericButton("Turn Letter (xx)",1,"2");
+	this.Button_Objs[2] = this.createGenericButton("SNATCH IT",2,"3");
+	this.Button_Objs[3] = this.createGenericButton("Scores",3,"4");
+	this.Button_Objs[4] = this.createGenericButton(":",4,null);
 	this.updateTurnLetter_number();
     },
 
 
-    createGenericButton: function(text,n_ind){
+    createGenericButton: function(text,n_ind,key_label){
 
 	var N_but = this.button_widths.length;
 	var button_w_px = [];
@@ -58,16 +58,10 @@ snDraw.Game.Controls = {
 	var button_width = button_w_px[n_ind];
 	var button_left = button_l_px[n_ind];
 
-	var buttonText = new fabric.Text(text,{
-	    originX: 'center',
-	    top: (this.button_height - this.button_font_size) * 0.5,
-	    fill: 'black',
-	    fontWeight: 'bold',
-	    fontSize: this.button_font_size
-	});
+	var buttonObsArray = [];
 
+	//defined the rounded, containing rectangle
 	var buttonRect = new fabric.Rect({
-	    originX: 'center',
 	    top: 0,
 	    fill: '#AAA',
 	    stroke: snDraw.Game.fg_col,
@@ -77,8 +71,75 @@ snDraw.Game.Controls = {
 	    rx: this.corners_rounding,
 	    ry: this.corners_rounding
 	});
+	buttonObsArray.push(buttonRect);
 
-	var buttonGrp = new fabric.Group( [buttonRect, buttonText], {
+	var centerising_offset = undefined;
+	if(text == ":"){//the special case of the 3 lines for the options button...
+
+	    var bar_length = button_width * 0.4;
+	    var left_offset = button_width * (1.0 - 0.4) / 2
+	    var bar_height = this.line_thickness;
+	    var bar_spacing = this.button_height *0.25;
+
+	    for (var i=1; i<4; i++){
+		var thin_bar = new fabric.Rect({
+		    top: bar_spacing * i,
+		    left: left_offset,
+		    fill: 'black',
+		    width: bar_length,
+		    height: bar_height,
+		    rx: bar_height/2,
+		    ry: bar_height/2
+		});
+		buttonObsArray.push(thin_bar);
+	    }
+
+
+	}else{//use text for all other buttons...
+	    var buttonText = new fabric.Text(text,{
+		top: (this.button_height - this.button_font_size) * 0.5,
+		fill: 'black',
+		fontWeight: 'bold',
+		fontSize: this.button_font_size
+	    });
+	    centerising_offset = (button_width - buttonText.getWidth())/2; 
+	    buttonText.set({left: centerising_offset});
+	    buttonObsArray.push(buttonText);
+	}
+
+	//label on the key
+	var box_dim = this.button_height/2;
+
+	if(centerising_offset != undefined){
+	    
+	    var kl_top = this.button_height * 0.15;
+	    var kl_left = centerising_offset *0.5 - this.button_font_size*0.3;
+	    
+	    var key_letter = new fabric.Text(key_label, {
+		top: kl_top,
+		left: (kl_left + this.line_thickness),
+		fill: 'black',
+		fontWeight: 'bold',
+		fontSize: this.button_font_size*0.9
+	    });
+	    
+	    var key_box = new fabric.Rect({
+		top: kl_top,
+		left: kl_left,
+		fill: '#CCC',
+		stroke: 'black',
+		strokeWidth: 1,
+		width: (key_letter.getWidth() + 2*this.line_thickness),
+		height: (this.button_font_size*0.9)
+	    });
+
+
+	    //sequence of layer ordering: push the box before the letter...
+	    buttonObsArray.push(key_box);
+	    buttonObsArray.push(key_letter);
+	}
+
+	var buttonGrp = new fabric.Group( buttonObsArray, {
 	    hasControls: false,
 	    hasBorders: false,
 	    selectable: false,
@@ -182,18 +243,22 @@ snDraw.Game.Controls = {
     buttonRecolor: function(myButtonGrp,style){
 	if((myButtonGrp.gameButtonID!=1)||(!this.turnDisabled)){//condition prevents interference with the animating Turn button (ID =1 for Turn button)
 	    var ButtonRect = myButtonGrp.item(0);
-
+	    var KeyLabel = myButtonGrp.gameButtonID == 4 ? null : myButtonGrp.item(2);
+ 
 	    if (style=="hover"){
     		ButtonRect.setStroke('#FF0');
     		ButtonRect.setFill('#AAA');
+		if(KeyLabel){KeyLabel.setFill('#FF9');}
 	    }
 	    else if (style=="press"){
 		ButtonRect.setStroke('#FF0');
     		ButtonRect.setFill(snDraw.Game.fg_col);
+		if(KeyLabel){KeyLabel.setFill('#999');}
 	    }
 	    else{
     		ButtonRect.setStroke(snDraw.Game.fg_col);
     		ButtonRect.setFill('#AAA');
+		if(KeyLabel){KeyLabel.setFill('#CCC');}
 	    }
 	    canvas.renderAll();
 	}
@@ -217,6 +282,9 @@ snDraw.Game.Controls = {
 
 
     createPlayersListWindow: function(){
+	
+	this.playersListWindowVisible = true;
+
 	var DIM = snDraw.Game.tileSize * 1.35;
 	var stroke_px = DIM * 0.1;
 	var myZoneSmaller = Math.min(snDraw.canv_W,snDraw.canv_H); 
@@ -307,8 +375,11 @@ snDraw.Game.Controls = {
     },
 
     removePlayersListWindow: function(){
-	console.log("removing the scores window...");
-	canvas.remove(ScoresWindow);
-	playersListWindowVisible=false;
+	if(this.playersListWindowVisible){
+	    console.log("removing the scores window...");
+	    canvas.remove(ScoresWindow);
+	    snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+	    this.playersListWindowVisible = false;
+	}
     }
 };
