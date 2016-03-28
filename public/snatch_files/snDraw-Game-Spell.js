@@ -4,22 +4,27 @@ snDraw.Game.Spell = {
     // data
     SkeletalLetters: [],
     SpellUsageCounter: {},
+    SpellBottomPx: undefined,
+    SpellLeftPx: undefined,
 
     // methods
     addLetter: function(letter){
-	if(this.allowLetter(letter)){
 
-	    var NewSkeletal = snDraw.Game.generateTileObject({letter:letter, status:"skeletal"}, -100 + this.SkeletalLetters.length);
-	    this.SkeletalLetters.push(NewSkeletal);
-	    var spell_len = this.SkeletalLetters.length;
-	    var x_loco = snDraw.Game.x_plotter_R + (spell_len-1) * snDraw.Game.h_spacer;
+	var x_loco_now = this.SpellLeftPx + this.SkeletalLetters.length * snDraw.Game.h_spacer;
+	//prevents spelling a word that goes off (this user's screen). For a 2:1 H:W aspect, this means 10 letters long
+	//note that "snDraw.Game.h_spacer" is the horizontal pixel separation of adjacent tiles in words 1.04 * tileSize
+	if(!snDraw.Game.Words.xCoordExceedsWrapThreshold(x_loco_now + snDraw.Game.h_spacer)){
 
-	    //prevents spelling a word that goes off (this user's screen). For a 2:1 H:W aspect, this means XXX letters long
-	    //note that "snDraw.Game.h_spacer" is the horizontal pixel separation of adjacent tiles in words 1.04 * tileSize
-	    if(!snDraw.Game.Words.xCoordExceedsWrapThreshold(x_loco + snDraw.Game.h_spacer)){
+	    if(this.allowLetter(letter)){
 
-		var CP = players[client_player_index];
-		var y_loco = (CP.words.length > 0 ? snDraw.Game.v_spacer : 0 ) + CP.y_next_word;
+		var NewSkeletal = snDraw.Game.generateTileObject({letter:letter, status:"skeletal"}, -100 + this.SkeletalLetters.length);
+		this.SkeletalLetters.push(NewSkeletal);
+		var spell_len = this.SkeletalLetters.length;
+		var x_loco = this.SpellLeftPx + (spell_len-1) * snDraw.Game.h_spacer;
+
+
+		var y_loco = this.SpellBottomPx - snDraw.Game.v_spacer;
+
 		NewSkeletal.set({
 		    left: x_loco,
 		    top: y_loco
@@ -32,8 +37,7 @@ snDraw.Game.Spell = {
 
     repositionSkeletal: function(){
 
-	var CP = players[client_player_index];
-	var y_loco = (CP.words.length > 0 ? snDraw.Game.v_spacer : 0 ) + CP.y_next_word;
+	var y_loco = this.SpellBottomPx - snDraw.Game.v_spacer;
 
 	for (var i=0; i<this.SkeletalLetters.length; i++){
 	    snDraw.moveSwitchable(this.SkeletalLetters[i], true, snDraw.ani.sty_Resize,{
@@ -61,7 +65,7 @@ snDraw.Game.Spell = {
 	    for (var i=rem_i; i<this.SkeletalLetters.length; i++){
 		var ShiftMeSkeletal = this.SkeletalLetters[i];
 		ShiftMeSkeletal.tileID = i - 100;
-		var x_loco = snDraw.Game.x_plotter_R + i * snDraw.Game.h_spacer;
+		var x_loco = this.SpellLeftPx + i * snDraw.Game.h_spacer;
 		snDraw.moveSwitchable(ShiftMeSkeletal, true, snDraw.ani.sty_Sing,{
 		    left: x_loco
 		});
