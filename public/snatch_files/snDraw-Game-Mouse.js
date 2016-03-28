@@ -79,33 +79,16 @@ snDraw.Game.Mouse = {
 
 		    //for certain types of drag, add the letter...
 		    if((!this.significantMovement(e.target))||(this.draggedIntoPlayZone(e.target))){
-			var moved = snDraw.Game.Spell.addLetter(e.target.letter);
-		    }
-		
-		    // restore old position:
-		    snDraw.moveSwitchable(e.target, true, snDraw.ani.sty_Anag,{
-			left: e.target.x_availableSpace,
-			top: e.target.y_availableSpace
-		    });
-		    
-		    //TODO implement alternative, which is to lock to nearest grid location.
-		}
-		//TODO: the code below is only relevant to the anagram drag stuff. Refactor/remove
-		
-		//ELSE is really important, because the first statement mutates data such that  that the second condition might then be met
-		//this is for RELEASES that land on active tiles...
-		/*
-		else if(e.target.visual=="ACTIVE"){
-		    if(this.verticalMovement(e.target) ||  //if the yellow letter is dragged up/down, remove it
-		       (!this.significant_drag)){//if a click is released without a significant move, remove it
-			snDraw.Game.Spell.removeLetter(e.target);
+			
 
-		    }else{
-			snDraw.Game.Spell.shuffleAnagramRelease(e.target);
+			//only all the addition of the letter if it wasn't recently clicked...
+			if (e.target.recentClick != true){
+			    snDraw.Game.Spell.addLetter(e.target.letter);
+			    snDraw.Game.TileArray[my_tile_index].recentClick = true;
+			    setTimeout(function(){snDraw.Game.TileArray[my_tile_index].recentClick = false;}, 500);
+			}
 		    }
 		}
-		*/
-
 	    }
 	}
 
@@ -131,12 +114,17 @@ snDraw.Game.Mouse = {
 	    var index_upper = e.target._objects.length;
 	    index = Math.min(index, index_upper-1);
 	    var hit_letter = e.target.item(index).letter;
+	    var hit_tileID = e.target.item(index).tileID;
 	    //this ought to be conditional upon the word not having been dragged - TODO!
-	    snDraw.Game.Spell.addLetter(hit_letter);
+	    if (snDraw.Game.TileArray[hit_tileID].recentClick != true){
+	    	snDraw.Game.Spell.addLetter(hit_letter);
+	    	snDraw.Game.TileArray[hit_tileID].recentClick = true;
+	    	setTimeout(function(){snDraw.Game.TileArray[hit_tileID].recentClick = false;}, 500);
+	    }
 	}
     },
 
-    mOver: function (e) {
+	    mOver: function (e) {
 
 	//for handling "mouse:over" on the row of buttons accross the top.
 	GCindex = e.target.gameButtonID;
