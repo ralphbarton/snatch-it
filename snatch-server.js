@@ -162,8 +162,9 @@ module.exports = function (nTiles){
 
 	    if(!WordChecker(STR)){
 		return {validity: (STR + ' was not found in the Sowpods dictionary')};
+	    }else{
+		console.log(STR + ' is in the Sowpods dictionary');
 	    }
-
 
 	    //another basic check for non-duplicates...
 	    var tile_id_array_clone = tile_id_array.slice(0);
@@ -320,9 +321,6 @@ module.exports = function (nTiles){
 	    var mySet = undefined;
 	    fiveColorsSent_socketKey[socket_key] = {};
 
-	    console.log("emergency_colors length",emergency_colors.length);
-	    console.log("my_color_palette.length",my_color_palette.length);
-
 	    if(my_color_palette.length >= 5){
 		mySet = my_color_palette.splice(0,5);
 		fiveColorsSent_socketKey[socket_key].restore = true;
@@ -333,7 +331,6 @@ module.exports = function (nTiles){
 		fiveColorsSent_socketKey[socket_key].restore = false;
 	    }
 
-	    console.log(mySet);
 	    fiveColorsSent_socketKey[socket_key].cols = mySet;//remove 5 colours from the palette
 	    return mySet;
 	},

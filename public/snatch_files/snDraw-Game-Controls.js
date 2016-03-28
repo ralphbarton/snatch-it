@@ -77,7 +77,7 @@ snDraw.Game.Controls = {
 	if(text == ":"){//the special case of the 3 lines for the options button...
 
 	    var bar_length = button_width * 0.4;
-	    var left_offset = button_width * (1.0 - 0.4) / 2
+	    var left_offset = button_width * (1.0 - 0.4) / 2 + this.line_thickness/2;
 	    var bar_height = this.line_thickness;
 	    var bar_spacing = this.button_height *0.25;
 
@@ -108,36 +108,55 @@ snDraw.Game.Controls = {
 	}
 
 	//label on the key
-	var box_dim = this.button_height/2;
+	
+	var draw_boxed_label = function(ll, size, myleft){
 
-	if(centerising_offset != undefined){
-	    
-	    var kl_top = this.button_height * 0.15;
-	    var kl_left = centerising_offset *0.5 - this.button_font_size*0.3;
-	    
-	    var key_letter = new fabric.Text(key_label, {
+	    var kl_top = snDraw.Game.Controls.button_height * 0.15;
+	    var key_letter = new fabric.Text(ll, {
 		top: kl_top,
-		left: (kl_left + this.line_thickness),
+		left: (myleft + snDraw.Game.Controls.line_thickness),
 		fill: 'black',
 		fontWeight: 'bold',
-		fontSize: this.button_font_size*0.9
+		fontSize: size 
 	    });
 	    
 	    var key_box = new fabric.Rect({
 		top: kl_top,
-		left: kl_left,
+		left: myleft,
 		fill: '#CCC',
 		stroke: 'black',
 		strokeWidth: 1,
-		width: (key_letter.getWidth() + 2*this.line_thickness),
-		height: (this.button_font_size*0.9)
+		width: (key_letter.getWidth() + 2*snDraw.Game.Controls.line_thickness),
+		height: size
 	    });
-
-
-	    //sequence of layer ordering: push the box before the letter...
+	    
+	    //Add the objects to the group
 	    buttonObsArray.push(key_box);
 	    buttonObsArray.push(key_letter);
+	    
+
 	}
+
+	if(centerising_offset != undefined){
+
+	    var key_font_size = Math.min (this.button_font_size * 0.9, 20);
+	    var kl_left = centerising_offset *0.5 - this.button_font_size*0.3;
+
+	    console.log(key_label, key_font_size, kl_left);
+	    draw_boxed_label(key_label, key_font_size, kl_left);
+
+	    if(n_ind == 0){//it's the CANCEL button
+		var extra_width = buttonObsArray[2].getWidth();
+		draw_boxed_label("5", key_font_size, kl_left + extra_width);
+		var CancelTextwith15boxRightPx = kl_left + extra_width*2;
+		if(buttonObsArray[1].getLeft() < CancelTextwith15boxRightPx){
+		    buttonObsArray[1].setLeft(CancelTextwith15boxRightPx);
+		} 
+	    }
+	}
+
+	//sequence of layer ordering: push the box before the letter...
+	
 
 	var buttonGrp = new fabric.Group( buttonObsArray, {
 	    hasControls: false,
