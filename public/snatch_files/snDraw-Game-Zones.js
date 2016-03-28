@@ -137,7 +137,18 @@ snDraw.Game.Zones = {
 		fontWeight: 'bold',
 	    });
 
-	    ObjectArray.push(youBlock,youText);
+	    //todo finish up the spell pointer business...
+	    /*
+	    var spellPointer = new fabric.Triangle({
+		left: boxLeft + cell * 0.3,
+		top: labelTop - (cell * 0.5),
+		width: (cell * 0.4),//is actually height, due to rotation
+		height: (cell * 0.3),//is actually width, due to rotation
+		fill: pZone.player.color,
+		angle: 90
+	    });*/
+
+	    ObjectArray.push(youBlock, youText/*, spellPointer*/);
 	}
 
 	pZone.FabObjects = [];

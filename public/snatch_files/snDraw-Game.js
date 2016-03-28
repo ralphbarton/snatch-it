@@ -23,6 +23,7 @@ snDraw.Game = {
     dark_background: undefined,
     bg_col: undefined,
     fg_col: undefined,
+    client_col: undefined,
 
     //member objects (the point with these is that they contain fabric objects and are not native variables):
     TileArray: [],
@@ -75,7 +76,7 @@ snDraw.Game = {
 	this.v_spacer = this.tileSize * 1.12;
 	this.x_plotter_R = 2 * this.marginUnit;
 	this.tile_space_px = this.tileSize * grid_letter_spacing;
-
+	this.client_col = players[client_player_index].color;
     },
 
     generateTileObject: function(tile,tile_id){
@@ -157,9 +158,9 @@ snDraw.Game = {
 	    ObjFlip();
 	}
 	else if(to_state=="skeletal"){
-	    myTile.item(0).setFill('#383838');
-	    myTile.item(1).setFill('#8ec2e8');
-	    myTile.item(0).setStroke('#8ec2e8');
+	    myTile.item(0).setFill('black');
+	    myTile.item(1).setFill(this.client_col);
+	    myTile.item(0).setStroke(this.client_col);
 	    ObjFlip();
 	}
 	else if(to_state=="partial"){

@@ -217,8 +217,7 @@ snDraw.Game.Controls = {
 
 	    //make the outline of the button coloured.
 	    var RoundedRec = this.Button_Objs[1].item(0);
-	    clientCol = players[client_player_index].color;
-	    RoundedRec.setStroke(clientCol);
+	    RoundedRec.setStroke(snDraw.Game.client_col);
 
 	    //todo: this values ought only be calculated once as they are constant w.r.t. a game instance
 
