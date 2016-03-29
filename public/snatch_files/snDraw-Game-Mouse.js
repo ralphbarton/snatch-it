@@ -199,10 +199,26 @@ snDraw.Game.Mouse = {
 
 
 snDraw.Game.KB = {
+    
+    secretCode: "99FROGS99TEST",
+    codeCounter: 0,
 
     kDown: function (e) {
 	var myKeycode = e.keyCode;
 	var keyPressed = String.fromCharCode(myKeycode);//note that this is non-case sensitive.
+
+	//this design only handles one code but could easily be modified for more.
+	if(keyPressed == this.secretCode[this.codeCounter]){
+	    this.codeCounter++;
+	    if(this.codeCounter == this.secretCode.length){
+		//the whole code was entered!!
+		alert("TOAST: You typed the secret code to enter developement mode\nEnjoy the faster tile flips for you only!");
+		dev = true;
+		this.codeCounter = 0;
+	    }
+	}else{
+	    this.codeCounter = 0;
+	}
 
 	if(snDraw.Game.Controls.playersListWindowVisible){
 	    snDraw.Game.Controls.removePlayersListWindow();	    
