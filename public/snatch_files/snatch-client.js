@@ -182,7 +182,9 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
 socket.on('snatch rejected', function(rejection_reason){
     
     //a toast here
-    snDraw.Game.Spell.CancelWord();
+    //issue 114 - we decided: Don't clear word upon a failed snatch...
+    //snDraw.Game.Spell.CancelWord();
+    
     console.log("The snatch was rejected by the server for the following reason: " + rejection_reason);
 });
 

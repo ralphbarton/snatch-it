@@ -212,8 +212,8 @@ snDraw.Game.KB = {
 	    this.codeCounter++;
 	    if(this.codeCounter == this.secretCode.length){
 		//the whole code was entered!!
-		alert("TOAST: You typed the secret code to enter developement mode\nEnjoy the faster tile flips for you only!");
-		dev = true;
+		alert("TOAST: You typed the secret code to enter developement mode\nEnjoy the faster tile flips for you only!\nDev mode " + (!dev ? "ON" : "OFF"));
+		dev = !dev;
 		this.codeCounter = 0;
 	    }
 	}else{

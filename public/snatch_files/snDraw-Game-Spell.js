@@ -146,8 +146,12 @@ snDraw.Game.Spell = {
 	if(false){//what happens for a unsuitable word??
 	    alert("Free letters are not available to make the word \""+snatch_string+"\".");
 	}
-	
-	console.log("Sending...",word_by_tile_indeces);
-	PLAYER_SUBMITS_WORD(word_by_tile_indeces);
+
+	if(word_by_tile_indeces == undefined){
+	    console.log("Toast: the algorithm did not find that these letters could be used in a valid SNATCH");
+	}else{
+	    console.log("Sending...",word_by_tile_indeces);
+	    PLAYER_SUBMITS_WORD(word_by_tile_indeces);
+	}
     }
 };
