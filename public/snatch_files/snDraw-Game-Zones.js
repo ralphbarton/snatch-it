@@ -138,14 +138,14 @@ snDraw.Game.Zones = {
 	    });
 
 	    //"Spell Pointer" is a triangle that points to the word being spelled
-	    snDraw.Game.Spell.SpellBottomPx = labelTop;
+	    snDraw.Game.Spell.SpellBottomPx = labelTop - cell * 0.05;
 
 	    //this won't change over the course of the game...
 	    snDraw.Game.Spell.SpellLeftPx = boxLeft + cell * 0.3;
 
 	    var spellPointer = new fabric.Triangle({
 		left: boxLeft + cell * 0.25,
-		top: labelTop - (cell * 0.53),
+		top: labelTop - (cell * 0.58),
 		width: (cell * 0.3),//is actually height, due to rotation
 		height: (cell * 0.22),//is actually width, due to rotation
 		fill: pZone.player.color,
@@ -297,7 +297,7 @@ snDraw.Game.Zones = {
 	    var spellPointer = bxFab[4];
 	    
 	    var labelTop  = boxTop + boxHeight;
-	    var cell = snDraw.Game.tileSize * 1.4;
+	    var cell = snDraw.Game.tileSize * 1.5;
 
 	    snDraw.moveSwitchable(youBlock, true, snDraw.ani.sty_Resize,{
 		top: labelTop - cell * 0.5
@@ -306,9 +306,9 @@ snDraw.Game.Zones = {
 		top: labelTop - cell * 0.5
 	    });
 
-	    snDraw.Game.Spell.SpellBottomPx = labelTop;
+	    snDraw.Game.Spell.SpellBottomPx = labelTop - cell * 0.05;
 	    snDraw.moveSwitchable(spellPointer, true, snDraw.ani.sty_Resize,{
-		top: labelTop - (cell * 0.53)
+		top: labelTop - (cell * 0.58)
 	    });
 
 	}

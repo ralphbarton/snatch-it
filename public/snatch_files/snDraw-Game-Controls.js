@@ -44,7 +44,7 @@ snDraw.Game.Controls = {
     },
 
 
-    createGenericButton: function(text,n_ind,key_label){
+    createGenericButton: function(text, n_ind, key_label){
 
 	var N_but = this.button_widths.length;
 	var button_w_px = [];
@@ -107,8 +107,7 @@ snDraw.Game.Controls = {
 	    buttonObsArray.push(buttonText);
 	}
 
-	//label on the key
-	
+	//Function to add the little box which labels the button with its keyboard shortcut key.	
 	var draw_boxed_label = function(ll, size, myleft){
 
 	    var kl_top = snDraw.Game.Controls.button_height * 0.15;
@@ -131,32 +130,36 @@ snDraw.Game.Controls = {
 	    });
 	    
 	    //Add the objects to the group
-	    buttonObsArray.push(key_box);
-	    buttonObsArray.push(key_letter);
-	    
-
+	    //sequence of layer ordering: push the box before the letter...
+	    buttonObsArray.push(key_box, key_letter);
+	    buttonObsArray.push();
 	}
 
-	if(centerising_offset != undefined){
+	if(centerising_offset != undefined){//this applies for all buttons except the rightmost -/-/- options button
 
 	    var key_font_size = Math.min (this.button_font_size * 0.9, 20);
-	    var kl_left = centerising_offset *0.5 - this.button_font_size*0.3;
+	    var kl_left = centerising_offset * 0.5 - this.button_font_size*0.3;
 
-	    console.log(key_label, key_font_size, kl_left);
 	    draw_boxed_label(key_label, key_font_size, kl_left);
 
 	    if(n_ind == 0){//it's the CANCEL button
 		var extra_width = buttonObsArray[2].getWidth();
 		draw_boxed_label("5", key_font_size, kl_left + extra_width);
+
 		var CancelTextwith15boxRightPx = kl_left + extra_width*2;
 		if(buttonObsArray[1].getLeft() < CancelTextwith15boxRightPx){
 		    buttonObsArray[1].setLeft(CancelTextwith15boxRightPx);
 		} 
 	    }
-	}
 
-	//sequence of layer ordering: push the box before the letter...
-	
+	    //this is a bit of a scrappy, iterative approach to nicely centering (ish) 2 objects evenly accross a space...
+	    //Having used the main text to position the 'key label boxes', I now use the 'key label boxes to reposition the main text
+	    var item_i = n_ind == 0 ? 4 : 2;
+	    var littleBoxRightEdge = buttonObsArray[item_i].getLeft() + buttonObsArray[item_i].getWidth();
+	    var buttonText = buttonObsArray[1];
+	    var twoThirds_centerise_offset = littleBoxRightEdge + (button_width - littleBoxRightEdge - buttonText.getWidth())/2; 
+	    buttonText.setLeft(twoThirds_centerise_offset);
+	}
 
 	var buttonGrp = new fabric.Group( buttonObsArray, {
 	    hasControls: false,
