@@ -172,32 +172,5 @@ var snDraw = {
 	}
 	canvas.renderAll();
 	return separates;
-    },
-
-
-    gameMessage: function (message,size,text_color){
-	
-	toastText = new fabric.Text('null text', {
-	    textAlign: 'center',
-	    fontWeight: 'bold',
-	    borderColor: 'rgb(0,70,70)',
-	    //	shadow: '#676 -5px -5px 3px',
-	});
-
-
-	toastText.set({
-	    text:message,
-	    fontSize:size,
-	    fill: text_color
-	});
-
-	//this needs to be a separate, later function call, since the first one alters the size...
-	toastText.set({
-	    left: (canvas.getWidth() - toastText.getWidth()) / 2,
-	    top: (canvas.getHeight() - toastText.getHeight()) / 2,
-	});
-
-	canvas.add(toastText);
-	canvas.renderAll();
     }
 };

@@ -3,36 +3,107 @@ snDraw.Splash = {
     player_name: null,
     myFiveColors: undefined,
     myFiveBBs: [],
-    welcome_sel_color_text_obj: undefined,
+    textObject_main: undefined,
     ringZoneTopPx: undefined,
+    name_validated: false,
 
-    renderPromptScreen: function(colorChoices){
-
+    triggerPromptScreen: function(colorChoices){
+	
+	//set the global objects
 	this.myFiveColors = colorChoices;
+	
+	//up until this point the canvas is transparent...
+	canvas.setBackgroundColor('white');
 
-	//get the name via browser prompt box...
-	this.player_name = prompt("What is your name?");
-	while((this.player_name == null)||(this.player_name.length == 0)){
-	    this.player_name = prompt("Please enter an actual name for yourself:");
-	}
+	//the fact that this checks for clicks landing on objects that don't yet exist doesn't matter
+	this.addKBmouseListeners();
 
-	//Draw the "Welcome Joe Blogs" message quite big on the canvas...
-	canvas.setBackgroundColor('white');//is this superfluous?
-	var ts_px = snDraw.canv_W * 0.070;
-	var mytext = "Welcome, " + this.player_name + "!\nSelect your color:";
-	this.welcome_sel_color_text_obj = new fabric.Text(mytext, {
+	var ts_px = snDraw.canv_W * 0.060;
+	var approx_1px = snDraw.canv_W / 500;
+
+	this.textObject_main = new fabric.Text("", {
 	    textAlign: 'left',
 	    fontWeight: 'bold',
-	    fontSize: ts_px,
-	    left: 20,
-	    top: 20
+	    fontSize: ts_px*0.6,
+	    left: approx_1px * 10,
+	    top: approx_1px * 10,
+	    hasControls: false,
+	    hasBorders: false,
+	    selectable: false
 	});
-	canvas.add(this.welcome_sel_color_text_obj);
-	this.ringZoneTopPx = this.welcome_sel_color_text_obj.getHeight()*0.9;
 
+	//get the name via browser prompt box...
+	if(!this.namePrompt()){
+	    //code to run when valid name is not supplied...
+	    
+	    var mytext = "You will need to enter a name to continue...\n\
+ Press ENTER or click the box below to provide a name";
+	    this.textObject_main.set({text: mytext});
+	    
+	    var NPbuttonText = new fabric.Text("Open Name\nEntry Prompt",{
+		fill: 'black',
+		fontWeight: 'bold',
+		fontSize: ts_px * 0.8,
+		top: (this.textObject_main.getTop() + this.textObject_main.getHeight()) * 2,
+		hasControls: false,
+		hasBorders: false,
+		selectable: false
+	    });
+
+	    NPbuttonText.set({
+		left: (snDraw.canv_W - NPbuttonText.getWidth())/2
+	    });
+
+	    var padding = 10;
+	    var NPbuttonRect = new fabric.Rect({
+		fill: '#AAA',
+		stroke: 'black',
+		strokeWidth: approx_1px * 4,
+		left: (NPbuttonText.getLeft() - padding),
+		top: (NPbuttonText.getTop() - padding),
+		width: NPbuttonText.getWidth() + padding * 2,
+		height: NPbuttonText.getHeight() + padding * 2,
+		rx: approx_1px * 10,
+		ry: approx_1px * 10,
+		hasControls: false,
+		hasBorders: false,
+		selectable: false
+	    });
+
+	    canvas.add(this.textObject_main);
+	    NPbuttonRect.isNameEntryPrompt = true;
+	    NPbuttonText.isNameEntryPrompt = true;
+	    canvas.add(NPbuttonRect, NPbuttonText);
+
+	    canvas.renderAll();
+
+	}
+    },
+
+    namePrompt: function(){
+	this.player_name = prompt("What is your name?");
+	this.name_validated = (this.player_name != null) && (this.player_name.length != 0);
+	if (this.name_validated){
+	    this.renderPromptScreen();
+	}
+	return this.name_validated;
+    },
+
+    renderPromptScreen: function(){
+
+	//Draw the "Welcome Joe Blogs" message quite big on the canvas...
+	canvas.clear();
+	var mytext = "Welcome, " + this.player_name + "!\nSelect your color:";
+	this.textObject_main.set({
+	    text: mytext,
+	    fontSize: snDraw.canv_W * 0.060
+	});
+	canvas.add(this.textObject_main);
+
+	this.ringZoneTopPx = this.textObject_main.getHeight()*0.9;
 	//draw the ring of BB's
 	this.drawBBring();
-	this.addKBmouseListeners();
+
 
 	//TODO: set whether background is dark or light
 	snDraw.Game.setDarkBackground(true);
@@ -120,11 +191,26 @@ snDraw.Splash = {
     handleBBchosenReleased: function(){
 
 	var onComplete_BBchosenReleased_animation = function(){
-	    canvas.remove(snDraw.Splash.welcome_sel_color_text_obj);
+
 	    snDraw.Splash.removeKBmouseListeners();	    
 
 	    var wait_str = "Waiting for server\nto send the state of the ongoing\nSNATCH-IT game...";
-	    snDraw.gameMessage(wait_str, snDraw.canv_W * 0.065,'rgb(230,0,40)'); 
+	    var my_font_size = snDraw.canv_W * 0.055;
+	    var textObj = snDraw.Splash.textObject_main;
+
+	    textObj.set({
+		text: wait_str,
+		textAlign: 'center',
+		fontWeight: 'bold',
+		fontSize: my_font_size,
+		fill: 'rgb(230,0,40)'
+	    });
+
+	    //this needs to be a separate, later function call, since the first one alters the size...
+	    textObj.set({
+		left: (canvas.getWidth() - textObj.getWidth()) / 2,
+		top: (canvas.getHeight() - textObj.getHeight()) / 2,
+	    });
 
 	    //send the data to the server
 	    var playerDetailsObj = {
@@ -147,6 +233,11 @@ snDraw.Splash = {
 		var BB_hit_i = e.target.BBindex;
 		if(BB_hit_i != undefined){
 		    snDraw.Splash.handleBBchosen(BB_hit_i);
+		}
+		
+		var isNamePrompt = e.target.isNameEntryPrompt;
+		if(isNamePrompt != undefined){
+		    snDraw.Splash.namePrompt();		    
 		}
 	    }
 	}); 
@@ -176,6 +267,14 @@ snDraw.Splash = {
 		    setTimeout(snDraw.Splash.handleBBchosenReleased, shrink_dur * 0.5);		
 		}
 	    }
+
+	    if(myKeycode == 13){//enter
+		if(!snDraw.Splash.name_validated){
+		    snDraw.Splash.namePrompt();
+		}
+	    }
+	    
+
 	};
 	this.KBListener_ref = KBlistenerSplash;
 

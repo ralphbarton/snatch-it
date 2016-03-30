@@ -14,7 +14,7 @@ socket.emit('player joining game', 0);
 socket.on('player color choices', function(colorSet){
     snDraw.initialiseCanvas();
     //the colour set is an array with objects <fabric color>, length 5
-    snDraw.Splash.renderPromptScreen(colorSet);
+    snDraw.Splash.triggerPromptScreen(colorSet);
 });
 
 
@@ -22,6 +22,8 @@ socket.on('player color choices', function(colorSet){
 ///upon arrival, process the transmitted game state from the server
 socket.on('full game state transmission', function(gameState){
 
+    //this will clear the message "waiting for the server..."
+    canvas.clear();	    
     /*
       For now, receipt of the first ever game state message (compared with others) is detected
       by looking at the global tileset, which is initially [].

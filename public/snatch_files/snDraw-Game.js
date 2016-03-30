@@ -50,7 +50,6 @@ snDraw.Game = {
     initialDrawEntireGame: function(){
 	this.calculateRenderingDimentionConstants();
 	canvas.setBackgroundColor(this.bg_col);
-	canvas.clear();	    
 	snDraw.Game.Controls.createControls();//draw buttons on the top of the screen
 	snDraw.Game.Grid.createEveryTileObject_inGridAtTop();//next draw all the unturned tiles underneath
 	snDraw.Game.Zones.CreatePlayerZoneListAndDraw();//next draw all the players word zones
