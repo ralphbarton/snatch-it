@@ -81,7 +81,6 @@ socket.on('new turned tile', function(newTile_info){
     var client_is_flipper = PI == client_player_index;
 
     var player_name = client_is_flipper ? "You" : players[PI].name;
-    console.log("TOAST: " + player_name + " flipped a tile...");
     tileset[TI] = {
 	letter: LET,
 	status: "turned"
@@ -186,8 +185,7 @@ socket.on('snatch rejected', function(rejection_reason){
     //a toast here
     //issue 114 - we decided: Don't clear word upon a failed snatch...
     //snDraw.Game.Spell.CancelWord();
-    
-    console.log("The snatch was rejected by the server for the following reason: " + rejection_reason);
+    snDraw.Game.Toast.showToast("The snatch was rejected by the server for the following reason: " + rejection_reason);
 });
 
 function PLAYER_SUBMITS_WORD(p)       {socket.emit('player submits word', p);}
