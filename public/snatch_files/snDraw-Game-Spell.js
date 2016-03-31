@@ -145,6 +145,7 @@ snDraw.Game.Spell = {
 	    N_valid_moves = Assembler.synthesiseSnatch(letters_array,true);
 	}
 
+	snDraw.Game.Controls.modifySNATCHbuttonBar(N_valid_moves);
 	snDraw.Game.Controls.setButtonDisabled(2, N_valid_moves == 0);
 	if(N_valid_moves>1){
 	    console.log("Number of valid moves for this 'Spell' = " + N_valid_moves);

@@ -40,7 +40,10 @@ snDraw.Game.Controls = {
 	this.Button_Objs[2] = this.createGenericButton("SNATCH IT",2,"3");
 	this.Button_Objs[3] = this.createGenericButton("Scores",3,"4");
 	this.Button_Objs[4] = this.createGenericButton(":",4,null);
+
+	//starting state of buttons with visual state
 	this.updateTurnLetter_number();
+	this.setButtonDisabled(2, true);
     },
 
 
@@ -177,8 +180,6 @@ snDraw.Game.Controls = {
 
     updateTurnLetter_number: function(){
 	var n_tiles_remaining = tilestats.n_tiles-tileset.length;
-	console.log(n_tiles_remaining);
-
 	var TurnButton = this.Button_Objs[1];
 	if(n_tiles_remaining>0){
 	    TurnButton.item(1).setText("Turn Letter (" + n_tiles_remaining + ")");
@@ -203,6 +204,49 @@ snDraw.Game.Controls = {
 	    myTextObj.setFill('black');//text colour to black
 	    myRectObj.setStroke(snDraw.Game.fg_col);//box border colour to black, in case it was changed...
 	}
+    },
+
+    SNATCHbuttonBar_Objs: [],
+    modifySNATCHbuttonBar: function(n_pieces){
+
+	//certainly, remove any pre-existing bars...
+	for (var i=0; i<this.SNATCHbuttonBar_Objs.length; i++){
+	    canvas.remove(this.SNATCHbuttonBar_Objs[i]);
+	}
+
+	//re-add the correct number of bars
+	if(n_pieces > 0){
+	    var BGrp = this.Button_Objs[2];//this assumes SNATCH button has index 2
+
+	    var h_pad = BGrp.height * 0.5;
+	    var stroke_w = BGrp.item(0).strokeWidth;
+	    var h_gap = BGrp.height * 0.25;
+
+	    var w_bar = (BGrp.width - h_pad*2 - h_gap*(n_pieces-1)) / n_pieces;
+
+	    //these next 2 lines reduce w_bar length and h_pad to match
+	    //again, I'm being a bit iterative here to save thought
+	    w_bar = Math.min(w_bar, BGrp.height*0.9);
+	    h_pad = (BGrp.width - w_bar*n_pieces - h_gap*(n_pieces-1))/2;
+
+	    var top_o = BGrp.top + BGrp.height * 0.75;
+	    var left_o = BGrp.left + h_pad;
+
+	    for (var i=0; i<n_pieces; i++){
+		var thin_bar = new fabric.Rect({
+		    top: top_o,
+		    left: (left_o + i*(w_bar+h_gap)),
+		    fill: 'rgba(0,0,0,0.8)',//this effectively is choosing dark grey
+		    width: w_bar,
+		    height: stroke_w,
+		    rx: w_bar/2,
+		    ry: stroke_w/2
+		});
+		this.SNATCHbuttonBar_Objs.push(thin_bar);
+		canvas.add(thin_bar);
+	    }
+	}
+	snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
     },
 
     startTurnDisableTimeout: function(){
