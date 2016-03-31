@@ -100,7 +100,7 @@ snDraw.Game.Controls = {
 
 	}else{//use text for all other buttons...
 	    var buttonText = new fabric.Text(text,{
-		top: (this.button_height - this.button_font_size) * 0.5,
+		top: (this.button_height - this.button_font_size*1.15) * 0.5,//the 1.1 is a fudgefactor to generally shift text up
 		fill: 'black',
 		fontWeight: 'bold',
 		fontSize: this.button_font_size
@@ -230,13 +230,20 @@ snDraw.Game.Controls = {
 	    w_bar = Math.min(w_bar, BGrp.height*0.9);
 	    h_pad = (BGrp.width - w_bar*n_pieces - h_gap*(n_pieces-1))/2;
 
-	    var top_o = BGrp.top + BGrp.height * 0.75;
+	    var top_o = BGrp.top + BGrp.height * 0.72;
 	    var left_o = BGrp.left + h_pad;
 
+	    //setting up the variables for the dots specifically
+	    var dot_dia = stroke_w * 1.5; 
+	    var dot_stroke = dot_dia * 0.17; 
+
 	    for (var i = 0; i < n_pieces; i++){//run through each of those bars
+
+		var barWithDotsObj = [];
+
 		var thin_bar = new fabric.Rect({
-		    top: top_o,
-		    left: (left_o + i*(w_bar+h_gap)),
+		    top: 0,
+		    left: 0,
 		    fill: 'rgba(0,0,0,0.8)',//this effectively is choosing dark grey
 		    width: w_bar,
 		    height: stroke_w,
@@ -244,12 +251,41 @@ snDraw.Game.Controls = {
 		    ry: stroke_w/2
 		});
 
+		barWithDotsObj.push(thin_bar);
+
 		//create those 'dot' objects...
 		//DotSet[i]
+		
+		var n_dots = DotSet[i].length;
+		var dot_rel_left = (w_bar - n_dots * dot_dia)/2;
 
-		this.SNATCHbuttonBar_Objs.push(thin_bar);
-		canvas.add(thin_bar);
+		for (var j = 0; j < n_dots; j++){//run through each of those bars
+		    
+		    var dot_col = players[DotSet[i][j]].color;
+		    var myDot = new fabric.Circle({
+			radius: dot_dia/2,
+			stroke: 'black',
+			strokeWidth: dot_stroke,
+			fill: dot_col,
+			left: (dot_rel_left + dot_dia*j),
+			top: (stroke_w - dot_dia)/2
+		    });
+
+		    barWithDotsObj.push(myDot);
+		}
+
+		var DottedBarGrp = new fabric.Group(barWithDotsObj, {
+		    top: top_o,
+		    left: (left_o + i*(w_bar+h_gap)),
+		    hasControls: false,
+		    hasBorders: false,
+		    selectable: false
+		});
+
+		this.SNATCHbuttonBar_Objs.push(DottedBarGrp);
+		canvas.add(DottedBarGrp);
 	    }
+
 	}
 	snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
     },

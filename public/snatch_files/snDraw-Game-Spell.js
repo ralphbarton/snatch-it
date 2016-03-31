@@ -107,7 +107,7 @@ snDraw.Game.Spell = {
 	    this.recolourAll(this.ListAllVisibleTilesOf(letter));//to ensure all the letter types that were involved get restored in colour.
 	}
 	this.SkeletalLetters = [];//clear the array (lose the references to the Fabric objects. Hope they get deleted
-	snDraw.Game.Controls.setButtonDisabled(2, true);//cancelling word always has the effect of disabling "SNATCH-IT"
+	this.indicateN_validMoves_onButton();//cancelling word always has the effect of disabling "SNATCH-IT"
 	snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
     },
 
