@@ -189,17 +189,19 @@ snDraw.Game.Controls = {
 
     turnDisabled: false,
     cancelTurnDisabled: false,
-    setTurnDisabled: function(disable){
-	this.turnDisabled = disable;
-	var TurnTextObj = this.Button_Objs[1].item(1);
-	var TurnRectObj = this.Button_Objs[1].item(0);
-    	TurnRectObj.setFill('#AAA');
+    setButtonDisabled: function(buttonID, disable){
+	if(buttonID == 1){//this code is specific to the Turn Letter button
+	    this.turnDisabled = disable;
+	}
+	var myTextObj = this.Button_Objs[buttonID].item(1);
+	var myRectObj = this.Button_Objs[buttonID].item(0);
+    	myRectObj.setFill('#AAA');
 	//change the button text colour
 	if(disable){
-	    TurnTextObj.setFill('#75746E');
+	    myTextObj.setFill('#75746E');//text colour to a dull grey-brown
 	}else{
-	    TurnTextObj.setFill('black');
-	    TurnRectObj.setStroke(snDraw.Game.fg_col);
+	    myTextObj.setFill('black');//text colour to black
+	    myRectObj.setStroke(snDraw.Game.fg_col);//box border colour to black, in case it was changed...
 	}
     },
 
@@ -246,7 +248,7 @@ snDraw.Game.Controls = {
 		    if((this.count > f_tot)||(snDraw.Game.Controls.cancelTurnDisabled)){//animation completed...
 			//restore the visual state of the button to normal
 			RoundedRec.setStrokeDashArray(null);
-			snDraw.Game.Controls.setTurnDisabled(false);
+			snDraw.Game.Controls.setButtonDisabled(1, false);//un-disable the "Turn Letter" button
 			//instrumentation....
 			var end_time = new Date();
 			//TODO: make the animation duration more accurate...
@@ -290,7 +292,7 @@ snDraw.Game.Controls = {
 	if(this.turnDisabled){
 	    console.log("TOAST: you must wait before you are allowed to take another turn. Number of seconds = [todo]");
 	}else{
-	    this.setTurnDisabled(true);
+	    this.setButtonDisabled(1, true);//Disable the "turn letter" button...
 	    var n_tiles_remaining = tilestats.n_tiles-tileset.length;
 	    if(n_tiles_remaining>0){
 		TILE_TURN_REQUEST(); //request another tile...

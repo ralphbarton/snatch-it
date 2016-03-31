@@ -200,7 +200,7 @@ snDraw.Game.Mouse = {
 
 snDraw.Game.KB = {
     
-    secretCode: "99FROGS99TEST",
+    secretCode: "99FROGS99",
     codeCounter: 0,
 
     kDown: function (e) {

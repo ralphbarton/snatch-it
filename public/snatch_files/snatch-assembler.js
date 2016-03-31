@@ -32,7 +32,7 @@ var Assembler = {
 	}
     },
 
-    synthesiseSnatch: function(letter_array){
+    synthesiseSnatch: function(letter_array, count_only){
 	var tileID_array = [];
 
 	this.regenerateAllWordTallies();
@@ -44,16 +44,16 @@ var Assembler = {
 	this.Assemblies = [];
 	this.ASSEMBLE([],snatch_tally,this.SubsetWordList);
 
-	var index_arb = getRandomInt(0,this.Assemblies.length-1);
-	var AnArbitraryAssembly = this.Assemblies[index_arb];
-	if(AnArbitraryAssembly){
-	var word_tileID_array = this.Assembly_to_TileSequence(letter_array, AnArbitraryAssembly);
-	    console.log("Proposed word_tileID_array = ", word_tileID_array);
+	if(count_only){
+	    return this.Assemblies.length;
 	}else{
-	    console.log("Assembly failed for the word. The list of assemblies is:", this.Assemblies);
+	    var index_arb = getRandomInt(0,this.Assemblies.length-1);
+	    var AnArbitraryAssembly = this.Assemblies[index_arb];
+	    if(AnArbitraryAssembly){
+		var word_tileID_array = this.Assembly_to_TileSequence(letter_array, AnArbitraryAssembly);
+	    }
+	    return word_tileID_array;
 	}
-
-	return word_tileID_array;
     },
 
 

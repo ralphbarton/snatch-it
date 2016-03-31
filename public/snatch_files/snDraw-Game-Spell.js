@@ -31,6 +31,9 @@ snDraw.Game.Spell = {
 		});
 		canvas.add(NewSkeletal);
 		snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+
+		//'logical validity' of the word in the spell may have changed. Recolour button accordingly
+		this.indicateN_validMoves_onButton();
 	    }
 	}
     },
@@ -70,6 +73,10 @@ snDraw.Game.Spell = {
 		    left: x_loco
 		});
 	    }
+
+	    //'logical validity' of the word in the spell may have changed. Recolour button accordingly
+	    this.indicateN_validMoves_onButton();
+
 	    snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
 	}
     },
@@ -100,6 +107,7 @@ snDraw.Game.Spell = {
 	    this.recolourAll(this.ListAllVisibleTilesOf(letter));//to ensure all the letter types that were involved get restored in colour.
 	}
 	this.SkeletalLetters = [];//clear the array (lose the references to the Fabric objects. Hope they get deleted
+	snDraw.Game.Controls.setButtonDisabled(2, true);//cancelling word always has the effect of disabling "SNATCH-IT"
 	snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
     },
 
@@ -123,6 +131,25 @@ snDraw.Game.Spell = {
 	}
     },
 
+
+    indicateN_validMoves_onButton: function(){
+
+	var N_valid_moves = undefined;
+	if(this.SkeletalLetters.length<3){
+	    N_valid_moves = 0;//no valid moves involves fewer than 3 letters
+	}else{
+    	    var letters_array = [];
+	    for(var i=0; i < this.SkeletalLetters.length; i++){
+		letters_array.push(this.SkeletalLetters[i].letter);
+	    }
+	    N_valid_moves = Assembler.synthesiseSnatch(letters_array,true);
+	}
+
+	snDraw.Game.Controls.setButtonDisabled(2, N_valid_moves == 0);
+	if(N_valid_moves>1){
+	    console.log("Number of valid moves for this 'Spell' = " + N_valid_moves);
+	}
+    },
 
     //send a candidate word to the server
     SubmitWord: function(){
