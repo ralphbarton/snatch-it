@@ -128,6 +128,10 @@ snDraw.Game.Spell = {
     SubmitWord: function(){
 	var letters_array = [];
 	if(this.SkeletalLetters.length>0){//construct the letters array using the skeletal letters.
+	    if(this.SkeletalLetters.length<3){
+		snDraw.Game.Toast.showToast("Words must be 3 letters or more");
+		return null;
+	    }
 	    for(var i=0; i < this.SkeletalLetters.length; i++){
 		letters_array.push(this.SkeletalLetters[i].letter);
 	    }
@@ -143,12 +147,8 @@ snDraw.Game.Spell = {
 	}
 
 	var word_by_tile_indeces = Assembler.synthesiseSnatch(letters_array);
-	if(false){//what happens for a unsuitable word??
-	    alert("Free letters are not available to make the word \""+snatch_string+"\".");
-	}
-
 	if(word_by_tile_indeces == undefined){
-	    console.log("Toast: the algorithm did not find that these letters could be used in a valid SNATCH");
+	    snDraw.Game.Toast.showToast("The letters " + letters_array + " are not a valid move");
 	}else{
 	    console.log("Sending...",word_by_tile_indeces);
 	    PLAYER_SUBMITS_WORD(word_by_tile_indeces);
