@@ -135,6 +135,7 @@ snDraw.Game.Spell = {
     indicateN_validMoves_onButton: function(){
 
 	var N_valid_moves = undefined;
+	    var DotSet = [];
 	if(this.SkeletalLetters.length<3){
 	    N_valid_moves = 0;//no valid moves involves fewer than 3 letters
 	}else{
@@ -142,14 +143,18 @@ snDraw.Game.Spell = {
 	    for(var i=0; i < this.SkeletalLetters.length; i++){
 		letters_array.push(this.SkeletalLetters[i].letter);
 	    }
-	    N_valid_moves = Assembler.synthesiseSnatch(letters_array,true);
+	    var AssemblySet = Assembler.synthesiseSnatch(letters_array,true);
+	    for(var i=0; i < AssemblySet.length; i++){//loop through the different Assemblies
+		DotSet[i] = [];
+		for(var j=0; j < AssemblySet[i].words_used.length; j++){//loop through words used in each Assembly
+		    DotSet[i].push(AssemblySet[i].words_used[j].player);
+		}
+	    }
+	    N_valid_moves = AssemblySet.length;
 	}
-
-	snDraw.Game.Controls.modifySNATCHbuttonBar(N_valid_moves);
+	snDraw.Game.Controls.modifySNATCHbuttonBar(DotSet);
+	console.log(DotSet);
 	snDraw.Game.Controls.setButtonDisabled(2, N_valid_moves == 0);
-	if(N_valid_moves>1){
-	    console.log("Number of valid moves for this 'Spell' = " + N_valid_moves);
-	}
     },
 
     //send a candidate word to the server

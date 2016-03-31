@@ -32,7 +32,7 @@ var Assembler = {
 	}
     },
 
-    synthesiseSnatch: function(letter_array, count_only){
+    synthesiseSnatch: function(letter_array, full_ret){
 	var tileID_array = [];
 
 	this.regenerateAllWordTallies();
@@ -44,8 +44,8 @@ var Assembler = {
 	this.Assemblies = [];
 	this.ASSEMBLE([],snatch_tally,this.SubsetWordList);
 
-	if(count_only){
-	    return this.Assemblies.length;
+	if(full_ret){
+	    return this.Assemblies;
 	}else{
 	    var index_arb = getRandomInt(0,this.Assemblies.length-1);
 	    var AnArbitraryAssembly = this.Assemblies[index_arb];

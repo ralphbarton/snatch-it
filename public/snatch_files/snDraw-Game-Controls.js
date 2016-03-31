@@ -207,7 +207,7 @@ snDraw.Game.Controls = {
     },
 
     SNATCHbuttonBar_Objs: [],
-    modifySNATCHbuttonBar: function(n_pieces){
+    modifySNATCHbuttonBar: function(DotSet){
 
 	//certainly, remove any pre-existing bars...
 	for (var i=0; i<this.SNATCHbuttonBar_Objs.length; i++){
@@ -215,6 +215,7 @@ snDraw.Game.Controls = {
 	}
 
 	//re-add the correct number of bars
+	var n_pieces = DotSet.length;
 	if(n_pieces > 0){
 	    var BGrp = this.Button_Objs[2];//this assumes SNATCH button has index 2
 
@@ -232,7 +233,7 @@ snDraw.Game.Controls = {
 	    var top_o = BGrp.top + BGrp.height * 0.75;
 	    var left_o = BGrp.left + h_pad;
 
-	    for (var i=0; i<n_pieces; i++){
+	    for (var i = 0; i < n_pieces; i++){//run through each of those bars
 		var thin_bar = new fabric.Rect({
 		    top: top_o,
 		    left: (left_o + i*(w_bar+h_gap)),
@@ -242,6 +243,10 @@ snDraw.Game.Controls = {
 		    rx: w_bar/2,
 		    ry: stroke_w/2
 		});
+
+		//create those 'dot' objects...
+		//DotSet[i]
+
 		this.SNATCHbuttonBar_Objs.push(thin_bar);
 		canvas.add(thin_bar);
 	    }
