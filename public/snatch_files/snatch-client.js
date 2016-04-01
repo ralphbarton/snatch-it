@@ -98,6 +98,7 @@ socket.on('new turned tile', function(newTile_info){
     //This is a little expensive, but any new tile has the potential to change letter availability
     if(snDraw.Game.Spell.SkeletalLetters.length>0){ // irrelivant if the speller is empty
 	snDraw.Game.Spell.recolourAll(snDraw.Game.Spell.ListAllVisibleTilesOf(LET));
+	snDraw.Game.Spell.indicateN_validMoves_onButton();//also re-indicate how to make
     }
 
     if(TI%5==0){snDraw.measureFramePeriod();}//every 5 tiles, remeasure frame rate
@@ -185,7 +186,7 @@ socket.on('snatch rejected', function(rejection_reason){
     //a toast here
     //issue 114 - we decided: Don't clear word upon a failed snatch...
     //snDraw.Game.Spell.CancelWord();
-    snDraw.Game.Toast.showToast("The snatch was rejected by the server for the following reason: " + rejection_reason);
+    snDraw.Game.Toast.showToast("Move invalid: " + rejection_reason);
 });
 
 function PLAYER_SUBMITS_WORD(p)       {socket.emit('player submits word', p);}

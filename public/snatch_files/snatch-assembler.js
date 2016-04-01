@@ -43,7 +43,44 @@ var Assembler = {
 	var snatch_tally = this.wordTally(letter_array);
 	this.Assemblies = [];
 	this.ASSEMBLE([],snatch_tally,this.SubsetWordList);
+	this.stripAnagramOnlyOptionsfrom_Assemblies();
 
+	//determine which assembly is best play (from PoV of scoring)...
+	var max_score = -100;
+	var max_score_index = undefined;
+	var value_weight_opponent_letter_consumed = 1.1;
+	var value_weight_own_letter_consumed = -0.7;
+	for(var i=0; i < this.Assemblies.length; i++){//loop through all Assemblies
+	    var score_i = 0;
+	    var Ass_i = this.Assemblies[i];	    
+	    //determine the value of this option
+	    for(var j=0; j < Ass_i.words_used.length; j++){//loop through all words in this assembly
+		var PI = Ass_i.words_used[j].player;
+		var WI = Ass_i.words_used[j].word;
+		var N_letters = players[PI].words[WI].length;
+		var my_weight = client_player_index == PI ? value_weight_own_letter_consumed : value_weight_opponent_letter_consumed;
+		score_i += N_letters * my_weight;
+	    }
+	    if(score_i > max_score){
+		max_score = score_i;
+		max_score_index = i;
+	    }
+	}
+
+	if(full_ret){
+	    return {ASM: this.Assemblies, best_i: max_score_index};
+	}else{
+	    var AnArbitraryAssembly = this.Assemblies[max_score_index];
+	    if(AnArbitraryAssembly){
+		var word_tileID_array = this.Assembly_to_TileSequence(letter_array, AnArbitraryAssembly);
+	    }else{
+		console.log("this should never happen and I don't know why it would");
+	    }
+	    return word_tileID_array;
+	}
+    },
+
+    stripAnagramOnlyOptionsfrom_Assemblies: function(){
 	//strip out any assemblies here which use exactly one stolen word only (they are not valid moves)
 	for(var i=0; i < this.Assemblies.length; i++){//loop through the different Assemblies
 	    var Ass_i = this.Assemblies[i];
@@ -55,26 +92,7 @@ var Assembler = {
 		}
 	    }
 	}
-
-	if(full_ret){
-	    return this.Assemblies;
-	}else{
-	    var index_arb = getRandomInt(0,this.Assemblies.length-1);
-	    var AnArbitraryAssembly = this.Assemblies[index_arb];
-	    if(AnArbitraryAssembly){
-		var word_tileID_array = this.Assembly_to_TileSequence(letter_array, AnArbitraryAssembly);
-	    }
-	    return word_tileID_array;
-	}
     },
-
-
-    //Maybe work on the more complex case of continuous maintainance later...
-    /*
-    addWordAsTally_from_tileIDs: function(tile_ids){
-	
-
-    },*/
 
     WordData: [],
     regenerateAllWordTallies: function(){

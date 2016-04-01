@@ -207,7 +207,7 @@ snDraw.Game.Controls = {
     },
 
     SNATCHbuttonBar_Objs: [],
-    modifySNATCHbuttonBar: function(DotSet){
+    modifySNATCHbuttonBar: function(DotSet, i_optimal){
 
 	//certainly, remove any pre-existing bars...
 	for (var i=0; i<this.SNATCHbuttonBar_Objs.length; i++){
@@ -230,7 +230,7 @@ snDraw.Game.Controls = {
 	    w_bar = Math.min(w_bar, BGrp.height*0.9);
 	    h_pad = (BGrp.width - w_bar*n_pieces - h_gap*(n_pieces-1))/2;
 
-	    var top_o = BGrp.top + BGrp.height * 0.72;
+	    var top_o = BGrp.top + BGrp.height * 0.76;
 	    var left_o = BGrp.left + h_pad;
 
 	    //setting up the variables for the dots specifically
@@ -240,15 +240,17 @@ snDraw.Game.Controls = {
 	    for (var i = 0; i < n_pieces; i++){//run through each of those bars
 
 		var barWithDotsObj = [];
+		var stroke_w_actual = i == i_optimal ? stroke_w * 1.4 : stroke_w * 0.8;
 
 		var thin_bar = new fabric.Rect({
-		    top: 0,
+		    top: (-stroke_w_actual/2),
 		    left: 0,
 		    fill: 'rgba(0,0,0,0.8)',//this effectively is choosing dark grey
+		    strokeWidth: 0,
 		    width: w_bar,
-		    height: stroke_w,
+		    height: stroke_w_actual,
 		    rx: w_bar/2,
-		    ry: stroke_w/2
+		    ry: stroke_w_actual/2
 		});
 
 		barWithDotsObj.push(thin_bar);
@@ -268,14 +270,15 @@ snDraw.Game.Controls = {
 			strokeWidth: dot_stroke,
 			fill: dot_col,
 			left: (dot_rel_left + dot_dia*j),
-			top: (stroke_w - dot_dia)/2
+			top: ( -(dot_dia+dot_stroke)/2)
 		    });
 
 		    barWithDotsObj.push(myDot);
 		}
 
+		var top_o_adj = top_o - (n_dots==0 ? stroke_w_actual : (dot_dia+dot_stroke))/2;
 		var DottedBarGrp = new fabric.Group(barWithDotsObj, {
-		    top: top_o,
+		    top: top_o_adj,
 		    left: (left_o + i*(w_bar+h_gap)),
 		    hasControls: false,
 		    hasBorders: false,
@@ -291,7 +294,7 @@ snDraw.Game.Controls = {
     },
 
     startTurnDisableTimeout: function(){
-
+	
 	if(this.turnDisabled){//the function irrelivant if the turn is not already disabled...
 
 	    //count words in play...

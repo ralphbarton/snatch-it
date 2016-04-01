@@ -143,7 +143,10 @@ snDraw.Game.Spell = {
 	    for(var i=0; i < this.SkeletalLetters.length; i++){
 		letters_array.push(this.SkeletalLetters[i].letter);
 	    }
-	    var AssemblySet = Assembler.synthesiseSnatch(letters_array,true);
+	    var AssemblyData = Assembler.synthesiseSnatch(letters_array,true);
+	    var best_i_in_ASM = AssemblyData ? AssemblyData.best_i : undefined;
+
+	    var AssemblySet = AssemblyData.ASM;
 	    for(var i=0; i < AssemblySet.length; i++){//loop through the different Assemblies
 		DotSet[i] = [];
 		for(var j=0; j < AssemblySet[i].words_used.length; j++){//loop through words used in each Assembly
@@ -152,7 +155,7 @@ snDraw.Game.Spell = {
 	    }
 	    N_valid_moves = AssemblySet.length;
 	}
-	snDraw.Game.Controls.modifySNATCHbuttonBar(DotSet);
+	snDraw.Game.Controls.modifySNATCHbuttonBar(DotSet, best_i_in_ASM);
 	snDraw.Game.Controls.setButtonDisabled(2, N_valid_moves == 0);
     },
 
