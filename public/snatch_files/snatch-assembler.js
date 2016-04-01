@@ -44,6 +44,18 @@ var Assembler = {
 	this.Assemblies = [];
 	this.ASSEMBLE([],snatch_tally,this.SubsetWordList);
 
+	//strip out any assemblies here which use exactly one stolen word only (they are not valid moves)
+	for(var i=0; i < this.Assemblies.length; i++){//loop through the different Assemblies
+	    var Ass_i = this.Assemblies[i];
+	    if(this.isZero_Tally(Ass_i.free_letters)){//no new letters are included in the word
+		if(Ass_i.words_used.length <= 1){// and only one word is used...
+		    //this means this assembly is just an anagram of someone's pre-existing word, and not valid:
+		    this.Assemblies.splice(i,1);
+		    i--;//everything beyond what had been i will be shifted back one...
+		}
+	    }
+	}
+
 	if(full_ret){
 	    return this.Assemblies;
 	}else{
@@ -120,6 +132,19 @@ var Assembler = {
 	return word_tally;
     },
 
+    /*
+      The form of the overall Assembly data structure is
+      Array [ {free_letters: X, words_used: Y}, {etc...}]
+
+      (note in the specific function below, we take one element of such an array)
+
+      The form of free_letters is 
+      {A:0, B:0, ...} i.e. it is a Tally
+
+      The form of words_used is
+      Array [ {player:0, word: 0, tally: {}}, {etc...}]
+
+     */
     //this will destroy the assembly object...
     Assembly_to_TileSequence: function(letter_array, MyAssembly){
 	var word_tileID_array = [];
@@ -204,6 +229,13 @@ var Assembler = {
     isEqual_Tally: function(A,B){
 	for (var key in A){
 	    if(A[key] != B[key]){return false;}
+	}
+	return true;//if none were not equal
+    },
+
+    isZero_Tally: function(A){
+	for (var key in A){
+	    if(A[key] != 0){return false;}
 	}
 	return true;//if none were not equal
     },

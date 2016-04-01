@@ -153,7 +153,6 @@ snDraw.Game.Spell = {
 	    N_valid_moves = AssemblySet.length;
 	}
 	snDraw.Game.Controls.modifySNATCHbuttonBar(DotSet);
-	console.log(DotSet);
 	snDraw.Game.Controls.setButtonDisabled(2, N_valid_moves == 0);
     },
 
