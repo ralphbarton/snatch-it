@@ -44,7 +44,7 @@ snDraw.Game = {
 	canvas.on('mouse:out',  function(e){snDraw.Game.Mouse.mOut(e);  });
 
 	//keyboard event listeners
-	document.addEventListener("keydown",function(e){snDraw.Game.KB.kDown(e); }, false);
+	document.addEventListener("keydown",function(e){snDraw.Game.Keyboard.kDown(e); }, false);
     },
 
     initialDrawEntireGame: function(){
