@@ -86,7 +86,7 @@ snDraw.Game.Zones = {
 	}
     },
 
-    createZoneBox: function(pZone,animate_from_left){
+    createZoneBox: function(pZone, animate_from_left){
 
 	var boxLeft   = snDraw.Game.marginUnit;
 	var boxTop    = pZone.zone_top;
@@ -156,7 +156,7 @@ snDraw.Game.Zones = {
 	}
 
 	pZone.FabObjects = [];
-	for(var i=ObjectArray.length-1; i>=0; i--){
+	for(var i = ObjectArray.length-1; i >= 0; i--){
 	    var OB = ObjectArray[i];
 	    OB.set({
 		hasControls: false,
@@ -165,14 +165,13 @@ snDraw.Game.Zones = {
 		lockMovementY: true,
 		selectable: false
 	    });
-	    canvas.add(OB);
-	    canvas.sendToBack(OB);//TODO: determine if this command with the one above represents duplication?
+	    canvas.insertAt(OB,i);//this uses i as the z-index for placement of object on Canvas...
 	    pZone.FabObjects[i] = OB;
-
+	    
 	    if(animate_from_left){
 		var origX = OB.getLeft();
 
-		//move away (non animated)
+		//place the object outside the Canvas (setting this position is non animated)
 		snDraw.moveSwitchable(OB, false, null,{
 		    left: origX - snDraw.canv_W,
 		});
@@ -182,8 +181,10 @@ snDraw.Game.Zones = {
 		    left: origX,
 		});
 	    }
-
 	}
+
+	//array item [1] this is the name text...
+	ObjectArray[1].bringForward();//so that it shows above the line..
 
 	/*
 	  var plrZone = new fabric.Group(ObjectArray,{
@@ -289,6 +290,9 @@ snDraw.Game.Zones = {
 	snDraw.moveSwitchable(plrName, true, snDraw.ani.sty_Resize,{
 	    top: boxTop - snDraw.Game.textMarginUnit
 	});
+	
+	plrName.bringForward();//so that it shows above the line..
+	snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
 
 	//if present, animate the 'YOU'
 	if(myZone.player.index == client_player_index){

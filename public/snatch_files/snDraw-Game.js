@@ -84,7 +84,7 @@ snDraw.Game = {
 	var tile_letter_prop = 0.9;
 	var tile_stroke_prop = 0.06;
 
-	var myTileLetterObj = new fabric.Text("",{
+	var myTileLetterObj = new fabric.Text(tile.letter,{
 	    originX: 'center',
 	    top: -this.tileSize/2,
 	    fill: 'yellow',
@@ -108,7 +108,7 @@ snDraw.Game = {
 	    originX: 'center',
 	    originY: 'center',
 	    fill: 'rgb(54,161,235)',
-	    stroke: '#999',
+	    stroke: '#777',
 	    strokeWidth: this.tileSize*tile_stroke_prop,
 	    width: this.tileSize,
 	    height: this.tileSize,
@@ -127,7 +127,6 @@ snDraw.Game = {
 
 	myNewTileObj.tileID=tile_id;
 	myNewTileObj.letter=tile.letter;
-	myNewTileObj.visual="facedown";
 
 	if(tile.status == "turned"){this.modifyTileObject(myNewTileObj,"flipped");}
 	if(tile.status == "inword"){this.modifyTileObject(myNewTileObj,"flipped");}
@@ -143,36 +142,22 @@ snDraw.Game = {
 
 
     modifyTileObject: function(myTile,to_state,options){
+	//record the visual state of the tile as part of the object
 	myTile.visual = to_state;
 
-	var ObjFlip = function(){
-	    myTile.item(1).setText(myTile.letter);
-	    //myTile.set({selectable:true});
-	};
-
 	if(to_state=="flipped"){//only to be called from within the function
-	    myTile.item(0).setFill('rgb(54,161,235)');
-	    myTile.item(1).setFill('yellow');
-	    myTile.item(0).setStroke('#666');
-	    ObjFlip();
+	    myTile.setOpacity(1.0);
 	}
 	else if(to_state=="skeletal"){
 	    myTile.item(0).setFill('black');
 	    myTile.item(1).setFill(this.client_col);
 	    myTile.item(0).setStroke(this.client_col);
-	    ObjFlip();
 	}
 	else if(to_state=="partial"){
-	    myTile.item(0).setFill('#75b8c9');
-	    myTile.item(1).setFill('#c77a00');
-	    myTile.item(0).setStroke('#c77a00');
-	    ObjFlip();
+	    myTile.setOpacity(0.75);
 	}
 	else if(to_state=="shadow"){
-	    myTile.item(0).setFill('#70855c');
-	    myTile.item(1).setFill('#682424');
-	    myTile.item(0).setStroke('#682424');
-	    ObjFlip();
+	    myTile.setOpacity(0.40);
 	}
     }
 };
