@@ -105,10 +105,9 @@ snDraw.Game.Grid = {
 
 	//added term is one tile height
 	var grid_height = (max_col_height==0? snDraw.Game.marginUnit : this.Grid_yPx[max_col_height-1]);
-	var unusedTilesBottomPx = grid_height + (snDraw.Game.tile_space_px + snDraw.Game.tileSize);
 
-	//it's only upon determining the bottom of the unsed tiles that we can set the variable "playersZoneTopPx"
-	snDraw.Game.Zones.playersZoneTopPx = Math.round(unusedTilesBottomPx + snDraw.Game.marginUnit);
+	//here is the one place in the code where tiles bottom is determined and thus set in the Zones class.
+	snDraw.Game.Zones.unusedTilesBottomPx = grid_height + snDraw.Game.tile_space_px + snDraw.Game.tileSize;
     },
 
     //it is important that the destination grid location is empty

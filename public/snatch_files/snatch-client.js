@@ -6,6 +6,7 @@ var players = [];//global reference - for server data...
 var tilestats = {};//global reference - for server data...
 
 var client_player_index = undefined;
+var disconnected_players = [];
 
 //initialise the Canvas
 
@@ -121,6 +122,8 @@ socket.on('player wants reset', function(player_index){
 socket.on('player disconnected', function(player_index){
     var player_name = players[player_index].name;
     console.log("TOAST: " + player_name + " disconnected");
+
+
     console.log("this message needs to be replace with additional code to handle this event...");
 });
 

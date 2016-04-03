@@ -73,7 +73,7 @@ snDraw.Game = {
 	this.h_space_word = this.tileSize * 0.6;//define a constant: additional horizonal spacing pixels to use for a space between words
 	this.h_spacer = this.tileSize * 1.04;
 	this.v_spacer = this.tileSize * 1.12;
-	this.x_plotter_R = 2 * this.marginUnit;
+	this.x_plotter_R = 2 * this.marginUnit + this.stroke_px;
 	this.tile_space_px = this.tileSize * grid_letter_spacing;
 	this.client_col = players[client_player_index].color;
     },

@@ -135,24 +135,41 @@ snDraw.Game.Words = {
     //drawing them one after another to avoid any gap.
     //in the case where this player has just snatched a word, the final word in their list will be animating into place.
     //Thus function should not attempt to animate it (which would be duplication), hence the flag...
-    animateRepositionPlayerWords: function(player,exclude_final_word_reposition){
+    animateRepositionPlayerWords: function(player_index,exclude_final_word_reposition){
 
-	var x_plotter = snDraw.Game.x_plotter_R;
-	var y_plotter = player.y_first_word;
-	var word_set = player.words;
-	var word_GRPs = this.TileGroupsArray[player.index];
+	//being used on a real player...
+	if (player_index !== null){
+	    var X_left_offset = snDraw.Game.x_plotter_R;
+	    var X_right_offset = snDraw.Game.marginUnit;
+	    var player = players[player_index];
+	    var y_plotter = player.y_first_word;
+	    var word_GRPs = this.TileGroupsArray[player_index];
+	    var r_offset = snDraw.Game.marginUnit;
+	    //being used to put words into the unclaimed zone
+	}else{
+	    var X_left_offset = 0;//
+	    var X_right_offset = 0;//xs
 
-	var n_words = word_set.length;
+	    var y_plotter = 200;//player.y_first_word;
+	    var word_GRPs = [];
+	    for (var i = 0; i < disconnected_players.length; i++){
+		var dPIi = disconnected_players[i].index;
+		word_GRPs.concat(this.TileGroupsArray[dPIi]);
+	    }
+	}
+	var x_plotter = X_left_offset;
+
+	var n_words = word_GRPs.length;
 	if(exclude_final_word_reposition){n_words--;}
 
 	for (var i = 0; i < n_words; i++){
 
-	    var x_span_word = snDraw.Game.h_spacer * word_set[i].length;
+	    var x_span_word = snDraw.Game.h_spacer * word_GRPs[i].getObjects().length;
 
 	    //if this word will run over the end of the line, do a carriage return...
-	    if( this.xCoordExceedsWrapThreshold(x_plotter + x_span_word)){
+	    if( this.xCoordExceedsWrapThreshold(x_plotter + x_span_word, X_right_offset)){
 		y_plotter += snDraw.Game.v_spacer;
-		x_plotter = snDraw.Game.x_plotter_R;
+		x_plotter = X_left_offset;
 	    }
 	    
 	    //now its position is determined; animate it into position.
@@ -165,12 +182,17 @@ snDraw.Game.Words = {
 	    x_plotter += snDraw.Game.h_space_word + x_span_word;
 	}
 
-	//set the saved coordinates back as modified...
-	player.x_next_word = x_plotter;
-	player.y_next_word = y_plotter;
+	if (player_index !== null){
+	    //set the saved coordinates back as modified...
+	    player.x_next_word = x_plotter;
+	    player.y_next_word = y_plotter;
+	}
     },
 
-    xCoordExceedsWrapThreshold: function(x_coord){
-	return (x_coord > snDraw.canv_W - snDraw.Game.marginUnit);
+    xCoordExceedsWrapThreshold: function(x_coord, r_offset){//second parameter optional
+	if(!r_offset){
+	    var r_offset = snDraw.Game.marginUnit;
+	}
+	return (x_coord > snDraw.canv_W - r_offset);
     }
 };

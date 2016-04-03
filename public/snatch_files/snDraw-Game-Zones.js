@@ -2,7 +2,7 @@ snDraw.Game.Zones = {
 
     //member data
     PlayerZone: [],//rarranged subset of array players
-    playersZoneTopPx: undefined,
+    unusedTilesBottomPx: undefined,
 
     //member functions
     CreatePlayerZoneListAndDraw: function(){
@@ -55,13 +55,20 @@ snDraw.Game.Zones = {
 	    n_letters_played += n_letters_in_zone[i];
 	}
 
+	//Determine the height coordinate of the top of all of the zones
+	var plr_top_cumulator = undefined;
+	if(disconnected_players.length == 0){//there is no "unclaimed words zone"
+	    plr_top_cumulator = Math.round(this.unusedTilesBottomPx + snDraw.Game.marginUnit);
+	}else{
+	    plr_top_cumulator = 3;//TODO: DETERMINE THE POSITION...
+	}
+
 	//determine total amount of height contained within players' zone boxes
-	section_height = snDraw.canv_H - this.playersZoneTopPx;
+	section_height = snDraw.canv_H - plr_top_cumulator;
 	zones_sum_height = section_height - nZones * snDraw.Game.stroke_px - (nZones-1)*snDraw.Game.textMarginUnit - snDraw.Game.marginUnit;
 	basic_height = snDraw.Game.tileSize + 4*snDraw.Game.marginUnit;
 	shareable_height = zones_sum_height - nZones * basic_height;
 
-	var plr_top_cumulator = this.playersZoneTopPx;// the starting value for this variable is the lower edge of the tile zone...
 	for(var i=0; i<nZones; i++){
 	    //now, we don't want to go dividing by zero if it's a new game with nothing played!!
 	    var hRatio = 0;
@@ -84,6 +91,28 @@ snDraw.Game.Zones = {
 
 	    plr_top_cumulator += this.PlayerZone[i].zone_height + snDraw.Game.textMarginUnit + snDraw.Game.stroke_px;
 	}
+    },
+
+    createUnclaimedZone: function(animate_in){
+
+	var edge_pad = snDraw.Game.tileSize * 0.2;
+	var u_thickness = snDraw.Game.stroke_px * 2.5;
+
+	var boxLeft   = edge_pad;
+	var boxTop    = this.unusedTilesBottomPx + edge_pad/2;
+	var boxWidth  = snDraw.canv_W - 2 * edge_pad - u_thickness;
+//	var boxHeight = //pZone.zone_height;
+
+	//determine the height...
+
+	//determine the other zone sizes
+
+	//make the fabric objects
+
+	//set them to animate in...
+
+	//get the words to 
+
     },
 
     createZoneBox: function(pZone, animate_from_left){
@@ -185,15 +214,6 @@ snDraw.Game.Zones = {
 
 	//array item [1] this is the name text...
 	ObjectArray[1].bringForward();//so that it shows above the line..
-
-	/*
-	  var plrZone = new fabric.Group(ObjectArray,{
-	  hasControls: false,
-	  hasBorders: false,
-	  lockMovementX: true,
-	  lockMovementY: true
-	  });
-	*/
     },
 
 
@@ -234,10 +254,11 @@ snDraw.Game.Zones = {
 	}
 
 	//delete zones if required
-	for(var i=0; i < this.PlayerZone.length; i++){
+	for(var i = 0; i < this.PlayerZone.length; i++){
 	    var zone_i = this.PlayerZone[i];
 	    if((zone_i.player.words.length == 0)&&(!zone_i.is_client)){//there are no words in the zone, and it's a non-client player. 
 		var empty_zone = this.PlayerZone.splice(i,1)[0];
+		i--;//because we spliced, counteract the increment of i.
 		this.removeZoneBox(empty_zone);
 	    }
 	}
@@ -252,7 +273,7 @@ snDraw.Game.Zones = {
 	    var snatched_word_in_this_zone = zone_i.player.index == snatching_player.index;
 	    this.animateResizeRewrapZone(zone_i);
 	    //shuffle the player's words to back fill the gap, in case one of their words was just snatched away.
-	    snDraw.Game.Words.animateRepositionPlayerWords(zone_i.player, snatched_word_in_this_zone);
+	    snDraw.Game.Words.animateRepositionPlayerWords(zone_i.player.index, snatched_word_in_this_zone);
 	}//loop
 
 	// does the player box need to be inserted onto the screen?
@@ -270,7 +291,7 @@ snDraw.Game.Zones = {
 	for(var i=0; i < this.PlayerZone.length; i++){
 	    var ZOi = this.PlayerZone[i];
 	    this.animateResizeRewrapZone(ZOi);
-	    snDraw.Game.Words.animateRepositionPlayerWords(ZOi.player, false);
+	    snDraw.Game.Words.animateRepositionPlayerWords(ZOi.player.index, false);
 	}
     },
 
