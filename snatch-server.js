@@ -4,8 +4,8 @@ module.exports = function (nTiles){
     var tileSet = generateNewRandomTileSet(nTiles);
     var playerSet = [];//this would be an empty player set for game start
     var player_index_from_socketKey_lkup = [];
-    var my_color_palette = shuffle(color_palette.slice(0));
-    var emergency_colors = shuffle(color_palette.slice(0));
+    var my_color_palette = shuffle(generateDistributedRandomColorSet(12));
+    var emergency_colors = shuffle(my_color_palette.slice(0));//duplicated data
     var fiveColorsSent_socketKey = {};
 
     var disconnectedPlayerRefs = [];
@@ -453,6 +453,65 @@ function generateNewRandomTileSet(nTiles){
 
     return(tileset);
 }
+
+
+//code taken from http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
+/**
+ * Converts an HSL color value to RGB. Conversion formula
+ * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+ * Assumes h, s, and l are contained in the set [0, 1] and
+ * returns r, g, and b in the set [0, 255].
+ *
+ * @param   Number  h       The hue
+ * @param   Number  s       The saturation
+ * @param   Number  l       The lightness
+ * @return  Array           The RGB representation
+ */
+function hslToRgb(h, s, l){
+    var r, g, b;
+
+    if(s == 0){
+        r = g = b = l; // achromatic
+    }else{
+        function hue2rgb(p, q, t){
+            if(t < 0) t += 1;
+            if(t > 1) t -= 1;
+            if(t < 1/6) return p + (q - p) * 6 * t;
+            if(t < 1/2) return q;
+            if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+        }
+	
+        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        var p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+    }
+    return 'rgb(' + Math.round(r * 255,0) + ',' + Math.round(g * 255,0) + ',' + Math.round(b * 255,0) + ')';
+}
+
+
+
+function generateDistributedRandomColorSet(n_colors){
+    var myColSet = [];
+
+    var M = [{sat_m: 0.9, sat_s: 0.1, lum_m: 0.40, lum_s: 0.15},
+	     {sat_m: 0.9, sat_s: 0.1, lum_m: 0.70, lum_s: 0.15},
+	     {sat_m: 0.6, sat_s: 0.3, lum_m: 0.50, lum_s: 0.10}];
+
+    var h_rot = 3 * Math.random() / n_colors;
+
+    for (var i = 0; i < n_colors; i++) {
+	var myM = M[i%3];
+	var h_i = ( i/n_colors + h_rot) % 1.0;
+	var s_i = myM.sat_m + (2*Math.random() - 1) * myM.sat_s;
+	var l_i = myM.lum_m + (2*Math.random() - 1) * myM.lum_s;
+	myColSet.push(hslToRgb(h_i, s_i, l_i));
+    }
+    return myColSet;
+}
+
 
 
 //TODO - set up shared code better.

@@ -71,10 +71,8 @@ var Assembler = {
 	    return {ASM: this.Assemblies, best_i: max_score_index};
 	}else{
 	    var AnArbitraryAssembly = this.Assemblies[max_score_index];
-	    if(AnArbitraryAssembly){
+	    if(AnArbitraryAssembly){//if there is no valid assembley, null is returns to indiate so...
 		var word_tileID_array = this.Assembly_to_TileSequence(letter_array, AnArbitraryAssembly);
-	    }else{
-		console.log("this should never happen and I don't know why it would");
 	    }
 	    return word_tileID_array;
 	}
