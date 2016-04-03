@@ -87,7 +87,7 @@ socket.on('new turned tile', function(newTile_info){
 	status: "turned"
     };
     var old_zones_top_coord = snDraw.Game.Zones.playersZoneTopPx;
-    snDraw.Game.Turn.addNewTurnedTile(TI, PI);
+    snDraw.Game.Turn.newTurnedTile_FlyIn_animate(TI, PI);
     snDraw.Game.Grid.shiftTilesUpGrid();//function call is extravagant (inefficient) as it will never cause a shift. We're just using it to correctly set playersZoneTopPx
     var zone_resize_necesary = snDraw.Game.Zones.playersZoneTopPx != old_zones_top_coord;
     snDraw.Game.Controls.updateTurnLetter_number();

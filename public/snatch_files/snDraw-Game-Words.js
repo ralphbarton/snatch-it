@@ -147,10 +147,10 @@ snDraw.Game.Words = {
 	    var r_offset = snDraw.Game.marginUnit;
 	    //being used to put words into the unclaimed zone
 	}else{
-	    var X_left_offset = 0;//
-	    var X_right_offset = 0;//xs
+	    var X_left_offset = snDraw.Game.Zones.uc_Zone_words_L;
+	    var X_right_offset = snDraw.Game.Zones.uc_Zone_words_R;
+	    var y_plotter = snDraw.Game.Zones.uc_Zone_words_T;
 
-	    var y_plotter = 200;//player.y_first_word;
 	    var word_GRPs = [];
 	    for (var i = 0; i < disconnected_players.length; i++){
 		var dPIi = disconnected_players[i].index;

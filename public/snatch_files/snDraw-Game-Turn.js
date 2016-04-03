@@ -3,7 +3,7 @@ snDraw.Game.Turn = {
     //member
     r_spark: undefined,
 
-    addNewTurnedTile: function (tile_index, player_index){
+    newTurnedTile_FlyIn_animate: function (tile_index, player_index){
 	var newTile = snDraw.Game.generateTileObject(tileset[tile_index], tile_index);
 
 	var WW = 1.5 * snDraw.canv_W; 

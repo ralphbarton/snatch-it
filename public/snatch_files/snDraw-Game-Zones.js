@@ -93,6 +93,10 @@ snDraw.Game.Zones = {
 	}
     },
 
+    uc_Zone_words_L: undefined,
+    uc_Zone_words_R: undefined,
+    uc_Zone_words_T: undefined,
+    uc_Zone_words_B: undefined,//note that this variable is set **Externally**
     createUnclaimedZone: function(animate_in){
 
 	var edge_pad = snDraw.Game.tileSize * 0.2;
@@ -101,6 +105,12 @@ snDraw.Game.Zones = {
 	var boxLeft   = edge_pad;
 	var boxTop    = this.unusedTilesBottomPx + edge_pad/2;
 	var boxWidth  = snDraw.canv_W - 2 * edge_pad - u_thickness;
+
+	this.uc_Zone_words_L = edge_pad + u_thickness;
+	this.uc_Zone_words_R = edge_pad + u_thickness;
+	this.uc_Zone_words_T = boxTop + u_thickness;
+
+	//now command all the words to move into 
 //	var boxHeight = //pZone.zone_height;
 
 	//determine the height...
