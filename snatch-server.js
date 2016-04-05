@@ -15,6 +15,7 @@ module.exports = function (nTiles){
     var WC_factory = require('./word_check.js');
     var WordChecker = WC_factory('./dictionaries/sowpods.txt',0);
 
+
     console.log("created snatch game instance on server");
 
     //this is the collection of externally callable functions

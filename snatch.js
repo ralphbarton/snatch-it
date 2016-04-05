@@ -8,17 +8,40 @@ app.get('/', function(req, res){
 });
 
 app.get('/hardreset', function(req, res){
-    myGame = snatchSvr(qty_tiles);//create a snatch game instance with 50 tiles...
+    myGame = snatchSvr_factory(qty_tiles);//create a snatch game instance with 50 tiles...
     X = new Date();
     res.send('Hard reset of the SNATCH server at ' + X);
 });
 
+
+
+
+
+
 app.use(express.static('public'));
 
-var snatchSvr = require('./snatch-server.js');
-
 var qty_tiles = 100;
-var myGame = snatchSvr(qty_tiles);//create a snatch game instance with 50 tiles...
+var snatchSvr_factory = require('./snatch-server.js');
+var myGame = snatchSvr_factory(qty_tiles);//create a snatch game instance with 50 tiles...
+
+var SDC_factory = require('./scrape_definition_client.js');
+var my_SDC = SDC_factory();
+    
+var prev_result = undefined;
+var prev_word = undefined;
+my_SDC.rEvent.on('searchComplete', function(result){
+    prev_result = result;
+
+});
+
+app.get('/definition/*', function(req, res){
+    var frags = req.url.split('/');
+    var word = frags[frags.length-1];
+    my_SDC.lookup_definition(word);
+    res.send('You have just looked up: ' + word + '. <br> Previously, you\
+ looked up ' + prev_word + ' and a search result was:<br>' + prev_result);
+    prev_word = word;
+});
 
 
 io.on('connection', function(socket){

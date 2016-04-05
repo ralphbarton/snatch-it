@@ -96,7 +96,7 @@ snDraw.Game.Zones = {
     uc_Zone_words_L: undefined,
     uc_Zone_words_R: undefined,
     uc_Zone_words_T: undefined,
-    uc_Zone_words_B: undefined,//note that this variable is set **Externally**
+    uc_Zone_words_bottomPx: undefined,//note that this variable is set **Externally**
     createUnclaimedZone: function(animate_in){
 
 	var edge_pad = snDraw.Game.tileSize * 0.2;
@@ -281,7 +281,7 @@ snDraw.Game.Zones = {
 	    //second parameter true prevents it from attempting to shuffle the final word (already present as data), as it will not yet be existant as a fabric group 
 	    var zone_i = this.PlayerZone[i];
 	    var snatched_word_in_this_zone = zone_i.player.index == snatching_player.index;
-	    this.animateResizeRewrapZone(zone_i);
+	    this.animateResizeZoneBox(zone_i);
 	    //shuffle the player's words to back fill the gap, in case one of their words was just snatched away.
 	    snDraw.Game.Words.animateRepositionPlayerWords(zone_i.player.index, snatched_word_in_this_zone);
 	}//loop
@@ -300,12 +300,12 @@ snDraw.Game.Zones = {
 	this.calculatePlayerZoneSizes();
 	for(var i=0; i < this.PlayerZone.length; i++){
 	    var ZOi = this.PlayerZone[i];
-	    this.animateResizeRewrapZone(ZOi);
+	    this.animateResizeZoneBox(ZOi);
 	    snDraw.Game.Words.animateRepositionPlayerWords(ZOi.player.index, false);
 	}
     },
 
-    animateResizeRewrapZone: function(myZone){
+    animateResizeZoneBox: function(myZone){
 
 	//animate the name and the box outline
 	var bxFab = myZone.FabObjects;
