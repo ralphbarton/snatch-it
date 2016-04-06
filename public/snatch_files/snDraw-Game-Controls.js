@@ -321,26 +321,21 @@ snDraw.Game.Controls = {
 	    var fps = (1000/snDraw.frameperiod_measured);//TODO: fps is not fixed for different platforms. It needs to be measured upon page load.
 	    var f_tot = Math.round(dur*fps,0);//whole number of frames...
 	    
+	    var start_time = (new Date()).getTime();
+
 	    RoundedRec.setStrokeDashArray([0, l_tot]);
 
 	    this.cancelTurnDisabled=false;
 	    snDraw.FrameTargetsArray.push({
-		//these persistant data are set for the lifespan of the function below.
-		count:0,
-		start_time: undefined, // this is just code instrumentation...
 		frame: function(){
-		    if(this.count==0){this.start_time = new Date();}
-		    this.count++;
-		    var solid_len = (this.count/f_tot)*l_tot;
+		    var time_now = (new Date()).getTime();
+		    var progress_fraction = (time_now-start_time) / (1000 * dur);
+		    var solid_len = progress_fraction * l_tot;
 		    RoundedRec.setStrokeDashArray([solid_len, l_tot-solid_len]);
-		    if((this.count > f_tot)||(snDraw.Game.Controls.cancelTurnDisabled)){//animation completed...
+		    if((progress_fraction>=1)||(snDraw.Game.Controls.cancelTurnDisabled)){//animation completed...
 			//restore the visual state of the button to normal
 			RoundedRec.setStrokeDashArray(null);
 			snDraw.Game.Controls.setButtonDisabled(1, false);//un-disable the "Turn Letter" button
-			//instrumentation....
-			var end_time = new Date();
-			//TODO: make the animation duration more accurate...
-			//console.log("The animation was meant to take " + dur + " seconds; measured as " + (end_time.getTime() - this.start_time.getTime())/1000);
 			return true; //this means the function call chain shall terminate
 		    }else{
 			return false; // function call chain to continue
