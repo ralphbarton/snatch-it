@@ -157,12 +157,14 @@ io.on('connection', function(socket){
 	var letters = [];
 	var tileID_first = undefined
 	var tileID_final = undefined
+	var fl_player = undefined
 	for (var i = 0; i < n_tiles; i++){
 	    var newTile_info = myGame.flipNextTile(socket.id);
 	    if(newTile_info){
 		io.emit('new turned tile', newTile_info);
 		letters.push(newTile_info.tile_letter);
 		tileID_final = newTile_info.tile_index
+		fl_player = newTile_info.flipping_player;
 		if(i==0){tileID_first = newTile_info.tile_index;}
 	    }else{
 		break;
@@ -170,7 +172,7 @@ io.on('connection', function(socket){
 	}
 
 	if(tileID_final !== undefined){
-	    console.log("PI=" + newTile_info.flipping_player + " has turned multiple tiles at once, from\
+	    console.log("PI=" + fl_player + " has turned multiple tiles at once, from\
  tileID=" + tileID_first + " to tileID=" + tileID_final + ". The letters are: " + letters);
 	}else{
 	    console.log("All tiles turned");

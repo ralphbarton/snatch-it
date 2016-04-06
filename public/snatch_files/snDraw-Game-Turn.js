@@ -5,6 +5,7 @@ snDraw.Game.Turn = {
 
     newTurnedTile_FlyIn_animate: function (tile_index, player_index){
 	var newTile = snDraw.Game.generateTileObject(tileset[tile_index], tile_index);
+	newTile.visual = "animating_in";
 
 	var WW = 1.5 * snDraw.canv_W; 
 	var HH = 0.25 * (snDraw.canv_H + snDraw.canv_W);
@@ -61,6 +62,17 @@ snDraw.Game.Turn = {
 	    newTileObscurer.grpCoords = {x:loc_left, y:loc_top};
 	    newTileObscurer.centerCoords = {x: loc_left + hts, y: loc_top + hts};
 	    snDraw.Game.Turn.disperseObscurer(newTileObscurer);
+
+	    //the start of dispersing the obscurer is also treated as when the tile really exists (before it is not visible)
+	    newTile.visual = "flipped";
+
+	    //This is a little expensive, but any new tile has the potential to change letter availability
+	    if(snDraw.Game.Spell.SkeletalLetters.length>0){ // irrelivant if the speller is empty
+		snDraw.Game.Spell.recolourAll(snDraw.Game.Spell.ListAllVisibleTilesOf(newTile.letter));
+		snDraw.Game.Spell.indicateN_validMoves_onButton();//also re-indicate how to make
+	    }
+
+
 	};
 
 	//apply the SAME animation to the obscurer:

@@ -133,8 +133,10 @@ var Assembler = {
 	//determine how many instances of 'letter' are in play (i.e. visible, whether in word or free)
 	for (var i=0; i<tileset.length; i++){
 	    if (tileset[i].status == 'turned'){
-		free_letter_array.push(tileset[i].letter);
-	    } 
+		if(snDraw.Game.TileArray[i].visual != "animating_in"){
+		    free_letter_array.push(tileset[i].letter);
+		}	    
+	    }
 	}
 	this.freeLettersTally = this.wordTally(free_letter_array);
     },
@@ -267,8 +269,8 @@ var Assembler = {
 	var tile_index_matching_letter = undefined;
 	find_tile_index:
 	for (var i = tileset.length-1; i>=0; i--){
-	    if ((tileset[i].status == 'turned')&&(tileset[i].letter==myletter)){
-		if(snDraw.Game.TileArray[i].visual != "ACTIVE"){
+	    if ((tileset[i].status == 'turned')&&(tileset[i].letter == myletter)){
+		if(snDraw.Game.TileArray[i].visual != "animating_in"){
 		    if(n_skips == 0){
 			tile_index_matching_letter = i;
 			break find_tile_index;

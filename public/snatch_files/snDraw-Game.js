@@ -130,9 +130,9 @@ snDraw.Game = {
 
 	if(tile.status == "turned"){this.modifyTileObject(myNewTileObj,"flipped");}
 	if(tile.status == "inword"){this.modifyTileObject(myNewTileObj,"flipped");}
+
+	//note that tile.status does not refer to a real member of the 'tileset' array, necessarily
 	if(tile.status == "skeletal"){this.modifyTileObject(myNewTileObj,"skeletal");}
-	if(tile.status == "partial"){this.modifyTileObject(myNewTileObj,"partial");}
-	if(tile.status == "shadow"){this.modifyTileObject(myNewTileObj,"shadow");}
 
 	//add flat-array reference to the object
 	this.TileArray[tile_id] = myNewTileObj;
@@ -141,7 +141,7 @@ snDraw.Game = {
     },
 
 
-    modifyTileObject: function(myTile,to_state,options){
+    modifyTileObject: function(myTile,to_state){
 	//record the visual state of the tile as part of the object
 	myTile.visual = to_state;
 
