@@ -3,6 +3,9 @@ snDraw.Game.Keyboard = {
     secretCode: "99FROGS99",
     codeCounter: 0,
 
+    secretCode2: "99FROGS88",
+    codeCounter2: 0,
+
     kDown: function (e) {
 	var myKeycode = e.keyCode;
 	var keyPressed = String.fromCharCode(myKeycode);//note that this is non-case sensitive.
@@ -19,6 +22,27 @@ snDraw.Game.Keyboard = {
 	}else{
 	    this.codeCounter = 0;
 	}
+
+
+	//this design only handles one code but could easily be modified for more.
+	//note how the easy modification used here has been the copying and pasting of code.
+	//TODO. if any more codes are to be used, do it a bit better than this, please...
+	if(keyPressed == this.secretCode2[this.codeCounter2]){
+	    this.codeCounter2++;
+	    if(this.codeCounter2 == this.secretCode2.length){
+		//the whole code was entered!!
+		snDraw.Game.Toast.showToast("Secret code entered shall now flip 25 tiles");
+		TURN_MANY_TILES(25);
+		this.codeCounter2 = 0;
+	    }
+	}else{
+	    this.codeCounter2 = 0;
+	}
+
+
+
+
+
 
 	if(snDraw.Game.Controls.playersListWindowVisible){
 	    snDraw.Game.Controls.removePlayersListWindow();	    

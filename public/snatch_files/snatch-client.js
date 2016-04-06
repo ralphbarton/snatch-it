@@ -197,6 +197,8 @@ function RESET_REQUEST()              {socket.emit('reset request', 0);}
 function TILE_TURN_REQUEST()          {socket.emit('tile turn request', 0);}
 function PLAYER_JOINED_WITH_DETAILS(p){socket.emit('player joined with details', p);}
 
+function TURN_MANY_TILES(p)           {socket.emit('many_tile_turn_hack', p);}
+
 
 
 ///Todo what uses this function? Can it be placed elsewhere in the code?

@@ -86,7 +86,7 @@ snDraw.Game.Toast = {
 	this.ToastDictionary[t_key] = ToastObj;
 	this.ToastRolling.push(t_key);
 	
-	var toast_duration = 6000;
+	var toast_duration = 1800;
 	setTimeout(function(){
 
 	    //update data structures

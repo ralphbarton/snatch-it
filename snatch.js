@@ -138,6 +138,7 @@ io.on('connection', function(socket){
 
 
 
+
     //client requests to turn over a tile
     socket.on('tile turn request', function(blank_msg){
 	var newTile_info = myGame.flipNextTile(socket.id);
@@ -148,6 +149,34 @@ io.on('connection', function(socket){
 	    console.log("All tiles turned - flip message recieved...");
 	}
     });
+
+
+    //client requests to turn over a tile
+    socket.on('many_tile_turn_hack', function(n_tiles){
+
+	var letters = [];
+	var tileID_first = undefined
+	var tileID_final = undefined
+	for (var i = 0; i < n_tiles; i++){
+	    var newTile_info = myGame.flipNextTile(socket.id);
+	    if(newTile_info){
+		io.emit('new turned tile', newTile_info);
+		letters.push(newTile_info.tile_letter);
+		tileID_final = newTile_info.tile_index
+		if(i==0){tileID_first = newTile_info.tile_index;}
+	    }else{
+		break;
+	    }
+	}
+
+	if(tileID_final !== undefined){
+	    console.log("PI=" + newTile_info.flipping_player + " has turned multiple tiles at once, from\
+ tileID=" + tileID_first + " to tileID=" + tileID_final + ". The letters are: " + letters);
+	}else{
+	    console.log("All tiles turned");
+	}
+    });
+
 
 });
 
