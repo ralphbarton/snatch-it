@@ -347,6 +347,169 @@ snDraw.Game.Zones = {
 	    });
 
 	}
+    },
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// NEW FUNCTIONS HERE...
+
+    Style = { //all in pixels
+	hpad // horizonal padding
+	fill // inside the box
+	color // text colour and box boundary
+	thick // thickness of the box line
+	text // Text of the title
+	justify // justification of the title
+	fontsize // refers to the font of the title
+	isClient // boolean, means extra
+	scale_you // scaling of the block saying "you"
+	scale_tri // scaling of the triangle/pointer
+    }
+
+
+    CreateZoneBox: function(Height, Style){
+	
+	var boxLeft   = Style.hpad + Style.thick/2;
+	var boxWidth  = snDraw.canv_W - 2 * Style.hpad - Style.thick;
+
+	var zoneBox = new fabric.Rect({
+	    left: boxLeft,
+	    width: boxWidth,
+	    height: Height,
+	    fill: Style.fill,
+	    stroke: Style.color,
+	    strokeWidth: Style.thick
+	});
+
+	var plrName = new fabric.Text(pZone.player.name,{
+	    left: //ahem...
+	    fontSize: Style.fontsize,
+	    textBackgroundColor: Style.fill,
+	    fill: Style.color
+	});
+
+	//maybe do it like this, or differently?
+	//var ObjectArray = [zoneBox,plrName];
+
+	if(Style.isClient){
+	    var boxRight = boxLeft + boxWidth;
+
+	    var youBlock = new fabric.Rect({
+		left: (boxRight - Style.scale_you),
+		width: (Style.scale_you * 2),
+		height: Style.scale_you,
+		fill: Style.color
+	    });
+
+	    var youText = new fabric.Text("You",{
+	    	left: (boxRight - Style.scale_you * 1.8),
+		fill: snDraw.Game.bg_col,
+		fontSize: Style.scale_you * 0.46,
+		fontWeight: 'bold',
+	    });
+
+	    var spellPointer = new fabric.Triangle({
+		left: boxLeft + cell * 0.25,//due to rotation, left is effectively right
+		top: labelTop - (cell * 0.58),
+		width: (cell * 0.3),//is actually height, due to rotation
+		height: (cell * 0.22),//is actually width, due to rotation
+		fill: pZone.player.color,
+		angle: 90
+	    });
+
+
+	    //"Spell Pointer" is a triangle that points to the word being spelled
+	    snDraw.Game.Spell.SpellBottomPx = labelTop - cell * 0.05;
+	    snDraw.Game.Spell.SpellLeftPx = boxLeft + cell * 0.3;
+
+	    //maybe do it like this, or differently?
+	    ObjectArray.push(youBlock, youText, spellPointer);
+
+
+	}
+
+    },
+
+    DetermineZoneBoxObjectsVerticalCoordinates: function(Top, Height, Style){
+	var box_top = Top + Style.fontsize/2;
+	var box_bottom = box_top + Height;
+	return {
+	    zoneBox_top: box_top,
+	    plrName_top: Top,
+	    youBlock_top: (box_bottom - Style.scale_you),
+	    youText_top: (box_bottom - Style.scale_you),
+	    spellPointer_top: (box_bottom - Style.scale_you)
+	};
+    },
+
+
+    createZoneBox_TEAR_UP: function(pZone, animate_from_left){
+
+
+	var ObjectArray = [zoneBox,plrName];
+
+	//label if YOU
+	if(pZone.is_client){
+	    
+
+
+	}
+
+	pZone.FabObjects = [];
+	for(var i = ObjectArray.length-1; i >= 0; i--){
+	    var OB = ObjectArray[i];
+	    OB.set({
+		hasControls: false,
+		hasBorders: false,
+		lockMovementX: true,
+		lockMovementY: true,
+		selectable: false
+	    });
+	    canvas.insertAt(OB,i);//this uses i as the z-index for placement of object on Canvas...
+	    pZone.FabObjects[i] = OB;
+	    
+	    if(animate_from_left){
+		var origX = OB.getLeft();
+
+		//place the object outside the Canvas (setting this position is non animated)
+		snDraw.moveSwitchable(OB, false, null,{
+		    left: origX - snDraw.canv_W,
+		});
+
+		//move in (animated)
+		snDraw.moveSwitchable(OB, true, snDraw.ani.sty_Join,{
+		    left: origX,
+		});
+	    }
+	}
+
+	//array item [1] this is the name text...
+	ObjectArray[1].bringForward();//so that it shows above the line..
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    AnimateZoneBox: function(xxx){
+
+    },
+
+
+    CalculateAllZoneSizes: function(xxx){
+
     }
 
 };

@@ -226,7 +226,7 @@ snDraw.Game.Words = {
 
 
     // see makeTilesDraggableGroup [68]
-    CreateWordAsNewTileGroupAtOrigin: function(WordTileArray, Spacings, owner_player){
+    CreateWordAsTileGroupAtOrigin: function(WordTileArray, Spacings, owner_player){
 
 	//remove all single tiles (after animation), so that they can be re-added as a group...
 	//arrange them as word, based at the origin
