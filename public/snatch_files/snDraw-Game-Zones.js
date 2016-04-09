@@ -488,9 +488,64 @@ snDraw.Game.Zones = {
     },
 
 
+    // the parameter 'TargetDims' will be null if it is an animation exit
 
-    AnimateZoneBox: function(xxx){
-	
+    AnimateZoneBox: function(BoxObjs, Height, TargetDims, ani_sty, ani_type, direction){
+
+	if(ani_type == "entry"){
+	    for(var i = 0; i < BoxObjs.length; i++){
+
+		var target_off = {};
+		if(direction == "left"){
+		    target_off.left =
+
+		}else if(direction == "right"){
+		    target_off.left =
+
+		}else if(direction == "top"){
+		    target_off.top =
+
+		}else if(direction == "bottom"){
+		    TargetDims.top =
+		}
+
+		//this is to statically place object in starting position
+		BoxObjs[i].set({
+
+		});
+
+		//this sets it animating
+
+
+	    }
+	}else if(ani_type == "exit"){
+
+	    //this is ugly: we're now inferring a specific set of objects, where the 'top' of array[1] is the top overall
+	    var BT = BoxObjs[1].top;
+
+	    for(var i = 0; i < BoxObjs.length; i++){
+
+		var target_off = {};
+		if(direction == "left"){
+		    target_off.left = BoxObjs[i].getLeft() - snDraw.canv_W;
+
+		}else if(direction == "right"){
+		    target_off.left = BoxObjs[i].getLeft() + snDraw.canv_W;
+
+		}else if(direction == "top"){
+		    target_off.top = BoxObjs[i].getTop() - (Height + BT);
+
+		}else if(direction == "bottom"){
+		    TargetDims.top = BoxObjs[i].getTop() + (snDraw.canv_H - BT);
+		}
+
+		//with object deletion upon animation completion built in...
+		snDraw.moveSwitchable(BoxObjs[i], function(){canvas.remove(BoxObjs[i]);}, ani_sty, target_off);
+	    }
+
+	}else if(ani_type == "size asjust"){
+
+	}
     },
 
 
