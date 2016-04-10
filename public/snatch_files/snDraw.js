@@ -128,7 +128,19 @@ var snDraw = {
 	this.nAnimations--;
     },
 
-    moveSwitchable: function(FabricObject,animate_onComplete,animation_style,properties){
+/*
+Parameters:
+
+animate_onComplete
+ - if it is a function, this function is called upon completion of the animation
+ - if it is boolean TRUE, use animation (but with no custom callback upon competion)
+ - if it boolean FALSE, do not use animation, just place it..
+
+animation_style
+ - object to define the duration and easing of the animation...
+
+*/
+    moveSwitchable: function(FabricObject, animate_onComplete, animation_style, properties){
 	var my_onComplete = undefined;
 
 	if(typeof(animate_onComplete)=='function'){//a custom on-complete function has been supplied

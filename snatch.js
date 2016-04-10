@@ -155,10 +155,12 @@ io.on('connection', function(socket){
     socket.on('many_tile_turn_hack', function(n_tiles){
 
 	var letters = [];
-	var tileID_first = undefined
-	var tileID_final = undefined
-	var fl_player = undefined
-	for (var i = 0; i < n_tiles; i++){
+	var tileID_first = undefined;
+	var tileID_final = undefined;
+	var fl_player = undefined;
+	var period = 100;
+
+	var R1 = function(i){
 	    var newTile_info = myGame.flipNextTile(socket.id);
 	    if(newTile_info){
 		io.emit('new turned tile', newTile_info);
@@ -166,17 +168,20 @@ io.on('connection', function(socket){
 		tileID_final = newTile_info.tile_index
 		fl_player = newTile_info.flipping_player;
 		if(i==0){tileID_first = newTile_info.tile_index;}
-	    }else{
-		break;
+		if(i < n_tiles){setTimeout(function(){R1(i+1);},period);}//here is the recursive call achieving simple looping...
 	    }
-	}
+	    if(i >= n_tiles){
+		if(tileID_final !== undefined){
+		    console.log("PI=" + fl_player + " has turned multiple tiles at once, from\
+tileID=" + tileID_first + " to tileID=" + tileID_final + ". The letters are: " + letters);
+		}else{
+		    console.log("All tiles turned");
+		}
 
-	if(tileID_final !== undefined){
-	    console.log("PI=" + fl_player + " has turned multiple tiles at once, from\
- tileID=" + tileID_first + " to tileID=" + tileID_final + ". The letters are: " + letters);
-	}else{
-	    console.log("All tiles turned");
-	}
+	    }
+	};
+	R1(0);
+
     });
 
 

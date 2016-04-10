@@ -1,8 +1,4 @@
 snDraw.Game.Grid = {
-    //member objects
-    TileGrid: undefined,
-    Grid_xPx: [],
-    Grid_yPx: [],
 
     createEveryTileObject_inGridAtTop: function (){
 
@@ -154,4 +150,130 @@ snDraw.Game.Grid = {
 	    }
 	}
     },
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// NEW FUNCTIONS HERE...
+
+    //member objects
+    TileGrid: [[]],
+    xGridOrigin: undefined,
+    yGridOrigin: undefined,
+    xy_incr: undefined,
+    n_tiles_row: undefined,
+    
+    InitialiseGrid: function(){
+
+	var min_edge_pad = snDraw.Game.tileSize * 0.2;
+	this.xy_incr = snDraw.Game.tileSize + snDraw.Game.tile_space_px;
+	this.n_tiles_row = Math.floor( (snDraw.canv_W-min_edge_pad) / this.xy_incr );
+	var width_used = (this.n_tiles_row-1) * this.xy_incr + snDraw.Game.tileSize;
+	var left_pad = (snDraw.canv_W-width_used)/2;
+
+	this.xGridOrigin = left_pad;
+	this.yGridOrigin = snDraw.Game.Controls.underneath_buttons_px;
+
+	//var n_rows_max = Math.ceil(tilestats.n_tiles / this.n_tiles_row);
+    },
+
+    //as a side effect, this function displays the moved tile on screen.
+    //it sets the location without animation.
+    AddLetterToGrid: function(TileObject, ani_oC, ani_sty){
+
+	//find empty grid slot
+	//get to a row with space
+	row = 0;
+	while(true){
+	    var col = undefined;
+	    var c_count = 0;
+	    while(col == undefined){//gets an empty column
+		if(this.TileGrid[row][c_count]===undefined){
+		    col = c_count;
+		}
+		c_count++;
+	    }
+	    if(col < this.n_tiles_row){//it's a valid column (within bounds...)
+		break;
+	    }else{
+		row++;
+		if(this.TileGrid[row] == undefined){
+		    this.TileGrid.push([]);
+		}
+	    }
+	}
+	
+	//put the tile in the grid
+	this.PlaceTileInGrid(TileObject.tileID, row, col, ani_oC, ani_sty);
+	
+    },
+
+
+    DetachLetterSetFromGrid: function(tileIDs, ani_sty){
+
+	//1. Remove references
+	//it is an array of tiles supplied...
+	for (var i=0; i<tileIDs.length; i++){
+	    var TID = tileIDs[i];
+	    var TileObj = snDraw.Game.TileArray[TID];
+	    //if present, remove references (i.e. follow the tile's reference to its grid location)
+	    if(TileObj.Grid_row !== null){
+		this.TileGrid[TileObj.Grid_row][TileObj.Grid_col] = null;//now nullify forward ref
+		TileObj.Grid_row = null;//nullify back-refs:
+		TileObj.Grid_col = null;
+	    }
+	}
+
+	//2. shuffle all tiles into these new gaps defined
+	var max_col_height = 0;
+	for (var c = 0; c < this.n_tiles_row; c++){//loop through all COLUMNS
+	    var n_tiles_in_col = 0; //counts tiles in this column
+	    for (var r = 0; r < this.TileGrid.length; r++){//loop through all ROWS
+		var TID = this.TileGrid[r][c];
+		if(TID != null){//is there a tile here in the grid?
+		    n_tiles_in_col++;
+		    var min_row_index = n_tiles_in_col - 1;
+		    if(min_row_index < r){//could it be shifted up?
+			this.PlaceTileInGrid(TID, min_row_index, c, true, ani_sty);
+		    }
+		}
+	    }
+	    //record the height of the heighest column (in order to adjust player zone size)
+	    if(n_tiles_in_col > max_col_height){
+		max_col_height = n_tiles_in_col;
+	    }
+	}
+
+	//3. Return the height of the grid in its new state.
+	var grid_height = (max_col_height==0? snDraw.Game.marginUnit : this.Grid_yPx[max_col_height-1]);
+	return grid_height;
+
+    },
+
+
+
+    ReshapeGrid: function(){},
+
+
+    PlaceTileInGrid: function(tile_index,row,col, ani_oC, ani_sty){
+
+	var TileObject = snDraw.Game.TileArray[tile_index];
+
+	//update the GRID -> TILE references
+	//only happens if tile already on grid.
+	if(TileObject.Grid_row!=undefined){this.TileGrid[TileObject.Grid_row][TileObject.Grid_col] = null;}
+	this.TileGrid[row][col] = tile_ID;
+
+	//set the TILE -> GRID references
+	TileObject.Grid_row = row;
+	TileObject.Grid_col = col;
+
+	//move the tile object to the canvas location identified
+	snDraw.moveSwitchable(TileObject, ani_oC, ani_sty,{
+	    left: (col * this.xy_incr + this.xGridOrigin),
+	    top: (row * this.xy_incr + this.yGridOrigin)
+	});
+    }
+
 };

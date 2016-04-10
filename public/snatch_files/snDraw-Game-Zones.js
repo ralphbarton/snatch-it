@@ -373,6 +373,7 @@ snDraw.Game.Zones = {
     }
 */
 
+
     CreateZoneBox: function(Height, Style){
 	
 	var boxWidth  = snDraw.canv_W - 2 * Style.hpad - Style.thick;
@@ -492,21 +493,22 @@ snDraw.Game.Zones = {
 
     AnimateZoneBox: function(BoxObjs, Height, TargetDims, ani_sty, ani_type, direction){
 
+	
 	if(ani_type == "entry"){
 	    for(var i = 0; i < BoxObjs.length; i++){
 
 		var target_off = {};
 		if(direction == "left"){
-		    target_off.left =
+		    target_off.left = null;//TODO
 
 		}else if(direction == "right"){
-		    target_off.left =
+		    target_off.left = null;//todo
 
 		}else if(direction == "top"){
-		    target_off.top =
+		    target_off.top = null;//TODO
 
 		}else if(direction == "bottom"){
-		    TargetDims.top =
+		    TargetDims.top = null;//TODO
 		}
 
 		//this is to statically place object in starting position
@@ -544,13 +546,13 @@ snDraw.Game.Zones = {
 	    }
 
 	}else if(ani_type == "size asjust"){
-
+	    return null
 	}
     },
 
 
     CalculateAllZoneSizes: function(xxx){
-
+	return null;
     }
 
 };
