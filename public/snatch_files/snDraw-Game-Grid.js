@@ -163,24 +163,30 @@ snDraw.Game.Grid = {
     yGridOrigin: undefined,
     xy_incr: undefined,
     n_tiles_row: undefined,
+
+/*
+	Spacings { //all in pixels
+	    ts: (this.tileSize), //tile size
+	    lg: (this.tileSize * 0.04), //letter gap (gap only)
+	    tslg: (this.tileSize * 1.04), //tile size added to letter gap
+	    tsgg: (this.tileSize * 1.14), //tile size added to grid gap
+	    wg: (this.tileSize * 0.6), // word gap (gap only)
+	    vg: (this.tileSize * 0.12) //vertical gap (gap only)
+	};
+*/
+
     
-    InitialiseGrid: function(){
+    InitialiseGrid: function(Spacings){
 
-	var min_edge_pad = snDraw.Game.tileSize * 0.2;
-	this.xy_incr = snDraw.Game.tileSize + snDraw.Game.tile_space_px;
-	this.n_tiles_row = Math.floor( (snDraw.canv_W-min_edge_pad) / this.xy_incr );
-
-	var width_used = (this.n_tiles_row-1) * this.xy_incr + snDraw.Game.tileSize;
-	console.log(width_used);
-	console.log(snDraw.canv_W);
+	var min_edge_pad = Spacings.ts * 0.2;
+	this.n_tiles_row = Math.floor( (snDraw.canv_W-min_edge_pad) / Spacings.tsgg );
+	var width_used = (this.n_tiles_row-1) * Spacings.tsgg + Spacings.ts;
 	var left_pad = (snDraw.canv_W-width_used)/2;
-	console.log(left_pad);
 
 	var tile_stroke_prop = 0.06;
-	this.xGridOrigin = left_pad - snDraw.Game.tileSize*tile_stroke_prop/2;
+	this.xGridOrigin = left_pad - Spacings.ts*tile_stroke_prop/2;
 	this.yGridOrigin = snDraw.Game.Controls.underneath_buttons_px;
-
-	//var n_rows_max = Math.ceil(tilestats.n_tiles / this.n_tiles_row);
+	this.xy_incr = Spacings.tsgg;
     },
 
     // This function handles the visual canvas placement, as well as the logic for ensuring that the tile is added

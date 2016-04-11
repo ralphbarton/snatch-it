@@ -74,6 +74,16 @@ snDraw.Game = {
 	this.x_plotter_R = 2 * this.marginUnit + this.stroke_px;
 	this.tile_space_px = this.tileSize * grid_letter_spacing;
 	this.client_col = players[client_player_index].color;
+
+	return { //all in pixels
+	    ts: (this.tileSize), //tile size
+	    lg: (this.tileSize * 0.04), //letter gap (gap only)
+	    tslg: (this.tileSize * 1.04), //tile size added to letter gap
+	    tsgg: (this.tileSize * 1.14), //tile size added to grid gap
+	    wg: (this.tileSize * 0.6), // word gap (gap only)
+	    vg: (this.tileSize * 0.12) //vertical gap (gap only)
+	};
+
     },
 
     generateTileObject: function(tile,tile_id){

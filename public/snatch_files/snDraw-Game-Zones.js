@@ -386,7 +386,7 @@ snDraw.Game.Zones = {
 	    strokeWidth: Style.thick
 	});
 
-	var plrName = new fabric.Text(pZone.player.name,{
+	var plrName = new fabric.Text(Style.text,{
 	    fontSize: Style.fontsize,
 	    textBackgroundColor: Style.fill,
 	    fill: Style.color
@@ -551,7 +551,7 @@ snDraw.Game.Zones = {
     },
 
 
-    CalculateAllZoneSizes: function(xxx){
+    CalculateAllZoneSizes: function(ArrangementsArray){
 	return null;
     }
 
