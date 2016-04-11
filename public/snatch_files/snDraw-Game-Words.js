@@ -233,7 +233,7 @@ snDraw.Game.Words = {
 	for (var i=0; i<WordTileArray.length; i++){
 	    canvas.remove(WordTileArray[i]);
 	    WordTileArray[i].set({
-		left: (i * snDraw.Game.tileSize * (1+Spacings.r_letter_gap)),
+		left: (i * Spacings.tslg),
 		top: 0
 	    });
 	}
@@ -249,7 +249,7 @@ snDraw.Game.Words = {
 	//customise the properties of the word group...
 	WordGRP.OwnerPlayer = owner_player;
 	this.TileGroupsArray[owner_player.index].push(WordGRP);
-	canvas.add(PlayerWordGRP);
+	canvas.add(WordGRP);
 
 	return WordGRP;
     },

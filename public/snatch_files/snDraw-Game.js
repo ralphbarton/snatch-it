@@ -65,7 +65,7 @@ snDraw.Game = {
 	this.tileSize = Math.round(tile_dim);
 	
 	this.marginUnit = this.tileSize*0.13;
-	this.textMarginUnit = this.tileSize*0.2;
+	/*this.textMarginUnit = this.tileSize*0.2;*/ // though others are now redundant too...
 	this.stroke_px = Math.round(this.marginUnit * 0.5);
 	
 	this.h_space_word = this.tileSize * 0.6;//define a constant: additional horizonal spacing pixels to use for a space between words
@@ -77,11 +77,14 @@ snDraw.Game = {
 
 	return { //all in pixels
 	    ts: (this.tileSize), //tile size
-	    lg: (this.tileSize * 0.04), //letter gap (gap only)
+	    lg: (this.tileSize * 0.04), //letter gap (gap only) - "letter gap" refers to the gaps between letters within words. 
 	    tslg: (this.tileSize * 1.04), //tile size added to letter gap
 	    tsgg: (this.tileSize * 1.14), //tile size added to grid gap
 	    wg: (this.tileSize * 0.6), // word gap (gap only)
-	    vg: (this.tileSize * 0.12) //vertical gap (gap only)
+	    vg: (this.tileSize * 0.12), //vertical gap (gap only)
+	    grpad: (this.tileSize * 0.20), // minimum horizonal padding of the left and the right of the grid of letters
+	    ingh: (this.tileSize * 0.20), // inside a zone box, this is the horizonal padding between the inner wall and a letter
+	    ingt: (this.tileSize * 0.20) // inside a zone box, this is the vertical padding between the upper wall and a letter
 	};
 
     },

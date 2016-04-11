@@ -552,7 +552,59 @@ snDraw.Game.Zones = {
 
 
     CalculateAllZoneSizes: function(ArrangementsArray){
+	var nZones = this.PlayerZone.length;
 	return null;
-    }
+    },
+
+
+    calculatePlayerZoneSizes_tearup: function(){
+	var nZones = this.PlayerZone.length;
+	n_letters_in_zone = [];
+	n_letters_played = 0;
+	
+	//count the number of letters each player has, and total letters used within words
+	for(var i=0; i<nZones; i++){
+	    n_letters_in_zone[i] = 0;
+	    for(var j=0; j < this.PlayerZone[i].player.words.length; j++){
+		n_letters_in_zone[i] += this.PlayerZone[i].player.words[j].length;
+	    }
+	    n_letters_played += n_letters_in_zone[i];
+	}
+
+	//Determine the height coordinate of the top of all of the zones
+	var plr_top_cumulator = undefined;
+	plr_top_cumulator = Math.round(this.unusedTilesBottomPx + snDraw.Game.marginUnit);
+
+	//determine total amount of height contained within players' zone boxes
+	section_height = snDraw.canv_H - plr_top_cumulator;
+	zones_sum_height = section_height - nZones * snDraw.Game.stroke_px - (nZones-1)*snDraw.Game.textMarginUnit - snDraw.Game.marginUnit;
+	basic_height = snDraw.Game.tileSize + 4*snDraw.Game.marginUnit;
+	shareable_height = zones_sum_height - nZones * basic_height;
+
+	for(var i=0; i<nZones; i++){
+	    //now, we don't want to go dividing by zero if it's a new game with nothing played!!
+	    var hRatio = 0;
+	    if(n_letters_played){
+		hRatio = n_letters_in_zone[i] / n_letters_played;
+	    }else{
+		hRatio = 1 / nZones;
+	    }
+
+	    var zone_i = this.PlayerZone[i];
+
+	    //this line of code adds the attribute calculated to the relevant player object within the array...
+	    zone_i.zone_height = basic_height + Math.round( hRatio * shareable_height );
+	    zone_i.zone_top = plr_top_cumulator;
+
+	    //set the base coordinates:
+	    zone_i.player.x_next_word = snDraw.Game.x_plotter_R;
+	    zone_i.player.y_first_word = zone_i.zone_top + 1.8 * snDraw.Game.marginUnit;
+	    zone_i.player.y_next_word = zone_i.player.y_first_word;
+
+	    plr_top_cumulator += this.PlayerZone[i].zone_height + snDraw.Game.textMarginUnit + snDraw.Game.stroke_px;
+	}
+    },
+
+
 
 };

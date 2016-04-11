@@ -178,8 +178,7 @@ snDraw.Game.Grid = {
     
     InitialiseGrid: function(Spacings){
 
-	var min_edge_pad = Spacings.ts * 0.2;
-	this.n_tiles_row = Math.floor( (snDraw.canv_W-min_edge_pad) / Spacings.tsgg );
+	this.n_tiles_row = Math.floor( (snDraw.canv_W - 2*Spacings.grpad) / Spacings.tsgg );
 	var width_used = (this.n_tiles_row-1) * Spacings.tsgg + Spacings.ts;
 	var left_pad = (snDraw.canv_W-width_used)/2;
 

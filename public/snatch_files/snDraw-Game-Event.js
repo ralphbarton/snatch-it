@@ -13,10 +13,11 @@ snDraw.Game.Event = {
 	// 3. Create all the grid tiles...
 	snDraw.Game.Grid.InitialiseGrid(Spacings);
 	for (var i = 0; i < tilestats.n_turned; i++){
-	    //generate a tile
-	    var TileObject_i = snDraw.Game.generateTileObject(tileset[i], i);
-	    //put it into grid
-	    snDraw.Game.Grid.AddLetterToGrid(TileObject_i, false, null);
+	    if(tileset[i].status == "turned"){
+		//generate tile & put in grid
+		var TileObject_i = snDraw.Game.generateTileObject(tileset[i], i);
+		snDraw.Game.Grid.AddLetterToGrid(TileObject_i, false, null);
+	    }
 	}
 
 	// 4. Create the zones containers (this is NOT visually creating the zones)
