@@ -169,17 +169,23 @@ snDraw.Game.Grid = {
 	var min_edge_pad = snDraw.Game.tileSize * 0.2;
 	this.xy_incr = snDraw.Game.tileSize + snDraw.Game.tile_space_px;
 	this.n_tiles_row = Math.floor( (snDraw.canv_W-min_edge_pad) / this.xy_incr );
-	var width_used = (this.n_tiles_row-1) * this.xy_incr + snDraw.Game.tileSize;
-	var left_pad = (snDraw.canv_W-width_used)/2;
 
-	this.xGridOrigin = left_pad;
+	var width_used = (this.n_tiles_row-1) * this.xy_incr + snDraw.Game.tileSize;
+	console.log(width_used);
+	console.log(snDraw.canv_W);
+	var left_pad = (snDraw.canv_W-width_used)/2;
+	console.log(left_pad);
+
+	var tile_stroke_prop = 0.06;
+	this.xGridOrigin = left_pad - snDraw.Game.tileSize*tile_stroke_prop/2;
 	this.yGridOrigin = snDraw.Game.Controls.underneath_buttons_px;
 
 	//var n_rows_max = Math.ceil(tilestats.n_tiles / this.n_tiles_row);
     },
 
-    //as a side effect, this function displays the moved tile on screen.
-    //it sets the location without animation.
+    // This function handles the visual canvas placement, as well as the logic for ensuring that the tile is added
+    // to the NEXT AVAILABLE SPACE in the grid. It will be used both for the initial render and for the turned tiles
+    // during game play
     AddLetterToGrid: function(TileObject, ani_oC, ani_sty){
 
 	//find empty grid slot
@@ -255,25 +261,28 @@ snDraw.Game.Grid = {
 
     ReshapeGrid: function(){},
 
-
-    PlaceTileInGrid: function(tile_index,row,col, ani_oC, ani_sty){
+    PlaceTileInGrid: function(tile_index, row,col, ani_oC, ani_sty){
 
 	var TileObject = snDraw.Game.TileArray[tile_index];
 
 	//update the GRID -> TILE references
 	//only happens if tile already on grid.
 	if(TileObject.Grid_row!=undefined){this.TileGrid[TileObject.Grid_row][TileObject.Grid_col] = null;}
-	this.TileGrid[row][col] = tile_ID;
+	this.TileGrid[row][col] = tile_index;
 
 	//set the TILE -> GRID references
 	TileObject.Grid_row = row;
 	TileObject.Grid_col = col;
 
 	//move the tile object to the canvas location identified
-	snDraw.moveSwitchable(TileObject, ani_oC, ani_sty,{
-	    left: (col * this.xy_incr + this.xGridOrigin),
-	    top: (row * this.xy_incr + this.yGridOrigin)
-	});
+	snDraw.moveSwitchable(TileObject, ani_oC, ani_sty, this.RCgridPx(row, col));
+    },
+
+    RCgridPx: function(r, c){
+	return{
+	    left: (c * this.xy_incr + this.xGridOrigin),
+	    top: (r * this.xy_incr + this.yGridOrigin)
+	};
     }
 
 };

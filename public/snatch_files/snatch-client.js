@@ -8,6 +8,8 @@ var tilestats = {};//global reference - for server data...
 var client_player_index = undefined;
 var disconnected_players = [];
 
+var dev = true;
+
 //initialise the Canvas
 
 socket.emit('player joining game', 0);
@@ -22,27 +24,19 @@ socket.on('player color choices', function(colorSet){
 
 ///upon arrival, process the transmitted game state from the server
 socket.on('full game state transmission', function(gameState){
-
-    //this will clear the message "waiting for the server..."
-    canvas.clear();	    
-    /*
-      For now, receipt of the first ever game state message (compared with others) is detected
-      by looking at the global tileset, which is initially [].
-
-      In any case, there should only ever be one transmission of this message, so the check should not be necessary.
-    */
-
-    //RECIEVE THE MESSAGE FOR THE FIRST time - in this case need to add the listeners...
-    if(tileset.length<1){
-	snDraw.Game.addListeners_kb_mouse();
-    }else{//clear old data ready for the new...
-	snDraw.Game.TileArray = [];
-    }
-
     //the message is sent on the following events:
     // (1) a player has just joined the game (they just chose a color)
     // (2) a player has requested reset and they are the only player
     // (3) a player has agreed to a reset request, and now everyone agrees...
+
+    //this will clear the message "waiting for the server..."
+    snDraw.Game.TileArray = [];
+    canvas.clear();	    
+
+    //RECIEVE THE MESSAGE FOR THE FIRST time - in this case need to add the listeners...
+    if(tileset.length<1){
+	snDraw.Game.addListeners_kb_mouse();
+    }
 
     players = gameState.playerSet;
     tileset = gameState.turned_tiles;
@@ -54,7 +48,11 @@ socket.on('full game state transmission', function(gameState){
     }
 
     //draws the entire game state on the canvas from the data supplied
-    snDraw.Game.initialDrawEntireGame();
+    if(dev){
+	snDraw.Game.Event.DrawAll();
+    }else{
+	snDraw.Game.initialDrawEntireGame();
+    }
 
 });//end of function to load game data
 
@@ -192,6 +190,10 @@ function TILE_TURN_REQUEST()          {socket.emit('tile turn request', 0);}
 function PLAYER_JOINED_WITH_DETAILS(p){socket.emit('player joined with details', p);}
 
 function TURN_MANY_TILES(p)           {socket.emit('many_tile_turn_hack', p);}
+
+
+
+window.onresize = function(){console.log("A window resize event occured");};
 
 
 
