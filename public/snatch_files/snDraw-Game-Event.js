@@ -42,6 +42,7 @@ snDraw.Game.Event = {
 
 	// 5. For all zones: generate words and determine their arrangement
 	var ArrangementsArray = [];
+	var ZonesWordsGroups = [];
 	for (var i=0; i < snDraw.Game.Zones.PlayerZone.length; i++){
 
 	    var Zone_i = snDraw.Game.Zones.PlayerZone[i];
@@ -73,20 +74,20 @@ snDraw.Game.Event = {
 	      This is a problem. We're supposed to get the inner bound of the box from creating the zone,
 	      but we also require the before the zone is created. Refactor AAargh.
 	    */
-	    Bounds = {
+	    HorizontalBounds = {
 		left: 20,
-		right: 480,
-		top: 0
+		right: 360,
 	    };
 
 
-	    var Arrangement_i = snDraw.Game.Words.CalculateWordArrangement(WordGrpsList_i, Bounds, Spacings, "left");
+	    var Arrangement_i = snDraw.Game.Words.CalculateWordArrangement(WordGrpsList_i, HorizontalBounds, Spacings, "left");
 	    ArrangementsArray.push(Arrangement_i);
+	    ZonesWordsGroups.push(WordGrpsList_i);
 	}
+	
 
 	// 6. Determine the sizes for all the zones, then make them as Fabric objects...
 	var grid_bottom_px = snDraw.Game.Grid.GetGridBottomPx();
-	console.log(grid_bottom_px);
 	var ZoneSizes = snDraw.Game.Zones.CalculateAllZoneSizes(ArrangementsArray, grid_bottom_px, 8, 4, Spacings);
 
 	for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
@@ -131,18 +132,13 @@ snDraw.Game.Event = {
 	    }
 
 	    // place the words in the zone
-	    Bounds = {
-		left: 20,
-		right: 480,
-		top: 0
-	    };
 
-	    var Arrangement_i = snDraw.Game.Words.CalculateWordArrangement(WordGrpsList_i, Bounds, Spacings, "left");
-	    
-
-
-
+	    var Arrangement_i = snDraw.Game.Words.WordArrangementSetHeight(ArrangementsArray[i], Top+50);
+	    for (var j = 0; j < Arrangement_i.coords.length; j++){
+		snDraw.moveSwitchable(ZonesWordsGroups[i][j], false, null, Arrangement_i.coords[j]);
+	    }
 	}
+
 
     },
 

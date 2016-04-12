@@ -275,11 +275,11 @@ snDraw.Game.Words = {
 */
 
 
-    AnimateWordCapture: function(WordTileArray, Coords, Bounds, Spacings, owner_player){
+    AnimateWordCapture: function(WordTileArray, Coords, HorizonalBounds, Spacings, owner_player){
 	var word_length = WordTileArray.length;
 	var w_width_px = this.word_width_px(word_length, Spacings);
-
-	var wrapCoords = this.wordTilesWrap(Coords, Bounds, Spacings, my_width_px);
+	
+	var wrapCoords = this.wordTilesWrap(Coords, HorizonalBounds, Spacings, my_width_px);
 	if(wrapCoords){
 	    Coords = wrapCoords;
 	}
@@ -318,18 +318,18 @@ snDraw.Game.Words = {
 
 
     // drawSingleCapturedWord & animateRepositionPlayerWords
-    CalculateWordArrangement: function(WordArray, Bounds, Spacings, justification){
+    CalculateWordArrangement: function(WordArray, HorizonalBounds, Spacings, justification){
 
 	// Array 'breaks' holds the indices of the last word of each line
 	var Arrangement = {coords: [], word_width_px: [], breaks: []};
 
-	var x_plotter = Bounds.left;
-	var y_plotter = Bounds.top;
+	var x_plotter = HorizonalBounds.left;
+	var y_plotter = 0;
 
 	//function used internally
 	var justify_final_word_row = function(spare_px){
-	    var i_first = Arrangement.breaks.slice(-2)[0]
-	    var i_final = Arrangement.breaks.slice(-1)[0]
+	    var i_first = Arrangement.breaks.slice(-2)[0];
+	    var i_final = Arrangement.breaks.slice(-1)[0];
 
 	    for (var j = i_first; j <= i_final; j++){//this will run through the words to shift
 		if(justification == "center"){
@@ -337,7 +337,7 @@ snDraw.Game.Words = {
 		}else if(justification == "right"){
 		    Arrangement.coords[j].left += spare_px;
 		}
-	    }	    
+	    }
 	};
 
 	for (var i = 0; i < WordArray.length; i++){
@@ -349,19 +349,18 @@ snDraw.Game.Words = {
 	    Arrangement.word_width_px.push(w_width_px);
 	    
 	    //determine if wrap necessary
-	    var wrapCoords = this.wordTilesWrap({left: x_plotter, top: y_plotter}, Bounds, Spacings, w_width_px);
+	    var wrapCoords = this.wordTilesWrap({left: x_plotter, top: y_plotter}, HorizonalBounds, Spacings, w_width_px);
 	    if(wrapCoords){//this is if wrap is happening
 		Arrangement.breaks.push(i-1);
 
 		//potentially shuffle the words along in accordance with the requested justification
-		justify_final_word_row(Bounds.right - x_plotter);
+		justify_final_word_row(HorizonalBounds.right - x_plotter);
 
 		//now adjust the plotter coords along...
 		x_plotter = wrapCoords.left;
 		y_plotter = wrapCoords.top;
 	    }
 
-	    x_plotter += Spacings.wg;
 	    //add the coordinate that has been determined....
 	    Arrangement.coords.push({
 		left: x_plotter,
@@ -369,13 +368,23 @@ snDraw.Game.Words = {
 	    });
 
 	    //increment the plotter to the pixel which marks the end of the word
-	    x_plotter += w_width_px;
+	    x_plotter += w_width_px + Spacings.wg;
 	}
 
 	//take all the wrap actions for the final word
 	if(WordArray.length>0){
 	    Arrangement.breaks.push(WordArray.length-1);
-	    justify_final_word_row(Bounds.right - x_plotter);
+	    justify_final_word_row(HorizonalBounds.right - x_plotter - Spacings.wg);//the value passed is "space px"
+	}
+	return Arrangement;
+    },
+
+    WordArrangementSetHeight: function(Arrangement, Top){
+	// Arrangement
+	// data...
+	// Arrangement = {coords: [], word_width_px: [], breaks: []};
+	for (var i = 0; i < Arrangement.coords.length; i++){
+	    Arrangement.coords[i].top += Top;
 	}
 	return Arrangement;
     },
@@ -386,10 +395,10 @@ snDraw.Game.Words = {
     },
 
 
-    wordTilesWrap: function(Coords, Bounds, Spacings, my_width_px){
-	if(Coords.left + Spacings.wg + my_width_px > Bounds.right){
+    wordTilesWrap: function(Coords, HorizonalBounds, Spacings, my_width_px){
+	if(Coords.left + Spacings.wg + my_width_px > HorizonalBounds.right){
 	    return {
-		left: Bounds.left,
+		left: HorizonalBounds.left,
 		top: (Coords.top + Spacings.tsvg)
 	    };
 	}else{
