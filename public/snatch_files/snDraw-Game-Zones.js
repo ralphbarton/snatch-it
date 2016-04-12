@@ -551,8 +551,22 @@ snDraw.Game.Zones = {
     },
 
 
-    CalculateAllZoneSizes: function(ArrangementsArray){
-	var nZones = this.PlayerZone.length;
+    CalculateAllZoneSizes: function(ArrangementsArray, top_px, v_spacer, Spacings){
+
+	var n_zones = ArrangementsArray.length;
+	var ZoneSizes = [];
+	
+	var words_consume_height = [];
+	var words_consume_height_total = 0;
+	
+	
+
+	for(var i = 0; i < n_zones; i++){
+	    var n_lines_i = ArrangementsArray[i].breaks.length;
+	    words_consume_height[i] = n_lines_i * Spacings.ts + (n_lines_i - 1) * Spacings.vg;
+	    words_consume_height_total += words_consume_height[i];
+	}
+	
 	return null;
     },
 

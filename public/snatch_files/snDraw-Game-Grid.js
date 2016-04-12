@@ -191,7 +191,7 @@ snDraw.Game.Grid = {
     // This function handles the visual canvas placement, as well as the logic for ensuring that the tile is added
     // to the NEXT AVAILABLE SPACE in the grid. It will be used both for the initial render and for the turned tiles
     // during game play
-    AddLetterToGrid: function(TileObject, ani_oC, ani_sty){
+    GetGridSpace: function(){
 
 	//find empty grid slot
 	//get to a row with space
@@ -215,9 +215,7 @@ snDraw.Game.Grid = {
 	    }
 	}
 	
-	//put the tile in the grid
-	this.PlaceTileInGrid(TileObject.tileID, row, col, ani_oC, ani_sty);
-	
+	return {row: row, col: col};
     },
 
 
@@ -246,7 +244,7 @@ snDraw.Game.Grid = {
 		    n_tiles_in_col++;
 		    var min_row_index = n_tiles_in_col - 1;
 		    if(min_row_index < r){//could it be shifted up?
-			this.PlaceTileInGrid(TID, min_row_index, c, true, ani_sty);
+			this.PlaceTileInGrid(TID, {row:min_row_index, col:c}, true, ani_sty);
 		    }
 		}
 	    }
@@ -266,27 +264,27 @@ snDraw.Game.Grid = {
 
     ReshapeGrid: function(){},
 
-    PlaceTileInGrid: function(tile_index, row,col, ani_oC, ani_sty){
+    PlaceTileInGrid: function(tile_index, gridRC, ani_oC, ani_sty){
 
 	var TileObject = snDraw.Game.TileArray[tile_index];
 
 	//update the GRID -> TILE references
 	//only happens if tile already on grid.
 	if(TileObject.Grid_row!=undefined){this.TileGrid[TileObject.Grid_row][TileObject.Grid_col] = null;}
-	this.TileGrid[row][col] = tile_index;
+	this.TileGrid[gridRC.row][gridRC.col] = tile_index;
 
 	//set the TILE -> GRID references
-	TileObject.Grid_row = row;
-	TileObject.Grid_col = col;
+	TileObject.Grid_row = gridRC.row;
+	TileObject.Grid_col = gridRC.col;
 
 	//move the tile object to the canvas location identified
-	snDraw.moveSwitchable(TileObject, ani_oC, ani_sty, this.RCgridPx(row, col));
+	snDraw.moveSwitchable(TileObject, ani_oC, ani_sty, this.RCgridPx(gridRC));
     },
 
-    RCgridPx: function(r, c){
+    RCgridPx: function(gridRC){
 	return{
-	    left: (c * this.xy_incr + this.xGridOrigin),
-	    top: (r * this.xy_incr + this.yGridOrigin)
+	    left: (gridRC.col * this.xy_incr + this.xGridOrigin),
+	    top: (gridRC.row * this.xy_incr + this.yGridOrigin)
 	};
     }
 

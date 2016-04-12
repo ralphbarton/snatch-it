@@ -16,7 +16,8 @@ snDraw.Game.Event = {
 	    if(tileset[i].status == "turned"){
 		//generate tile & put in grid
 		var TileObject_i = snDraw.Game.generateTileObject(tileset[i], i);
-		snDraw.Game.Grid.AddLetterToGrid(TileObject_i, false, null);
+		var gridRC = snDraw.Game.Grid.GetGridSpace();
+		var bottomTilePx = snDraw.Game.Grid.PlaceTileInGrid(i, gridRC, false, null);//todo rename this...
 	    }
 	}
 
@@ -83,7 +84,7 @@ snDraw.Game.Event = {
 	}
 
 	// 6. Determine the sizes for all the zones, then make them as Fabric objects...
-	var xxx = snDraw.Game.Zones.CalculateAllZoneSizes(ArrangementsArray);
+	var xxx = snDraw.Game.Zones.CalculateAllZoneSizes(ArrangementsArray, 0, 0, Spacings);
 
 	for (var i=0; i < snDraw.Game.Zones.PlayerZone.length; i++){
 	    var Height = 400;//TODO this is wrong
@@ -94,7 +95,7 @@ snDraw.Game.Event = {
 		hpad: 2,  // horizonal padding between screen boundary and box edge (vertical)
 		vpad: 10, // vertical spacing between zones (between lower edge of bottom boundary and top of upper text)
 		spellpad: 10, // vertical padding of spell (between upper edge of bottom box boundary and lower edge of tile).
-		fill: 'black', // inside the box
+		fill: 'rgba(0,0,0,1)', // inside the box
 		color: 'yellow', // text colour and box boundary
 		thick: 10, // thickness of the box line
 		text: "Newt", // Text of the title
