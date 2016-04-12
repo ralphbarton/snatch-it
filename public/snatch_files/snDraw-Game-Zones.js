@@ -369,7 +369,8 @@ snDraw.Game.Zones = {
 	fontsize // refers to the font of the title
 	isClient // boolean, means extra
 	scale_you // scaling of the block saying "you"
-	scale_tri // scaling of the triangle/pointer
+	tri_w // Width, in pixels, of the little triangle (spell pointer)
+	tri_h // Height, in pixels, of the little triangle (spell pointer)
     }
 */
 
@@ -380,13 +381,13 @@ snDraw.Game.Zones = {
 
 	var zoneBox = new fabric.Rect({
 	    width: boxWidth,
-	    height: Height,
+	    height: Height,///////////////////////  WRONG
 	    fill: Style.fill,
 	    stroke: Style.color,
 	    strokeWidth: Style.thick
 	});
 
-	var plrName = new fabric.Text(Style.text,{
+	var plrName = new fabric.Text((Style.text_pad + Style.text + Style.text_pad),{
 	    fontSize: Style.fontsize,
 	    textBackgroundColor: Style.fill,
 	    fill: Style.color
@@ -407,11 +408,9 @@ snDraw.Game.Zones = {
 		fontWeight: 'bold',
 	    });
 
-	    var pointer_h = Style.scale_tri * 0.85;
-	    var pointer_w = Style.scale_tri;
 	    var spellPointer = new fabric.Triangle({
-		width: pointer_h,//is actually height, due to rotation
-		height: pointer_w,//is actually width, due to rotation
+		width: Style.tri_h,//is actually height, due to rotation
+		height: Style.tri_w,//is actually width, due to rotation
 		fill: Style.color,
 		angle: 90
 	    });
@@ -465,27 +464,28 @@ snDraw.Game.Zones = {
 	var box_top = Top + Style.fontsize/2;
 	var box_bottom = box_top + Height;
 	var hor_centerline_height = box_bottom - (Style.thick/2 + Style.spellpad + snDraw.Game.tileSize/2);
-	return {
-	    zoneBox_top: box_top,
-	    plrName_top: Top,
-	    youBlock_top: (box_bottom - Style.scale_you),
-	    youText_top: (box_bottom - Style.scale_you),
-	    spellPointer_top: (hor_centerline_height - pointer_h/2),
-	    SPELL_TILES_top: (hor_centerline_height - snDraw.Game.tileSize/2)
-	};
+	return [
+	    box_top, //zoneBox_top
+	    Top, // plrName_top
+	    (box_bottom - Style.scale_you), //youBlock_top
+	    (box_bottom - Style.scale_you), // youBlock_top
+	    (hor_centerline_height - Style.tri_h/2), // spellPointer_top
+	    (hor_centerline_height - snDraw.Game.tileSize/2) // SPELL_TILES_top
+	];
     },
 
     DetermineZoneBoxObjectsLefts: function(Left_Offset, Style){
-	var boxLeft = Style.hpad + Style.thick/2;
-	var boxRight = boxLeft + boxWidth;
+	var boxLeft = Style.hpad;
+	var boxWidth  = snDraw.canv_W - 2 * Style.hpad - Style.thick; // this line is duplicated
+	var boxRight = boxLeft + boxWidth; // be careful. What is the definition of this? // TODO - CORRECT
 	var pointer_w = Style.scale_tri;
-	return {
-	    zoneBox_left: boxLeft,
-	    plrName_left: titlepad,//Ahem - this is incomplete!!!
-	    youBlock_left: (boxRight - Style.scale_you),
-	    youText_left: (boxRight - Style.scale_you * 1.8),
-	    spellPointer_left: boxLeft + pointer_w//due to rotation, left is effectively a coordinate 'right'
-	};
+	return [
+	    (Left_Offset + boxLeft), // zoneBox_left
+	    (Left_Offset + Style.titlepad), // plrName_left -  // Ahem - this is incomplete!!!
+	    (Left_Offset + boxRight - Style.scale_you), // youBlock_left
+	    (Left_Offset + boxRight - Style.scale_you * 1.8), // youText_left
+	    (Left_Offset + boxLeft + pointer_w) // spellPointer_left // due to rotation, left is effectively a coordinate 'right'
+	];
     },
 
 

@@ -86,9 +86,42 @@ snDraw.Game.Event = {
 	var xxx = snDraw.Game.Zones.CalculateAllZoneSizes(ArrangementsArray);
 
 	for (var i=0; i < snDraw.Game.Zones.PlayerZone.length; i++){
-	    var Height = 0;//TODO this is wrong
+	    var Height = 400;//TODO this is wrong
 	    var Style = {text:'33'};//TODO this is wrong
+
+
+	    var Style = { //all in pixels
+		hpad: 2,  // horizonal padding between screen boundary and box edge (vertical)
+		vpad: 10, // vertical spacing between zones (between lower edge of bottom boundary and top of upper text)
+		spellpad: 10, // vertical padding of spell (between upper edge of bottom box boundary and lower edge of tile).
+		fill: 'black', // inside the box
+		color: 'yellow', // text colour and box boundary
+		thick: 10, // thickness of the box line
+		text: "Newt", // Text of the title
+		text_pad: " ",
+		justify: "left", // justification of the title
+		titlepad: 70, // effectively, the indentation of the title	
+		fontsize: 30, // refers to the font of the title
+		isClient: false, // boolean, means extra
+		scale_you: 80, // scaling of the block saying "you"
+		tri_w: 50, // Width, in pixels, of the little triangle (spell pointer)
+		tri_h: 30, // Height, in pixels, of the little triangle (spell pointer)
+	    }
+
+	    
+	    //generate the fabric objects that represent the new zone. Note that properties left & top are not set
+	    //nor are the objects present onf the canvas.
 	    var Zone_i_FabObjs = snDraw.Game.Zones.CreateZoneBox(Height, Style);
+	    var Zone_i_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(200, 300, Style);
+	    var Zone_i_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, Style);
+
+	    //for each object, set coordinates and place on canvas...
+	    for (var j = 0; j < Zone_i_FabObjs.length; j++){
+		Zone_i_FabObjs[j].setLeft(Zone_i_Lefts[j]);
+		Zone_i_FabObjs[j].setTop(Zone_i_Tops[j]);
+		canvas.add(Zone_i_FabObjs[j]);
+	    }
+
 	}
 
     },
