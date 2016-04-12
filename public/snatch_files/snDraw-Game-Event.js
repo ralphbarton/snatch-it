@@ -64,7 +64,7 @@ snDraw.Game.Event = {
 		    WordTileArray, Spacings, player_i);
 
 		//Add that word to the list...
-		WordGrpsList_i.push();
+		WordGrpsList_i.push(WordGroup_j);
 	    }
 
 	    // 5.2 Determine the Arrangement of that player's words.
@@ -74,46 +74,48 @@ snDraw.Game.Event = {
 	      but we also require the before the zone is created. Refactor AAargh.
 	    */
 	    Bounds = {
-		left: 0,
-		right: 200,
+		left: 20,
+		right: 480,
 		top: 0
 	    };
+
 
 	    var Arrangement_i = snDraw.Game.Words.CalculateWordArrangement(WordGrpsList_i, Bounds, Spacings, "left");
 	    ArrangementsArray.push(Arrangement_i);
 	}
 
 	// 6. Determine the sizes for all the zones, then make them as Fabric objects...
-	var xxx = snDraw.Game.Zones.CalculateAllZoneSizes(ArrangementsArray, 0, 0, Spacings);
+	var ZoneSizes = snDraw.Game.Zones.CalculateAllZoneSizes(ArrangementsArray, 100, 4, Spacings);
 
-	for (var i=0; i < snDraw.Game.Zones.PlayerZone.length; i++){
-	    var Height = 400;//TODO this is wrong
-	    var Style = {text:'33'};//TODO this is wrong
-
+	for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
+	    var Height = ZoneSizes[i].Height;
+	    var Top = ZoneSizes[i].Top;
 
 	    var Style = { //all in pixels
-		hpad: 2,  // horizonal padding between screen boundary and box edge (vertical)
-		vpad: 10, // vertical spacing between zones (between lower edge of bottom boundary and top of upper text)
+		hpad: 4,  // horizonal padding between screen boundary and box edge (vertical)
+		// no use here... vpad: 1, // vertical spacing between zones (between lower edge of bottom boundary and top of upper text)
 		spellpad: 10, // vertical padding of spell (between upper edge of bottom box boundary and lower edge of tile).
-		fill: 'rgba(0,0,0,1)', // inside the box
+		box_fill: 'rgba(0,0,0,0)', // inside the box
+		text_bg: 'blue', // inside the box
 		color: 'yellow', // text colour and box boundary
-		thick: 10, // thickness of the box line
+		thick: 8, // thickness of the box line
 		text: "Newt", // Text of the title
 		text_pad: " ",
 		justify: "left", // justification of the title
-		titlepad: 70, // effectively, the indentation of the title	
+		titlepad: 40, // effectively, the indentation of the title	
 		fontsize: 30, // refers to the font of the title
+		fonthalfheight: 17, // refers to the offset between top of font and top surface of box
 		isClient: false, // boolean, means extra
 		scale_you: 80, // scaling of the block saying "you"
 		tri_w: 50, // Width, in pixels, of the little triangle (spell pointer)
-		tri_h: 30, // Height, in pixels, of the little triangle (spell pointer)
+		tri_h: 30 // Height, in pixels, of the little triangle (spell pointer)
 	    }
 
 	    
 	    //generate the fabric objects that represent the new zone. Note that properties left & top are not set
 	    //nor are the objects present onf the canvas.
 	    var Zone_i_FabObjs = snDraw.Game.Zones.CreateZoneBox(Height, Style);
-	    var Zone_i_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(200, 300, Style);
+	    var Zone_i_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, Style);
 	    var Zone_i_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, Style);
 
 	    //for each object, set coordinates and place on canvas...

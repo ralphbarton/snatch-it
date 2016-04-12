@@ -340,8 +340,7 @@ snDraw.Game.Words = {
 	    }	    
 	};
 
-	var i = undefined;//the final value of 'i' is used beyond the end of the loop.
-	for (i = 0; i < WordArray.length; i++){
+	for (var i = 0; i < WordArray.length; i++){
 	    var WordTileArray = WordArray[i].getObjects();
 	    var n_tile = WordTileArray.length;
 
@@ -374,8 +373,10 @@ snDraw.Game.Words = {
 	}
 
 	//take all the wrap actions for the final word
-	Arrangement.breaks.push(i-1);
-	justify_final_word_row(Bounds.right - x_plotter);
+	if(WordArray.length>0){
+	    Arrangement.breaks.push(WordArray.length-1);
+	    justify_final_word_row(Bounds.right - x_plotter);
+	}
 	return Arrangement;
     },
 
@@ -389,7 +390,7 @@ snDraw.Game.Words = {
 	if(Coords.left + Spacings.wg + my_width_px > Bounds.right){
 	    return {
 		left: Bounds.left,
-		top: (Coords.top + Spacings.vg)
+		top: (Coords.top + Spacings.tsvg)
 	    };
 	}else{
 	    return false;

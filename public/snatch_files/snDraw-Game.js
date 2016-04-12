@@ -81,7 +81,7 @@ snDraw.Game = {
 	    tslg: (this.tileSize * 1.04), //tile size added to letter gap
 	    tsgg: (this.tileSize * 1.14), //tile size added to grid gap
 	    wg: (this.tileSize * 0.6), // word gap (gap only)
-	    vg: (this.tileSize * 0.12), //vertical gap (gap only)
+	    tsvg: (this.tileSize * 1.12), //vertical gap between different rows of words, plus actual tile size
 	    grpad: (this.tileSize * 0.20), // minimum horizonal padding of the left and the right of the grid of letters
 	    ingh: (this.tileSize * 0.20), // inside a zone box, this is the horizonal padding between the inner wall and a letter
 	    ingt: (this.tileSize * 0.20) // inside a zone box, this is the vertical padding between the upper wall and a letter

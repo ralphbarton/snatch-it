@@ -355,25 +355,6 @@ snDraw.Game.Zones = {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // NEW FUNCTIONS HERE...
-/*
-    Style = { //all in pixels
-	hpad // horizonal padding between screen boundary and box edge (vertical)
-	vpad // vertical spacing between zones (between lower edge of bottom boundary and top of upper text)
-	spellpad // vertical padding of spell (between upper edge of bottom box boundary and lower edge of tile).
-	fill // inside the box
-	color // text colour and box boundary
-	thick // thickness of the box line
-	text // Text of the title
-	justify // justification of the title
-	titlepad // effectively, the indentation of the title	
-	fontsize // refers to the font of the title
-	isClient // boolean, means extra
-	scale_you // scaling of the block saying "you"
-	tri_w // Width, in pixels, of the little triangle (spell pointer)
-	tri_h // Height, in pixels, of the little triangle (spell pointer)
-    }
-*/
-
 
     CreateZoneBox: function(Height, Style){
 	
@@ -381,15 +362,15 @@ snDraw.Game.Zones = {
 
 	var zoneBox = new fabric.Rect({
 	    width: boxWidth,
-	    height: Height,///////////////////////  WRONG
-	    fill: Style.fill,
+	    height: (Height - Style.fonthalfheight - Style.thick/2),
+	    fill: Style.box_fill,
 	    stroke: Style.color,
 	    strokeWidth: Style.thick
 	});
 
 	var plrName = new fabric.Text((Style.text_pad + Style.text + Style.text_pad),{
 	    fontSize: Style.fontsize,
-	    textBackgroundColor: Style.fill,
+	    backgroundColor: Style.text_bg,
 	    fill: Style.color
 	});
 
@@ -461,9 +442,9 @@ snDraw.Game.Zones = {
 
 
     DetermineZoneBoxObjectsTops: function(Top, Height, Style){
-	var box_top = Top + Style.fontsize/2;
-	var box_bottom = box_top + Height;
-	var hor_centerline_height = box_bottom - (Style.thick/2 + Style.spellpad + snDraw.Game.tileSize/2);
+	var box_top = Top + Style.fonthalfheight - Style.thick/2;
+	var box_bottom = Top + Height;
+	var hor_centerline_height = box_bottom - (Style.thick + Style.spellpad + snDraw.Game.tileSize/2);
 	return [
 	    box_top, //zoneBox_top
 	    Top, // plrName_top
@@ -559,15 +540,30 @@ snDraw.Game.Zones = {
 	var words_consume_height = [];
 	var words_consume_height_total = 0;
 	
-	
-
+	//1. Determine how much height is actually required by all the lines of words...
 	for(var i = 0; i < n_zones; i++){
 	    var n_lines_i = ArrangementsArray[i].breaks.length;
-	    words_consume_height[i] = n_lines_i * Spacings.ts + (n_lines_i - 1) * Spacings.vg;
+	    words_consume_height[i] = (n_lines_i - 1) * Spacings.tsvg + Spacings.ts;
 	    words_consume_height_total += words_consume_height[i];
 	}
-	
-	return null;
+
+	//2.
+	var total_zone_height = snDraw.canv_H - top_px - n_zones * v_spacer;
+	var spare_sharable_height = total_zone_height - words_consume_height_total;
+	var space_height_each = spare_sharable_height / (n_zones+1);
+
+	//3. return the sizes array...
+	var ZonesHeightsTops = [];
+	var Top_cumulator = top_px;
+	for(var i = 0; i < n_zones; i++){
+	    var Height = words_consume_height[i] + space_height_each * (i==0?2:1);
+	    ZonesHeightsTops.push({
+		Top: Top_cumulator,
+		Height: Height 
+	    });
+	    Top_cumulator += Height + v_spacer;
+	}
+	return ZonesHeightsTops;
     },
 
 
