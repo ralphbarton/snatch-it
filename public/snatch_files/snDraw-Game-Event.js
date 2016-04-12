@@ -17,7 +17,7 @@ snDraw.Game.Event = {
 		//generate tile & put in grid
 		var TileObject_i = snDraw.Game.generateTileObject(tileset[i], i);
 		var gridRC = snDraw.Game.Grid.GetGridSpace();
-		var bottomTilePx = snDraw.Game.Grid.PlaceTileInGrid(i, gridRC, false, null);//todo rename this...
+		snDraw.Game.Grid.PlaceTileInGrid(i, gridRC, false, null);//todo rename this...
 	    }
 	}
 
@@ -85,7 +85,9 @@ snDraw.Game.Event = {
 	}
 
 	// 6. Determine the sizes for all the zones, then make them as Fabric objects...
-	var ZoneSizes = snDraw.Game.Zones.CalculateAllZoneSizes(ArrangementsArray, 100, 4, Spacings);
+	var grid_bottom_px = snDraw.Game.Grid.GetGridBottomPx();
+	console.log(grid_bottom_px);
+	var ZoneSizes = snDraw.Game.Zones.CalculateAllZoneSizes(ArrangementsArray, grid_bottom_px, 8, 4, Spacings);
 
 	for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
 	    var Height = ZoneSizes[i].Height;
@@ -96,10 +98,8 @@ snDraw.Game.Event = {
 		// no use here... vpad: 1, // vertical spacing between zones (between lower edge of bottom boundary and top of upper text)
 		spellpad: 10, // vertical padding of spell (between upper edge of bottom box boundary and lower edge of tile).
 		box_fill: 'rgba(0,0,0,0)', // inside the box
-		text_bg: 'blue', // inside the box
-		color: 'yellow', // text colour and box boundary
+		text_bg: 'black', // inside the box
 		thick: 8, // thickness of the box line
-		text: "Newt", // Text of the title
 		text_pad: " ",
 		justify: "left", // justification of the title
 		titlepad: 40, // effectively, the indentation of the title	
@@ -111,19 +111,36 @@ snDraw.Game.Event = {
 		tri_h: 30 // Height, in pixels, of the little triangle (spell pointer)
 	    }
 
+	    var Properties = {
+		color: snDraw.Game.Zones.PlayerZone[i].player.color, // text colour and box boundary
+		text: snDraw.Game.Zones.PlayerZone[i].player.name // Text of the title
+	    };
+
 	    
 	    //generate the fabric objects that represent the new zone. Note that properties left & top are not set
 	    //nor are the objects present onf the canvas.
-	    var Zone_i_FabObjs = snDraw.Game.Zones.CreateZoneBox(Height, Style);
+	    var Zone_i_FabObjs = snDraw.Game.Zones.CreateZoneBox(Height, Style, Properties);
 	    var Zone_i_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, Style);
 	    var Zone_i_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, Style);
 
-	    //for each object, set coordinates and place on canvas...
+	    //for each object making the ZONE, set coordinates and place on canvas...
 	    for (var j = 0; j < Zone_i_FabObjs.length; j++){
 		Zone_i_FabObjs[j].setLeft(Zone_i_Lefts[j]);
 		Zone_i_FabObjs[j].setTop(Zone_i_Tops[j]);
 		canvas.add(Zone_i_FabObjs[j]);
 	    }
+
+	    // place the words in the zone
+	    Bounds = {
+		left: 20,
+		right: 480,
+		top: 0
+	    };
+
+	    var Arrangement_i = snDraw.Game.Words.CalculateWordArrangement(WordGrpsList_i, Bounds, Spacings, "left");
+	    
+
+
 
 	}
 

@@ -163,28 +163,18 @@ snDraw.Game.Grid = {
     yGridOrigin: undefined,
     xy_incr: undefined,
     n_tiles_row: undefined,
-
-/*
-	Spacings { //all in pixels
-	    ts: (this.tileSize), //tile size
-	    lg: (this.tileSize * 0.04), //letter gap (gap only)
-	    tslg: (this.tileSize * 1.04), //tile size added to letter gap
-	    tsgg: (this.tileSize * 1.14), //tile size added to grid gap
-	    wg: (this.tileSize * 0.6), // word gap (gap only)
-	    vg: (this.tileSize * 0.12) //vertical gap (gap only)
-	};
-*/
-
     
     InitialiseGrid: function(Spacings){
 
+	// 'Spacings.grpad' refers to minimum padding to left and right of the grid
+	// 'Spacings.tsgg' is tile size plus grid gap
 	this.n_tiles_row = Math.floor( (snDraw.canv_W - 2*Spacings.grpad) / Spacings.tsgg );
 	var width_used = (this.n_tiles_row-1) * Spacings.tsgg + Spacings.ts;
 	var left_pad = (snDraw.canv_W-width_used)/2;
 
 	var tile_stroke_prop = 0.06;
-	this.xGridOrigin = left_pad - Spacings.ts*tile_stroke_prop/2;
-	this.yGridOrigin = snDraw.Game.Controls.underneath_buttons_px;
+	this.xGridOrigin = left_pad - Spacings.ts * tile_stroke_prop/2;
+	this.yGridOrigin = snDraw.Game.Controls.underneath_buttons_px - Spacings.ts * tile_stroke_prop/2;
 	this.xy_incr = Spacings.tsgg;
     },
 
@@ -200,7 +190,7 @@ snDraw.Game.Grid = {
 	    var col = undefined;
 	    var c_count = 0;
 	    while(col == undefined){//gets an empty column
-		if(this.TileGrid[row][c_count]===undefined){
+		if(this.TileGrid[row][c_count] === undefined){
 		    col = c_count;
 		}
 		c_count++;
@@ -218,6 +208,25 @@ snDraw.Game.Grid = {
 	return {row: row, col: col};
     },
 
+    GetGridBottomPx: function(){
+	var empty_row = false;
+	var row_count = 0;
+	// determine index of the highest row which is empty
+	while(!empty_row){
+	    empty_row = true;    
+	    if(this.TileGrid[row_count] != undefined){//the row exists, or has existed...
+		for (var c = 0; c < this.n_tiles_row; c++){//loop through all ROWS
+		    if(this.TileGrid[row_count][c] != undefined){
+			empty_row = false;	
+		    }
+		}
+		row_count++;
+	    }
+	}
+	var bottomLeft = this.RCgridPx({row:(row_count-1), col:0})
+	var tile_stroke_prop = 0.06;
+	return bottomLeft.top + snDraw.Game.tileSize*(1+tile_stroke_prop);
+    },
 
     DetachLetterSetFromGrid: function(tileIDs, ani_sty){
 

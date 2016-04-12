@@ -356,7 +356,7 @@ snDraw.Game.Zones = {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // NEW FUNCTIONS HERE...
 
-    CreateZoneBox: function(Height, Style){
+    CreateZoneBox: function(Height, Style, Properties){
 	
 	var boxWidth  = snDraw.canv_W - 2 * Style.hpad - Style.thick;
 
@@ -364,14 +364,14 @@ snDraw.Game.Zones = {
 	    width: boxWidth,
 	    height: (Height - Style.fonthalfheight - Style.thick/2),
 	    fill: Style.box_fill,
-	    stroke: Style.color,
+	    stroke: Properties.color,
 	    strokeWidth: Style.thick
 	});
 
-	var plrName = new fabric.Text((Style.text_pad + Style.text + Style.text_pad),{
+	var plrName = new fabric.Text((Style.text_pad + Properties.text + Style.text_pad),{
 	    fontSize: Style.fontsize,
 	    backgroundColor: Style.text_bg,
-	    fill: Style.color
+	    fill: Properties.color
 	});
 
 	var ObjectArray = [zoneBox,plrName];
@@ -380,7 +380,7 @@ snDraw.Game.Zones = {
 	    var youBlock = new fabric.Rect({
 		width: (Style.scale_you * 2),
 		height: Style.scale_you,
-		fill: Style.color
+		fill: Properties.color
 	    });
 
 	    var youText = new fabric.Text("You",{
@@ -392,7 +392,7 @@ snDraw.Game.Zones = {
 	    var spellPointer = new fabric.Triangle({
 		width: Style.tri_h,//is actually height, due to rotation
 		height: Style.tri_w,//is actually width, due to rotation
-		fill: Style.color,
+		fill: Properties.color,
 		angle: 90
 	    });
 
@@ -532,7 +532,7 @@ snDraw.Game.Zones = {
     },
 
 
-    CalculateAllZoneSizes: function(ArrangementsArray, top_px, v_spacer, Spacings){
+    CalculateAllZoneSizes: function(ArrangementsArray, top_px, v_spacer, b_spacer, Spacings){
 
 	var n_zones = ArrangementsArray.length;
 	var ZoneSizes = [];
@@ -548,7 +548,7 @@ snDraw.Game.Zones = {
 	}
 
 	//2.
-	var total_zone_height = snDraw.canv_H - top_px - n_zones * v_spacer;
+	var total_zone_height = snDraw.canv_H - top_px - (n_zones-1) * v_spacer - b_spacer;
 	var spare_sharable_height = total_zone_height - words_consume_height_total;
 	var space_height_each = spare_sharable_height / (n_zones+1);
 
