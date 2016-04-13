@@ -532,10 +532,11 @@ snDraw.Game.Zones = {
     },
 
 
-    CalculateAllZoneSizes: function(ArrangementsArray, top_px, v_spacer, b_spacer, Spacings){
+    CalcZoneSizes: function(ArrangementsArray, top_px, ZoneVerticalPaddings, Spacings){
 
 	var n_zones = ArrangementsArray.length;
 	var ZoneSizes = [];
+	var EffectiveZoneTopPx = top_px + ZoneVerticalPaddings.above;
 	
 	var words_consume_height = [];
 	var words_consume_height_total = 0;
@@ -548,20 +549,22 @@ snDraw.Game.Zones = {
 	}
 
 	//2.
-	var total_zone_height = snDraw.canv_H - top_px - (n_zones-1) * v_spacer - b_spacer;
+
+	var rem_height = snDraw.canv_H - EffectiveZoneTopPx;
+	var total_zone_height = rem_height - (n_zones-1) * ZoneVerticalPaddings.between - ZoneVerticalPaddings.bottom;
 	var spare_sharable_height = total_zone_height - words_consume_height_total;
 	var space_height_each = spare_sharable_height / (n_zones+1);
 
 	//3. return the sizes array...
 	var ZonesHeightsTops = [];
-	var Top_cumulator = top_px;
+	var Top_cumulator = EffectiveZoneTopPx;
 	for(var i = 0; i < n_zones; i++){
 	    var Height = words_consume_height[i] + space_height_each * (i==0?2:1);
 	    ZonesHeightsTops.push({
 		Top: Top_cumulator,
 		Height: Height 
 	    });
-	    Top_cumulator += Height + v_spacer;
+	    Top_cumulator += Height + ZoneVerticalPaddings.between;
 	}
 	return ZonesHeightsTops;
     },

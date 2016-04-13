@@ -74,13 +74,44 @@ snDraw.Game.Event = {
 	      This is a problem. We're supposed to get the inner bound of the box from creating the zone,
 	      but we also require the before the zone is created. Refactor AAargh.
 	    */
-	    HorizontalBounds = {
-		left: 20,
-		right: 360,
+
+	    var Tx = snDraw.Game.tileSize / 10;
+
+	    var PlayerZoneStyle = { //all in pixels
+		hpad: Tx * 1.5,  // horizonal padding between screen boundary and box edge (vertical)
+		w_hpad: Tx * 2.0, // horizonal padding between words and the inside of the box
+		spellpad: Tx * 2.5, // vertical padding of spell (upper edge of bottom box to lower edge of tile).
+		box_fill: 'rgba(0,0,0,0)', // inside the box
+		text_bg: 'black', // inside the box
+		thick: Tx * 1.2, // thickness of the box line
+		text_pad: " ",
+		justify: "left", // justification of the title
+		titlepad: Tx * 10, // effectively, the indentation of the title	
+		fontsize: Tx * 7, // refers to the font of the title
+		fonthalfheight: Tx * 4, // refers to the offset between top of font and top surface of box
+		w_vpad: Tx * 8.2, // vertical padding between words and the inside of the box
+		isClient: false, // boolean, means extra
+		scale_you: Tx * 20, // scaling of the block saying "you"
+		tri_w: Tx * 12, // Width, in pixels, of the little triangle (spell pointer)
+		tri_h: Tx * 8 // Height, in pixels, of the little triangle (spell pointer)
 	    };
 
 
-	    var Arrangement_i = snDraw.Game.Words.CalculateWordArrangement(WordGrpsList_i, HorizontalBounds, Spacings, "left");
+	    var WordBlockBounds = {
+		left: (PlayerZoneStyle.hpad + PlayerZoneStyle.thick + PlayerZoneStyle.w_hpad),
+		right: (snDraw.canv_W - (PlayerZoneStyle.hpad + PlayerZoneStyle.thick + PlayerZoneStyle.w_hpad)),
+		topPadding: PlayerZoneStyle.w_vpad
+	    };
+	    
+	    var ZoneVPaddings = {
+		above: Tx,
+		between: Tx * 1.5,
+		bottom: Tx
+	    }
+
+	    console.log(WordBlockBounds);
+
+	    var Arrangement_i = snDraw.Game.Words.GenWordArrangement(WordGrpsList_i, WordBlockBounds, Spacings, "left");
 	    ArrangementsArray.push(Arrangement_i);
 	    ZonesWordsGroups.push(WordGrpsList_i);
 	}
@@ -88,29 +119,13 @@ snDraw.Game.Event = {
 
 	// 6. Determine the sizes for all the zones, then make them as Fabric objects...
 	var grid_bottom_px = snDraw.Game.Grid.GetGridBottomPx();
-	var ZoneSizes = snDraw.Game.Zones.CalculateAllZoneSizes(ArrangementsArray, grid_bottom_px, 8, 4, Spacings);
+	var ZoneSizes = snDraw.Game.Zones.CalcZoneSizes(ArrangementsArray, grid_bottom_px, ZoneVPaddings, Spacings);
 
 	for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
 	    var Height = ZoneSizes[i].Height;
 	    var Top = ZoneSizes[i].Top;
 
-	    var Style = { //all in pixels
-		hpad: 4,  // horizonal padding between screen boundary and box edge (vertical)
-		// no use here... vpad: 1, // vertical spacing between zones (between lower edge of bottom boundary and top of upper text)
-		spellpad: 10, // vertical padding of spell (between upper edge of bottom box boundary and lower edge of tile).
-		box_fill: 'rgba(0,0,0,0)', // inside the box
-		text_bg: 'black', // inside the box
-		thick: 8, // thickness of the box line
-		text_pad: " ",
-		justify: "left", // justification of the title
-		titlepad: 40, // effectively, the indentation of the title	
-		fontsize: 30, // refers to the font of the title
-		fonthalfheight: 17, // refers to the offset between top of font and top surface of box
-		isClient: false, // boolean, means extra
-		scale_you: 80, // scaling of the block saying "you"
-		tri_w: 50, // Width, in pixels, of the little triangle (spell pointer)
-		tri_h: 30 // Height, in pixels, of the little triangle (spell pointer)
-	    }
+
 
 	    var Properties = {
 		color: snDraw.Game.Zones.PlayerZone[i].player.color, // text colour and box boundary
@@ -120,9 +135,9 @@ snDraw.Game.Event = {
 	    
 	    //generate the fabric objects that represent the new zone. Note that properties left & top are not set
 	    //nor are the objects present onf the canvas.
-	    var Zone_i_FabObjs = snDraw.Game.Zones.CreateZoneBox(Height, Style, Properties);
-	    var Zone_i_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, Style);
-	    var Zone_i_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, Style);
+	    var Zone_i_FabObjs = snDraw.Game.Zones.CreateZoneBox(Height, PlayerZoneStyle, Properties);
+	    var Zone_i_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, PlayerZoneStyle);
+	    var Zone_i_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, PlayerZoneStyle);
 
 	    //for each object making the ZONE, set coordinates and place on canvas...
 	    for (var j = 0; j < Zone_i_FabObjs.length; j++){
@@ -133,7 +148,8 @@ snDraw.Game.Event = {
 
 	    // place the words in the zone
 
-	    var Arrangement_i = snDraw.Game.Words.WordArrangementSetHeight(ArrangementsArray[i], Top+50);
+	    var WordsTopPx = Top + WordBlockBounds.topPadding;
+	    var Arrangement_i = snDraw.Game.Words.WordArrangementSetHeight(ArrangementsArray[i], WordsTopPx);
 	    for (var j = 0; j < Arrangement_i.coords.length; j++){
 		snDraw.moveSwitchable(ZonesWordsGroups[i][j], false, null, Arrangement_i.coords[j]);
 	    }

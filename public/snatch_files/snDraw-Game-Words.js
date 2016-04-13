@@ -208,7 +208,7 @@ snDraw.Game.Words = {
     MoveWordsIntoRectangleSpace: function(WordArray, Bounds, Spacings, justification, b_animate){
 
 	//get the coordinates for the arrangement
-	var myArrangement = this.CalculateWordArrangement(WordArray, Bounds, Spacings, justification);
+	var myArrangement = this.GenWordArrangement(WordArray, Bounds, Spacings, justification);
 
 	//move all words to those coordinates.
 	for (var i = 0; i < WordArray.length; i++){//this will run through the words to move...
@@ -318,7 +318,7 @@ snDraw.Game.Words = {
 
 
     // drawSingleCapturedWord & animateRepositionPlayerWords
-    CalculateWordArrangement: function(WordArray, HorizonalBounds, Spacings, justification){
+    GenWordArrangement: function(WordArray, HorizonalBounds, Spacings, justification){
 
 	// Array 'breaks' holds the indices of the last word of each line
 	var Arrangement = {coords: [], word_width_px: [], breaks: []};
@@ -328,10 +328,13 @@ snDraw.Game.Words = {
 
 	//function used internally
 	var justify_final_word_row = function(spare_px){
-	    var i_first = Arrangement.breaks.slice(-2)[0];
-	    var i_final = Arrangement.breaks.slice(-1)[0];
+	    var j_first = 0;
+	    if(Arrangement.breaks.length > 1){
+		j_first = Arrangement.breaks.slice(-2)[0] + 1;//first word of next line...
+	    }
+	    var j_final = Arrangement.breaks.slice(-1)[0];
 
-	    for (var j = i_first; j <= i_final; j++){//this will run through the words to shift
+	    for (var j = j_first; j <= j_final; j++){//this will run through the words to shift
 		if(justification == "center"){
 		    Arrangement.coords[j].left += (spare_px/2);
 		}else if(justification == "right"){
@@ -354,7 +357,7 @@ snDraw.Game.Words = {
 		Arrangement.breaks.push(i-1);
 
 		//potentially shuffle the words along in accordance with the requested justification
-		justify_final_word_row(HorizonalBounds.right - x_plotter);
+		justify_final_word_row(HorizonalBounds.right - (x_plotter - Spacings.wg));
 
 		//now adjust the plotter coords along...
 		x_plotter = wrapCoords.left;
@@ -374,7 +377,7 @@ snDraw.Game.Words = {
 	//take all the wrap actions for the final word
 	if(WordArray.length>0){
 	    Arrangement.breaks.push(WordArray.length-1);
-	    justify_final_word_row(HorizonalBounds.right - x_plotter - Spacings.wg);//the value passed is "space px"
+	    justify_final_word_row(HorizonalBounds.right - (x_plotter - Spacings.wg));//the value passed is "space px"
 	}
 	return Arrangement;
     },
