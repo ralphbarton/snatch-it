@@ -6,7 +6,6 @@ var players = [];//global reference - for server data...
 var tilestats = {};//global reference - for server data...
 
 var client_player_index = undefined;
-var disconnected_players = [];
 
 var dev = true;
 

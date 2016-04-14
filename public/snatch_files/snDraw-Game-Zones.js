@@ -2,7 +2,9 @@ snDraw.Game.Zones = {
 
     //member data
     PlayerZone: [],//rarranged subset of array players
-    unusedTilesBottomPx: undefined,
+    Unclaimed: {},
+    
+    unusedTilesBottomPx: undefined,//delete this line and others...
 
     //member functions
     CreatePlayerZoneListAndDraw: function(){
@@ -376,16 +378,16 @@ snDraw.Game.Zones = {
 
 	var ObjectArray = [zoneBox,plrName];
 
-	if(Style.isClient){
+	if(Properties.isClient){
 	    var youBlock = new fabric.Rect({
-		width: (Style.scale_you * 2),
-		height: Style.scale_you,
+		width: Style.you_w,
+		height: Style.you_h,
 		fill: Properties.color
 	    });
 
 	    var youText = new fabric.Text("You",{
 		fill: snDraw.Game.bg_col,
-		fontSize: Style.scale_you * 0.46,
+		fontSize: Style.you_fontsize,
 		fontWeight: 'bold',
 	    });
 
@@ -396,9 +398,11 @@ snDraw.Game.Zones = {
 		angle: 90
 	    });
 
+	    /*
 	    //"Spell Pointer" is a triangle that points to the word being spelled
 	    snDraw.Game.Spellx.SpellBottomPx = labelTop - cell * 0.05;
 	    snDraw.Game.Spellx.SpellLeftPx = boxLeft + cell * 0.3;
+	    */
 
 	    //maybe do it like this, or differently?
 	    ObjectArray.push(youBlock, youText, spellPointer);
@@ -443,13 +447,13 @@ snDraw.Game.Zones = {
 
     DetermineZoneBoxObjectsTops: function(Top, Height, Style){
 	var box_top = Top + Style.fonthalfheight - Style.thick/2;
-	var box_bottom = Top + Height;
-	var hor_centerline_height = box_bottom - (Style.thick + Style.spellpad + snDraw.Game.tileSize/2);
+	var box_bottom = Top + Height - Style.thick/2;//center of border
+	var hor_centerline_height = box_bottom - (Style.spellpad + snDraw.Game.tileSize/2);
 	return [
 	    box_top, //zoneBox_top
 	    Top, // plrName_top
-	    (box_bottom - Style.scale_you), //youBlock_top
-	    (box_bottom - Style.scale_you), // youBlock_top
+	    (box_bottom - Style.you_h), //youBlock_top
+	    (box_bottom - Style.you_h + Style.you_font_Yoff), // youText_top
 	    (hor_centerline_height - Style.tri_h/2), // spellPointer_top
 	    (hor_centerline_height - snDraw.Game.tileSize/2) // SPELL_TILES_top
 	];
@@ -458,14 +462,13 @@ snDraw.Game.Zones = {
     DetermineZoneBoxObjectsLefts: function(Left_Offset, Style){
 	var boxLeft = Style.hpad;
 	var boxWidth  = snDraw.canv_W - 2 * Style.hpad - Style.thick; // this line is duplicated
-	var boxRight = boxLeft + boxWidth; // be careful. What is the definition of this? // TODO - CORRECT
-	var pointer_w = Style.scale_tri;
+	var boxRight = boxLeft + boxWidth + Style.thick/2; //center of border
 	return [
 	    (Left_Offset + boxLeft), // zoneBox_left
 	    (Left_Offset + Style.titlepad), // plrName_left -  // Ahem - this is incomplete!!!
-	    (Left_Offset + boxRight - Style.scale_you), // youBlock_left
-	    (Left_Offset + boxRight - Style.scale_you * 1.8), // youText_left
-	    (Left_Offset + boxLeft + pointer_w) // spellPointer_left // due to rotation, left is effectively a coordinate 'right'
+	    (Left_Offset + boxRight - Style.you_w), // youBlock_left
+	    (Left_Offset + boxRight - Style.you_w + Style.you_font_Xoff), // youText_left
+	    (Left_Offset + boxLeft + Style.tri_w) // spellPointer_left // rotation => left is effectively 'right'
 	];
     },
 
@@ -569,55 +572,65 @@ snDraw.Game.Zones = {
 	return ZonesHeightsTops;
     },
 
+    Style1: undefined,
+    Style2: undefined,
+    ZoneVerticalPaddings: undefined,
+    SetZoneStyleScalingsFromTileSize: function(tile_size_px){
+	var Tx = tile_size_px / 10;
 
-    calculatePlayerZoneSizes_tearup: function(){
-	var nZones = this.PlayerZone.length;
-	n_letters_in_zone = [];
-	n_letters_played = 0;
-	
-	//count the number of letters each player has, and total letters used within words
-	for(var i=0; i<nZones; i++){
-	    n_letters_in_zone[i] = 0;
-	    for(var j=0; j < this.PlayerZone[i].player.words.length; j++){
-		n_letters_in_zone[i] += this.PlayerZone[i].player.words[j].length;
-	    }
-	    n_letters_played += n_letters_in_zone[i];
+	//Zone Style 1 refers to the Player Zones....
+	this.Style1 = { //all in pixels
+	    hpad: Tx * 1.5,  // horizonal padding between screen boundary and box edge (vertical)
+	    w_hpad: Tx * 2.0, // horizonal padding between words and the inside of the box
+	    spellpad: Tx * 2.5, // vertical padding of spell (upper edge of bottom box to lower edge of tile).
+	    box_fill: 'rgba(0,0,0,0)', // inside the box
+	    text_bg: 'black', // inside the box
+	    thick: Tx * 1.2, // thickness of the box line
+	    text_pad: " ",
+	    justify: "left", // justification of the title
+	    titlepad: Tx * 10, // effectively, the indentation of the title	
+	    fontsize: Tx * 7, // refers to the font of the title
+	    fonthalfheight: Tx * 4, // refers to the offset between top of font and top surface of box
+	    w_vpad: Tx * 8.2, // vertical padding between words and the inside of the box
+	    you_w: Tx * 20, // scaling of the block saying "you"
+	    you_h: Tx * 10, // scaling of the block saying "you"
+	    you_fontsize: Tx * 9,
+	    you_font_Xoff: Tx * 2.9,
+	    you_font_Yoff: Tx * 0.5,
+	    tri_w: Tx * 12, // Width, in pixels, of the little triangle (spell pointer)
+	    tri_h: Tx * 8 // Height, in pixels, of the little triangle (spell pointer)
+	};
+
+	//Zone Style 2 refers to unused word Zone
+	this.Style2 = { //all in pixels
+	    hpad: Tx * 2.5,  // horizonal padding between screen boundary and box edge (vertical)
+	    w_hpad: Tx * 1.8, // horizonal padding between words and the inside of the box
+	    box_fill: 'rgba(255,255,255,0.02)', // inside the box
+	    text_bg: 'black', // inside the box
+	    thick: Tx * 1.8, // thickness of the box line
+	    text_pad: " ",
+	    justify: "center", // justification of the title
+	    fontsize: Tx * 9, // refers to the font of the title
+	    fonthalfheight: Tx * 5.14, // refers to the offset between top of font and top surface of box
+	    w_vpad: Tx * 9.2 // vertical padding between words and the inside of the box
+	};
+
+	function setStyleWordBlockBounds (Style){
+	    Style.WordBlockBounds = {
+		left: (Style.hpad + Style.thick + Style.w_hpad),
+		right: (snDraw.canv_W - (Style.hpad + Style.thick + Style.w_hpad)),
+		topPadding: Style.w_vpad
+	    };
 	}
 
-	//Determine the height coordinate of the top of all of the zones
-	var plr_top_cumulator = undefined;
-	plr_top_cumulator = Math.round(this.unusedTilesBottomPx + snDraw.Game.marginUnit);
+	setStyleWordBlockBounds(this.Style1);
+	setStyleWordBlockBounds(this.Style2);
 
-	//determine total amount of height contained within players' zone boxes
-	section_height = snDraw.canv_H - plr_top_cumulator;
-	zones_sum_height = section_height - nZones * snDraw.Game.stroke_px - (nZones-1)*snDraw.Game.textMarginUnit - snDraw.Game.marginUnit;
-	basic_height = snDraw.Game.tileSize + 4*snDraw.Game.marginUnit;
-	shareable_height = zones_sum_height - nZones * basic_height;
-
-	for(var i=0; i<nZones; i++){
-	    //now, we don't want to go dividing by zero if it's a new game with nothing played!!
-	    var hRatio = 0;
-	    if(n_letters_played){
-		hRatio = n_letters_in_zone[i] / n_letters_played;
-	    }else{
-		hRatio = 1 / nZones;
-	    }
-
-	    var zone_i = this.PlayerZone[i];
-
-	    //this line of code adds the attribute calculated to the relevant player object within the array...
-	    zone_i.zone_height = basic_height + Math.round( hRatio * shareable_height );
-	    zone_i.zone_top = plr_top_cumulator;
-
-	    //set the base coordinates:
-	    zone_i.player.x_next_word = snDraw.Game.x_plotter_R;
-	    zone_i.player.y_first_word = zone_i.zone_top + 1.8 * snDraw.Game.marginUnit;
-	    zone_i.player.y_next_word = zone_i.player.y_first_word;
-
-	    plr_top_cumulator += this.PlayerZone[i].zone_height + snDraw.Game.textMarginUnit + snDraw.Game.stroke_px;
-	}
-    },
-
-
+	this.ZoneVerticalPaddings = {
+	    above: Tx,
+	    between: Tx * 1.5,
+	    bottom: Tx
+	};
+    }
 
 };

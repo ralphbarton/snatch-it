@@ -5,6 +5,7 @@ snDraw.Game.Event = {
 
 	// 1. Determine Scale Constants & set background...
 	var Spacings = snDraw.Game.calculateRenderingDimentionConstants();
+	snDraw.Game.Zones.SetZoneStyleScalingsFromTileSize(Spacings.ts);
 	canvas.setBackgroundColor(snDraw.Game.bg_col);
 
 	// 2. Add the controls strip
@@ -30,19 +31,33 @@ snDraw.Game.Event = {
 	    is_client: true
 	};
 
-	// 4.2 Add all players who who have words and aren't client
+	// 4.2 Add all players who who (A) have words, (B) aren't our client and (C) aren't disconnected
+	snDraw.Game.Zones.Unclaimed.playerslist = [];
 	for (var i=0; i<players.length; i++){
 	    if((i!=client_player_index) && (players[i].words.length>0)){
-		snDraw.Game.Zones.PlayerZone.push({
-		    player: players[i],
-		    is_client: false
-		});
+		if(players[i].is_disconnected == false){
+		    snDraw.Game.Zones.PlayerZone.push({
+			player: players[i],
+			is_client: false
+		    });
+		}else{
+		    snDraw.Game.Zones.Unclaimed.playerslist.push(players[i]);
+		}
 	    }
 	}
 
-	// 5. For all zones: generate words and determine their arrangement
+	// 4.9 For uncalimed
+
+	// 5. For all player zones: generate words and determine their arrangement
+	var ZoneSty_P = snDraw.Game.Zones.Style1;
+	var WordBounds_P = ZoneSty_P.WordBlockBounds;
+	var ZoneSty_U = snDraw.Game.Zones.Style2;
+	var WordBounds_U = ZoneSty_U.WordBlockBounds;
+	var interzonePad = snDraw.Game.Zones.ZoneVerticalPaddings;
+
 	var ArrangementsArray = [];
 	var ZonesWordsGroups = [];
+
 	for (var i=0; i < snDraw.Game.Zones.PlayerZone.length; i++){
 
 	    var Zone_i = snDraw.Game.Zones.PlayerZone[i];
@@ -69,49 +84,9 @@ snDraw.Game.Event = {
 	    }
 
 	    // 5.2 Determine the Arrangement of that player's words.
-	    // ?? efficiency problem. Use the function iteratively?
-	    /*
-	      This is a problem. We're supposed to get the inner bound of the box from creating the zone,
-	      but we also require the before the zone is created. Refactor AAargh.
-	    */
-
-	    var Tx = snDraw.Game.tileSize / 10;
-
-	    var PlayerZoneStyle = { //all in pixels
-		hpad: Tx * 1.5,  // horizonal padding between screen boundary and box edge (vertical)
-		w_hpad: Tx * 2.0, // horizonal padding between words and the inside of the box
-		spellpad: Tx * 2.5, // vertical padding of spell (upper edge of bottom box to lower edge of tile).
-		box_fill: 'rgba(0,0,0,0)', // inside the box
-		text_bg: 'black', // inside the box
-		thick: Tx * 1.2, // thickness of the box line
-		text_pad: " ",
-		justify: "left", // justification of the title
-		titlepad: Tx * 10, // effectively, the indentation of the title	
-		fontsize: Tx * 7, // refers to the font of the title
-		fonthalfheight: Tx * 4, // refers to the offset between top of font and top surface of box
-		w_vpad: Tx * 8.2, // vertical padding between words and the inside of the box
-		isClient: false, // boolean, means extra
-		scale_you: Tx * 20, // scaling of the block saying "you"
-		tri_w: Tx * 12, // Width, in pixels, of the little triangle (spell pointer)
-		tri_h: Tx * 8 // Height, in pixels, of the little triangle (spell pointer)
-	    };
 
 
-	    var WordBlockBounds = {
-		left: (PlayerZoneStyle.hpad + PlayerZoneStyle.thick + PlayerZoneStyle.w_hpad),
-		right: (snDraw.canv_W - (PlayerZoneStyle.hpad + PlayerZoneStyle.thick + PlayerZoneStyle.w_hpad)),
-		topPadding: PlayerZoneStyle.w_vpad
-	    };
-	    
-	    var ZoneVPaddings = {
-		above: Tx,
-		between: Tx * 1.5,
-		bottom: Tx
-	    }
-
-	    console.log(WordBlockBounds);
-
-	    var Arrangement_i = snDraw.Game.Words.GenWordArrangement(WordGrpsList_i, WordBlockBounds, Spacings, "left");
+	    var Arrangement_i = snDraw.Game.Words.GenWordArrangement(WordGrpsList_i, WordBounds_P, Spacings, "left");
 	    ArrangementsArray.push(Arrangement_i);
 	    ZonesWordsGroups.push(WordGrpsList_i);
 	}
@@ -119,28 +94,34 @@ snDraw.Game.Event = {
 
 	// 6. Determine the sizes for all the zones, then make them as Fabric objects...
 	var grid_bottom_px = snDraw.Game.Grid.GetGridBottomPx();
-	var ZoneSizes = snDraw.Game.Zones.CalcZoneSizes(ArrangementsArray, grid_bottom_px, ZoneVPaddings, Spacings);
+
+
+
+	//Calculate sizes of the zones...
+	var ZoneSizes = snDraw.Game.Zones.CalcZoneSizes(ArrangementsArray, grid_bottom_px, interzonePad, Spacings);
+
 
 	for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
 	    var Height = ZoneSizes[i].Height;
 	    var Top = ZoneSizes[i].Top;
 
 
-
 	    var Properties = {
 		color: snDraw.Game.Zones.PlayerZone[i].player.color, // text colour and box boundary
-		text: snDraw.Game.Zones.PlayerZone[i].player.name // Text of the title
+		text: snDraw.Game.Zones.PlayerZone[i].player.name, // Text of the title
+		isClient: snDraw.Game.Zones.PlayerZone[i].is_client
 	    };
 
 	    
 	    //generate the fabric objects that represent the new zone. Note that properties left & top are not set
 	    //nor are the objects present onf the canvas.
-	    var Zone_i_FabObjs = snDraw.Game.Zones.CreateZoneBox(Height, PlayerZoneStyle, Properties);
-	    var Zone_i_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, PlayerZoneStyle);
-	    var Zone_i_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, PlayerZoneStyle);
+	    var Zone_i_FabObjs = snDraw.Game.Zones.CreateZoneBox(Height, ZoneSty_P, Properties);
+	    var Zone_i_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneSty_P);
+	    var Zone_i_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, ZoneSty_P);
 
 	    //for each object making the ZONE, set coordinates and place on canvas...
 	    for (var j = 0; j < Zone_i_FabObjs.length; j++){
+		console.log("placing an object at : ", Zone_i_Lefts[j], Zone_i_Tops[j]);
 		Zone_i_FabObjs[j].setLeft(Zone_i_Lefts[j]);
 		Zone_i_FabObjs[j].setTop(Zone_i_Tops[j]);
 		canvas.add(Zone_i_FabObjs[j]);
@@ -148,7 +129,7 @@ snDraw.Game.Event = {
 
 	    // place the words in the zone
 
-	    var WordsTopPx = Top + WordBlockBounds.topPadding;
+	    var WordsTopPx = Top + WordBounds_P.topPadding;
 	    var Arrangement_i = snDraw.Game.Words.WordArrangementSetHeight(ArrangementsArray[i], WordsTopPx);
 	    for (var j = 0; j < Arrangement_i.coords.length; j++){
 		snDraw.moveSwitchable(ZonesWordsGroups[i][j], false, null, Arrangement_i.coords[j]);
