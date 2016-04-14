@@ -112,11 +112,13 @@ socket.on('player wants reset', function(player_index){
 
 
 socket.on('player disconnected', function(player_index){
-    var player_name = players[player_index].name;
-    console.log("TOAST: " + player_name + " disconnected");
+    var dis_plr = players[player_index];
+    dis_plr.is_disconnected = true;
 
+    console.log("TOAST: " + dis_plr.name + " disconnected");
 
     console.log("this message needs to be replace with additional code to handle this event...");
+
 });
 
 //this is message to Tell me that Alex has said "Reset" - inform of another players decision

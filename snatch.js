@@ -1,4 +1,4 @@
-var express = require('express');
+1var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
@@ -48,15 +48,14 @@ io.on('connection', function(socket){
 
     //basic logging
     console.log('a user connected, with ID: '+socket.id);
+
     socket.on('disconnect', function(){
 	var dis_pl_i = myGame.playerIndexFromSocket(socket.id);
 	//does a player with this socket ID still exist in the server's list anyway?
 
-	if(myGame.playerWithSocketExists(socket.id)){
+	socket.broadcast.emit('player disconnected',dis_pl_i);
+	myGame.removePlayer(socket.id);
 
-	    socket.broadcast.emit('player disconnected',dis_pl_i);
-	    myGame.removePlayer(socket.id);
-	}
 	console.log('Player ' + dis_pl_i + ' disconnected (socket.id = ' + socket.id + ')');
     });
 
