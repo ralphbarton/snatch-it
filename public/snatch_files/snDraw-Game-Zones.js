@@ -58,12 +58,7 @@ snDraw.Game.Zones = {
 	}
 
 	//Determine the height coordinate of the top of all of the zones
-	var plr_top_cumulator = undefined;
-	if(disconnected_players.length == 0){//there is no "unclaimed words zone"
-	    plr_top_cumulator = Math.round(this.unusedTilesBottomPx + snDraw.Game.marginUnit);
-	}else{
-	    plr_top_cumulator = 3;//TODO: DETERMINE THE POSITION...
-	}
+	plr_top_cumulator = Math.round(this.unusedTilesBottomPx + snDraw.Game.marginUnit);
 
 	//determine total amount of height contained within players' zone boxes
 	section_height = snDraw.canv_H - plr_top_cumulator;
@@ -546,19 +541,17 @@ snDraw.Game.Zones = {
 	
 	//1. Determine how much height is actually required by all the lines of words...
 	for(var i = 0; i < n_zones; i++){
-	    var n_lines_i = ArrangementsArray[i].breaks.length;
-	    words_consume_height[i] = (n_lines_i - 1) * Spacings.tsvg + Spacings.ts;
+	    words_consume_height[i] = this.WordsStackHeightPx(ArrangementsArray[i], Spacings);
 	    words_consume_height_total += words_consume_height[i];
 	}
 
-	//2.
-
+	//2. Share the "spare height" between all active players...
 	var rem_height = snDraw.canv_H - EffectiveZoneTopPx;
 	var total_zone_height = rem_height - (n_zones-1) * ZoneVerticalPaddings.between - ZoneVerticalPaddings.bottom;
 	var spare_sharable_height = total_zone_height - words_consume_height_total;
 	var space_height_each = spare_sharable_height / (n_zones+1);
 
-	//3. return the sizes array...
+	//3. generate and return the sizes array (with Top and Height for each zone)...
 	var ZonesHeightsTops = [];
 	var Top_cumulator = EffectiveZoneTopPx;
 	for(var i = 0; i < n_zones; i++){
@@ -571,6 +564,12 @@ snDraw.Game.Zones = {
 	}
 	return ZonesHeightsTops;
     },
+
+    WordsStackHeightPx: function(Arrangement, Spacings){
+	var n_lines_i = Arrangement.breaks.length;
+	return (n_lines_i - 1) * Spacings.tsvg + Spacings.ts;
+    },
+
 
     Style1: undefined,
     Style2: undefined,

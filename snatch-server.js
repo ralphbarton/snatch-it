@@ -48,10 +48,13 @@ module.exports = function (nTiles){
 
 	removePlayer: function(socket_key) {
 	    var PI = player_index_from_socketKey_lkup[socket_key];
-	    playerSet[PI].is_disconnected = true;
-	    playerSet[PI].socket_key = true;
-	  
-	    delete player_index_from_socketKey_lkup[socket_key];
+	    //there is the possibility that the player was never attached to this socket...
+	    if(PI != undefined){
+		playerSet[PI].is_disconnected = true;
+		playerSet[PI].socket_key = true;
+	
+		delete player_index_from_socketKey_lkup[socket_key];
+	    }
 	},
 
 	isDisconnectedPlayerOfName: function(name) {

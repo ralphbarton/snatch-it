@@ -33,6 +33,7 @@ snDraw.Game.Event = {
 
 	// 4.2 Add all players who who (A) have words, (B) aren't our client and (C) aren't disconnected
 	snDraw.Game.Zones.Unclaimed.playerslist = [];
+	snDraw.Game.Zones.Unclaimed.exists = false;
 	for (var i=0; i<players.length; i++){
 	    if((i!=client_player_index) && (players[i].words.length>0)){
 		if(players[i].is_disconnected == false){
@@ -41,30 +42,16 @@ snDraw.Game.Event = {
 			is_client: false
 		    });
 		}else{
+		    snDraw.Game.Zones.Unclaimed.exists = true;
 		    snDraw.Game.Zones.Unclaimed.playerslist.push(players[i]);
 		}
 	    }
 	}
 
-	// 4.9 For uncalimed
 
-	// 5. For all player zones: generate words and determine their arrangement
-	var ZoneSty_P = snDraw.Game.Zones.Style1;
-	var WordBounds_P = ZoneSty_P.WordBlockBounds;
-	var ZoneSty_U = snDraw.Game.Zones.Style2;
-	var WordBounds_U = ZoneSty_U.WordBlockBounds;
-	var interzonePad = snDraw.Game.Zones.ZoneVerticalPaddings;
-
-	var ArrangementsArray = [];
-	var ZonesWordsGroups = [];
-
-	for (var i=0; i < snDraw.Game.Zones.PlayerZone.length; i++){
-
-	    var Zone_i = snDraw.Game.Zones.PlayerZone[i];
-	    var player_i = Zone_i.player;
-
-	    // 5.1 Generate that player's word list (as Fabric Groups)
-	    var WordGrpsList_i = [];
+	//5. Define a function here to generate a player's words as a list of Fabric objects
+	function generatePlayerWordObjs(player){
+	    var WordGrpsList = [];
 	    for (var j = 0; j < player_i.words.length; j++){
 
 		//extract the tileIDs of the tiles that make up this word, and create a tile object array
@@ -80,31 +67,91 @@ snDraw.Game.Event = {
 		    WordTileArray, Spacings, player_i);
 
 		//Add that word to the list...
-		WordGrpsList_i.push(WordGroup_j);
+		WordGrpsList.push(WordGroup_j);
 	    }
+	    return WordGrpsList;
+	}
 
-	    // 5.2 Determine the Arrangement of that player's words.
+	//5.1 retrieve style information...
+	var ZoneSty_P = snDraw.Game.Zones.Style1;
+	var WordBounds_P = ZoneSty_P.WordBlockBounds;
+	var ZoneSty_U = snDraw.Game.Zones.Style2;
+	var WordBounds_U = ZoneSty_U.WordBlockBounds;
+	var interzonePad = snDraw.Game.Zones.ZoneVerticalPaddings;
 
+
+	//5.2 Generate the word objects for all of the inactive players, and determine the arrangement for the unclaimed zone
+	if(snDraw.Game.Zones.Unclaimed.exists){
+	    var UnclaimedWordList = [];
+	    for (var i = 0; i < snDraw.Game.Zones.Unclaimed.playerslist.length; i++){
+		var player_i = snDraw.Game.Zones.Unclaimed.playerslist[i];
+		var UnclaimedWordList = UnclaimedWordList.concat(generatePlayerWordObjs(player_i));
+	    }
+	    var UnclaimedArrangement = snDraw.Game.Words.GenWordArrangement(UnclaimedWordList, WordBounds_U, Spacings, "center");
+	}
+
+	//5.3 Generate all word objects and arrangements for the zones of active players
+	var ArrangementsArray = [];
+	var ZonesWordsGroups = [];
+
+	for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
+	    var player_i = snDraw.Game.Zones.PlayerZone[i].player;
+
+	    var WordGrpsList_i = generatePlayerWordObjs(player_i);
+	    ZonesWordsGroups.push(WordGrpsList_i);
 
 	    var Arrangement_i = snDraw.Game.Words.GenWordArrangement(WordGrpsList_i, WordBounds_P, Spacings, "left");
 	    ArrangementsArray.push(Arrangement_i);
-	    ZonesWordsGroups.push(WordGrpsList_i);
+	}
+
+
+	// 6. Define a function which draws a zone filled with words on screen...
+	function generateZoneOnCanvas(Top, Height, ZoneSty, Properties, WordGroup, WordArrangement_noH, WordBounds){
+	    //generate the fabric objects that represent the new zone. Note that properties left & top are not set
+	    //nor are the objects present onf the canvas.
+	    var Zone_FabObjs = snDraw.Game.Zones.CreateZoneBox(Height, ZoneSty, Properties);
+	    var Zone_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneSty);
+	    var Zone_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, ZoneSty);
+
+	    //for each object making the ZONE, set coordinates and place on canvas...
+	    for (var j = 0; j < Zone_FabObjs.length; j++){
+		console.log("placing an object at : ", Zone_Lefts[j], Zone_Tops[j]);
+		Zone_FabObjs[j].setLeft(Zone_Lefts[j]);
+		Zone_FabObjs[j].setTop(Zone_Tops[j]);
+		canvas.add(Zone_FabObjs[j]);
+	    }
+
+	    // place the words in the zone
+
+	    var WordsTopPx = Top + WordBounds_P.topPadding;
+	    var Arrangement = snDraw.Game.Words.WordArrangementSetHeight(WordArrangement_noH, WordsTopPx);
+	    for (var j = 0; j < Arrangement.coords.length; j++){
+		snDraw.moveSwitchable(WordGroup[j], false, null, Arrangement.coords[j]);
+	    }
+	}
+
+	var upper_drawing_bound = snDraw.Game.Grid.GetGridBottomPx();
+
+	// 6.1 if an "unclaimed words zone" exists, then make this first.
+	if(snDraw.Game.Zones.Unclaimed.exists){
+	    snDraw.Game.Zones.WordsStackHeightPx(UnclaimedArrangement, Spacings);
+
+//can't call it yet, stuff not set...	    
+//	    generateZoneOnCanvas(Top, Height, ZoneSty_P, Properties, ZonesWordsGroups[i], ArrangementsArray[i], WordBounds_P);
+
+	    upper_drawing_bound += 100;
 	}
 	
 
-	// 6. Determine the sizes for all the zones, then make them as Fabric objects...
-	var grid_bottom_px = snDraw.Game.Grid.GetGridBottomPx();
+	// 6.2 Now make all of the player zones. Calculate their heights and draw them...
+	// function returns [{Top: , Height: }, ...}
+	var ZoneSizes = snDraw.Game.Zones.CalcZoneSizes(ArrangementsArray, upper_drawing_bound, interzonePad, Spacings);
 
-
-
-	//Calculate sizes of the zones...
-	var ZoneSizes = snDraw.Game.Zones.CalcZoneSizes(ArrangementsArray, grid_bottom_px, interzonePad, Spacings);
-
-
+	//Actually generate all of the active player zones...
 	for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
-	    var Height = ZoneSizes[i].Height;
-	    var Top = ZoneSizes[i].Top;
 
+	    var Top = ZoneSizes[i].Top;
+	    var Height = ZoneSizes[i].Height;
 
 	    var Properties = {
 		color: snDraw.Game.Zones.PlayerZone[i].player.color, // text colour and box boundary
@@ -112,30 +159,8 @@ snDraw.Game.Event = {
 		isClient: snDraw.Game.Zones.PlayerZone[i].is_client
 	    };
 
-	    
-	    //generate the fabric objects that represent the new zone. Note that properties left & top are not set
-	    //nor are the objects present onf the canvas.
-	    var Zone_i_FabObjs = snDraw.Game.Zones.CreateZoneBox(Height, ZoneSty_P, Properties);
-	    var Zone_i_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneSty_P);
-	    var Zone_i_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, ZoneSty_P);
-
-	    //for each object making the ZONE, set coordinates and place on canvas...
-	    for (var j = 0; j < Zone_i_FabObjs.length; j++){
-		console.log("placing an object at : ", Zone_i_Lefts[j], Zone_i_Tops[j]);
-		Zone_i_FabObjs[j].setLeft(Zone_i_Lefts[j]);
-		Zone_i_FabObjs[j].setTop(Zone_i_Tops[j]);
-		canvas.add(Zone_i_FabObjs[j]);
-	    }
-
-	    // place the words in the zone
-
-	    var WordsTopPx = Top + WordBounds_P.topPadding;
-	    var Arrangement_i = snDraw.Game.Words.WordArrangementSetHeight(ArrangementsArray[i], WordsTopPx);
-	    for (var j = 0; j < Arrangement_i.coords.length; j++){
-		snDraw.moveSwitchable(ZonesWordsGroups[i][j], false, null, Arrangement_i.coords[j]);
-	    }
+	    generateZoneOnCanvas(Top, Height, ZoneSty_P, Properties, ZonesWordsGroups[i], ArrangementsArray[i], WordBounds_P);
 	}
-
 
     },
 
