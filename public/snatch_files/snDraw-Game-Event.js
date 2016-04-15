@@ -113,6 +113,11 @@ snDraw.Game.Event = {
 	    var Zone_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneSty);
 	    var Zone_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, ZoneSty, Zone_FabObjs[1].width);
 
+	    if(ZoneSty.justify == "center"){
+		console.log(Top);
+		console.log(Zone_Tops);
+	    }
+
 	    //for each object making the ZONE, set coordinates and place on canvas...
 	    for (var j = 0; j < Zone_FabObjs.length; j++){
 		Zone_FabObjs[j].setLeft(Zone_Lefts[j]);
@@ -122,7 +127,7 @@ snDraw.Game.Event = {
 
 	    // place the words in the zone
 
-	    var WordsTopPx = Top + WordBounds_P.topPadding;
+	    var WordsTopPx = Top + WordBounds.topPadding;
 	    var Arrangement = snDraw.Game.Words.WordArrangementSetHeight(WordArrangement_noH, WordsTopPx);
 	    for (var j = 0; j < Arrangement.coords.length; j++){
 		snDraw.moveSwitchable(WordGroup[j], false, null, Arrangement.coords[j]);
@@ -134,8 +139,13 @@ snDraw.Game.Event = {
 	// 6.1 if an "unclaimed words zone" exists, then make this first.
 	if(snDraw.Game.Zones.Unclaimed.exists){
 
+	    upper_drawing_bound += snDraw.Game.Zones.ZoneVerticalPaddings.aboveU;
 	    var Top = upper_drawing_bound;
-	    var Height = snDraw.Game.Zones.WordsStackHeightPx(UnclaimedArrangement, Spacings) + 50;
+	    console.log(upper_drawing_bound);
+	    var tile_stroke_prop = 0.06;
+	    //note that top padding includes 
+	    var Height_pads_tot = Spacings.ts * tile_stroke_prop + ZoneSty_U.thick*2 + ZoneSty_U.w_vpad*2;
+	    var Height = snDraw.Game.Zones.WordsStackHeightPx(UnclaimedArrangement, Spacings) + Height_pads_tot;// + ZoneSty_U;
 
 	    var Properties = {
 		color: 'grey',

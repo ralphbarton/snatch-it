@@ -359,7 +359,7 @@ snDraw.Game.Zones = {
 
 	var zoneBox = new fabric.Rect({
 	    width: boxWidth,
-	    height: (Height - Style.fonthalfheight - Style.thick/2),
+	    height: (Height - Math.max(Style.fonthalfheight, Style.thick/2) - Style.thick/2),
 	    fill: Style.box_fill,
 	    stroke: Properties.color,
 	    strokeWidth: Style.thick
@@ -418,30 +418,8 @@ snDraw.Game.Zones = {
     },
 
 
-    createZoneBox_TEAR_UP: function(pZone, animate_from_left){
-	
-	if(animate_from_left){
-	    var origX = OB.getLeft();
-
-	    //place the object outside the Canvas (setting this position is non animated)
-	    snDraw.moveSwitchable(OB, false, null,{
-		left: origX - snDraw.canv_W,
-	    });
-
-	    //move in (animated)
-	    snDraw.moveSwitchable(OB, true, snDraw.ani.sty_Join,{
-		left: origX,
-	    });
-	}
-	
-
-	//array item [1] this is the name text...
-	ObjectArray[1].bringForward();//so that it shows above the line..
-    },
-
-
     DetermineZoneBoxObjectsTops: function(Top, Height, Style){
-	var box_top = Top + Style.fonthalfheight - Style.thick/2;
+	var box_top = Top + Math.max(Style.fonthalfheight - Style.thick/2, 0);
 	var box_bottom = Top + Height - Style.thick/2;//center of border
 	var hor_centerline_height = box_bottom - (Style.spellpad + snDraw.Game.tileSize/2);
 	return [
@@ -614,21 +592,21 @@ snDraw.Game.Zones = {
 	this.Style2 = { //all in pixels
 	    hpad: Tx * 9,  // horizonal padding between screen boundary and box edge (vertical)
 	    w_hpad: Tx * 1.8, // horizonal padding between words and the inside of the box
-	    box_fill: 'rgba(255,255,255,0.02)', // inside the box
+	    box_fill: 'rgba(255,255,255,0.1)', // inside the box
 	    text_bg: 'black', // inside the box
-	    thick: Tx * 1.8, // thickness of the box line
+	    thick: Tx * 2.2, // thickness of the box line
 	    text_pad: " ",
 	    justify: "center", // justification of the title
-	    fontsize: Tx * 9, // refers to the font of the title
-	    fonthalfheight: Tx * 6, // refers to the offset between top of font and top surface of box
-	    w_vpad: Tx * 9.2 // vertical padding between words and the inside of the box
+	    fontsize: 0.1, // refers to the font of the title
+	    fonthalfheight: 0.1, // refers to the offset between top of font and top surface of box
+	    w_vpad: Tx * 1.8 // vertical padding between words and the inside of the box
 	};
 
 	function setStyleWordBlockBounds (Style){
 	    Style.WordBlockBounds = {
 		left: (Style.hpad + Style.thick + Style.w_hpad),
 		right: (snDraw.canv_W - (Style.hpad + Style.thick + Style.w_hpad)),
-		topPadding: Style.w_vpad
+		topPadding: (Style.w_vpad + Style.thick)
 	    };
 	}
 
@@ -636,6 +614,7 @@ snDraw.Game.Zones = {
 	setStyleWordBlockBounds(this.Style2);
 
 	this.ZoneVerticalPaddings = {
+	    aboveU: Tx * 1.5,
 	    above: Tx,
 	    between: Tx * 1.5,
 	    bottom: Tx
