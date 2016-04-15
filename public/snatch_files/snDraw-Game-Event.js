@@ -82,12 +82,12 @@ snDraw.Game.Event = {
 
 	//5.2 Generate the word objects for all of the inactive players, and determine the arrangement for the unclaimed zone
 	if(snDraw.Game.Zones.Unclaimed.exists){
-	    var UnclaimedWordList = [];
+	    var UnclaimedWordGroups = [];
 	    for (var i = 0; i < snDraw.Game.Zones.Unclaimed.playerslist.length; i++){
 		var player_i = snDraw.Game.Zones.Unclaimed.playerslist[i];
-		var UnclaimedWordList = UnclaimedWordList.concat(generatePlayerWordObjs(player_i));
+		UnclaimedWordGroups = UnclaimedWordGroups.concat(generatePlayerWordObjs(player_i));
 	    }
-	    var UnclaimedArrangement = snDraw.Game.Words.GenWordArrangement(UnclaimedWordList, WordBounds_U, Spacings, "center");
+	    var UnclaimedArrangement = snDraw.Game.Words.GenWordArrangement(UnclaimedWordGroups, WordBounds_U, Spacings, "center");
 	}
 
 	//5.3 Generate all word objects and arrangements for the zones of active players
@@ -115,7 +115,6 @@ snDraw.Game.Event = {
 
 	    //for each object making the ZONE, set coordinates and place on canvas...
 	    for (var j = 0; j < Zone_FabObjs.length; j++){
-		console.log("placing an object at : ", Zone_Lefts[j], Zone_Tops[j]);
 		Zone_FabObjs[j].setLeft(Zone_Lefts[j]);
 		Zone_FabObjs[j].setTop(Zone_Tops[j]);
 		canvas.add(Zone_FabObjs[j]);
@@ -134,12 +133,19 @@ snDraw.Game.Event = {
 
 	// 6.1 if an "unclaimed words zone" exists, then make this first.
 	if(snDraw.Game.Zones.Unclaimed.exists){
-	    snDraw.Game.Zones.WordsStackHeightPx(UnclaimedArrangement, Spacings);
 
-//can't call it yet, stuff not set...	    
-//	    generateZoneOnCanvas(Top, Height, ZoneSty_P, Properties, ZonesWordsGroups[i], ArrangementsArray[i], WordBounds_P);
+	    var Top = upper_drawing_bound;
+	    var Height = snDraw.Game.Zones.WordsStackHeightPx(UnclaimedArrangement, Spacings) + 50;
 
-	    upper_drawing_bound += 100;
+	    var Properties = {
+		color: 'grey',
+		text: 'unclaimed',
+		isClient: false
+	    };
+
+	    generateZoneOnCanvas(Top, Height, ZoneSty_U, Properties, UnclaimedWordGroups, UnclaimedArrangement, WordBounds_U);
+
+	    upper_drawing_bound += Height;
 	}
 	
 

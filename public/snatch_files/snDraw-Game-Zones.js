@@ -579,12 +579,12 @@ snDraw.Game.Zones = {
 
 	//Zone Style 1 refers to the Player Zones....
 	this.Style1 = { //all in pixels
-	    hpad: Tx * 1.5,  // horizonal padding between screen boundary and box edge (vertical)
+	    hpad: Tx * 1.4,  // horizonal padding between screen boundary and box edge (vertical)
 	    w_hpad: Tx * 2.0, // horizonal padding between words and the inside of the box
 	    spellpad: Tx * 2.5, // vertical padding of spell (upper edge of bottom box to lower edge of tile).
 	    box_fill: 'rgba(0,0,0,0)', // inside the box
 	    text_bg: 'black', // inside the box
-	    thick: Tx * 1.2, // thickness of the box line
+	    thick: Tx * 0.9, // thickness of the box line
 	    text_pad: " ",
 	    justify: "left", // justification of the title
 	    titlepad: Tx * 10, // effectively, the indentation of the title	
@@ -602,7 +602,7 @@ snDraw.Game.Zones = {
 
 	//Zone Style 2 refers to unused word Zone
 	this.Style2 = { //all in pixels
-	    hpad: Tx * 2.5,  // horizonal padding between screen boundary and box edge (vertical)
+	    hpad: Tx * 9,  // horizonal padding between screen boundary and box edge (vertical)
 	    w_hpad: Tx * 1.8, // horizonal padding between words and the inside of the box
 	    box_fill: 'rgba(255,255,255,0.02)', // inside the box
 	    text_bg: 'black', // inside the box
