@@ -454,16 +454,26 @@ snDraw.Game.Zones = {
 	];
     },
 
-    DetermineZoneBoxObjectsLefts: function(Left_Offset, Style){
+    DetermineZoneBoxObjectsLefts: function(Left_Offset, Style, textWidth){
 	var boxLeft = Style.hpad;
 	var boxWidth  = snDraw.canv_W - 2 * Style.hpad - Style.thick; // this line is duplicated
 	var boxRight = boxLeft + boxWidth + Style.thick/2; //center of border
+	var textLeft = undefined;
+
+	if((textWidth != undefined)&&(Style.justify == "center")){
+	    textLeft = boxLeft + (boxWidth - textWidth)/2;
+	}else if((textWidth != undefined)&&(Style.justify == "right")){
+	    textLeft = boxRight - Style.titlepad - textWidth; 
+	}else{//assume it is left-justify
+	    textLeft = Style.titlepad;
+	}
+
 	return [
 	    (Left_Offset + boxLeft), // zoneBox_left
-	    (Left_Offset + Style.titlepad), // plrName_left -  // Ahem - this is incomplete!!!
+	    (Left_Offset + textLeft), // plrName_left
 	    (Left_Offset + boxRight - Style.you_w), // youBlock_left
 	    (Left_Offset + boxRight - Style.you_w + Style.you_font_Xoff), // youText_left
-	    (Left_Offset + boxLeft + Style.tri_w) // spellPointer_left // rotation => left is effectively 'right'
+	    (Left_Offset + boxLeft + Style.thick/2 + Style.tri_w) // spellPointer_left // rotation => left is effectively 'right'
 	];
     },
 
@@ -596,8 +606,8 @@ snDraw.Game.Zones = {
 	    you_fontsize: Tx * 9,
 	    you_font_Xoff: Tx * 2.9,
 	    you_font_Yoff: Tx * 0.5,
-	    tri_w: Tx * 12, // Width, in pixels, of the little triangle (spell pointer)
-	    tri_h: Tx * 8 // Height, in pixels, of the little triangle (spell pointer)
+	    tri_w: Tx * 5, // Width, in pixels, of the little triangle (spell pointer)
+	    tri_h: Tx * 7 // Height, in pixels, of the little triangle (spell pointer)
 	};
 
 	//Zone Style 2 refers to unused word Zone
@@ -610,7 +620,7 @@ snDraw.Game.Zones = {
 	    text_pad: " ",
 	    justify: "center", // justification of the title
 	    fontsize: Tx * 9, // refers to the font of the title
-	    fonthalfheight: Tx * 5.14, // refers to the offset between top of font and top surface of box
+	    fonthalfheight: Tx * 6, // refers to the offset between top of font and top surface of box
 	    w_vpad: Tx * 9.2 // vertical padding between words and the inside of the box
 	};
 

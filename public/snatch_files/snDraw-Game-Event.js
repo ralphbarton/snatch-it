@@ -111,7 +111,7 @@ snDraw.Game.Event = {
 	    //nor are the objects present onf the canvas.
 	    var Zone_FabObjs = snDraw.Game.Zones.CreateZoneBox(Height, ZoneSty, Properties);
 	    var Zone_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneSty);
-	    var Zone_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, ZoneSty);
+	    var Zone_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, ZoneSty, Zone_FabObjs[1].width);
 
 	    //for each object making the ZONE, set coordinates and place on canvas...
 	    for (var j = 0; j < Zone_FabObjs.length; j++){
