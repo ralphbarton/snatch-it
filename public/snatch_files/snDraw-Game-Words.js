@@ -255,26 +255,6 @@ snDraw.Game.Words = {
     },
 
 
-/* properties objects definitions:
-
-    Bounds = {
-    left
-    top
-    right
-    bottom??
-    }
-
-    Spacings = { //all in pixels
-    ts //tile size
-    lg //letter gap (gap only)
-    tslg //tile size added to letter gap
-    wg // word gap (gap only)
-    vg //vertical gap (gap only)
-    }
-
-*/
-
-
     AnimateWordCapture: function(WordTileArray, Coords, HorizonalBounds, Spacings, owner_player){
 	var word_length = WordTileArray.length;
 	var w_width_px = this.word_width_px(word_length, Spacings);
@@ -352,7 +332,7 @@ snDraw.Game.Words = {
 	    Arrangement.word_width_px.push(w_width_px);
 	    
 	    //determine if wrap necessary
-	    var wrapCoords = this.wordTilesWrap({left: x_plotter, top: y_plotter}, HorizonalBounds, Spacings, w_width_px);
+	    var wrapCoords = this.wordTilesWrap({left: (x_plotter-Spacings.wg), top: y_plotter}, HorizonalBounds, Spacings, w_width_px);
 	    if(wrapCoords){//this is if wrap is happening
 		Arrangement.breaks.push(i-1);
 
@@ -398,6 +378,7 @@ snDraw.Game.Words = {
     },
 
 
+    //the function assumes it is passed a coordinate which does not include a "trailing space"
     wordTilesWrap: function(Coords, HorizonalBounds, Spacings, my_width_px){
 	if(Coords.left + Spacings.wg + my_width_px > HorizonalBounds.right){
 	    return {

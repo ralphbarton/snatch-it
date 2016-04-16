@@ -56,6 +56,7 @@ snDraw.Game = {
 	TA = this.TileArray;//this is to enable faster debugging
     },
 
+    tileSpacings: undefined,
     calculateRenderingDimentionConstants: function(){    //this function relies upon a defined number of tiles, which is only after game state is loaded...
 	var N_pixels = snDraw.canv_W * snDraw.canv_H;
 	var Tile_pixels = N_pixels * this.Ratio_tile / tilestats.n_tiles;
@@ -75,25 +76,32 @@ snDraw.Game = {
 	this.tile_space_px = this.tileSize * grid_letter_spacing;
 	this.client_col = players[client_player_index].color;
 
-	return { //all in pixels
-	    ts: (this.tileSize), //tile size
-	    lg: (this.tileSize * 0.04), //letter gap (gap only) - "letter gap" refers to the gaps between letters within words. 
-	    tslg: (this.tileSize * 1.04), //tile size added to letter gap
-	    tsgg: (this.tileSize * 1.14), //tile size added to grid gap
-	    wg: (this.tileSize * 0.6), // word gap (gap only)
-	    tsvg: (this.tileSize * 1.12), //vertical gap between different rows of words, plus actual tile size
-	    grpad: (this.tileSize * 0.20), // minimum horizonal padding of the left and the right of the grid of letters
-	    ingh: (this.tileSize * 0.20), // inside a zone box, this is the horizonal padding between the inner wall and a letter
-	    ingt: (this.tileSize * 0.20) // inside a zone box, this is the vertical padding between the upper wall and a letter
+	var TSI = this.tileSize; // tile side inside (this excludes the size of the border)
+	var tile_stroke_prop = 0.06;
+	var TS = this.tileSize * (1+tile_stroke_prop);
+
+	this.tileSpacings = { //all in pixels
+	    tsi: TSI,
+	    ts_thick: TSI * tile_stroke_prop,
+	    ts: TS, //tile size, including border
+	    lg: (TS * 0.01), //letter gap (gap only) - "letter gap" refers to the gaps between letters within words. 
+	    tslg: (TS * 1.00), //tile size added to letter gap
+	    tsgg: (TS * 1.09), //tile size added to grid gap
+	    wg: (TS * 0.6), // word gap (gap only)
+	    tsvg: (TS * 1.15), //vertical gap between different rows of words, plus actual tile size
+	    grpad: (TS * 0.20), // minimum horizonal padding of the left and the right of the grid of letters
+	    ingh: (TS * 0.20), // inside a zone box, this is the horizonal padding between the inner wall and a letter
+	    ingt: (TS * 0.20) // inside a zone box, this is the vertical padding between the upper wall and a letter
 	};
 
+	return this.tileSpacings;
     },
 
     generateTileObject: function(tile,tile_id){
 
 	//parameter controlling the proportions of the tiles (boarder, font size)
 	var tile_letter_prop = 0.9;
-	var tile_stroke_prop = 0.06;
+
 
 	var myTileLetterObj = new fabric.Text(tile.letter,{
 	    originX: 'center',
@@ -120,7 +128,7 @@ snDraw.Game = {
 	    originY: 'center',
 	    fill: 'rgb(54,161,235)',
 	    stroke: '#777',
-	    strokeWidth: this.tileSize*tile_stroke_prop,
+	    strokeWidth: this.tileSpacings.ts_thick,
 	    width: this.tileSize,
 	    height: this.tileSize,
 	    rx: 0.12 * this.tileSize,

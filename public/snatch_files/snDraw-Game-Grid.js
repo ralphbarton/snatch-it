@@ -172,9 +172,8 @@ snDraw.Game.Grid = {
 	var width_used = (this.n_tiles_row-1) * Spacings.tsgg + Spacings.ts;
 	var left_pad = (snDraw.canv_W-width_used)/2;
 
-	var tile_stroke_prop = 0.06;
-	this.xGridOrigin = left_pad - Spacings.ts * tile_stroke_prop/2;
-	this.yGridOrigin = snDraw.Game.Controls.underneath_buttons_px - Spacings.ts * tile_stroke_prop/2;
+	this.xGridOrigin = left_pad;
+	this.yGridOrigin = snDraw.Game.Controls.underneath_buttons_px;
 	this.xy_incr = Spacings.tsgg;
     },
 
@@ -224,8 +223,7 @@ snDraw.Game.Grid = {
 	    }
 	}
 	var bottomLeft = this.RCgridPx({row:(row_count-1), col:0})
-	var tile_stroke_prop = 0.06;
-	return bottomLeft.top + snDraw.Game.tileSize*(1+tile_stroke_prop);
+	return bottomLeft.top + snDraw.Game.tileSpacings.ts;
     },
 
     DetachLetterSetFromGrid: function(tileIDs, ani_sty){

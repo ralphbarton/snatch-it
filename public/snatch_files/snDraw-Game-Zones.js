@@ -362,7 +362,9 @@ snDraw.Game.Zones = {
 	    height: (Height - Math.max(Style.fonthalfheight, Style.thick/2) - Style.thick/2),
 	    fill: Style.box_fill,
 	    stroke: Properties.color,
-	    strokeWidth: Style.thick
+	    strokeWidth: Style.thick,
+	    rx: Style.rounding,
+	    ry: Style.rounding
 	});
 
 	var plrName = new fabric.Text((Style.text_pad + Properties.text + Style.text_pad),{
@@ -386,21 +388,24 @@ snDraw.Game.Zones = {
 		fontWeight: 'bold',
 	    });
 
+	    //"Spell Pointer" is a triangle that points to the word being spelled
 	    var spellPointer = new fabric.Triangle({
 		width: Style.tri_h,//is actually height, due to rotation
 		height: Style.tri_w,//is actually width, due to rotation
 		fill: Properties.color,
+		angle: 90,
+	    });
+
+	    var spellPointerMask = new fabric.Triangle({
+		width: Style.tri_h,//is actually height, due to rotation
+		height: Style.tri_w,//is actually width, due to rotation
+		fill: 'rgba(0,0,0,1)',
 		angle: 90
 	    });
 
-	    /*
-	    //"Spell Pointer" is a triangle that points to the word being spelled
-	    snDraw.Game.Spellx.SpellBottomPx = labelTop - cell * 0.05;
-	    snDraw.Game.Spellx.SpellLeftPx = boxLeft + cell * 0.3;
-	    */
 
 	    //maybe do it like this, or differently?
-	    ObjectArray.push(youBlock, youText, spellPointer);
+	    ObjectArray.push(youBlock, youText, spellPointer, spellPointerMask);
 	}
 
 	for(var i = 0; i < ObjectArray.length; i++){
@@ -428,6 +433,7 @@ snDraw.Game.Zones = {
 	    (box_bottom - Style.you_h), //youBlock_top
 	    (box_bottom - Style.you_h + Style.you_font_Yoff), // youText_top
 	    (hor_centerline_height - Style.tri_h/2), // spellPointer_top
+	    (hor_centerline_height - Style.tri_h/2), // spellPointer_Mask_top
 	    (hor_centerline_height - snDraw.Game.tileSize/2) // SPELL_TILES_top
 	];
     },
@@ -445,13 +451,17 @@ snDraw.Game.Zones = {
 	}else{//assume it is left-justify
 	    textLeft = Style.titlepad;
 	}
+	
+	var spellpointer_left = boxLeft + Style.thick/2 + Style.tri_w; // rotation => left is effectively 'right'
+	var spellpointer_offset_thick = Style.thick * 2.5 * (Style.tri_w / Style.tri_h);
 
 	return [
 	    (Left_Offset + boxLeft), // zoneBox_left
 	    (Left_Offset + textLeft), // plrName_left
 	    (Left_Offset + boxRight - Style.you_w), // youBlock_left
 	    (Left_Offset + boxRight - Style.you_w + Style.you_font_Xoff), // youText_left
-	    (Left_Offset + boxLeft + Style.thick/2 + Style.tri_w) // spellPointer_left // rotation => left is effectively 'right'
+	    (Left_Offset + spellpointer_left), // spellPointer_left 
+	    (Left_Offset + spellpointer_left - spellpointer_offset_thick) // spellPointerMask_left
 	];
     },
 
@@ -568,17 +578,18 @@ snDraw.Game.Zones = {
 	//Zone Style 1 refers to the Player Zones....
 	this.Style1 = { //all in pixels
 	    hpad: Tx * 1.4,  // horizonal padding between screen boundary and box edge (vertical)
-	    w_hpad: Tx * 2.0, // horizonal padding between words and the inside of the box
+	    w_hpad: Tx * 1.4, // horizonal padding between words and the inside of the box
 	    spellpad: Tx * 2.5, // vertical padding of spell (upper edge of bottom box to lower edge of tile).
 	    box_fill: 'rgba(0,0,0,0)', // inside the box
 	    text_bg: 'black', // inside the box
 	    thick: Tx * 0.9, // thickness of the box line
+	    rounding: Tx * 0.5, // rounding of corners of box
 	    text_pad: " ",
 	    justify: "left", // justification of the title
 	    titlepad: Tx * 10, // effectively, the indentation of the title	
 	    fontsize: Tx * 7, // refers to the font of the title
 	    fonthalfheight: Tx * 4, // refers to the offset between top of font and top surface of box
-	    w_vpad: Tx * 8.2, // vertical padding between words and the inside of the box
+	    w_vpad: Tx * 2.8, // vertical padding between top of word tiles and lower inside edge of box border
 	    you_w: Tx * 20, // scaling of the block saying "you"
 	    you_h: Tx * 10, // scaling of the block saying "you"
 	    you_fontsize: Tx * 9,
@@ -595,18 +606,19 @@ snDraw.Game.Zones = {
 	    box_fill: 'rgba(255,255,255,0.1)', // inside the box
 	    text_bg: 'black', // inside the box
 	    thick: Tx * 2.2, // thickness of the box line
+	    rounding: Tx * 1.5, // rounding of corners of box
 	    text_pad: " ",
 	    justify: "center", // justification of the title
 	    fontsize: 0.1, // refers to the font of the title
 	    fonthalfheight: 0.1, // refers to the offset between top of font and top surface of box
-	    w_vpad: Tx * 1.8 // vertical padding between words and the inside of the box
+	    w_vpad: Tx * 1.8 // vertical padding between top of word tiles and lower inside edge of box border
 	};
 
 	function setStyleWordBlockBounds (Style){
 	    Style.WordBlockBounds = {
 		left: (Style.hpad + Style.thick + Style.w_hpad),
 		right: (snDraw.canv_W - (Style.hpad + Style.thick + Style.w_hpad)),
-		topPadding: (Style.w_vpad + Style.thick)
+		topPadding: (Math.max(Style.fonthalfheight + Style.thick/2, Style.thick) + Style.w_vpad)
 	    };
 	}
 
@@ -614,9 +626,9 @@ snDraw.Game.Zones = {
 	setStyleWordBlockBounds(this.Style2);
 
 	this.ZoneVerticalPaddings = {
-	    aboveU: Tx * 1.5,
+	    aboveU: Tx * 2.5,
 	    above: Tx,
-	    between: Tx * 1.5,
+	    between: Tx,
 	    bottom: Tx
 	};
     }

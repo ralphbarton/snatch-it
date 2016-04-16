@@ -142,9 +142,8 @@ snDraw.Game.Event = {
 	    upper_drawing_bound += snDraw.Game.Zones.ZoneVerticalPaddings.aboveU;
 	    var Top = upper_drawing_bound;
 	    console.log(upper_drawing_bound);
-	    var tile_stroke_prop = 0.06;
-	    //note that top padding includes 
-	    var Height_pads_tot = Spacings.ts * tile_stroke_prop + ZoneSty_U.thick*2 + ZoneSty_U.w_vpad*2;
+
+	    var Height_pads_tot = ZoneSty_U.thick*2 + ZoneSty_U.w_vpad*2;
 	    var Height = snDraw.Game.Zones.WordsStackHeightPx(UnclaimedArrangement, Spacings) + Height_pads_tot;// + ZoneSty_U;
 
 	    var Properties = {
