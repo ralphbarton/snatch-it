@@ -38,13 +38,15 @@ snDraw.Game.Spell = {
 	}
     },
 
-    repositionSkeletal: function(){
+    //function formerly repositionSkeletal (with no parameters)
+    setSpellPosition: function(newLeftPx, newTopPx, ani_oC, ani_sty){
 
-	var y_loco = this.SpellTopPx;
+	if(newLeftPx !== null){this.SpellLeftPx = newLeftPx;}
+	if(newTopPx !== null){this.SpellTopPx = newTopPx;}
 
 	for (var i=0; i<this.SkeletalLetters.length; i++){
-	    snDraw.moveSwitchable(this.SkeletalLetters[i], true, snDraw.ani.sty_Resize,{
-		top: y_loco
+	    snDraw.moveSwitchable(this.SkeletalLetters[i], ani_oC, ani_sty,{
+		top: (this.SpellTopPx)
 	    });
 	}
     },

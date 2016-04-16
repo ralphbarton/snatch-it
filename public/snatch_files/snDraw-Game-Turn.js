@@ -3,7 +3,7 @@ snDraw.Game.Turn = {
     //member
     r_spark: undefined,
 
-    newTurnedTile_FlyIn_animate: function (tile_index, player_index){
+    newTurnedTile_FlyIn_animate: function (tile_index, player_index, ani_sty){
 	var newTile = snDraw.Game.generateTileObject(tileset[tile_index], tile_index);
 	newTile.visual = "animating_in";
 
@@ -49,18 +49,18 @@ snDraw.Game.Turn = {
 	//also obscure the tile
 	var newTileObscurer = this.createObscurer(x_orig, y_orig, tile_index, players[player_index].color);
 
-	var loc = snDraw.Game.Grid.findNextEmptyGridSlot();
-	var loc_left = snDraw.Game.Grid.Grid_xPx[loc.c];
-	var loc_top = snDraw.Game.Grid.Grid_yPx[loc.r];
+	var gridRC = snDraw.Game.Grid.GetGridSpace();
+	var gridPx = snDraw.Game.Grid.RCgridPx(gridRC);
+
 	//ANIMATE the tile
-	snDraw.Game.Grid.moveTileOnGrid(tile_index, loc.r, loc.c, snDraw.ani.sty_Sing);
+	snDraw.Game.Grid.PlaceTileInGrid(tile_index, gridRC, true, ani_sty);
 
 	var onComplete_disperseThisObscurer = function(){
 	    var hts = snDraw.Game.tileSize / 2;
 
 	    //update object stored coordinates to the final animation position
-	    newTileObscurer.grpCoords = {x:loc_left, y:loc_top};
-	    newTileObscurer.centerCoords = {x: loc_left + hts, y: loc_top + hts};
+	    newTileObscurer.grpCoords = {x:gridPx.left, y:gridPx.top};
+	    newTileObscurer.centerCoords = {x: gridPx.left + hts, y: gridPx.top + hts};
 	    snDraw.Game.Turn.disperseObscurer(newTileObscurer);
 
 	    //the start of dispersing the obscurer is also treated as when the tile really exists (before it is not visible)
@@ -71,14 +71,12 @@ snDraw.Game.Turn = {
 		snDraw.Game.Spell.recolourAll(snDraw.Game.Spell.ListAllVisibleTilesOf(newTile.letter));
 		snDraw.Game.Spell.indicateN_validMoves_onButton();//also re-indicate how to make
 	    }
-
-
 	};
 
 	//apply the SAME animation to the obscurer:
-	snDraw.moveSwitchable(newTileObscurer, onComplete_disperseThisObscurer, snDraw.ani.sty_Sing,{
-	    left: loc_left,
-	    top: loc_top
+	snDraw.moveSwitchable(newTileObscurer, onComplete_disperseThisObscurer, ani_sty,{
+	    left: gridPx.left,
+	    top: gridPx.top
 	});
 
 

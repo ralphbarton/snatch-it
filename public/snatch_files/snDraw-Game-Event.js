@@ -114,8 +114,9 @@ snDraw.Game.Event = {
 	    var Zone_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, ZoneSty, Zone_FabObjs[1].width);
 
 	    if(Properties.isClient){
-		snDraw.Game.Spell.SpellTopPx = Zone_Tops[6];
-		snDraw.Game.Spell.SpellLeftPx = Zone_Lefts[6]; 
+		var spell_Left = Zone_Lefts[6]; 
+		var spell_Top = Zone_Tops[6];
+		snDraw.Game.Spell.setSpellPosition(spell_Left, spell_Top, false, null);
 	    }
 
 	    //for each object making the ZONE, set coordinates and place on canvas...
@@ -182,7 +183,39 @@ snDraw.Game.Event = {
 
     },
     
-    TileTurn: function(){
+    TileTurn: function(player_index, tile_index, letter){
+
+	// 1. modifiy the client copy of the fundamental game-state data:
+	tileset[tile_index] = {
+	    letter: letter,
+	    status: "turned"
+	};
+
+	// 2. Record the bottom of the tileset
+	var old_grid_bottom_px = snDraw.Game.Grid.GetGridBottomPx();
+
+	snDraw.Game.Turn.newTurnedTile_FlyIn_animate(tile_index, player_index, snDraw.ani.sty_Sing);
+
+	var zone_resize_necesary = old_grid_bottom_px != snDraw.Game.Grid.GetGridBottomPx();
+
+	snDraw.Game.Controls.updateTurnLetter_number();
+	if(zone_resize_necesary){
+	    
+	    //TODO muchos attentionos needed here
+
+	    //snDraw.Game.Zones.updateAllZoneSizes();
+	    //snDraw.Game.Spell.repositionSkeletal();
+	}
+
+	if(player_index == client_player_index){//the player that flipped was the client...
+	    snDraw.Game.Controls.startTurnDisableTimeout();
+	}else{
+	    //the simple effect of this is that any non-client player flip resets the timer to re-allow client flip.
+	    snDraw.Game.Controls.cancelTurnDisabled = true;
+	}
+
+
+
 
     },
     

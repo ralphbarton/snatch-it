@@ -74,35 +74,17 @@ socket.on('player has joined game', function(newPlayer){
 //when a new tile is sent from the server...
 socket.on('new turned tile', function(newTile_info){
 
-    var PI = newTile_info.flipping_player;
-    var TI = newTile_info.tile_index;
-    var LET = newTile_info.tile_letter;
-    var client_is_flipper = PI == client_player_index;
+    var player_index = newTile_info.flipping_player;
+    var tile_index = newTile_info.tile_index;
+    var letter = newTile_info.tile_letter;
 
-    var player_name = client_is_flipper ? "You" : players[PI].name;
-    tileset[TI] = {
-	letter: LET,
-	status: "turned"
-    };
-    var old_zones_top_coord = snDraw.Game.Zones.unusedTilesBottomPx;
-    snDraw.Game.Turn.newTurnedTile_FlyIn_animate(TI, PI);
-    snDraw.Game.Grid.shiftTilesUpGrid();//function call is extravagant (inefficient) as it will never cause a shift. We're just using it to correctly set unusedTilesBottomPx
-    var zone_resize_necesary = snDraw.Game.Zones.unusedTilesBottomPx != old_zones_top_coord;
-    snDraw.Game.Controls.updateTurnLetter_number();
-    if(zone_resize_necesary){
-	snDraw.Game.Zones.updateAllZoneSizes();
-	snDraw.Game.Spell.repositionSkeletal();
-    }
+    snDraw.Game.Event.TileTurn(player_index, tile_index, letter);
 
-    if(TI%5==0){snDraw.measureFramePeriod();}//every 5 tiles, remeasure frame rate
-
-    if(client_is_flipper){
-	snDraw.Game.Controls.startTurnDisableTimeout();
-    }else{
-	//the simple effect of this is that any non-client player flip resets the timer to re-allow client flip.
-	snDraw.Game.Controls.cancelTurnDisabled = true;
-    }
 });
+
+
+
+
 
 socket.on('player wants reset', function(player_index){
     var player_name = players[player_index].name;

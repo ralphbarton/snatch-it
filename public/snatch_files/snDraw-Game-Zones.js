@@ -469,10 +469,10 @@ snDraw.Game.Zones = {
 
     // the parameter 'TargetDims' will be null if it is an animation exit
 
-    AnimateZoneBox: function(BoxObjs, Height, TargetDims, ani_sty, ani_type, direction){
+    AnimateZoneBox: function(BoxObjs, Height, TargetDims, ani_sty, ani_entryexit, direction){
 
 	
-	if(ani_type == "entry"){
+	if(ani_entryexit == "entry"){
 	    for(var i = 0; i < BoxObjs.length; i++){
 
 		var target_off = {};
@@ -498,7 +498,7 @@ snDraw.Game.Zones = {
 
 
 	    }
-	}else if(ani_type == "exit"){
+	}else if(ani_entryexit == "exit"){
 
 	    //this is ugly: we're now inferring a specific set of objects, where the 'top' of array[1] is the top overall
 	    var BT = BoxObjs[1].top;
@@ -523,7 +523,7 @@ snDraw.Game.Zones = {
 		snDraw.moveSwitchable(BoxObjs[i], function(){canvas.remove(BoxObjs[i]);}, ani_sty, target_off);
 	    }
 
-	}else if(ani_type == "size asjust"){
+	}else if(ani_entryexit == "size asjust"){
 	    return null
 	}
     },
