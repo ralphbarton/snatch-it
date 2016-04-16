@@ -42,7 +42,8 @@ snDraw.Game.Controls = {
 	this.Button_Objs[4] = this.createGenericButton(":",4,null);
 
 	//starting state of buttons with visual state
-	this.updateTurnLetter_number();
+	var n_tiles_remaining = tilestats.n_tiles - tileset.length;
+	this.updateTurnLetter_number(n_tiles_remaining);
 	this.setButtonDisabled(2, true);
     },
 
@@ -178,8 +179,7 @@ snDraw.Game.Controls = {
     },
 
 
-    updateTurnLetter_number: function(){
-	var n_tiles_remaining = tilestats.n_tiles-tileset.length;
+    updateTurnLetter_number: function(n_tiles_remaining){
 	var TurnButton = this.Button_Objs[1];
 	if(n_tiles_remaining>0){
 	    TurnButton.item(1).setText("Turn Letter (" + n_tiles_remaining + ")");

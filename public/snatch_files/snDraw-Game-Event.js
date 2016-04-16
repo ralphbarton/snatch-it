@@ -13,7 +13,7 @@ snDraw.Game.Event = {
 
 	// 3. Create all the grid tiles...
 	snDraw.Game.Grid.InitialiseGrid(Spacings);
-	for (var i = 0; i < tilestats.n_turned; i++){
+	for (var i = 0; i < tileset.length; i++){
 	    if(tileset[i].status == "turned"){
 		//generate tile & put in grid
 		var TileObject_i = snDraw.Game.generateTileObject(tileset[i], i);
@@ -31,7 +31,8 @@ snDraw.Game.Event = {
 	    is_client: true
 	};
 
-	// 4.2 Add all players who who (A) have words, (B) aren't our client and (C) aren't disconnected
+	// 4.2 Add all players who who (A) have words, (B) aren't client and (C) aren't disconnected.
+	// Potentially add Unclaimed Zone
 	snDraw.Game.Zones.Unclaimed.playerslist = [];
 	snDraw.Game.Zones.Unclaimed.exists = false;
 	for (var i=0; i<players.length; i++){
@@ -49,7 +50,9 @@ snDraw.Game.Event = {
 	}
 
 
-	//5. Define a function here to generate a player's words as a list of Fabric objects
+	// 5. WORD OBJECT GENERATION - for all players, and for the unclaimed zone
+
+	// 5.1 Define a function here to generate a player's words as a list of Fabric objects
 	function generatePlayerWordObjs(player){
 	    var WordGrpsList = [];
 	    for (var j = 0; j < player_i.words.length; j++){
@@ -72,7 +75,7 @@ snDraw.Game.Event = {
 	    return WordGrpsList;
 	}
 
-	//5.1 retrieve style information...
+	//5.2 retrieve style information...
 	var ZoneSty_P = snDraw.Game.Zones.Style1;
 	var WordBounds_P = ZoneSty_P.WordBlockBounds;
 	var ZoneSty_U = snDraw.Game.Zones.Style2;
@@ -80,7 +83,7 @@ snDraw.Game.Event = {
 	var interzonePad = snDraw.Game.Zones.ZoneVerticalPaddings;
 
 
-	//5.2 Generate the word objects for all of the inactive players, and determine the arrangement for the unclaimed zone
+	//5.3 Generate the word objects for all of the inactive players, and determine the arrangement for the unclaimed zone
 	if(snDraw.Game.Zones.Unclaimed.exists){
 	    var UnclaimedWordGroups = [];
 	    for (var i = 0; i < snDraw.Game.Zones.Unclaimed.playerslist.length; i++){
@@ -90,7 +93,7 @@ snDraw.Game.Event = {
 	    var UnclaimedArrangement = snDraw.Game.Words.GenWordArrangement(UnclaimedWordGroups, WordBounds_U, Spacings, "center");
 	}
 
-	//5.3 Generate all word objects and arrangements for the zones of active players
+	//5.4 Generate all word objects and arrangements for the zones of active players
 	var ArrangementsArray = [];
 	var ZonesWordsGroups = [];
 
@@ -105,7 +108,10 @@ snDraw.Game.Event = {
 	}
 
 
-	// 6. Define a function which draws a zone filled with words on screen...
+
+	// 6. DRAWING THINGS IN PLACE ON CANVAS - create and draw the zones and fill them with words
+
+	// 6.1 Define a function which draws a zone filled with words on screen...
 	function generateZoneOnCanvas(Top, Height, ZoneSty, Properties, WordGroup, WordArrangement_noH, WordBounds){
 	    //generate the fabric objects that represent the new zone. Note that properties left & top are not set
 	    //nor are the objects present onf the canvas.
@@ -137,14 +143,14 @@ snDraw.Game.Event = {
 
 	var upper_drawing_bound = snDraw.Game.Grid.GetGridBottomPx();
 
-	// 6.1 if an "unclaimed words zone" exists, then make this first.
+	// 6.2 if an "unclaimed words zone" exists, then make this first.
 	if(snDraw.Game.Zones.Unclaimed.exists){
 
 	    upper_drawing_bound += snDraw.Game.Zones.ZoneVerticalPaddings.aboveU;
 	    var Top = upper_drawing_bound;
 
 	    var Height_pads_tot = ZoneSty_U.thick*2 + ZoneSty_U.w_vpad*2;
-	    var Height = snDraw.Game.Zones.WordsStackHeightPx(UnclaimedArrangement, Spacings) + Height_pads_tot;// + ZoneSty_U;
+	    var Height = snDraw.Game.Zones.WordsStackHeightPx(UnclaimedArrangement, Spacings) + Height_pads_tot;
 
 	    var Properties = {
 		color: 'grey',
@@ -158,7 +164,7 @@ snDraw.Game.Event = {
 	}
 	
 
-	// 6.2 Now make all of the player zones. Calculate their heights and draw them...
+	// 6.3 Now make all of the player zones. Calculate their heights and draw them...
 	// function returns [{Top: , Height: }, ...}
 	var ZoneSizes = snDraw.Game.Zones.CalcZoneSizes(ArrangementsArray, upper_drawing_bound, interzonePad, Spacings);
 
@@ -190,21 +196,35 @@ snDraw.Game.Event = {
 	    letter: letter,
 	    status: "turned"
 	};
+	tilestats.n_turned++;
+	// 1.1 update the button
+	var n_tiles_remaining = tilestats.n_tiles - tileset.length;
+	snDraw.Game.Controls.updateTurnLetter_number(n_tiles_remaining);
 
-	// 2. Record the bottom of the tileset
+
+	// 2. Determine if zones need to be squeezed because the tile grid has grown vertically...
 	var old_grid_bottom_px = snDraw.Game.Grid.GetGridBottomPx();
 
 	snDraw.Game.Turn.newTurnedTile_FlyIn_animate(tile_index, player_index, snDraw.ani.sty_Sing);
 
-	var zone_resize_necesary = old_grid_bottom_px != snDraw.Game.Grid.GetGridBottomPx();
+	var new_grid_bottom_px = snDraw.Game.Grid.GetGridBottomPx();
+	var zone_resize_necesary = old_grid_bottom_px != new_grid_bottom_px;
 
-	snDraw.Game.Controls.updateTurnLetter_number();
+	// 3. If necessary, squeeze everything downwards.
 	if(zone_resize_necesary){
-	    
+
 	    //TODO muchos attentionos needed here
 
-	    //snDraw.Game.Zones.updateAllZoneSizes();
-	    //snDraw.Game.Spell.repositionSkeletal();
+	    // 3.1 Move the unclaimed zone & its words
+
+	    // 3.2 Move the player zones and all words
+
+
+	    // 3.3 Shift the spell...
+//	    var spell_Left = Zone_Lefts[6]; 
+//	    var spell_Top = Zone_Tops[6];
+//	    snDraw.Game.Spell.setSpellPosition(spell_Left, spell_Top, false, null);
+	    
 	}
 
 	if(player_index == client_player_index){//the player that flipped was the client...
@@ -240,7 +260,8 @@ snDraw.Game.Event = {
 	    snDraw.makeCanvasFitWholeWindow();
 	    snDraw.Game.Event.DrawAll();
 	    console.log("Toast: A window resize was executed");
-	}, 3000);
+	    snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+	}, 1000);
     }
 
 };

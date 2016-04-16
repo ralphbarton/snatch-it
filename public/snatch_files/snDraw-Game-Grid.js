@@ -217,12 +217,15 @@ snDraw.Game.Grid = {
 	while(!empty_row){
 	    empty_row = true;    
 	    if(this.TileGrid[row_count] != undefined){//the row exists, or has existed...
-		for (var c = 0; c < this.n_tiles_row; c++){//loop through all ROWS
+		//determine if the row is empty
+		for (var c = 0; c < this.n_tiles_row; c++){//loop through all columns
 		    if(this.TileGrid[row_count][c] != undefined){
 			empty_row = false;	
 		    }
 		}
-		row_count++;
+		if(!empty_row){
+		    row_count++;
+		}
 	    }
 	}
 	var bottomLeft = this.RCgridPx({row:(row_count-1), col:0})
