@@ -158,7 +158,7 @@ snDraw.Game.Grid = {
 // NEW FUNCTIONS HERE...
 
     //member objects
-    TileGrid: [[]],
+    TileGrid: undefined,
     xGridOrigin: undefined,
     yGridOrigin: undefined,
     xy_incr: undefined,
@@ -175,6 +175,9 @@ snDraw.Game.Grid = {
 	this.xGridOrigin = left_pad;
 	this.yGridOrigin = snDraw.Game.Controls.underneath_buttons_px;
 	this.xy_incr = Spacings.tsgg;
+	
+	//clear any old version of the grid...
+	this.TileGrid = [[]];
     },
 
     // This function handles the visual canvas placement, as well as the logic for ensuring that the tile is added
@@ -266,10 +269,6 @@ snDraw.Game.Grid = {
 	return grid_height;
 
     },
-
-
-
-    ReshapeGrid: function(){},
 
     PlaceTileInGrid: function(tile_index, gridRC, ani_oC, ani_sty){
 

@@ -116,7 +116,6 @@ snDraw.Game.Event = {
 	    if(Properties.isClient){
 		snDraw.Game.Spell.SpellTopPx = Zone_Tops[6];
 		snDraw.Game.Spell.SpellLeftPx = Zone_Lefts[6]; 
-		console.log(Zone_Lefts[6], Zone_Tops[6]);
 	    }
 
 	    //for each object making the ZONE, set coordinates and place on canvas...
@@ -193,6 +192,22 @@ snDraw.Game.Event = {
     
     Reconnection: function(){
 
+    },
+
+    resizeTimeoutID: undefined,
+    WindowResize: function(){
+
+	if(this.resizeTimeoutID != undefined){
+	    clearTimeout(this.resizeTimeoutID);
+	    this.resizeTimeoutID = undefined;
+	}
+	
+	this.resizeTimeoutID = setTimeout(function(){
+	    canvas.clear();
+	    snDraw.makeCanvasFitWholeWindow();
+	    snDraw.Game.Event.DrawAll();
+	    console.log("Toast: A window resize was executed");
+	}, 3000);
     }
 
 };

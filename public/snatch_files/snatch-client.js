@@ -15,6 +15,7 @@ socket.emit('player joining game', 0);
 
 socket.on('player color choices', function(colorSet){
     snDraw.initialiseCanvas();
+    snDraw.makeCanvasFitWholeWindow();
     //the colour set is an array with objects <fabric color>, length 5
     snDraw.Splash.triggerPromptScreen(colorSet);
 });
@@ -194,7 +195,9 @@ function TURN_MANY_TILES(p)           {socket.emit('many_tile_turn_hack', p);}
 
 
 
-window.onresize = function(){console.log("A window resize event occured");};
+window.onresize = function(){
+    snDraw.Game.Event.WindowResize();
+};
 
 
 
