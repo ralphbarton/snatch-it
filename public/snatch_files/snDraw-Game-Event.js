@@ -113,9 +113,10 @@ snDraw.Game.Event = {
 	    var Zone_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneSty);
 	    var Zone_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, ZoneSty, Zone_FabObjs[1].width);
 
-	    if(ZoneSty.justify == "center"){
-		console.log(Top);
-		console.log(Zone_Tops);
+	    if(Properties.isClient){
+		snDraw.Game.Spell.SpellTopPx = Zone_Tops[6];
+		snDraw.Game.Spell.SpellLeftPx = Zone_Lefts[6]; 
+		console.log(Zone_Lefts[6], Zone_Tops[6]);
 	    }
 
 	    //for each object making the ZONE, set coordinates and place on canvas...
@@ -141,7 +142,6 @@ snDraw.Game.Event = {
 
 	    upper_drawing_bound += snDraw.Game.Zones.ZoneVerticalPaddings.aboveU;
 	    var Top = upper_drawing_bound;
-	    console.log(upper_drawing_bound);
 
 	    var Height_pads_tot = ZoneSty_U.thick*2 + ZoneSty_U.w_vpad*2;
 	    var Height = snDraw.Game.Zones.WordsStackHeightPx(UnclaimedArrangement, Spacings) + Height_pads_tot;// + ZoneSty_U;

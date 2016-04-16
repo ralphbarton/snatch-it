@@ -426,15 +426,15 @@ snDraw.Game.Zones = {
     DetermineZoneBoxObjectsTops: function(Top, Height, Style){
 	var box_top = Top + Math.max(Style.fonthalfheight - Style.thick/2, 0);
 	var box_bottom = Top + Height - Style.thick/2;//center of border
-	var hor_centerline_height = box_bottom - (Style.spellpad + snDraw.Game.tileSize/2);
+	var hor_centerline_height = box_bottom - (Style.thick/2 + Style.spell_vpad + snDraw.Game.tileSize/2);
 	return [
-	    box_top, //zoneBox_top
-	    Top, // plrName_top
-	    (box_bottom - Style.you_h), //youBlock_top
-	    (box_bottom - Style.you_h + Style.you_font_Yoff), // youText_top
-	    (hor_centerline_height - Style.tri_h/2), // spellPointer_top
-	    (hor_centerline_height - Style.tri_h/2), // spellPointer_Mask_top
-	    (hor_centerline_height - snDraw.Game.tileSize/2) // SPELL_TILES_top
+	    box_top, // 1. zoneBox_top
+	    Top, // 2. plrName_top
+	    (box_bottom - Style.you_h), // 3. youBlock_top
+	    (box_bottom - Style.you_h + Style.you_font_Yoff), // 4. youText_top
+	    (hor_centerline_height - Style.tri_h/2), // 5. spellPointer_top
+	    (hor_centerline_height - Style.tri_h/2), // 6. spellPointer_Mask_top
+	    (hor_centerline_height - snDraw.Game.tileSize/2) // 7. SPELL_TILES_top
 	];
     },
 
@@ -456,12 +456,13 @@ snDraw.Game.Zones = {
 	var spellpointer_offset_thick = Style.thick * 2.5 * (Style.tri_w / Style.tri_h);
 
 	return [
-	    (Left_Offset + boxLeft), // zoneBox_left
-	    (Left_Offset + textLeft), // plrName_left
-	    (Left_Offset + boxRight - Style.you_w), // youBlock_left
-	    (Left_Offset + boxRight - Style.you_w + Style.you_font_Xoff), // youText_left
-	    (Left_Offset + spellpointer_left), // spellPointer_left 
-	    (Left_Offset + spellpointer_left - spellpointer_offset_thick) // spellPointerMask_left
+	    (Left_Offset + boxLeft), // 1. zoneBox_left
+	    (Left_Offset + textLeft), // 2. plrName_left
+	    (Left_Offset + boxRight - Style.you_w), // 3. youBlock_left
+	    (Left_Offset + boxRight - Style.you_w + Style.you_font_Xoff), // 4. youText_left
+	    (Left_Offset + spellpointer_left), // 5. spellPointer_left 
+	    (Left_Offset + spellpointer_left - spellpointer_offset_thick), // 6. spellPointerMask_left
+	    (Left_Offset + boxLeft + Style.thick/2 + Style.tri_w + Style.spell_hpad)// 7. spell left
 	];
     },
 
@@ -579,7 +580,6 @@ snDraw.Game.Zones = {
 	this.Style1 = { //all in pixels
 	    hpad: Tx * 1.4,  // horizonal padding between screen boundary and box edge (vertical)
 	    w_hpad: Tx * 1.4, // horizonal padding between words and the inside of the box
-	    spellpad: Tx * 2.5, // vertical padding of spell (upper edge of bottom box to lower edge of tile).
 	    box_fill: 'rgba(0,0,0,0)', // inside the box
 	    text_bg: 'black', // inside the box
 	    thick: Tx * 0.9, // thickness of the box line
@@ -596,7 +596,9 @@ snDraw.Game.Zones = {
 	    you_font_Xoff: Tx * 2.9,
 	    you_font_Yoff: Tx * 0.5,
 	    tri_w: Tx * 5, // Width, in pixels, of the little triangle (spell pointer)
-	    tri_h: Tx * 7 // Height, in pixels, of the little triangle (spell pointer)
+	    tri_h: Tx * 7, // Height, in pixels, of the little triangle (spell pointer)
+	    spell_vpad: Tx * 2.5, // vertical padding of spell (upper edge of bottom box to lower edge of tile).
+	    spell_hpad: Tx * 2.5 // horizonatal padding of spell (tip of arrow to right edge of tile).
 	};
 
 	//Zone Style 2 refers to unused word Zone

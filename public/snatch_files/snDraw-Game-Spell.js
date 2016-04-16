@@ -4,7 +4,7 @@ snDraw.Game.Spell = {
     // data
     SkeletalLetters: [],
     SpellUsageCounter: {},
-    SpellBottomPx: undefined,
+    SpellTopPx: undefined,
     SpellLeftPx: undefined,
 
     // methods
@@ -23,7 +23,7 @@ snDraw.Game.Spell = {
 		var x_loco = this.SpellLeftPx + (spell_len-1) * snDraw.Game.h_spacer;
 
 
-		var y_loco = this.SpellBottomPx - snDraw.Game.v_spacer;
+		var y_loco = this.SpellTopPx;
 
 		NewSkeletal.set({
 		    left: x_loco,
@@ -40,7 +40,7 @@ snDraw.Game.Spell = {
 
     repositionSkeletal: function(){
 
-	var y_loco = this.SpellBottomPx - snDraw.Game.v_spacer;
+	var y_loco = this.SpellTopPx;
 
 	for (var i=0; i<this.SkeletalLetters.length; i++){
 	    snDraw.moveSwitchable(this.SkeletalLetters[i], true, snDraw.ani.sty_Resize,{
