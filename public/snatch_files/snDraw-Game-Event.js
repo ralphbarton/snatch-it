@@ -91,6 +91,8 @@ snDraw.Game.Event = {
 		UnclaimedWordGroups = UnclaimedWordGroups.concat(generatePlayerWordObjs(player_i));
 	    }
 	    var UnclaimedArrangement = snDraw.Game.Words.GenWordArrangement(UnclaimedWordGroups, WordBounds_U, Spacings, "center");
+	    snDraw.Game.Zones.Unclaimed.stored_WordArrangement_noH = UnclaimedArrangement;
+	    snDraw.Game.Zones.Unclaimed.stored_WordGroup = UnclaimedWordGroups;
 	}
 
 	//5.4 Generate all word objects and arrangements for the zones of active players
@@ -105,6 +107,8 @@ snDraw.Game.Event = {
 
 	    var Arrangement_i = snDraw.Game.Words.GenWordArrangement(WordGrpsList_i, WordBounds_P, Spacings, "left");
 	    ArrangementsArray.push(Arrangement_i);
+	    snDraw.Game.Zones.PlayerZone[i].stored_WordArrangement_noH = Arrangement_i;
+	    // PlayerZone[i].stored_WordGroup  // this is not needed (don't re-add it) because these objects are otherwise ref'd
 	}
 
 
@@ -139,6 +143,8 @@ snDraw.Game.Event = {
 	    for (var j = 0; j < Arrangement.coords.length; j++){
 		snDraw.moveSwitchable(WordGroup[j], false, null, Arrangement.coords[j]);
 	    }
+
+	    return Zone_FabObjs;
 	}
 
 	var upper_drawing_bound = snDraw.Game.Grid.GetGridBottomPx();
@@ -158,7 +164,15 @@ snDraw.Game.Event = {
 		isClient: false
 	    };
 
-	    generateZoneOnCanvas(Top, Height, ZoneSty_U, Properties, UnclaimedWordGroups, UnclaimedArrangement, WordBounds_U);
+	    var FAB = generateZoneOnCanvas(Top,
+					   Height,
+					   ZoneSty_U,
+					   Properties,
+					   UnclaimedWordGroups,
+					   UnclaimedArrangement,
+					   WordBounds_U);
+	    FabObjects
+	    //USE RETURN DATA!!
 
 	    upper_drawing_bound += Height;
 	}
@@ -181,6 +195,7 @@ snDraw.Game.Event = {
 	    };
 
 	    generateZoneOnCanvas(Top, Height, ZoneSty_P, Properties, ZonesWordsGroups[i], ArrangementsArray[i], WordBounds_P);
+	    //USE RETURN DATA!!
 	}
 
     },
@@ -207,17 +222,85 @@ snDraw.Game.Event = {
 
 	snDraw.Game.Turn.newTurnedTile_FlyIn_animate(tile_index, player_index, snDraw.ani.sty_Sing);
 
-	var new_grid_bottom_px = snDraw.Game.Grid.GetGridBottomPx();
-	var zone_resize_necesary = old_grid_bottom_px != new_grid_bottom_px;
+	var upper_drawing_bound = snDraw.Game.Grid.GetGridBottomPx();
+	var zone_resize_necesary = old_grid_bottom_px != upper_drawing_bound;
+
+	// 2.998 - create a function that moves and resizes the zone box)
+
+	// 2.999 - retrieve style information...
+	var ZoneSty_P = snDraw.Game.Zones.Style1;
+	var WordBounds_P = ZoneSty_P.WordBlockBounds;
+	var ZoneSty_U = snDraw.Game.Zones.Style2;
+	var WordBounds_U = ZoneSty_U.WordBlockBounds;
+	var interzonePad = snDraw.Game.Zones.ZoneVerticalPaddings;
+
+
+	function resizeZoneOnCanvas(Zone, Top, Height, WordGroup, WordArrangement_noH, WordBounds, ani_sty){
+
+
+
+	    //copy - pasted...
+	    Zone_FabObjs
+	    var Zone_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneSty);
+	    var Zone_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, ZoneSty, Zone_FabObjs[1].width);
+
+	    if(Properties.isClient){
+		var spell_Left = Zone_Lefts[6]; 
+		var spell_Top = Zone_Tops[6];
+		snDraw.Game.Spell.setSpellPosition(spell_Left, spell_Top, true, ani_sty);
+	    }
+
+	    //for each object making the ZONE, set coordinates and place on canvas...
+	    for (var j = 0; j < Zone_FabObjs.length; j++){
+		Zone_FabObjs[j].setLeft(Zone_Lefts[j]);
+		Zone_FabObjs[j].setTop(Zone_Tops[j]);
+		canvas.add(Zone_FabObjs[j]);
+	    }
+
+	    // place the words in the zone
+
+	    var WordsTopPx = Top + WordBounds.topPadding;
+	    var Arrangement = snDraw.Game.Words.WordArrangementSetHeight(WordArrangement_noH, WordsTopPx);
+	    for (var j = 0; j < Arrangement.coords.length; j++){
+		snDraw.moveSwitchable(WordGroup[j], false, null, Arrangement.coords[j]);
+	    }
+
+
+
+
+
+
+	}
 
 	// 3. If necessary, squeeze everything downwards.
 	if(zone_resize_necesary){
 
 	    //TODO muchos attentionos needed here
+	    //unfortunately, this is copy-pasted code from original creation of the zones....
+	    if(snDraw.Game.Zones.Unclaimed.exists){
+
+		upper_drawing_bound += snDraw.Game.Zones.ZoneVerticalPaddings.aboveU;
+		var Top = upper_drawing_bound;
+
+		var Height_pads_tot = ZoneSty_U.thick*2 + ZoneSty_U.w_vpad*2;
+		var Height = snDraw.Game.Zones.WordsStackHeightPx(UnclaimedArrangement, Spacings) + Height_pads_tot;
+
+
+	    snDraw.Game.Zones.Unclaimed.stored_WordGroup = UnclaimedWordGroups;
+		snDraw.Game.Zones.Unclaimed.stored_WordArrangement_noH
+
+		//generateZoneOnCanvas(Top, Height, ZoneSty_U, Properties, UnclaimedWordGroups, UnclaimedArrangement, WordBounds_U);
+
+		upper_drawing_bound += Height;
+	    }
+
 
 	    // 3.1 Move the unclaimed zone & its words
 
 	    // 3.2 Move the player zones and all words
+
+	    access the arrangement like this....
+	    //snDraw.Game.Zones.PlayerZone[i].stored_WordArrangement_noH
 
 
 	    // 3.3 Shift the spell...
