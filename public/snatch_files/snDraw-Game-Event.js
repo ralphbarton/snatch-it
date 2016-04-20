@@ -122,6 +122,7 @@ snDraw.Game.Event = {
 	    var Zone_FabObjs = snDraw.Game.Zones.CreateZoneBox(Height, ZoneSty, Properties);
 	    var Zone_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneSty);
 	    var Zone_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, ZoneSty, Zone_FabObjs[1].width);
+	    var flex_box_height = snDraw.Game.Zones.DetermineZoneFlexBoxHeight(Height, ZoneSty);
 
 	    if(Properties.isClient){
 		var spell_Left = Zone_Lefts[6]; 
@@ -135,9 +136,10 @@ snDraw.Game.Event = {
 		Zone_FabObjs[j].setTop(Zone_Tops[j]);
 		canvas.add(Zone_FabObjs[j]);
 	    }
+	    //also set the height of the only item in Zone_FabObjs which has flexi-height...
+	    Zone_FabObjs[0].setHeight(flex_box_height);
 
 	    // place the words in the zone
-
 	    var WordsTopPx = Top + WordBounds.topPadding;
 	    var Arrangement = snDraw.Game.Words.WordArrangementSetHeight(WordArrangement_noH, WordsTopPx);
 	    for (var j = 0; j < Arrangement.coords.length; j++){
@@ -249,7 +251,9 @@ snDraw.Game.Event = {
 		// copy - pasted...
 		var Zone_FabObjs = Zone.Zone_FabObjs;
 		var Zone_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneSty);
+		var flex_box_height = snDraw.Game.Zones.DetermineZoneFlexBoxHeight(Height, ZoneSty);
 
+		//these details are required to get a handle on the words that are going to visually shift on-screen
 		var WordArrangement_noH = Zone.stored_WordArrangement_noH;
 		var WordGroup = undefined;
 		if(Zone.exists == undefined){// this means it is a player zone not the unclaimed zone
@@ -267,13 +271,17 @@ snDraw.Game.Event = {
 
 		// for each object making the ZONE, animate it into the new position
 		for (var j = 0; j < Zone_FabObjs.length; j++){
-		    snDraw.moveSwitchable(Zone_FabObjs[i], true, ani_sty,{
-			top: Zone_Tops[i]
+		    snDraw.moveSwitchable(Zone_FabObjs[j], true, ani_sty,{
+			top: Zone_Tops[j]
 		    });
 		}
 
-		// also animate all words into new positions
+		//also, the box (Zone_FabObjs[0]) is the only array item with height that can be varied:
+		snDraw.moveSwitchable(Zone_FabObjs[0], true, ani_sty,{
+		    height: flex_box_height
+		});
 
+		// also animate all words into new positions
 		var WordsTopPx = Top + WordBounds.topPadding;
 		var Arrangement = snDraw.Game.Words.WordArrangementSetHeight(WordArrangement_noH, WordsTopPx);
 		for (var j = 0; j < Arrangement.coords.length; j++){
@@ -297,7 +305,8 @@ snDraw.Game.Event = {
 
 		upper_drawing_bound += snDraw.Game.Zones.ZoneVerticalPaddings.aboveU;
 		var Top = upper_drawing_bound;
-
+		var UnclaimedArrangement = snDraw.Game.Zones.Unclaimed.stored_WordArrangement_noH;
+		
 		var Height_pads_tot = ZoneSty_U.thick*2 + ZoneSty_U.w_vpad*2;
 		var Height = snDraw.Game.Zones.WordsStackHeightPx(UnclaimedArrangement, Spacings) + Height_pads_tot;
 
@@ -312,17 +321,15 @@ snDraw.Game.Event = {
 	    // 3.2.1 extract a list of all arrangements, and use it to determine new zone sizes...
 	    var ArrangementsArray = [];
 	    for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
-		ArrangementsArray[i] = snDraw.Game.Zones.stored_WordArrangement_noH;
+		ArrangementsArray[i] = snDraw.Game.Zones.PlayerZone[i].stored_WordArrangement_noH;
 	    }
 
 	    var ZoneSizes = snDraw.Game.Zones.CalcZoneSizes(ArrangementsArray, upper_drawing_bound, interzonePad, Spacings);
 
-	    // Actually generate all of the active player zones...
+	    // Enact the resizing of all of the active player zones...
 	    for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
-
 		var Top = ZoneSizes[i].Top;
 		var Height = ZoneSizes[i].Height;
-
 		resizeZoneOnCanvas(snDraw.Game.Zones.PlayerZone[i], Top, Height, ZoneSty_P, WordBounds_P, ani_sty);
 	    }
 	    

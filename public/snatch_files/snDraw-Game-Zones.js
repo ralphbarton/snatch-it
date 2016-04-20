@@ -359,7 +359,7 @@ snDraw.Game.Zones = {
 
 	var zoneBox = new fabric.Rect({
 	    width: boxWidth,
-	    height: (Height - Math.max(Style.fonthalfheight, Style.thick/2) - Style.thick/2),
+
 	    fill: Style.box_fill,
 	    stroke: Properties.color,
 	    strokeWidth: Style.thick,
@@ -379,6 +379,8 @@ snDraw.Game.Zones = {
 	    var youBlock = new fabric.Rect({
 		width: Style.you_w,
 		height: Style.you_h,
+		rx: Style.rounding,
+		ry: Style.rounding,
 		fill: Properties.color
 	    });
 
@@ -436,6 +438,10 @@ snDraw.Game.Zones = {
 	    (hor_centerline_height - Style.tri_h/2), // 6. spellPointer_Mask_top
 	    (hor_centerline_height - snDraw.Game.tileSize/2) // 7. SPELL_TILES_top
 	];
+    },
+
+    DetermineZoneFlexBoxHeight: function(Height, Style){
+	return (Height - Math.max(Style.fonthalfheight, Style.thick/2) - Style.thick/2);
     },
 
     DetermineZoneBoxObjectsLefts: function(Left_Offset, Style, textWidth){

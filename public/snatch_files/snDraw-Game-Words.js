@@ -366,10 +366,18 @@ snDraw.Game.Words = {
 	// Arrangement
 	// data...
 	// Arrangement = {coords: [], word_width_px: [], breaks: []};
+	var height_fixed_coord_set = []; 
 	for (var i = 0; i < Arrangement.coords.length; i++){
-	    Arrangement.coords[i].top += Top;
+	    height_fixed_coord_set[i] = {
+		left: Arrangement.coords[i].left,
+		top: (Arrangement.coords[i].top + Top)
+	    }
+
 	}
-	return Arrangement;
+	return {coords: height_fixed_coord_set,
+		word_width_px: Arrangement.word_width_px,
+		breaks: Arrangement.breaks
+	       };
     },
 
 
