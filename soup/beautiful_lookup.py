@@ -7,7 +7,7 @@ import bs4, urllib, re
 def www_word_lookup(search_word):
 
     r = urllib.urlopen('http://www.dictionary.com/browse/' + search_word).read()
-    soup = bs4.BeautifulSoup(r, "lxml")
+    soup = bs4.BeautifulSoup(r, "html.parser")
 
     Y = soup.body.find(id="source-luna").find_all('div')
 
