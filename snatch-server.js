@@ -8,7 +8,6 @@ module.exports = function (nTiles){
     var emergency_colors = shuffle(my_color_palette.slice(0));//duplicated data
     var fiveColorsSent_socketKey = {};
 
-    var disconnectedPlayerRefs = [];
     var tile_ownership = [];
     var next_unturned_tile_i = 0;
 
@@ -28,7 +27,7 @@ module.exports = function (nTiles){
 	    //return the unused colours to the list...
 	    if(fiveColorsSent_socketKey[socket_key].restore){
 		for(var i=0; i<5; i++){
-		    if(i==ci){continue;}
+		    if(i == ci){continue;}
 		    my_color_palette.push(fiveColorsSent_socketKey[socket_key].cols[i]);
 		}
 	    }
@@ -40,6 +39,7 @@ module.exports = function (nTiles){
 		color : col,
 		words : [],
 		agrees_to_reset: false,
+		is_disconnected: false,
 		socket_key: socket_key
 	    };
 	    playerSet.push(newPlayer);
@@ -48,10 +48,30 @@ module.exports = function (nTiles){
 
 	removePlayer: function(socket_key) {
 	    var PI = player_index_from_socketKey_lkup[socket_key];
-	    playerSet[PI].socket_key = false;//never use this key again...
-	  
-	    disconnectedPlayerRefs.push(PI);
-	    delete player_index_from_socketKey_lkup[socket_key];
+	    //there is the possibility that the player was never attached to this socket...
+	    if(PI != undefined){
+		playerSet[PI].is_disconnected = true;
+		playerSet[PI].socket_key = true;
+	
+		delete player_index_from_socketKey_lkup[socket_key];
+	    }
+	},
+
+	isDisconnectedPlayerOfName: function(name) {
+	    for(var i = 0; i < playerSet.length; i++){
+		var PLR = playerSet[i]; 
+		if((PLR.is_disconnected==true) && (PLR.name.toUpperCase == name.toUpperCase)){
+		    return i;
+		}
+	    }
+	    return null;
+	},
+
+	rejoinPlayer: function(socket_key, player_index) {
+	    playerSet[player_index].is_disconnected = false;
+	    playerSet[player_index].socket_key = socket_key;
+
+	    player_index_from_socketKey_lkup[socket_key] = player_index;
 	},
 
 	getGameObject: function() {
@@ -75,10 +95,6 @@ module.exports = function (nTiles){
 	getPlayerObject: function(socket_key) {
 	    var PI = player_index_from_socketKey_lkup[socket_key];
 	    return playerSet[PI];
-	},
-
-	playerWithSocketExists: function(socket_key) {
-	    return player_index_from_socketKey_lkup[socket_key] != undefined;
 	},
 
 	getPlayerNameBySocket: function(socket_key) {

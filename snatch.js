@@ -48,15 +48,14 @@ io.on('connection', function(socket){
 
     //basic logging
     console.log('a user connected, with ID: '+socket.id);
+
     socket.on('disconnect', function(){
 	var dis_pl_i = myGame.playerIndexFromSocket(socket.id);
 	//does a player with this socket ID still exist in the server's list anyway?
 
-	if(myGame.playerWithSocketExists(socket.id)){
+	socket.broadcast.emit('player disconnected',dis_pl_i);
+	myGame.removePlayer(socket.id);
 
-	    socket.broadcast.emit('player disconnected',dis_pl_i);
-	    myGame.removePlayer(socket.id);
-	}
 	console.log('Player ' + dis_pl_i + ' disconnected (socket.id = ' + socket.id + ')');
     });
 
@@ -138,6 +137,7 @@ io.on('connection', function(socket){
 
 
 
+
     //client requests to turn over a tile
     socket.on('tile turn request', function(blank_msg){
 	var newTile_info = myGame.flipNextTile(socket.id);
@@ -148,6 +148,41 @@ io.on('connection', function(socket){
 	    console.log("All tiles turned - flip message recieved...");
 	}
     });
+
+
+    //client requests to turn over a tile
+    socket.on('many_tile_turn_hack', function(n_tiles){
+
+	var letters = [];
+	var tileID_first = undefined;
+	var tileID_final = undefined;
+	var fl_player = undefined;
+	var period = 100;
+
+	var R1 = function(i){
+	    var newTile_info = myGame.flipNextTile(socket.id);
+	    if(newTile_info){
+		io.emit('new turned tile', newTile_info);
+		letters.push(newTile_info.tile_letter);
+		tileID_final = newTile_info.tile_index
+		fl_player = newTile_info.flipping_player;
+		if(i==0){tileID_first = newTile_info.tile_index;}
+		if(i < n_tiles){setTimeout(function(){R1(i+1);},period);}//here is the recursive call achieving simple looping...
+	    }
+	    if(i >= n_tiles){
+		if(tileID_final !== undefined){
+		    console.log("PI=" + fl_player + " has turned multiple tiles at once, from\
+tileID=" + tileID_first + " to tileID=" + tileID_final + ". The letters are: " + letters);
+		}else{
+		    console.log("All tiles turned");
+		}
+
+	    }
+	};
+	R1(0);
+
+    });
+
 
 });
 

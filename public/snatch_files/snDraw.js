@@ -49,18 +49,20 @@ var snDraw = {
 	// Obtain a canvas drawing surface from fabric.js
 	canvas = new fabric.Canvas('c');
 	
+	//we don't want to select a group of objects with the mouse
+	canvas.selection = false;
+	//speedup?
+	canvas.renderOnAddRemove = false;
+	canvas.stateful = false;
+    },
+
+    makeCanvasFitWholeWindow: function(){
 	//take the window dimentions at time of page load, and use these to draw on
 	// the screen of the device at the correct scaling
 	this.canv_W = window.innerWidth;
 	this.canv_H = window.innerHeight;
 	canvas.setWidth(this.canv_W);
 	canvas.setHeight(this.canv_H);
-
-	//we don't want to select a group of objects with the mouse
-	canvas.selection = false;
-	//speedup?
-	canvas.renderOnAddRemove = false;
-	canvas.stateful = false;
     },
 
     measureFramePeriod: function(){
@@ -128,7 +130,19 @@ var snDraw = {
 	this.nAnimations--;
     },
 
-    moveSwitchable: function(FabricObject,animate_onComplete,animation_style,properties){
+/*
+Parameters:
+
+animate_onComplete
+ - if it is a function, this function is called upon completion of the animation
+ - if it is boolean TRUE, use animation (but with no custom callback upon competion)
+ - if it boolean FALSE, do not use animation, just place it..
+
+animation_style
+ - object to define the duration and easing of the animation...
+
+*/
+    moveSwitchable: function(FabricObject, animate_onComplete, animation_style, properties){
 	var my_onComplete = undefined;
 
 	if(typeof(animate_onComplete)=='function'){//a custom on-complete function has been supplied

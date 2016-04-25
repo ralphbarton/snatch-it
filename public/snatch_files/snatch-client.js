@@ -6,7 +6,8 @@ var players = [];//global reference - for server data...
 var tilestats = {};//global reference - for server data...
 
 var client_player_index = undefined;
-var disconnected_players = [];
+
+var dev = true;
 
 //initialise the Canvas
 
@@ -14,6 +15,7 @@ socket.emit('player joining game', 0);
 
 socket.on('player color choices', function(colorSet){
     snDraw.initialiseCanvas();
+    snDraw.makeCanvasFitWholeWindow();
     //the colour set is an array with objects <fabric color>, length 5
     snDraw.Splash.triggerPromptScreen(colorSet);
 });
@@ -22,27 +24,19 @@ socket.on('player color choices', function(colorSet){
 
 ///upon arrival, process the transmitted game state from the server
 socket.on('full game state transmission', function(gameState){
-
-    //this will clear the message "waiting for the server..."
-    canvas.clear();	    
-    /*
-      For now, receipt of the first ever game state message (compared with others) is detected
-      by looking at the global tileset, which is initially [].
-
-      In any case, there should only ever be one transmission of this message, so the check should not be necessary.
-    */
-
-    //RECIEVE THE MESSAGE FOR THE FIRST time - in this case need to add the listeners...
-    if(tileset.length<1){
-	snDraw.Game.addListeners_kb_mouse();
-    }else{//clear old data ready for the new...
-	snDraw.Game.TileArray = [];
-    }
-
     //the message is sent on the following events:
     // (1) a player has just joined the game (they just chose a color)
     // (2) a player has requested reset and they are the only player
     // (3) a player has agreed to a reset request, and now everyone agrees...
+
+    //this will clear the message "waiting for the server..."
+    snDraw.Game.TileArray = [];
+    canvas.clear();	    
+
+    //RECIEVE THE MESSAGE FOR THE FIRST time - in this case need to add the listeners...
+    if(tileset.length<1){
+	snDraw.Game.addListeners_kb_mouse();
+    }
 
     players = gameState.playerSet;
     tileset = gameState.turned_tiles;
@@ -54,7 +48,11 @@ socket.on('full game state transmission', function(gameState){
     }
 
     //draws the entire game state on the canvas from the data supplied
-    snDraw.Game.initialDrawEntireGame();
+    if(dev){
+	snDraw.Game.Event.DrawAll();
+    }else{
+	snDraw.Game.initialDrawEntireGame();
+    }
 
 });//end of function to load game data
 
@@ -76,41 +74,17 @@ socket.on('player has joined game', function(newPlayer){
 //when a new tile is sent from the server...
 socket.on('new turned tile', function(newTile_info){
 
-    var PI = newTile_info.flipping_player;
-    var TI = newTile_info.tile_index;
-    var LET = newTile_info.tile_letter;
-    var client_is_flipper = PI == client_player_index;
+    var player_index = newTile_info.flipping_player;
+    var tile_index = newTile_info.tile_index;
+    var letter = newTile_info.tile_letter;
 
-    var player_name = client_is_flipper ? "You" : players[PI].name;
-    tileset[TI] = {
-	letter: LET,
-	status: "turned"
-    };
-    var old_zones_top_coord = snDraw.Game.Zones.playersZoneTopPx;
-    snDraw.Game.Turn.newTurnedTile_FlyIn_animate(TI, PI);
-    snDraw.Game.Grid.shiftTilesUpGrid();//function call is extravagant (inefficient) as it will never cause a shift. We're just using it to correctly set playersZoneTopPx
-    var zone_resize_necesary = snDraw.Game.Zones.playersZoneTopPx != old_zones_top_coord;
-    snDraw.Game.Controls.updateTurnLetter_number();
-    if(zone_resize_necesary){
-	snDraw.Game.Zones.updateAllZoneSizes();
-	snDraw.Game.Spell.repositionSkeletal();
-    }
+    snDraw.Game.Event.TileTurn(player_index, tile_index, letter);
 
-    //This is a little expensive, but any new tile has the potential to change letter availability
-    if(snDraw.Game.Spell.SkeletalLetters.length>0){ // irrelivant if the speller is empty
-	snDraw.Game.Spell.recolourAll(snDraw.Game.Spell.ListAllVisibleTilesOf(LET));
-	snDraw.Game.Spell.indicateN_validMoves_onButton();//also re-indicate how to make
-    }
-
-    if(TI%5==0){snDraw.measureFramePeriod();}//every 5 tiles, remeasure frame rate
-
-    if(client_is_flipper){
-	snDraw.Game.Controls.startTurnDisableTimeout();
-    }else{
-	//the simple effect of this is that any non-client player flip resets the timer to re-allow client flip.
-	snDraw.Game.Controls.cancelTurnDisabled = true;
-    }
 });
+
+
+
+
 
 socket.on('player wants reset', function(player_index){
     var player_name = players[player_index].name;
@@ -120,11 +94,13 @@ socket.on('player wants reset', function(player_index){
 
 
 socket.on('player disconnected', function(player_index){
-    var player_name = players[player_index].name;
-    console.log("TOAST: " + player_name + " disconnected");
+    var dis_plr = players[player_index];
+    dis_plr.is_disconnected = true;
 
+    console.log("TOAST: " + dis_plr.name + " disconnected");
 
     console.log("this message needs to be replace with additional code to handle this event...");
+
 });
 
 //this is message to Tell me that Alex has said "Reset" - inform of another players decision
@@ -196,6 +172,14 @@ function PLAYER_SUBMITS_WORD(p)       {socket.emit('player submits word', p);}
 function RESET_REQUEST()              {socket.emit('reset request', 0);}
 function TILE_TURN_REQUEST()          {socket.emit('tile turn request', 0);}
 function PLAYER_JOINED_WITH_DETAILS(p){socket.emit('player joined with details', p);}
+
+function TURN_MANY_TILES(p)           {socket.emit('many_tile_turn_hack', p);}
+
+
+
+window.onresize = function(){
+    snDraw.Game.Event.WindowResize();
+};
 
 
 

@@ -1,6 +1,4 @@
 //this file contains the functions that render the game onto the screen
-var dev = false;
-
 var TA = [];//this is to enable faster debugging
 
 snDraw.Game = {
@@ -58,6 +56,7 @@ snDraw.Game = {
 	TA = this.TileArray;//this is to enable faster debugging
     },
 
+    tileSpacings: undefined,
     calculateRenderingDimentionConstants: function(){    //this function relies upon a defined number of tiles, which is only after game state is loaded...
 	var N_pixels = snDraw.canv_W * snDraw.canv_H;
 	var Tile_pixels = N_pixels * this.Ratio_tile / tilestats.n_tiles;
@@ -67,7 +66,7 @@ snDraw.Game = {
 	this.tileSize = Math.round(tile_dim);
 	
 	this.marginUnit = this.tileSize*0.13;
-	this.textMarginUnit = this.tileSize*0.2;
+	/*this.textMarginUnit = this.tileSize*0.2;*/ // though others are now redundant too...
 	this.stroke_px = Math.round(this.marginUnit * 0.5);
 	
 	this.h_space_word = this.tileSize * 0.6;//define a constant: additional horizonal spacing pixels to use for a space between words
@@ -76,13 +75,33 @@ snDraw.Game = {
 	this.x_plotter_R = 2 * this.marginUnit + this.stroke_px;
 	this.tile_space_px = this.tileSize * grid_letter_spacing;
 	this.client_col = players[client_player_index].color;
+
+	var TSI = this.tileSize; // tile side inside (this excludes the size of the border)
+	var tile_stroke_prop = 0.06;
+	var TS = this.tileSize * (1+tile_stroke_prop);
+
+	this.tileSpacings = { //all in pixels
+	    tsi: TSI,
+	    ts_thick: TSI * tile_stroke_prop,
+	    ts: TS, //tile size, including border
+	    lg: (TS * 0.01), //letter gap (gap only) - "letter gap" refers to the gaps between letters within words. 
+	    tslg: (TS * 1.00), //tile size added to letter gap
+	    tsgg: (TS * 1.09), //tile size added to grid gap
+	    wg: (TS * 0.6), // word gap (gap only)
+	    tsvg: (TS * 1.15), //vertical gap between different rows of words, plus actual tile size
+	    grpad: (TS * 0.20), // minimum horizonal padding of the left and the right of the grid of letters
+	    ingh: (TS * 0.20), // inside a zone box, this is the horizonal padding between the inner wall and a letter
+	    ingt: (TS * 0.20) // inside a zone box, this is the vertical padding between the upper wall and a letter
+	};
+
+	return this.tileSpacings;
     },
 
     generateTileObject: function(tile,tile_id){
 
 	//parameter controlling the proportions of the tiles (boarder, font size)
 	var tile_letter_prop = 0.9;
-	var tile_stroke_prop = 0.06;
+
 
 	var myTileLetterObj = new fabric.Text(tile.letter,{
 	    originX: 'center',
@@ -109,7 +128,7 @@ snDraw.Game = {
 	    originY: 'center',
 	    fill: 'rgb(54,161,235)',
 	    stroke: '#777',
-	    strokeWidth: this.tileSize*tile_stroke_prop,
+	    strokeWidth: this.tileSpacings.ts_thick,
 	    width: this.tileSize,
 	    height: this.tileSize,
 	    rx: 0.12 * this.tileSize,
@@ -130,9 +149,9 @@ snDraw.Game = {
 
 	if(tile.status == "turned"){this.modifyTileObject(myNewTileObj,"flipped");}
 	if(tile.status == "inword"){this.modifyTileObject(myNewTileObj,"flipped");}
+
+	//note that tile.status does not refer to a real member of the 'tileset' array, necessarily
 	if(tile.status == "skeletal"){this.modifyTileObject(myNewTileObj,"skeletal");}
-	if(tile.status == "partial"){this.modifyTileObject(myNewTileObj,"partial");}
-	if(tile.status == "shadow"){this.modifyTileObject(myNewTileObj,"shadow");}
 
 	//add flat-array reference to the object
 	this.TileArray[tile_id] = myNewTileObj;
@@ -141,7 +160,7 @@ snDraw.Game = {
     },
 
 
-    modifyTileObject: function(myTile,to_state,options){
+    modifyTileObject: function(myTile,to_state){
 	//record the visual state of the tile as part of the object
 	myTile.visual = to_state;
 
