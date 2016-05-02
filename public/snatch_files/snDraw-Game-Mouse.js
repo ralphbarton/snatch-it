@@ -34,7 +34,7 @@ snDraw.Game.Mouse = {
 
 	    //Handle clicks that land on a Game Control
 	    var control_index = targetObj.gameButtonID;
-	    if(control_index!==undefined){ //implies the click landed on a button...
+	    if(control_index !== undefined){ //implies the click landed on a button...
 		snDraw.Game.Controls.buttonRecolor(targetObj,"press"); // visual
 		this.callGameControlHandler(control_index);
 	    }

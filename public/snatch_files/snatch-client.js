@@ -146,7 +146,7 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     snDraw.Game.Zones.ZoneHandlingUponSnatch(snatching_player,n_words_prior2S);
     
     //update the tiles data structure:
-    for(i=0; i<tile_indices.length; i++){
+    for(var i = 0; i < tile_indices.length; i++){
 	var TID = tile_indices[i];
 	tileset[TID].status = 'inword';
     }

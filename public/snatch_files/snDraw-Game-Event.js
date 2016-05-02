@@ -211,10 +211,6 @@ snDraw.Game.Event = {
 	}
 
     },
-
-    SnatchEvent: function(){
-
-    },
     
     TileTurn: function(player_index, tile_index, letter, ani_sty){
 
@@ -224,28 +220,23 @@ snDraw.Game.Event = {
 	    status: "turned"
 	};
 	tilestats.n_turned++;
-	// 1.1 update the button
+
+	// 1.1 update the button (to display correct number of letters remainng)
 	var n_tiles_remaining = tilestats.n_tiles - tileset.length;
 	snDraw.Game.Controls.updateTurnLetter_number(n_tiles_remaining);
 
 
 	// 2. Determine if zones need to be squeezed because the tile grid has grown vertically...
 	var old_grid_bottom_px = snDraw.Game.Grid.GetGridBottomPx();
-
 	snDraw.Game.Turn.newTurnedTile_FlyIn_animate(tile_index, player_index, snDraw.ani.sty_Sing);
 
 	var upper_drawing_bound = snDraw.Game.Grid.GetGridBottomPx();
 	var zone_resize_necesary = old_grid_bottom_px != upper_drawing_bound;
 
-
-
-
 	// 3. If necessary, squeeze everything downwards.
 	if(zone_resize_necesary){
 
-	    //TODO muchos attentionos needed here
-
-	    // 3.01 - create a function that moves and resizes the zone box)
+	    // 3.1 - define a function which moves and resizes any zone box
 	    function resizeZoneOnCanvas(Zone, Top, Height, ZoneSty, WordBounds, ani_sty){
 
 		// copy - pasted...
@@ -290,7 +281,7 @@ snDraw.Game.Event = {
 	    }
 
 
-	    // 3.02 - retrieve style information...
+	    // 3.2 - retrieve style information, for both player and unclaimed zones
 	    var ZoneSty_P = snDraw.Game.Zones.Style1;
 	    var WordBounds_P = ZoneSty_P.WordBlockBounds;
 	    var ZoneSty_U = snDraw.Game.Zones.Style2;
@@ -299,7 +290,7 @@ snDraw.Game.Event = {
 	    var Spacings = snDraw.Game.tileSpacings;
 
 
-	    // 3.1 Move the unclaimed zone & its words
+	    // 3.3 Move the unclaimed zone & its words
  	    //unfortunately, this is partly copy-pasted code from original creation of the zones....
 	    if(snDraw.Game.Zones.Unclaimed.exists){
 
@@ -316,9 +307,9 @@ snDraw.Game.Event = {
 	    }
 
 
-	    // 3.2 Move the player zones and all words
+	    // 3.4 Now move all of the player zones, and all of the contained words
 
-	    // 3.2.1 extract a list of all arrangements, and use it to determine new zone sizes...
+	    // 3.4.1 extract a list of all arrangements, and use it to determine new zone sizes...
 	    var ArrangementsArray = [];
 	    for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
 		ArrangementsArray[i] = snDraw.Game.Zones.PlayerZone[i].stored_WordArrangement_noH;
@@ -326,7 +317,7 @@ snDraw.Game.Event = {
 
 	    var ZoneSizes = snDraw.Game.Zones.CalcZoneSizes(ArrangementsArray, upper_drawing_bound, interzonePad, Spacings);
 
-	    // Enact the resizing of all of the active player zones...
+	    // 3.4.2 Actually resize each of the active player zones...
 	    for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
 		var Top = ZoneSizes[i].Top;
 		var Height = ZoneSizes[i].Height;
@@ -335,9 +326,8 @@ snDraw.Game.Event = {
 	    
 	}
 
-
-	// 4. modify the "Turn letter button, based upon who turned the tile.
-	if(player_index == client_player_index){//the player that flipped was the client...
+	// 4. Modify the "Turn Letter" button, based upon who turned the tile (start timer or cancel timer)
+	if(player_index == client_player_index){ // the player that flipped was the client...
 	    snDraw.Game.Controls.startTurnDisableTimeout();
 	}else{
 	    //the simple effect of this is that any non-client player flip resets the timer to re-allow client flip.
@@ -345,6 +335,12 @@ snDraw.Game.Event = {
 	}
 
     },
+
+
+    SnatchEvent: function(){
+
+    },
+
     
     Disconnection: function(){
 	return null;
