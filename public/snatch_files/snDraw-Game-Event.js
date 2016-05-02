@@ -336,12 +336,135 @@ snDraw.Game.Event = {
 
     },
 
+    SnatchEvent: function(player_index, tile_indices, words_used_list){
 
-    SnatchEvent: function(){
+	// 1. Clear the Spell if it is the Client Snatching (this also sets some useful variables that are used in-among).
+	var snatching_player = players[player_index];
+	var client_is_snatcher = client_player_index == player_index;
+	if(client_is_snatcher){snDraw.Game.Spell.CancelWord();}
+
+	// 1.1 (log some data relevant to the SNATCH event. TODO: convert to Toasts)
+	console.log("TOAST: " + snatching_player.name + " has snatched a word, tile indices are:", tile_indices);    
+	console.log("word usage : " + JSON.stringify(words_used_list));
+
+	// 2. Detach all the letters involved in the new word, and update tileset to reflect word usage.
+
+	// 2.1 Detach all tile objects from the words they're in
+	for (var i = 0; i < words_used_list.length; i++){
+	    var PIi = words_used_list[i].PI;
+	    var WIi = words_used_list[i].WI;
+
+	    //modify the players data structure:
+	    var removed_word_tileIDs = players[PIi].words[WIi];
+	    delete players[PIi].words[WIi];//just delete the array element now, purge the array of empy elements later
+
+	    //determine the group coordinates...
+	    var StolenGRP = snDraw.Game.Words.TileGroupsArray[PIi][WIi];	    
+	    var Stolen_x_base = StolenGRP.getLeft(); 
+	    var Stolen_y_base = StolenGRP.getTop(); 
+
+	    //remove tiles from Group, and place in position as individual tiles:
+	    for (var j=0; j<removed_word_tileIDs.length; j++){
+		var StolenTile = snDraw.Game.TileArray[removed_word_tileIDs[j]];
+		snDraw.Game.Words.TileGroupsArray[PIi][WIi].remove(StolenTile);		
+		//place individual tiles back on the canvas in location
+		StolenTile.set({
+		    left: Stolen_x_base + snDraw.Game.h_spacer * j,
+		    top: Stolen_y_base
+		});
+		canvas.add(StolenTile);
+	    }
+	    
+	    //remove the now empty group itself
+	    canvas.remove(StolenGRP);
+	    delete snDraw.Game.Words.TileGroupsArray[PIi][WIi];
+	}
+	// Remove the all references to Fabric Groups which are now empty of letter tiles, and words removed from raw data
+	for (var i = 0; i<players.length; i++){
+	    snDraw.Game.Words.TileGroupsArray[i].clean(undefined);
+	    players[i].words.clean(undefined);
+	}
+
+	// 2.2 update the players data structure:
+	snatching_player.words.push(tile_indices);
+
+
+	// 2.3 update tileset for letters now In Words, and detach any letters in grid (i.e. the Fabric Objects)
+	for(var i = 0; i < tile_indices.length; i++){
+	    var TID = tile_indices[i];
+	    tileset[TID].status = 'inword';
+	}
+	//note that there is handling in-place for when a tile index in the array we supply here is not actually in the grid.
+	//note also that this function will rearrange the tiles that remain in the grid, for efficient packing following the
+	//removal. This includes animation.
+	snDraw.Game.Grid.DetachLetterSetFromGrid(tile_indices, ani_styleXX);
+
+
+	// 3. Zone Handling upon Snatch
+	var client_is_snatcher = client_player_index == snatching_player.index;
+	var snatcher_first_word = snatching_player.words.length == 0;
+	var new_zone = (!client_is_snatcher) && (snatcher_first_word);
+
+	// 3.1 Create a new zone container (this is NOT visually creating the new zone for the snatching player)
+	if(new_zone){
+	    snDraw.Game.Zones.PlayerZone.push({
+		player: snatching_player,
+		is_client: false
+	    });
+	}
+
+	// 3.2 Delete zones if required
+
+
+
+
+
+	for(var i = 0; i < this.PlayerZone.length; i++){
+	    var zone_i = this.PlayerZone[i];
+	    if((zone_i.player.words.length == 0)&&(!zone_i.is_client)){//there are no words in the zone, and it's a non-client player. 
+		var empty_zone = this.PlayerZone.splice(i,1)[0];
+		i--;//because we spliced, counteract the increment of i.
+		this.removeZoneBox(empty_zone);
+	    }
+	}
+	// Animate the resizing of the zones 
+	var nZones = this.PlayerZone.length; //note that the immediately preceeding code may remove zones and change the length.
+	this.calculatePlayerZoneSizes();
+	if (new_zone){nZones--;}//don't make adjustment animations to any new final zone...
+
+	for(var i=0; i<nZones; i++){
+	    //second parameter true prevents it from attempting to shuffle the final word (already present as data), as it will not yet be existant as a fabric group 
+	    var zone_i = this.PlayerZone[i];
+	    var snatched_word_in_this_zone = zone_i.player.index == snatching_player.index;
+	    this.animateResizeZoneBox(zone_i);
+	    //shuffle the player's words to back fill the gap, in case one of their words was just snatched away.
+	    snDraw.Game.Words.animateRepositionPlayerWords(zone_i.player.index, snatched_word_in_this_zone);
+	}//loop
+
+	// does the player box need to be inserted onto the screen?
+	if(new_zone){
+	    //create new zone box...
+	    var PZ = snDraw.Game.Zones.PlayerZone;
+	    var FinalZone = PZ[PZ.length-1];
+	    snDraw.Game.Zones.createZoneBox(FinalZone,true);// Draws the BOX, second parameter is for animation.	
+	}
+
+
+
+
+
+	//OLD CODE, TAKEN FROM 'snatch-client.js'...
+	
+	//draw the new word into the player zone...
+	//the final parameter of this function call determines if animation is required (which we always have)
+	snDraw.Game.Words.drawSingleCapturedWord(snatching_player,snatching_player.words.length - 1, true);
+	snDraw.Game.Spell.repositionSkeletal();
+
+
+
 
     },
 
-    
     Disconnection: function(){
 	return null;
     },

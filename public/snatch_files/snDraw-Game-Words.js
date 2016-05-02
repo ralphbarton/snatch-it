@@ -93,45 +93,6 @@ snDraw.Game.Words = {
 	snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
     },
 
-    //this function removes an arbitrary set of words, indexed by player and within that by word index.
-    removeWordsAndUngroup: function(RemovalWordList){
-	
-	//LOOP through all stolen words
-	for (var i=0; i<RemovalWordList.length; i++){
-	    var PIi = RemovalWordList[i].PI;
-	    var WIi = RemovalWordList[i].WI;
-
-	    //modify the players data structure:
-	    var removed_word_tileIDs = players[PIi].words[WIi];
-	    delete players[PIi].words[WIi];//just delete the array element now, purge the array of empy elements later
-
-	    //determine the group coordinates...
-	    var StolenGRP = this.TileGroupsArray[PIi][WIi];	    
-	    var Stolen_x_base = StolenGRP.getLeft(); 
-	    var Stolen_y_base = StolenGRP.getTop(); 
-
-	    //remove tiles from Group, and place in position as individual tiles:
-	    for (var j=0; j<removed_word_tileIDs.length; j++){
-		var StolenTile = snDraw.Game.TileArray[removed_word_tileIDs[j]];
-		this.TileGroupsArray[PIi][WIi].remove(StolenTile);		
-		//place individual tiles back on the canvas in location
-		StolenTile.set({
-		    left: Stolen_x_base + snDraw.Game.h_spacer * j,
-		    top: Stolen_y_base
-		});
-		canvas.add(StolenTile);
-	    }
-	    
-	    //remove the now empty group itself
-	    canvas.remove(StolenGRP);
-	    delete this.TileGroupsArray[PIi][WIi];
-	}
-
-	for (var i = 0; i<players.length; i++){
-	    this.TileGroupsArray[i].clean(undefined);
-	    players[i].words.clean(undefined);
-	}
-    },
 
     //given the possibility that snatching a word from a player will leave a gap, this function runs through the words
     //drawing them one after another to avoid any gap.

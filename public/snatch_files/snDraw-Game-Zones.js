@@ -246,52 +246,6 @@ snDraw.Game.Zones = {
     },
 
 
-    ZoneHandlingUponSnatch: function(snatching_player, n_words_prior2S){
-
-	var client_is_snatcher = client_player_index == snatching_player.index;
-	var snatcher_first_word = n_words_prior2S == 0;
-	var new_zone = (!client_is_snatcher) && (snatcher_first_word);
-
-	//Generate a new zone if required.
-	if(new_zone){
-	    snDraw.Game.Zones.PlayerZone.push({
-		player: snatching_player,
-		is_client: false
-	    });
-	}
-
-	//delete zones if required
-	for(var i = 0; i < this.PlayerZone.length; i++){
-	    var zone_i = this.PlayerZone[i];
-	    if((zone_i.player.words.length == 0)&&(!zone_i.is_client)){//there are no words in the zone, and it's a non-client player. 
-		var empty_zone = this.PlayerZone.splice(i,1)[0];
-		i--;//because we spliced, counteract the increment of i.
-		this.removeZoneBox(empty_zone);
-	    }
-	}
-	// Animate the resizing of the zones 
-	var nZones = this.PlayerZone.length; //note that the immediately preceeding code may remove zones and change the length.
-	this.calculatePlayerZoneSizes();
-	if (new_zone){nZones--;}//don't make adjustment animations to any new final zone...
-
-	for(var i=0; i<nZones; i++){
-	    //second parameter true prevents it from attempting to shuffle the final word (already present as data), as it will not yet be existant as a fabric group 
-	    var zone_i = this.PlayerZone[i];
-	    var snatched_word_in_this_zone = zone_i.player.index == snatching_player.index;
-	    this.animateResizeZoneBox(zone_i);
-	    //shuffle the player's words to back fill the gap, in case one of their words was just snatched away.
-	    snDraw.Game.Words.animateRepositionPlayerWords(zone_i.player.index, snatched_word_in_this_zone);
-	}//loop
-
-	// does the player box need to be inserted onto the screen?
-	if(new_zone){
-	    //create new zone box...
-	    var PZ = snDraw.Game.Zones.PlayerZone;
-	    var FinalZone = PZ[PZ.length-1];
-	    snDraw.Game.Zones.createZoneBox(FinalZone,true);// Draws the BOX, second parameter is for animation.	
-	}
-    },
-
     // Animate the resizing of the zones 
     updateAllZoneSizes: function(){
 	this.calculatePlayerZoneSizes();

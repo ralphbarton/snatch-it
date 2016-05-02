@@ -42,7 +42,7 @@ socket.on('full game state transmission', function(gameState){
     tileset = gameState.turned_tiles;
     tilestats = gameState.tile_stats;
 
-    for(i=0; i<players.length; i++){
+    for(var i = 0; i < players.length; i++){
 	players[i].index = i;
 	snDraw.Game.Words.TileGroupsArray[i] = [];//correctly create empty container
     }
@@ -83,6 +83,17 @@ socket.on('new turned tile', function(newTile_info){
 });
 
 
+socket.on('snatch assert', function(SnatchUpdateMsg){
+
+    //Process the incoming data: 
+    var player_index = SnatchUpdateMsg.player_index;
+    var tile_indices = SnatchUpdateMsg.tile_id_array
+    var word_usage = SnatchUpdateMsg.words_consumed;
+
+    snDraw.Game.Event.SnatchEvent(player_index, tile_indices, word_usage);
+
+});
+
 
 
 
@@ -116,47 +127,6 @@ socket.on('give client their player index', function(myIndex){
 
 
 
-socket.on('snatch assert', function(SnatchUpdateMsg){
-
-    //Process the incoming data: 
-    var tile_indices = SnatchUpdateMsg.tile_id_array
-    var PI = SnatchUpdateMsg.player_index;
-    var word_usage = SnatchUpdateMsg.words_consumed;
-    var snatching_player = players[PI];
-    var client_is_snatcher = client_player_index == PI;
-
-    //a toast
-    console.log("TOAST: " + snatching_player.name + " has snatched a word, tile indices are:", tile_indices);    
-    console.log("word usage : " + JSON.stringify(word_usage));
-
-    //clear the spell only if client is snatcher
-    if(client_is_snatcher){snDraw.Game.Spell.CancelWord();}
-
-    //record how many words
-    var n_words_prior2S = snatching_player.words.length;
-
-    //update the players data structure:
-    snDraw.Game.Words.removeWordsAndUngroup(word_usage);
-    snatching_player.words.push(tile_indices);
-
-    //mark the locations of any snatched tiles on grid as empty
-    snDraw.Game.Grid.shiftTilesUpGrid(tile_indices);
-
-    //most of the Zone reshaping work happens here
-    snDraw.Game.Zones.ZoneHandlingUponSnatch(snatching_player,n_words_prior2S);
-    
-    //update the tiles data structure:
-    for(var i = 0; i < tile_indices.length; i++){
-	var TID = tile_indices[i];
-	tileset[TID].status = 'inword';
-    }
-    
-    //draw the new word into the player zone...
-    //the final parameter of this function call determines if animation is required (which we always have)
-    snDraw.Game.Words.drawSingleCapturedWord(snatching_player,snatching_player.words.length - 1, true);
-    snDraw.Game.Spell.repositionSkeletal();
-
-});
 
 
 
