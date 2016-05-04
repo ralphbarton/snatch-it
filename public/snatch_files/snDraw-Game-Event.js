@@ -22,16 +22,56 @@ snDraw.Game.Event = {
 	    }
 	}
 
-	// 4. Create the zones containers (this is NOT visually creating the zones)
+	// 4. Create all the word objects
+	// (for all players indiscriminately, as this will generate those for the unclaimed zone also)
+	for (var i = 0; i < players.length; i++){
+	    for (var j = 0; j < players[i].words.length; j++){
+
+		//extract the tileIDs of the tiles that make up this word, and create a tile object array
+		// simultaneously remove singly tiles from the canvas. They will be put in a group, and the group will go on canvas
+		var WordTileArray = [];
+		for (var k = 0; k < player_i.words[j].length; k++){
+
+		    var TID = players[i].words[j][k];
+		    var TileObject = snDraw.Game.generateTileObject(tileset[TID], TID);
+		    WordTileArray.push(TileObject);
+		    canvas.remove(WordTileArray[i]);
+
+		    //arrange into word based at origin
+		    WordTileArray[i].set({
+			left: (i * Spacings.tslg),
+			top: 0
+		    });
+		}
+		
+		//Form the Group for the word...
+		var WordGRP = new fabric.Group( WordTileArray, {
+		    left: 0, 
+		    top: 0,
+		    hasControls: false,
+		    hasBorders: false
+		});
+		canvas.add(WordGRP);
+
+		//Global references forwards and backwards
+		WordGRP.OwnerPlayer = players[i];
+		snDraw.Game.Words.TileGroupsArray[i].push(WordGRP);
+
+	    }
+	}
+
+
+
+	// 5. Create the zones containers (this is NOT visually creating the zones)
 	snDraw.Game.Zones.PlayerZone = [];
 
-	// 4.1 Unconditionally add client's zone
+	// 5.1 Unconditionally add client's zone
 	snDraw.Game.Zones.PlayerZone[0] = {
 	    player: players[client_player_index],
 	    is_client: true
 	};
 
-	// 4.2 Add all players who who (A) have words, (B) aren't client and (C) aren't disconnected.
+	// 5.2 Add all players who who (A) have words, (B) aren't client and (C) aren't disconnected.
 	// Potentially add Unclaimed Zone
 	snDraw.Game.Zones.Unclaimed.playerslist = [];
 	snDraw.Game.Zones.Unclaimed.exists = false;
@@ -49,67 +89,53 @@ snDraw.Game.Event = {
 	    }
 	}
 
+	// 6. Determinate the positions and arrangements of everything to be drawn on-screen
 
-	// 5. WORD OBJECT GENERATION - for all players, and for the unclaimed zone
-
-	// 5.1 Define a function here to generate a player's words as a list of Fabric objects
-	function generatePlayerWordObjs(player){
-	    var WordGrpsList = [];
-	    for (var j = 0; j < player_i.words.length; j++){
-
-		//extract the tileIDs of the tiles that make up this word, and create a tile object array
-		var WordTileArray = [];
-		for (var k = 0; k < player_i.words[j].length; k++){
-		    var TID = player_i.words[j][k];
-		    var TileObject = snDraw.Game.generateTileObject(tileset[TID], TID);
-		    WordTileArray.push(TileObject);
-		}
-		
-		//Now make it into a word...
-		var WordGroup_j = snDraw.Game.Words.CreateWordAsTileGroupAtOrigin(
-		    WordTileArray, Spacings, player_i);
-
-		//Add that word to the list...
-		WordGrpsList.push(WordGroup_j);
-	    }
-	    return WordGrpsList;
-	}
-
-	//5.2 retrieve style information...
+	// 6.1 retrieve style information...
 	var ZoneSty_P = snDraw.Game.Zones.Style1;
 	var WordBounds_P = ZoneSty_P.WordBlockBounds;
 	var ZoneSty_U = snDraw.Game.Zones.Style2;
 	var WordBounds_U = ZoneSty_U.WordBlockBounds;
 	var interzonePad = snDraw.Game.Zones.ZoneVerticalPaddings;
 
+	// 6.2 retrieve the bottom pixel of the letters grid
+	var upper_drawing_bound = snDraw.Game.Grid.GetGridBottomPx();
 
-	//5.3 Generate the word objects for all of the inactive players, and determine the arrangement for the unclaimed zone
+	// 6.3 If an unclaimed zone exists, calculate its word arrangement and hence its overall height
 	if(snDraw.Game.Zones.Unclaimed.exists){
-	    var UnclaimedWordGroups = [];
-	    for (var i = 0; i < snDraw.Game.Zones.Unclaimed.playerslist.length; i++){
-		var player_i = snDraw.Game.Zones.Unclaimed.playerslist[i];
-		UnclaimedWordGroups = UnclaimedWordGroups.concat(generatePlayerWordObjs(player_i));
-	    }
-	    var UnclaimedArrangement = snDraw.Game.Words.GenWordArrangement(UnclaimedWordGroups, WordBounds_U, Spacings, "center");
-	    snDraw.Game.Zones.Unclaimed.stored_WordArrangement_noH = UnclaimedArrangement;
-	    snDraw.Game.Zones.Unclaimed.stored_WordGroup = UnclaimedWordGroups;
+	    var words_list = getUnclaimedWordsList("via TID");
+	    var UnclaimedArrangement = snDraw.Game.Words.GenWordArrangement(words_list, WordBounds_U, Spacings, "center");
+
+	    upper_drawing_bound += snDraw.Game.Zones.ZoneVerticalPaddings.aboveU;
+	    var unclaimed_Top = upper_drawing_bound;
+
+	    var unclaimed_Height_pads_tot = ZoneSty_U.thick*2 + ZoneSty_U.w_vpad*2;
+	    var unclaimed_Height = snDraw.Game.Zones.WordsStackHeightPx(UnclaimedArrangement,Spacings) + unclaimed_Height_pads_tot;
+
+	    upper_drawing_bound += unclaimed_Height;
 	}
 
-	//5.4 Generate all word objects and arrangements for the zones of active players
+	// 6.4 calculate the word arrangements for zones of all active players
 	var ArrangementsArray = [];
-	var ZonesWordsGroups = [];
-
 	for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
+
 	    var player_i = snDraw.Game.Zones.PlayerZone[i].player;
-
-	    var WordGrpsList_i = generatePlayerWordObjs(player_i);
-	    ZonesWordsGroups.push(WordGrpsList_i);
-
-	    var Arrangement_i = snDraw.Game.Words.GenWordArrangement(WordGrpsList_i, WordBounds_P, Spacings, "left");
+	    var Arrangement_i = snDraw.Game.Words.GenWordArrangement(players[i].words, WordBounds_P, Spacings, "left");
 	    ArrangementsArray.push(Arrangement_i);
-	    snDraw.Game.Zones.PlayerZone[i].stored_WordArrangement_noH = Arrangement_i;
-	    // PlayerZone[i].stored_WordGroup  // this is not needed (don't re-add it) because these objects are otherwise ref'd
 	}
+
+	// 6.5 Finally, calculate the sizes of all zones...
+	// function returns [{Top: , Height: }, ...]
+	var ZoneSizes = snDraw.Game.Zones.CalcZoneSizes(ArrangementsArray, upper_drawing_bound, interzonePad, Spacings);
+
+
+	// 7. Drawing the zones on the canvas, and moving the words into them...
+
+
+
+
+
+
 
 
 
@@ -149,7 +175,7 @@ snDraw.Game.Event = {
 	    return Zone_FabObjs;
 	}
 
-	var upper_drawing_bound = snDraw.Game.Grid.GetGridBottomPx();
+
 
 	// 6.2 if an "unclaimed words zone" exists, then make this first.
 	if(snDraw.Game.Zones.Unclaimed.exists){
@@ -209,6 +235,24 @@ snDraw.Game.Event = {
 	    snDraw.Game.Zones.PlayerZone[i].Zone_FabObjs = FAB;
 
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     },
     
@@ -343,9 +387,10 @@ snDraw.Game.Event = {
 
 	// 1.1 (log some data relevant to the SNATCH event. TODO: convert to Toasts)
 	console.log("TOAST: " + snatching_player.name + " has snatched a word, tile indices are:", tile_indices);    
-	console.log("word usage : " + JSON.stringify(words_used_list));
+	console.log("words_used_list = " + JSON.stringify(words_used_list));
 
-	// 2. Detach all the letters involved in the new word, and update tileset to reflect word usage.
+	// 2. Firstly, on the canvas, detach all the letters involved in the new word
+	// also update underlying data to reflect the state update (i.e. updates "tileset" and "players")
 
 	// 2.1 Detach all tile objects from the words they're in
 	for (var i = 0; i < words_used_list.length; i++){
@@ -410,21 +455,26 @@ snDraw.Game.Event = {
 		is_client: false
 	    });
 	}
+	//TODO - add function to create and animate IN the newly defined zone box
 
 	// 3.2 Delete zones if required
-
-
-
-
-
-	for(var i = 0; i < this.PlayerZone.length; i++){
-	    var zone_i = this.PlayerZone[i];
-	    if((zone_i.player.words.length == 0)&&(!zone_i.is_client)){//there are no words in the zone, and it's a non-client player. 
-		var empty_zone = this.PlayerZone.splice(i,1)[0];
+	for(var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
+	    var zone_i = snDraw.Game.Zones.PlayerZone[i];
+	    
+	    //proceed to remove zone_i if (A) there are no words in the zone and (B) it's a non-client player
+	    if((zone_i.player.words.length == 0)&&(!zone_i.is_client)){
+		var empty_zone = snDraw.Game.Zones.PlayerZone.splice(i,1)[0];
 		i--;//because we spliced, counteract the increment of i.
-		this.removeZoneBox(empty_zone);
+
+		//TODO - replace with function to animate OUT the zone box
+		//this.removeZoneBox(empty_zone);
+
+
 	    }
 	}
+
+
+
 	// Animate the resizing of the zones 
 	var nZones = this.PlayerZone.length; //note that the immediately preceeding code may remove zones and change the length.
 	this.calculatePlayerZoneSizes();

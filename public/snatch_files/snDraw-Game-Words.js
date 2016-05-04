@@ -166,10 +166,10 @@ snDraw.Game.Words = {
 // NEW FUNCTIONS HERE...
 
     //based upon animateRepositionPlayerWords [138]
-    MoveWordsIntoRectangleSpace: function(WordArray, Bounds, Spacings, justification, b_animate){
+    MoveWordsIntoRectangleSpace: function(words_list_as_tileIDs, WordArray, Bounds, Spacings, justification, b_animate){
 
 	//get the coordinates for the arrangement
-	var myArrangement = this.GenWordArrangement(WordArray, Bounds, Spacings, justification);
+	var myArrangement = this.GenWordArrangement(words_list_as_tileIDs, Bounds, Spacings, justification);
 
 	//move all words to those coordinates.
 	for (var i = 0; i < WordArray.length; i++){//this will run through the words to move...
@@ -185,35 +185,6 @@ snDraw.Game.Words = {
 	};//coordinates to use for next word...
     },
 
-
-    // see makeTilesDraggableGroup [68]
-    CreateWordAsTileGroupAtOrigin: function(WordTileArray, Spacings, owner_player){
-
-	//remove all single tiles (after animation), so that they can be re-added as a group...
-	//arrange them as word, based at the origin
-	for (var i=0; i<WordTileArray.length; i++){
-	    canvas.remove(WordTileArray[i]);
-	    WordTileArray[i].set({
-		left: (i * Spacings.tslg),
-		top: 0
-	    });
-	}
-
-	//create the Group...
-	var WordGRP = new fabric.Group( WordTileArray, {
-	    left: 0, 
-	    top: 0,
-	    hasControls: false,
-	    hasBorders: false
-	});
-
-	//customise the properties of the word group...
-	WordGRP.OwnerPlayer = owner_player;
-	this.TileGroupsArray[owner_player.index].push(WordGRP);
-	canvas.add(WordGRP);
-
-	return WordGRP;
-    },
 
 
     AnimateWordCapture: function(WordTileArray, Coords, HorizonalBounds, Spacings, owner_player){
@@ -259,13 +230,15 @@ snDraw.Game.Words = {
 
 
     // drawSingleCapturedWord & animateRepositionPlayerWords
-    GenWordArrangement: function(WordArray, HorizonalBounds, Spacings, justification){
+    GenWordArrangement: function(words_list_as_tileIDs, HorizonalBounds, Spacings, justification){
 
 	// Array 'breaks' holds the indices of the last word of each line
 	var Arrangement = {coords: [], word_width_px: [], breaks: []};
 
 	var x_plotter = HorizonalBounds.left;
 	var y_plotter = 0;
+
+	var N_words = words_list_as_tileIDs.length;
 
 	//function used internally
 	var justify_final_word_row = function(spare_px){
@@ -284,9 +257,8 @@ snDraw.Game.Words = {
 	    }
 	};
 
-	for (var i = 0; i < WordArray.length; i++){
-	    var WordTileArray = WordArray[i].getObjects();
-	    var n_tile = WordTileArray.length;
+	for (var i = 0; i < N_words; i++){
+	    var n_tile = words_list_as_tileIDs[i].length;
 
 	    //determine word width on screen	    
 	    var w_width_px = this.word_width_px(n_tile, Spacings);
@@ -316,8 +288,8 @@ snDraw.Game.Words = {
 	}
 
 	//take all the wrap actions for the final word
-	if(WordArray.length>0){
-	    Arrangement.breaks.push(WordArray.length-1);
+	if(N_words > 0){
+	    Arrangement.breaks.push(N_words-1);
 	    justify_final_word_row(HorizonalBounds.right - (x_plotter - Spacings.wg));//the value passed is "space px"
 	}
 	return Arrangement;
@@ -357,6 +329,29 @@ snDraw.Game.Words = {
 	}else{
 	    return false;
 	}
+    },
+
+
+    getUnclaimedWordsList: function(TYPE_DIRECTIVE){
+
+	var VARIANT_unclaimed_words_list = [];
+
+	for (var i = 0; i < snDraw.Game.Zones.Unclaimed.playerslist.length; i++){
+
+	    var player_i = snDraw.Game.Zones.Unclaimed.playerslist[i];
+	    var VARIANT_unclaimed_words_chunk = undefined;
+
+	    if (TYPE_DIRECTIVE == "via Grp"){
+		VARIANT_unclaimed_words_chunk = snDraw.Game.Words.TileGroupsArray[player_i.index]; 
+
+	    }else if(TYPE_DIRECTIVE == "via TID"){
+		VARIANT_unclaimed_words_chunk = player_i.words;
+	    } 
+
+	    VARIANT_unclaimed_words_list = VARIANT_unclaimed_words_list.concat(VARIANT_unclaimed_words_chunk);
+	}
+
+	return VARIANT_unclaimed_words_list;
     }
 
 };
