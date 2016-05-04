@@ -373,11 +373,9 @@ snDraw.Game.Zones = {
 		selectable: false
 	    });
 	}
-	
+
 	return ObjectArray;
-
     },
-
 
     DetermineZoneBoxObjectsTops: function(Top, Height, Style){
 	var box_top = Top + Math.max(Style.fonthalfheight - Style.thick/2, 0);
@@ -426,9 +424,10 @@ snDraw.Game.Zones = {
 	];
     },
 
+    //consider this function...
+    //function repositionZoneAndEnclWordsOnCanvas(Zone, Top, Height, ZoneSty, WordBounds, ani_sty){
 
     // the parameter 'TargetDims' will be null if it is an animation exit
-
     AnimateZoneBox: function(BoxObjs, Height, TargetDims, ani_sty, ani_entryexit, direction){
 
 	
@@ -576,6 +575,7 @@ snDraw.Game.Zones = {
 	    w_vpad: Tx * 1.8 // vertical padding between top of word tiles and lower inside edge of box border
 	};
 
+	//this inline function has the side effect of modifying the Style object it is provided...
 	function setStyleWordBlockBounds (Style){
 	    Style.WordBlockBounds = {
 		left: (Style.hpad + Style.thick + Style.w_hpad),

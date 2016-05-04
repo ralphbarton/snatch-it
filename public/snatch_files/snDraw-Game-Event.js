@@ -237,49 +237,48 @@ snDraw.Game.Event = {
 	if(zone_resize_necesary){
 
 	    // 3.1 - define a function which moves and resizes any zone box
-	    function resizeZoneOnCanvas(Zone, Top, Height, ZoneSty, WordBounds, ani_sty){
+	    function repositionZoneAndEnclWordsOnCanvas(Zone, Top, Height, ZoneSty, WordBounds, ani_sty){
 
+		// (A) move the items of Zone box itself into their new positions
 		// copy - pasted...
 		var Zone_FabObjs = Zone.Zone_FabObjs;
 		var Zone_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneSty);
 		var flex_box_height = snDraw.Game.Zones.DetermineZoneFlexBoxHeight(Height, ZoneSty);
 
-		//these details are required to get a handle on the words that are going to visually shift on-screen
-		var WordArrangement_noH = Zone.stored_WordArrangement_noH;
-		var WordGroup = undefined;
-		if(Zone.exists == undefined){// this means it is a player zone not the unclaimed zone
-		    var PID = Zone.player.index;
-		    WordGroup = snDraw.Game.Words.TileGroupsArray[PID];
-		}else{
-		    WordGroup = Zone.stored_WordGroup;
-		}
-
-		if(Zone.is_client){
-		    var spell_Top = Zone_Tops[6];
-		    // move the spell-pointer into new position
-		    snDraw.Game.Spell.setSpellPosition(null, spell_Top, true, ani_sty);
-		}
-
-		// for each object making the ZONE, animate it into the new position
+		// (i) move items actually making up the zone...
 		for (var j = 0; j < Zone_FabObjs.length; j++){
 		    snDraw.moveSwitchable(Zone_FabObjs[j], true, ani_sty,{
 			top: Zone_Tops[j]
 		    });
 		}
-
-		//also, the box (Zone_FabObjs[0]) is the only array item with height that can be varied:
+		// (ii) change HEIGHT of box outline (Zone_FabObjs[0] the only array item with variable height)
 		snDraw.moveSwitchable(Zone_FabObjs[0], true, ani_sty,{
 		    height: flex_box_height
 		});
+		// (iii) if client zone, move spell-pointer...
+		if(Zone.is_client){
+		    var spell_Top = Zone_Tops[6];
+		    snDraw.Game.Spell.setSpellPosition(null, spell_Top, true, ani_sty);
+		}
 
-		// also animate all words into new positions
+		// (B) move all words within the box into their new positions
+		var WordArrangement_noH = Zone.stored_WordArrangement_noH;
+		var WordGroup = undefined;
+
+		if(Zone.exists == undefined){// case 1: a player owned-zone
+		    var PID = Zone.player.index;
+		    WordGroup = snDraw.Game.Words.TileGroupsArray[PID];
+		}else{// case 2: the unclaimed zone
+		    WordGroup = Zone.stored_WordGroup;
+		}
+
 		var WordsTopPx = Top + WordBounds.topPadding;
 		var Arrangement = snDraw.Game.Words.WordArrangementSetHeight(WordArrangement_noH, WordsTopPx);
+		// (i) move each word to the new location.
 		for (var j = 0; j < Arrangement.coords.length; j++){
 		    snDraw.moveSwitchable(WordGroup[j], true, ani_sty, Arrangement.coords[j]);
 		}
 	    }
-
 
 	    // 3.2 - retrieve style information, for both player and unclaimed zones
 	    var ZoneSty_P = snDraw.Game.Zones.Style1;
@@ -288,7 +287,6 @@ snDraw.Game.Event = {
 	    var WordBounds_U = ZoneSty_U.WordBlockBounds;
 	    var interzonePad = snDraw.Game.Zones.ZoneVerticalPaddings;
 	    var Spacings = snDraw.Game.tileSpacings;
-
 
 	    // 3.3 Move the unclaimed zone & its words
  	    //unfortunately, this is partly copy-pasted code from original creation of the zones....
@@ -301,7 +299,7 @@ snDraw.Game.Event = {
 		var Height_pads_tot = ZoneSty_U.thick*2 + ZoneSty_U.w_vpad*2;
 		var Height = snDraw.Game.Zones.WordsStackHeightPx(UnclaimedArrangement, Spacings) + Height_pads_tot;
 
-		resizeZoneOnCanvas(snDraw.Game.Zones.Unclaimed, Top, Height, ZoneSty_U, WordBounds_U, ani_sty);
+		repositionZoneAndEnclWordsOnCanvas(snDraw.Game.Zones.Unclaimed, Top, Height, ZoneSty_U, WordBounds_U, ani_sty);
 
 		upper_drawing_bound += Height;
 	    }
@@ -321,7 +319,7 @@ snDraw.Game.Event = {
 	    for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
 		var Top = ZoneSizes[i].Top;
 		var Height = ZoneSizes[i].Height;
-		resizeZoneOnCanvas(snDraw.Game.Zones.PlayerZone[i], Top, Height, ZoneSty_P, WordBounds_P, ani_sty);
+		repositionZoneAndEnclWordsOnCanvas(snDraw.Game.Zones.PlayerZone[i], Top, Height, ZoneSty_P, WordBounds_P, ani_sty);
 	    }
 	    
 	}
