@@ -593,6 +593,127 @@ snDraw.Game.Zones = {
 	    between: Tx,
 	    bottom: Tx
 	};
-    }
+    },
 
+
+    // Determinate the positions and arrangements of everything to be drawn on-screen
+    calculateAllPositionsArrangements: function(){
+
+	// 1. retrieve style information...
+	var ZoneSty_P = snDraw.Game.Zones.Style1;
+	var WordBounds_P = ZoneSty_P.WordBlockBounds;
+	var ZoneSty_U = snDraw.Game.Zones.Style2;
+	var WordBounds_U = ZoneSty_U.WordBlockBounds;
+	var interzonePad = snDraw.Game.Zones.ZoneVerticalPaddings;
+	var Spacings = snDraw.Game.tileSpacings;
+
+	// 2. retrieve the bottom pixel of the letters grid
+	var upper_drawing_bound = snDraw.Game.Grid.GetGridBottomPx();
+
+	// 3. If an unclaimed zone exists, calculate its word arrangement and hence its overall height
+	var Unclaimed_D = {};
+	if(snDraw.Game.Zones.Unclaimed.exists){
+	    var words_list = snDraw.Game.Words.getUnclaimedWordsList("via TID");
+	    Unclaimed_D.Arrangement_noH = snDraw.Game.Words.GenWordArrangement(words_list, WordBounds_U, Spacings, "center");
+
+	    upper_drawing_bound += snDraw.Game.Zones.ZoneVerticalPaddings.aboveU;
+	    Unclaimed_D.Top = upper_drawing_bound;
+
+	    var unclaimed_Height_pads_tot = ZoneSty_U.thick*2 + ZoneSty_U.w_vpad*2;
+	    var unclaimed_Height_words_stack = snDraw.Game.Zones.WordsStackHeightPx(Unclaimed_D.Arrangement_noH, Spacings);
+	    Unclaimed_D.Height = unclaimed_Height_words_stack + unclaimed_Height_pads_tot;
+
+	    upper_drawing_bound += Unclaimed_D.Height;
+	}
+
+	// 4. calculate the word arrangements for zones of all active players
+	var ArrangementsArray_noH = [];
+	for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
+	    var player_i = snDraw.Game.Zones.PlayerZone[i].player;
+	    ArrangementsArray_noH.push(snDraw.Game.Words.GenWordArrangement(player_i.words, WordBounds_P, Spacings, "left"));
+	}
+
+	// 5. Finally, calculate the sizes of all zones...
+	// function returns [{Top: , Height: }, {}, ...]
+	return {
+	    Unclaimed_D: Unclaimed_D,
+	    ArrangementsArray_noH: ArrangementsArray_noH,
+	    ZoneSizes: (snDraw.Game.Zones.CalcZoneSizes(ArrangementsArray_noH, upper_drawing_bound, interzonePad, Spacings))
+	};
+    },
+
+    AnimateResizeAllZones: function(ani_sty){
+	// 1. - retrieve style information, for both player and unclaimed zones
+	var ZoneSty_P = snDraw.Game.Zones.Style1;
+	var WordBounds_P = ZoneSty_P.WordBlockBounds;
+	var ZoneSty_U = snDraw.Game.Zones.Style2;
+	var WordBounds_U = ZoneSty_U.WordBlockBounds;
+
+	// 2. Get the positions and arrangements of everything...
+	var Positions = snDraw.Game.Zones.calculateAllPositionsArrangements();
+
+	// 2. If present, move the unclaimed zone & its words
+	if(snDraw.Game.Zones.Unclaimed.exists){
+	    this.repositionZoneAndEnclWordsOnCanvas(snDraw.Game.Zones.Unclaimed,
+						    Positions.Unclaimed_D.Arrangement_noH,
+						    Positions.Unclaimed_D.Top,
+						    Positions.Unclaimed_D.Height,
+						    ZoneSty_U,
+						    WordBounds_U,
+						    ani_sty
+						   );
+	}
+
+	// 4. Now move all of the player zones, and their contained words
+	for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
+	    this.repositionZoneAndEnclWordsOnCanvas(snDraw.Game.Zones.PlayerZone[i],
+						    Positions.ArrangementsArray_noH[i],
+						    Positions.ZoneSizes[i].Top,
+						    Positions.ZoneSizes[i].Height,
+						    ZoneSty_P,
+						    WordBounds_P,
+						    ani_sty
+						   );
+	}
+    },
+
+
+    repositionZoneAndEnclWordsOnCanvas: function(Zone, WordArrangement_noH, Top, Height, ZoneSty, WordBounds, ani_sty){
+	// (A) move the items of Zone box itself into their new positions
+	// copy - pasted...
+	var Zone_FabObjs = Zone.Zone_FabObjs;
+	var Zone_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneSty);
+	var flex_box_height = snDraw.Game.Zones.DetermineZoneFlexBoxHeight(Height, ZoneSty);
+
+	// (i) move items actually making up the zone...
+	for (var j = 0; j < Zone_FabObjs.length; j++){
+	    snDraw.moveSwitchable(Zone_FabObjs[j], true, ani_sty,{
+		top: Zone_Tops[j]
+	    });
+	}
+	// (ii) change HEIGHT of box outline (Zone_FabObjs[0] the only array item with variable height)
+	snDraw.moveSwitchable(Zone_FabObjs[0], true, ani_sty,{
+	    height: flex_box_height
+	});
+	// (iii) if client zone, move spell-pointer...
+	if(Zone.is_client){
+	    var spell_Top = Zone_Tops[6];
+	    snDraw.Game.Spell.setSpellPosition(null, spell_Top, true, ani_sty);
+	}
+
+	// (B) move all words within the box into their new positions
+	if(Zone.exists == undefined){// case 1: a player owned-zone
+	    var PID = Zone.player.index;
+	    var WordGroup = snDraw.Game.Words.TileGroupsArray[PID];
+	}else{// case 2: the unclaimed zone
+	    var WordGroup = snDraw.Game.Words.getUnclaimedWordsList("via Grp");
+	}
+
+	var WordsTopPx = Top + WordBounds.topPadding;
+	var Arrangement = snDraw.Game.Words.WordArrangementSetHeight(WordArrangement_noH, WordsTopPx);
+	// (i) move each word to the new location.
+	for (var j = 0; j < Arrangement.coords.length; j++){
+	    snDraw.moveSwitchable(WordGroup[j], true, ani_sty, Arrangement.coords[j]);
+	}
+    }
 };
