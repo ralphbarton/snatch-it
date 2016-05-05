@@ -424,6 +424,35 @@ snDraw.Game.Zones = {
 	];
     },
 
+    PositionOnCanvasZoneBox: function(Top, Height, ZoneSty, Properties){
+
+	//generate the fabric objects that represent the new zone. Note that properties left & top are not set
+	//nor are the objects present onf the canvas.
+	var Zone_FabObjs =  snDraw.Game.Zones.CreateZoneBox(Height, ZoneSty, Properties);
+	var Zone_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneSty);
+	var Zone_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, ZoneSty, Zone_FabObjs[1].width);
+	var flex_box_height = snDraw.Game.Zones.DetermineZoneFlexBoxHeight(Height, ZoneSty);
+
+	//for each object making the ZONE, set coordinates and place on canvas...
+	for (var j = 0; j < Zone_FabObjs.length; j++){
+	    Zone_FabObjs[j].setLeft(Zone_Lefts[j]);
+	    Zone_FabObjs[j].setTop(Zone_Tops[j]);
+	    canvas.add(Zone_FabObjs[j]);
+	}
+
+	//also set the height of the only item in Zone_FabObjs which has flexi-height...
+	Zone_FabObjs[0].setHeight(flex_box_height);
+
+	// non-animated movement of spell to correct position
+	if(Properties.isClient){
+	    var spell_Left = Zone_Lefts[6]; 
+	    var spell_Top = Zone_Tops[6];
+	    snDraw.Game.Spell.setSpellPosition(spell_Left, spell_Top, false, null);
+	}
+
+	return Zone_FabObjs;
+    },
+
     //consider this function...
     //function repositionZoneAndEnclWordsOnCanvas(Zone, Top, Height, ZoneSty, WordBounds, ani_sty){
 
@@ -664,6 +693,7 @@ snDraw.Game.Zones = {
 						   );
 	}
 
+
 	// 4. Now move all of the player zones, and their contained words
 	for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
 	    this.repositionZoneAndEnclWordsOnCanvas(snDraw.Game.Zones.PlayerZone[i],
@@ -715,5 +745,23 @@ snDraw.Game.Zones = {
 	for (var j = 0; j < Arrangement.coords.length; j++){
 	    snDraw.moveSwitchable(WordGroup[j], true, ani_sty, Arrangement.coords[j]);
 	}
+    },
+
+    getZoneProperties: function(zone_index){
+	if (typeof(zone_index) == "number"){
+	    return {
+		color: this.PlayerZone[zone_index].player.color, // text colour and box boundary
+		text: this.PlayerZone[zone_index].player.name, // Text of the title
+		isClient: this.PlayerZone[zone_index].is_client
+	    };
+	}else if(zone_index == "unclaimed"){
+	    return {
+		color: 'grey',
+		text: 'unclaimed',
+		isClient: false
+	    };
+	}
     }
+
+
 };

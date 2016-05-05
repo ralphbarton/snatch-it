@@ -266,11 +266,6 @@ snDraw.Game.Grid = {
 		max_col_height = n_tiles_in_col;
 	    }
 	}
-
-	//3. Return the height of the grid in its new state.
-	var grid_height = (max_col_height==0? snDraw.Game.marginUnit : this.Grid_yPx[max_col_height-1]);
-	return grid_height;
-
     },
 
     PlaceTileInGrid: function(tile_index, gridRC, ani_oC, ani_sty){

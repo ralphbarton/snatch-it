@@ -96,27 +96,8 @@ snDraw.Game.Event = {
 
 	// 7.1 Define a function which draws a zone filled with words on screen...
 	function generateZoneAndMoveWordsOnCanvas(Top, Height, ZoneSty, Properties, WordGroup, WordArrangement_noH, WordBounds){
-	    //generate the fabric objects that represent the new zone. Note that properties left & top are not set
-	    //nor are the objects present onf the canvas.
-	    var Zone_FabObjs =  snDraw.Game.Zones.CreateZoneBox(Height, ZoneSty, Properties);
-	    var Zone_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneSty);
-	    var Zone_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, ZoneSty, Zone_FabObjs[1].width);
-	    var flex_box_height = snDraw.Game.Zones.DetermineZoneFlexBoxHeight(Height, ZoneSty);
 
-	    if(Properties.isClient){
-		var spell_Left = Zone_Lefts[6]; 
-		var spell_Top = Zone_Tops[6];
-		snDraw.Game.Spell.setSpellPosition(spell_Left, spell_Top, false, null);
-	    }
-
-	    //for each object making the ZONE, set coordinates and place on canvas...
-	    for (var j = 0; j < Zone_FabObjs.length; j++){
-		Zone_FabObjs[j].setLeft(Zone_Lefts[j]);
-		Zone_FabObjs[j].setTop(Zone_Tops[j]);
-		canvas.add(Zone_FabObjs[j]);
-	    }
-	    //also set the height of the only item in Zone_FabObjs which has flexi-height...
-	    Zone_FabObjs[0].setHeight(flex_box_height);
+	    var Zone_FabObjs = snDraw.Game.Zones.PositionOnCanvasZoneBox(Top, Height, ZoneSty, Properties);
 
 	    // place the words in the zone
 	    var WordsTopPx = Top + WordBounds.topPadding;
@@ -124,6 +105,7 @@ snDraw.Game.Event = {
 	    for (var j = 0; j < Arrangement.coords.length; j++){
 		snDraw.moveSwitchable(WordGroup[j], false, null, Arrangement.coords[j]);
 	    }
+
 	    return Zone_FabObjs;
 	}
 
@@ -135,16 +117,11 @@ snDraw.Game.Event = {
 
 	// 7.3 if an "unclaimed words zone" exists, then make this first.
 	if(snDraw.Game.Zones.Unclaimed.exists){
-	    var Properties = {
-		color: 'grey',
-		text: 'unclaimed',
-		isClient: false
-	    };
-	    
+
 	    var FAB = generateZoneAndMoveWordsOnCanvas(Positions.Unclaimed_D.Top,
 						       Positions.Unclaimed_D.Height,
 						       ZoneSty_U,
-						       Properties,
+						       snDraw.Game.Zones.getZoneProperties("unclaimed"),
 						       snDraw.Game.Words.getUnclaimedWordsList("via Grp"),
 						       Positions.Unclaimed_D.Arrangement_noH,
 						       WordBounds_U
@@ -158,15 +135,11 @@ snDraw.Game.Event = {
 	// 7.4 Now make all of the player zones.
 	for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
 	    var player_index = snDraw.Game.Zones.PlayerZone[i].player.index;
-	    var Properties = {
-		color: snDraw.Game.Zones.PlayerZone[i].player.color, // text colour and box boundary
-		text: snDraw.Game.Zones.PlayerZone[i].player.name, // Text of the title
-		isClient: snDraw.Game.Zones.PlayerZone[i].is_client
-	    };
+
 	    var FAB = generateZoneAndMoveWordsOnCanvas(Positions.ZoneSizes[i].Top,
 						       Positions.ZoneSizes[i].Height,
 						       ZoneSty_P,
-						       Properties,
+						       snDraw.Game.Zones.getZoneProperties(i),
 						       snDraw.Game.Words.TileGroupsArray[player_index],
 						       Positions.ArrangementsArray_noH[i],
 						       WordBounds_P
@@ -177,7 +150,7 @@ snDraw.Game.Event = {
 	}
     },
     
-    TileTurn: function(player_index, tile_index, letter, ani_sty){
+    TileTurn: function(player_index, tile_index, letter){
 
 	// 1. modifiy the client copy of the fundamental game-state data:
 	tileset[tile_index] = {
@@ -200,7 +173,7 @@ snDraw.Game.Event = {
 
 	// 3. If necessary, squeeze everything downwards.
 	if(zone_resize_necesary){
-	    snDraw.Game.Zones.AnimateResizeAllZones(ani_sty);
+	    snDraw.Game.Zones.AnimateResizeAllZones(snDraw.ani.sty_Resize);
 	}
 
 	// 4. Modify the "Turn Letter" button, based upon who turned the tile (start timer or cancel timer)
@@ -275,7 +248,7 @@ snDraw.Game.Event = {
 	//note that there is handling in-place for when a tile index in the array we supply here is not actually in the grid.
 	//note also that this function will rearrange the tiles that remain in the grid, for efficient packing following the
 	//removal. This includes animation.
-	snDraw.Game.Grid.DetachLetterSetFromGrid(tile_indices, ani_styleXX);
+	snDraw.Game.Grid.DetachLetterSetFromGrid(tile_indices, snDraw.ani.sty_Resize);
 
 
 	// 3. Zone Handling upon Snatch
