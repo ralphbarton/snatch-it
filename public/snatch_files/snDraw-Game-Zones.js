@@ -641,66 +641,49 @@ snDraw.Game.Zones = {
     // given an already correctly sized zone box, this will animate it on or off the screen
     // handling the visuals of zone addition and zone removal events
     // the off-screen animation coordinates are simply determined from the Fabric object properties...
-    InOutAnimateZoneBox: function(Zone_FabObjs, ZoneSty, ani_sty, ani_entryexit, direction){
+    InOutAnimateZoneBox: function(Zone, ani_sty, ani_entryexit, direction){
 
 	var B_Top = Zone_FabObjs[1].getTop; // here, we assume the top of the "Name" text of the zone it its top
 
-	//this is to do the reverse of "DetermineZoneFlexBoxHeight"
-	var total_height_incrementor = -this.DetermineZoneFlexBoxHeight(0,ZoneSty);
-	var B_Height = Zone_FabObjs[0].getHeight + total_height_incrementor; // here, we assume
+	//this is to do the reverse of "DetermineZoneFlexBoxHeight" and determine overall height from box height
+	var zonetype = Zone.exists == undefined ? "player" : "unclaimed";
+	var total_height_incrementor = -this.DetermineZoneFlexBoxHeight(0, this.getZoneProperties(zonetype).ZoneSty);
+	var B_Height = Zone_FabObjs[0].getHeight + total_height_incrementor;
+	
+	var BoxObjs = Zone.Zone_FabObjs;
+	
+	for(var i = 0; i < BoxObjs.length; i++){
 
-	if(ani_entryexit == "entry"){
-	    for(var i = 0; i < BoxObjs.length; i++){
+	    var onScreen_location = {
+		left: BoxObjs[i].left,
+		top: BoxObjs[i].top;
+	    };
+	    var offScreen_location = {};
 
-		var start_location = {};
-		var finish_location = {};
+	    if(direction == "left"){
+		offScreen_location.left = BoxObjs[i].left - snDraw.canv_W;
 
-		if(direction == "left"){
-		    target_off.left = null;//TODO
+	    }else if(direction == "right"){
+		offScreen_location.left = BoxObjs[i].left + snDraw.canv_W;
 
-		}else if(direction == "right"){
-		    target_off.left = null;//todo
+	    }else if(direction == "top"){
+		offScreen_location.top = BoxObjs[i].top - (B_Height + B_Top);
 
-		}else if(direction == "top"){
-		    target_off.top = null;//TODO
+	    }else if(direction == "bottom"){
+		offScreen_location.top = BoxObjs[i].top + (snDraw.canv_H - B_Top);
+	    }
 
-		}else if(direction == "bottom"){
-		    TargetDims.top = null;//TODO
-		}
-
+	    if(ani_entryexit == "entry"){
 		//this is to statically place object in starting position
-		BoxObjs[i].set({
-
-		});
-
+		BoxObjs[i].set(offScreen_location);
 		//this sets it animating
-
-
+		snDraw.moveSwitchable(BoxObjs[i], true, ani_sty, onScreen_location);
 	    }
-	}else if(ani_entryexit == "exit"){
-
-	    for(var i = 0; i < BoxObjs.length; i++){
-
-		var target_off = {};
-		if(direction == "left"){
-		    target_off.left = BoxObjs[i].getLeft() - snDraw.canv_W;
-
-		}else if(direction == "right"){
-		    target_off.left = BoxObjs[i].getLeft() + snDraw.canv_W;
-
-		}else if(direction == "top"){
-		    target_off.top = BoxObjs[i].getTop() - (Height + BT);
-
-		}else if(direction == "bottom"){
-		    TargetDims.top = BoxObjs[i].getTop() + (snDraw.canv_H - BT);
-		}
-
+	    if(ani_entryexit == "exit"){
+		// it is already in its onScreen location, so only need to make it move off.
 		//with object deletion upon animation completion built in...
-		snDraw.moveSwitchable(BoxObjs[i], function(){canvas.remove(BoxObjs[i]);}, ani_sty, target_off);
+		snDraw.moveSwitchable(BoxObjs[i], function(){canvas.remove(BoxObjs[i]);}, ani_sty, offScreen_location);
 	    }
-
-	}else if(ani_entryexit == "size asjust"){
-	    return null
 	}
     },
 
