@@ -307,54 +307,54 @@ snDraw.Game.Zones = {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // NEW FUNCTIONS HERE...
 
-    CreateZoneBox: function(Height, Style, Properties){
+    CreateZoneBox: function(Height, ZoneProperties){
 	
-	var boxWidth  = snDraw.canv_W - 2 * Style.hpad - Style.thick;
+	var ZoneSty = ZoneProperties.ZoneSty;
+	var boxWidth  = snDraw.canv_W - 2 * ZoneSty.hpad - ZoneSty.thick;
 
 	var zoneBox = new fabric.Rect({
 	    width: boxWidth,
-
-	    fill: Style.box_fill,
-	    stroke: Properties.color,
-	    strokeWidth: Style.thick,
-	    rx: Style.rounding,
-	    ry: Style.rounding
+	    fill: ZoneSty.box_fill,
+	    stroke: ZoneProperties.color,
+	    strokeWidth: ZoneSty.thick,
+	    rx: ZoneSty.rounding,
+	    ry: ZoneSty.rounding
 	});
 
-	var plrName = new fabric.Text((Style.text_pad + Properties.text + Style.text_pad),{
-	    fontSize: Style.fontsize,
-	    backgroundColor: Style.text_bg,
-	    fill: Properties.color
+	var plrName = new fabric.Text((ZoneSty.text_pad + ZoneProperties.text + ZoneSty.text_pad),{
+	    fontSize: ZoneSty.fontsize,
+	    backgroundColor: ZoneSty.text_bg,
+	    fill: ZoneProperties.color
 	});
 
 	var ObjectArray = [zoneBox,plrName];
 
-	if(Properties.isClient){
+	if(ZoneProperties.isClient){
 	    var youBlock = new fabric.Rect({
-		width: Style.you_w,
-		height: Style.you_h,
-		rx: Style.rounding,
-		ry: Style.rounding,
-		fill: Properties.color
+		width: ZoneSty.you_w,
+		height: ZoneSty.you_h,
+		rx: ZoneSty.rounding,
+		ry: ZoneSty.rounding,
+		fill: ZoneProperties.color
 	    });
 
 	    var youText = new fabric.Text("You",{
 		fill: snDraw.Game.bg_col,
-		fontSize: Style.you_fontsize,
+		fontSize: ZoneSty.you_fontsize,
 		fontWeight: 'bold',
 	    });
 
 	    //"Spell Pointer" is a triangle that points to the word being spelled
 	    var spellPointer = new fabric.Triangle({
-		width: Style.tri_h,//is actually height, due to rotation
-		height: Style.tri_w,//is actually width, due to rotation
-		fill: Properties.color,
+		width: ZoneSty.tri_h,//is actually height, due to rotation
+		height: ZoneSty.tri_w,//is actually width, due to rotation
+		fill: ZoneProperties.color,
 		angle: 90,
 	    });
 
 	    var spellPointerMask = new fabric.Triangle({
-		width: Style.tri_h,//is actually height, due to rotation
-		height: Style.tri_w,//is actually width, due to rotation
+		width: ZoneSty.tri_h,//is actually height, due to rotation
+		height: ZoneSty.tri_w,//is actually width, due to rotation
 		fill: 'rgba(0,0,0,1)',
 		angle: 90
 	    });
@@ -377,143 +377,51 @@ snDraw.Game.Zones = {
 	return ObjectArray;
     },
 
-    DetermineZoneBoxObjectsTops: function(Top, Height, Style){
-	var box_top = Top + Math.max(Style.fonthalfheight - Style.thick/2, 0);
-	var box_bottom = Top + Height - Style.thick/2;//center of border
-	var hor_centerline_height = box_bottom - (Style.thick/2 + Style.spell_vpad + snDraw.Game.tileSize/2);
+    DetermineZoneBoxObjectsTops: function(Top, Height, ZoneSty){
+	var box_top = Top + Math.max(ZoneSty.fonthalfheight - ZoneSty.thick/2, 0);
+	var box_bottom = Top + Height - ZoneSty.thick/2;//center of border
+	var hor_centerline_height = box_bottom - (ZoneSty.thick/2 + ZoneSty.spell_vpad + snDraw.Game.tileSize/2);
 	return [
 	    box_top, // 1. zoneBox_top
 	    Top, // 2. plrName_top
-	    (box_bottom - Style.you_h), // 3. youBlock_top
-	    (box_bottom - Style.you_h + Style.you_font_Yoff), // 4. youText_top
-	    (hor_centerline_height - Style.tri_h/2), // 5. spellPointer_top
-	    (hor_centerline_height - Style.tri_h/2), // 6. spellPointer_Mask_top
+	    (box_bottom - ZoneSty.you_h), // 3. youBlock_top
+	    (box_bottom - ZoneSty.you_h + ZoneSty.you_font_Yoff), // 4. youText_top
+	    (hor_centerline_height - ZoneSty.tri_h/2), // 5. spellPointer_top
+	    (hor_centerline_height - ZoneSty.tri_h/2), // 6. spellPointer_Mask_top
 	    (hor_centerline_height - snDraw.Game.tileSize/2) // 7. SPELL_TILES_top
 	];
     },
 
-    DetermineZoneFlexBoxHeight: function(Height, Style){
-	return (Height - Math.max(Style.fonthalfheight, Style.thick/2) - Style.thick/2);
+    DetermineZoneFlexBoxHeight: function(Height, ZoneSty){
+	return (Height - Math.max(ZoneSty.fonthalfheight, ZoneSty.thick/2) - ZoneSty.thick/2);
     },
 
-    DetermineZoneBoxObjectsLefts: function(Left_Offset, Style, textWidth){
-	var boxLeft = Style.hpad;
-	var boxWidth  = snDraw.canv_W - 2 * Style.hpad - Style.thick; // this line is duplicated
-	var boxRight = boxLeft + boxWidth + Style.thick/2; //center of border
+    DetermineZoneBoxObjectsLefts: function(Left_Offset, ZoneSty, textWidth){
+	var boxLeft = ZoneSty.hpad;
+	var boxWidth  = snDraw.canv_W - 2 * ZoneSty.hpad - ZoneSty.thick; // this line is duplicated
+	var boxRight = boxLeft + boxWidth + ZoneSty.thick/2; //center of border
 	var textLeft = undefined;
 
-	if((textWidth != undefined)&&(Style.justify == "center")){
+	if((textWidth != undefined)&&(ZoneSty.justify == "center")){
 	    textLeft = boxLeft + (boxWidth - textWidth)/2;
-	}else if((textWidth != undefined)&&(Style.justify == "right")){
-	    textLeft = boxRight - Style.titlepad - textWidth; 
+	}else if((textWidth != undefined)&&(ZoneSty.justify == "right")){
+	    textLeft = boxRight - ZoneSty.titlepad - textWidth; 
 	}else{//assume it is left-justify
-	    textLeft = Style.titlepad;
+	    textLeft = ZoneSty.titlepad;
 	}
 	
-	var spellpointer_left = boxLeft + Style.thick/2 + Style.tri_w; // rotation => left is effectively 'right'
-	var spellpointer_offset_thick = Style.thick * 2.5 * (Style.tri_w / Style.tri_h);
+	var spellpointer_left = boxLeft + ZoneSty.thick/2 + ZoneSty.tri_w; // rotation => left is effectively 'right'
+	var spellpointer_offset_thick = ZoneSty.thick * 2.5 * (ZoneSty.tri_w / ZoneSty.tri_h);
 
 	return [
 	    (Left_Offset + boxLeft), // 1. zoneBox_left
 	    (Left_Offset + textLeft), // 2. plrName_left
-	    (Left_Offset + boxRight - Style.you_w), // 3. youBlock_left
-	    (Left_Offset + boxRight - Style.you_w + Style.you_font_Xoff), // 4. youText_left
+	    (Left_Offset + boxRight - ZoneSty.you_w), // 3. youBlock_left
+	    (Left_Offset + boxRight - ZoneSty.you_w + ZoneSty.you_font_Xoff), // 4. youText_left
 	    (Left_Offset + spellpointer_left), // 5. spellPointer_left 
 	    (Left_Offset + spellpointer_left - spellpointer_offset_thick), // 6. spellPointerMask_left
-	    (Left_Offset + boxLeft + Style.thick/2 + Style.tri_w + Style.spell_hpad)// 7. spell left
+	    (Left_Offset + boxLeft + ZoneSty.thick/2 + ZoneSty.tri_w + ZoneSty.spell_hpad)// 7. spell left
 	];
-    },
-
-    PositionOnCanvasZoneBox: function(Top, Height, ZoneSty, Properties){
-
-	//generate the fabric objects that represent the new zone. Note that properties left & top are not set
-	//nor are the objects present onf the canvas.
-	var Zone_FabObjs =  snDraw.Game.Zones.CreateZoneBox(Height, ZoneSty, Properties);
-	var Zone_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneSty);
-	var Zone_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, ZoneSty, Zone_FabObjs[1].width);
-	var flex_box_height = snDraw.Game.Zones.DetermineZoneFlexBoxHeight(Height, ZoneSty);
-
-	//for each object making the ZONE, set coordinates and place on canvas...
-	for (var j = 0; j < Zone_FabObjs.length; j++){
-	    Zone_FabObjs[j].setLeft(Zone_Lefts[j]);
-	    Zone_FabObjs[j].setTop(Zone_Tops[j]);
-	    canvas.add(Zone_FabObjs[j]);
-	}
-
-	//also set the height of the only item in Zone_FabObjs which has flexi-height...
-	Zone_FabObjs[0].setHeight(flex_box_height);
-
-	// non-animated movement of spell to correct position
-	if(Properties.isClient){
-	    var spell_Left = Zone_Lefts[6]; 
-	    var spell_Top = Zone_Tops[6];
-	    snDraw.Game.Spell.setSpellPosition(spell_Left, spell_Top, false, null);
-	}
-
-	return Zone_FabObjs;
-    },
-
-    //consider this function...
-    //function repositionZoneAndEnclWordsOnCanvas(Zone, Top, Height, ZoneSty, WordBounds, ani_sty){
-
-    // the parameter 'TargetDims' will be null if it is an animation exit
-    AnimateZoneBox: function(BoxObjs, Height, TargetDims, ani_sty, ani_entryexit, direction){
-
-	
-	if(ani_entryexit == "entry"){
-	    for(var i = 0; i < BoxObjs.length; i++){
-
-		var target_off = {};
-		if(direction == "left"){
-		    target_off.left = null;//TODO
-
-		}else if(direction == "right"){
-		    target_off.left = null;//todo
-
-		}else if(direction == "top"){
-		    target_off.top = null;//TODO
-
-		}else if(direction == "bottom"){
-		    TargetDims.top = null;//TODO
-		}
-
-		//this is to statically place object in starting position
-		BoxObjs[i].set({
-
-		});
-
-		//this sets it animating
-
-
-	    }
-	}else if(ani_entryexit == "exit"){
-
-	    //this is ugly: we're now inferring a specific set of objects, where the 'top' of array[1] is the top overall
-	    var BT = BoxObjs[1].top;
-
-	    for(var i = 0; i < BoxObjs.length; i++){
-
-		var target_off = {};
-		if(direction == "left"){
-		    target_off.left = BoxObjs[i].getLeft() - snDraw.canv_W;
-
-		}else if(direction == "right"){
-		    target_off.left = BoxObjs[i].getLeft() + snDraw.canv_W;
-
-		}else if(direction == "top"){
-		    target_off.top = BoxObjs[i].getTop() - (Height + BT);
-
-		}else if(direction == "bottom"){
-		    TargetDims.top = BoxObjs[i].getTop() + (snDraw.canv_H - BT);
-		}
-
-		//with object deletion upon animation completion built in...
-		snDraw.moveSwitchable(BoxObjs[i], function(){canvas.remove(BoxObjs[i]);}, ani_sty, target_off);
-	    }
-
-	}else if(ani_entryexit == "size asjust"){
-	    return null
-	}
     },
 
 
@@ -558,14 +466,14 @@ snDraw.Game.Zones = {
     },
 
 
-    Style1: undefined,
-    Style2: undefined,
+    ZoneSty1: undefined,
+    ZoneSty2: undefined,
     ZoneVerticalPaddings: undefined,
     SetZoneStyleScalingsFromTileSize: function(tile_size_px){
 	var Tx = tile_size_px / 10;
 
 	//Zone Style 1 refers to the Player Zones....
-	this.Style1 = { //all in pixels
+	this.ZoneSty1 = { //all in pixels
 	    hpad: Tx * 1.4,  // horizonal padding between screen boundary and box edge (vertical)
 	    w_hpad: Tx * 1.4, // horizonal padding between words and the inside of the box
 	    box_fill: 'rgba(0,0,0,0)', // inside the box
@@ -590,7 +498,7 @@ snDraw.Game.Zones = {
 	};
 
 	//Zone Style 2 refers to unused word Zone
-	this.Style2 = { //all in pixels
+	this.ZoneSty2 = { //all in pixels
 	    hpad: Tx * 9,  // horizonal padding between screen boundary and box edge (vertical)
 	    w_hpad: Tx * 1.8, // horizonal padding between words and the inside of the box
 	    box_fill: 'rgba(255,255,255,0.1)', // inside the box
@@ -604,17 +512,17 @@ snDraw.Game.Zones = {
 	    w_vpad: Tx * 1.8 // vertical padding between top of word tiles and lower inside edge of box border
 	};
 
-	//this inline function has the side effect of modifying the Style object it is provided...
-	function setStyleWordBlockBounds (Style){
-	    Style.WordBlockBounds = {
-		left: (Style.hpad + Style.thick + Style.w_hpad),
-		right: (snDraw.canv_W - (Style.hpad + Style.thick + Style.w_hpad)),
-		topPadding: (Math.max(Style.fonthalfheight + Style.thick/2, Style.thick) + Style.w_vpad)
+	//this inline function has the side effect of modifying the ZoneSty object it is provided...
+	function setZoneStyWordBlockBounds (ZoneSty){
+	    ZoneSty.WordBlockBounds = {
+		left: (ZoneSty.hpad + ZoneSty.thick + ZoneSty.w_hpad),
+		right: (snDraw.canv_W - (ZoneSty.hpad + ZoneSty.thick + ZoneSty.w_hpad)),
+		topPadding: (Math.max(ZoneSty.fonthalfheight + ZoneSty.thick/2, ZoneSty.thick) + ZoneSty.w_vpad)
 	    };
 	}
 
-	setStyleWordBlockBounds(this.Style1);
-	setStyleWordBlockBounds(this.Style2);
+	setZoneStyWordBlockBounds(this.ZoneSty1);
+	setZoneStyWordBlockBounds(this.ZoneSty2);
 
 	this.ZoneVerticalPaddings = {
 	    aboveU: Tx * 2.5,
@@ -629,9 +537,9 @@ snDraw.Game.Zones = {
     calculateAllPositionsArrangements: function(){
 
 	// 1. retrieve style information...
-	var ZoneSty_P = snDraw.Game.Zones.Style1;
+	var ZoneSty_P = snDraw.Game.Zones.ZoneSty1;
 	var WordBounds_P = ZoneSty_P.WordBlockBounds;
-	var ZoneSty_U = snDraw.Game.Zones.Style2;
+	var ZoneSty_U = snDraw.Game.Zones.ZoneSty2;
 	var WordBounds_U = ZoneSty_U.WordBlockBounds;
 	var interzonePad = snDraw.Game.Zones.ZoneVerticalPaddings;
 	var Spacings = snDraw.Game.tileSpacings;
@@ -671,14 +579,8 @@ snDraw.Game.Zones = {
 	};
     },
 
-    AnimateResizeAllZones: function(ani_sty){
-	// 1. - retrieve style information, for both player and unclaimed zones
-	var ZoneSty_P = snDraw.Game.Zones.Style1;
-	var WordBounds_P = ZoneSty_P.WordBlockBounds;
-	var ZoneSty_U = snDraw.Game.Zones.Style2;
-	var WordBounds_U = ZoneSty_U.WordBlockBounds;
-
-	// 2. Get the positions and arrangements of everything...
+    AnimateResizeAllZones: function(ani_sty, exclude_this_zone){
+	// 1. Get the positions and arrangements of everything...
 	var Positions = snDraw.Game.Zones.calculateAllPositionsArrangements();
 
 	// 2. If present, move the unclaimed zone & its words
@@ -687,8 +589,7 @@ snDraw.Game.Zones = {
 						    Positions.Unclaimed_D.Arrangement_noH,
 						    Positions.Unclaimed_D.Top,
 						    Positions.Unclaimed_D.Height,
-						    ZoneSty_U,
-						    WordBounds_U,
+						    snDraw.Game.Zones.getZoneProperties("unclaimed"),	
 						    ani_sty
 						   );
 	}
@@ -700,20 +601,118 @@ snDraw.Game.Zones = {
 						    Positions.ArrangementsArray_noH[i],
 						    Positions.ZoneSizes[i].Top,
 						    Positions.ZoneSizes[i].Height,
-						    ZoneSty_P,
-						    WordBounds_P,
+						    snDraw.Game.Zones.getZoneProperties("player"),
 						    ani_sty
 						   );
 	}
     },
 
 
-    repositionZoneAndEnclWordsOnCanvas: function(Zone, WordArrangement_noH, Top, Height, ZoneSty, WordBounds, ani_sty){
+    CreateNewZoneBoxOnCanvas: function(Top, Height, ZoneProperties){
+
+	//generate the fabric objects that represent the new zone. Note that properties left & top are not set
+	//nor are the objects present onf the canvas.
+	var Zone_FabObjs =  snDraw.Game.Zones.CreateZoneBox(Height, ZoneProperties);
+	var Zone_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneProperties.ZoneSty);
+	var Zone_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, ZoneProperties.ZoneSty, Zone_FabObjs[1].width);
+	var flex_box_height = snDraw.Game.Zones.DetermineZoneFlexBoxHeight(Height, ZoneProperties.ZoneSty);
+
+	//for each object making the ZONE, set coordinates and place on canvas...
+	for (var j = 0; j < Zone_FabObjs.length; j++){
+	    Zone_FabObjs[j].setLeft(Zone_Lefts[j]);
+	    Zone_FabObjs[j].setTop(Zone_Tops[j]);
+	    canvas.add(Zone_FabObjs[j]);
+	}
+
+	//also set the height of the only item in Zone_FabObjs which has flexi-height...
+	Zone_FabObjs[0].setHeight(flex_box_height);
+
+	// non-animated movement of spell to correct position
+	if(ZoneProperties.isClient){
+	    var spell_Left = Zone_Lefts[6]; 
+	    var spell_Top = Zone_Tops[6];
+	    snDraw.Game.Spell.setSpellPosition(spell_Left, spell_Top, false, null);
+	}
+
+	return Zone_FabObjs;
+    },
+
+    // the intended purpose of this function has changed since I last considered it.
+    // given an already correctly sized zone box, this will animate it on or off the screen
+    // handling the visuals of zone addition and zone removal events
+    // the off-screen animation coordinates are simply determined from the Fabric object properties...
+    InOutAnimateZoneBox: function(Zone_FabObjs, ZoneSty, ani_sty, ani_entryexit, direction){
+
+	var B_Top = Zone_FabObjs[1].getTop; // here, we assume the top of the "Name" text of the zone it its top
+
+	//this is to do the reverse of "DetermineZoneFlexBoxHeight"
+	var total_height_incrementor = -this.DetermineZoneFlexBoxHeight(0,ZoneSty);
+	var B_Height = Zone_FabObjs[0].getHeight + total_height_incrementor; // here, we assume
+
+	if(ani_entryexit == "entry"){
+	    for(var i = 0; i < BoxObjs.length; i++){
+
+		var start_location = {};
+		var finish_location = {};
+
+		if(direction == "left"){
+		    target_off.left = null;//TODO
+
+		}else if(direction == "right"){
+		    target_off.left = null;//todo
+
+		}else if(direction == "top"){
+		    target_off.top = null;//TODO
+
+		}else if(direction == "bottom"){
+		    TargetDims.top = null;//TODO
+		}
+
+		//this is to statically place object in starting position
+		BoxObjs[i].set({
+
+		});
+
+		//this sets it animating
+
+
+	    }
+	}else if(ani_entryexit == "exit"){
+
+	    for(var i = 0; i < BoxObjs.length; i++){
+
+		var target_off = {};
+		if(direction == "left"){
+		    target_off.left = BoxObjs[i].getLeft() - snDraw.canv_W;
+
+		}else if(direction == "right"){
+		    target_off.left = BoxObjs[i].getLeft() + snDraw.canv_W;
+
+		}else if(direction == "top"){
+		    target_off.top = BoxObjs[i].getTop() - (Height + BT);
+
+		}else if(direction == "bottom"){
+		    TargetDims.top = BoxObjs[i].getTop() + (snDraw.canv_H - BT);
+		}
+
+		//with object deletion upon animation completion built in...
+		snDraw.moveSwitchable(BoxObjs[i], function(){canvas.remove(BoxObjs[i]);}, ani_sty, target_off);
+	    }
+
+	}else if(ani_entryexit == "size asjust"){
+	    return null
+	}
+    },
+
+
+
+
+    repositionZoneAndEnclWordsOnCanvas: function(Zone, WordArrangement_noH, Top, Height, ZoneProperties, ani_sty){
 	// (A) move the items of Zone box itself into their new positions
 	// copy - pasted...
 	var Zone_FabObjs = Zone.Zone_FabObjs;
-	var Zone_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneSty);
-	var flex_box_height = snDraw.Game.Zones.DetermineZoneFlexBoxHeight(Height, ZoneSty);
+	var Zone_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneProperties.ZoneSty);
+	var flex_box_height = snDraw.Game.Zones.DetermineZoneFlexBoxHeight(Height, ZoneProperties.ZoneSty);
 
 	// (i) move items actually making up the zone...
 	for (var j = 0; j < Zone_FabObjs.length; j++){
@@ -739,7 +738,7 @@ snDraw.Game.Zones = {
 	    var WordGroup = snDraw.Game.Words.getUnclaimedWordsList("via Grp");
 	}
 
-	var WordsTopPx = Top + WordBounds.topPadding;
+	var WordsTopPx = Top + ZoneProperties.WordBounds.topPadding;
 	var Arrangement = snDraw.Game.Words.WordArrangementSetHeight(WordArrangement_noH, WordsTopPx);
 	// (i) move each word to the new location.
 	for (var j = 0; j < Arrangement.coords.length; j++){
@@ -748,17 +747,27 @@ snDraw.Game.Zones = {
     },
 
     getZoneProperties: function(zone_index){
+	// 7.2 - retrieve style information, for both player and unclaimed zones
 	if (typeof(zone_index) == "number"){
 	    return {
 		color: this.PlayerZone[zone_index].player.color, // text colour and box boundary
 		text: this.PlayerZone[zone_index].player.name, // Text of the title
-		isClient: this.PlayerZone[zone_index].is_client
+		isClient: this.PlayerZone[zone_index].is_client,
+		ZoneSty: this.ZoneSty1,
+		WordBounds: this.ZoneSty1.WordBlockBounds
 	    };
 	}else if(zone_index == "unclaimed"){
 	    return {
 		color: 'grey',
 		text: 'unclaimed',
-		isClient: false
+		isClient: false,
+		ZoneSty: this.ZoneSty2,
+		WordBounds: this.ZoneSty2.WordBlockBounds
+	    };
+	}else if(zone_index == "player"){
+	    return {
+		ZoneSty: this.ZoneSty2,
+		WordBounds: this.ZoneSty2.WordBlockBounds
 	    };
 	}
     }

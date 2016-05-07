@@ -95,12 +95,12 @@ snDraw.Game.Event = {
 	// 7. Drawing the zones on the canvas, and moving the words into them...
 
 	// 7.1 Define a function which draws a zone filled with words on screen...
-	function generateZoneAndMoveWordsOnCanvas(Top, Height, ZoneSty, Properties, WordGroup, WordArrangement_noH, WordBounds){
+	function generateZoneAndMoveWordsOnCanvas(Top, Height, ZoneProperties, WordGroup, WordArrangement_noH){
 
-	    var Zone_FabObjs = snDraw.Game.Zones.PositionOnCanvasZoneBox(Top, Height, ZoneSty, Properties);
+	    var Zone_FabObjs = snDraw.Game.Zones.CreateNewZoneBoxOnCanvas(Top, Height, ZoneProperties);
 
 	    // place the words in the zone
-	    var WordsTopPx = Top + WordBounds.topPadding;
+	    var WordsTopPx = Top + ZoneProperties.WordBounds.topPadding;
 	    var Arrangement = snDraw.Game.Words.WordArrangementSetHeight(WordArrangement_noH, WordsTopPx);
 	    for (var j = 0; j < Arrangement.coords.length; j++){
 		snDraw.moveSwitchable(WordGroup[j], false, null, Arrangement.coords[j]);
@@ -109,22 +109,14 @@ snDraw.Game.Event = {
 	    return Zone_FabObjs;
 	}
 
-	// 7.2 - retrieve style information, for both player and unclaimed zones
-	var ZoneSty_P = snDraw.Game.Zones.Style1;
-	var WordBounds_P = ZoneSty_P.WordBlockBounds;
-	var ZoneSty_U = snDraw.Game.Zones.Style2;
-	var WordBounds_U = ZoneSty_U.WordBlockBounds;
-
-	// 7.3 if an "unclaimed words zone" exists, then make this first.
+	// 7.2 if an "unclaimed words zone" exists, then make this first.
 	if(snDraw.Game.Zones.Unclaimed.exists){
 
 	    var FAB = generateZoneAndMoveWordsOnCanvas(Positions.Unclaimed_D.Top,
 						       Positions.Unclaimed_D.Height,
-						       ZoneSty_U,
 						       snDraw.Game.Zones.getZoneProperties("unclaimed"),
 						       snDraw.Game.Words.getUnclaimedWordsList("via Grp"),
-						       Positions.Unclaimed_D.Arrangement_noH,
-						       WordBounds_U
+						       Positions.Unclaimed_D.Arrangement_noH
 						      );
 
 	    //store a reference to the fabric ojects that make the zone box on the canvas
@@ -132,17 +124,15 @@ snDraw.Game.Event = {
 	}
 	
 
-	// 7.4 Now make all of the player zones.
+	// 7.3 Now make all of the player zones.
 	for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
 	    var player_index = snDraw.Game.Zones.PlayerZone[i].player.index;
 
 	    var FAB = generateZoneAndMoveWordsOnCanvas(Positions.ZoneSizes[i].Top,
 						       Positions.ZoneSizes[i].Height,
-						       ZoneSty_P,
 						       snDraw.Game.Zones.getZoneProperties(i),
 						       snDraw.Game.Words.TileGroupsArray[player_index],
-						       Positions.ArrangementsArray_noH[i],
-						       WordBounds_P
+						       Positions.ArrangementsArray_noH[i]
 						      );
 
 	    //store a reference to the fabric ojects that make the zone box on the canvas
@@ -263,7 +253,6 @@ snDraw.Game.Event = {
 		is_client: false
 	    });
 	}
-	//TODO - add function to create and animate IN the newly defined zone box
 
 	// 3.2 Delete zones if required
 	for(var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
@@ -271,8 +260,13 @@ snDraw.Game.Event = {
 	    
 	    //proceed to remove zone_i if (A) there are no words in the zone and (B) it's a non-client player
 	    if((zone_i.player.words.length == 0)&&(!zone_i.is_client)){
+		
 		var empty_zone = snDraw.Game.Zones.PlayerZone.splice(i,1)[0];
+
+		snDraw.Game.Zones.InOutAnimateZoneBox(empty_zone, ani_sty, ani_entryexit, direction);
+
 		i--;//because we spliced, counteract the increment of i.
+
 
 		//TODO - replace with function to animate OUT the zone box
 		//this.removeZoneBox(empty_zone);
@@ -281,6 +275,9 @@ snDraw.Game.Event = {
 	    }
 	}
 
+	//TODO Calculate all zone sizes. Animate the squeezing/stretching of all zones except the new one 
+
+	//TODO - add function to create and animate IN the newly defined zone box
 
 
 	// Animate the resizing of the zones 

@@ -48,11 +48,7 @@ socket.on('full game state transmission', function(gameState){
     }
 
     //draws the entire game state on the canvas from the data supplied
-    if(dev){
-	snDraw.Game.Event.DrawAll();
-    }else{
-	snDraw.Game.initialDrawEntireGame();
-    }
+    snDraw.Game.Event.DrawAll();
 
 });//end of function to load game data
 
