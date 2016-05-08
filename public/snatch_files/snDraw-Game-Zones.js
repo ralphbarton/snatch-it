@@ -582,14 +582,13 @@ snDraw.Game.Zones = {
     AnimateResizeAllZones: function(ani_sty, exclude_this_zone){
 	// 1. Get the positions and arrangements of everything...
 	var Positions = snDraw.Game.Zones.calculateAllPositionsArrangements();
-
 	// 2. If present, move the unclaimed zone & its words
 	if(snDraw.Game.Zones.Unclaimed.exists){
 	    this.repositionZoneAndEnclWordsOnCanvas(snDraw.Game.Zones.Unclaimed,
 						    Positions.Unclaimed_D.Arrangement_noH,
 						    Positions.Unclaimed_D.Top,
 						    Positions.Unclaimed_D.Height,
-						    snDraw.Game.Zones.getZoneProperties("unclaimed"),	
+						    this.getZoneProperties("unclaimed"),	
 						    ani_sty
 						   );
 	}
@@ -601,7 +600,7 @@ snDraw.Game.Zones = {
 						    Positions.ArrangementsArray_noH[i],
 						    Positions.ZoneSizes[i].Top,
 						    Positions.ZoneSizes[i].Height,
-						    snDraw.Game.Zones.getZoneProperties("player"),
+						    this.getZoneProperties("player"),
 						    ani_sty
 						   );
 	}
@@ -656,7 +655,7 @@ snDraw.Game.Zones = {
 
 	    var onScreen_location = {
 		left: BoxObjs[i].left,
-		top: BoxObjs[i].top;
+		top: BoxObjs[i].top
 	    };
 	    var offScreen_location = {};
 
@@ -749,8 +748,8 @@ snDraw.Game.Zones = {
 	    };
 	}else if(zone_index == "player"){
 	    return {
-		ZoneSty: this.ZoneSty2,
-		WordBounds: this.ZoneSty2.WordBlockBounds
+		ZoneSty: this.ZoneSty1,
+		WordBounds: this.ZoneSty1.WordBlockBounds
 	    };
 	}
     }

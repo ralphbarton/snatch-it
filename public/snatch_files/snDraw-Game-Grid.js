@@ -240,7 +240,7 @@ snDraw.Game.Grid = {
 	    var TID = tileIDs[i];
 	    var TileObj = snDraw.Game.TileArray[TID];
 	    //if present, remove references (i.e. follow the tile's reference to its grid location)
-	    if(TileObj.Grid_row !== null){
+	    if((TileObj.Grid_row !== null)&&(TileObj.Grid_row !== undefined)){
 		this.TileGrid[TileObj.Grid_row][TileObj.Grid_col] = null;//now nullify forward ref
 		TileObj.Grid_row = null;//nullify back-refs:
 		TileObj.Grid_col = null;
