@@ -70,8 +70,7 @@ snDraw.Game.Event = {
 	    var Zone_FabObjs = snDraw.Game.Zones.CreateNewZoneBoxOnCanvas(Top, Height, ZoneProperties);
 
 	    // place the words in the zone
-	    var WordsTopPx = Top + ZoneProperties.WordBounds.topPadding;
-	    var Arrangement = snDraw.Game.Words.WordArrangementSetHeight(WordArrangement_noH, WordsTopPx);
+	    var Arrangement = snDraw.Game.Words.WordArrangementSetHeight(WordArrangement_noH, ZoneProperties.WordBounds, Top);
 	    for (var j = 0; j < Arrangement.coords.length; j++){
 		snDraw.moveSwitchable(WordGroup[j], false, null, Arrangement.coords[j]);
 	    }
@@ -214,9 +213,6 @@ snDraw.Game.Event = {
 	// 2.2 update the players data structure:
 	snatching_player.words.push(tile_indices);
 
-	console.log("client_is_snatcher", client_is_snatcher);
-	console.log("snatcher_first_word", snatcher_first_word);
-
 	var new_zone = (!client_is_snatcher) && (snatcher_first_word);
 
 	// 3.1 Create a new zone container, and additionally create the new zone on the canvas.
@@ -259,7 +255,7 @@ snDraw.Game.Event = {
 	// no additional code needed to achieve (B) since, words are picked up by accessing
 
 	// Arrangements = {coords: [], word_width_px: [], breaks: []};
-	var ArrangementsArray_noH = snDraw.Game.Zones.AnimateResizeAllZones(snDraw.ani.sty_Resize, new_zone_index);
+	var Positions = snDraw.Game.Zones.AnimateResizeAllZones(snDraw.ani.sty_Resize, new_zone_index);
 
 	//animate the new zone coming in (this has to happen after the resize all, which determines correct size...)
 	if(new_zone){
@@ -267,7 +263,6 @@ snDraw.Game.Event = {
 	    snDraw.Game.Zones.InOutAnimateZoneBox(NewZone, snDraw.ani.sty_Join, "entry", "left");
 	}
 
-	console.log("searching", snDraw.Game.Zones.PlayerZone, "for", snatching_player.index);
 	//Gahh. We need to determine the zone of the snatching player
 	for(var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
 	    if(snDraw.Game.Zones.PlayerZone[i].player.index == snatching_player.index){
@@ -275,14 +270,19 @@ snDraw.Game.Event = {
 	    }
 	}
 
-	console.log("snatching_player_zone_index", snatching_player_zone_index);
-	console.log("ArrangementsArray_noH[snatching_player_zone_index].coords", ArrangementsArray_noH[snatching_player_zone_index].coords);
+	var sp_Arrangement_noH = Positions.ArrangementsArray_noH[snatching_player_zone_index];
+	var sp_Top = Positions.ZoneSizes[snatching_player_zone_index].Top;
+	var PlayerZoneProperties = snDraw.Game.Zones.getZoneProperties("player");
+
+	var Arrangement = snDraw.Game.Words.WordArrangementSetHeight(sp_Arrangement_noH, PlayerZoneProperties.WordBounds, sp_Top);
 
 	//finally, animate the snatching of the snatched word...
 	var word_index = snatching_player.words.length - 1;
+	console.log("word_index", word_index);
+	console.log("target coords", Arrangement.coords[word_index]);
 	snDraw.Game.Words.AnimateWordCapture(snatching_player.index,
 					     word_index,
-					     ArrangementsArray_noH[snatching_player_zone_index].coords[word_index]
+					     Arrangement.coords[word_index]
 					    );
 
 

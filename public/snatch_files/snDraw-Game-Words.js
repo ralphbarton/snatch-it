@@ -199,10 +199,11 @@ snDraw.Game.Words = {
 
 	var word_by_TIDs = players[player_index].words[word_index];
 
+	var TargetCoords_clone = {left: Coords.left, top: Coords.top};
 	var onComplete_groupLetters = function(){
 	    var WordGrp = snDraw.Game.Words.WordAsTileGroupAtOrigin(player_index, word_index, false, Spacings);
 	    //move into position...
-	    WordGrp.set(Coords);
+	    WordGrp.set(TargetCoords_clone);//messy syntax in lieu of whatever jquery clones an object...
 	};
 
 	var waveAnimateContext_WordTA = function (i){
@@ -327,15 +328,16 @@ snDraw.Game.Words = {
 	return Arrangement;
     },
 
-    WordArrangementSetHeight: function(Arrangement, Top){
+    WordArrangementSetHeight: function(Arrangement, WordBounds, Top){
 	// Arrangement
 	// data...
 	// Arrangement = {coords: [], word_width_px: [], breaks: []};
 	var height_fixed_coord_set = []; 
+	var WordsTopPx = Top + WordBounds.topPadding;
 	for (var i = 0; i < Arrangement.coords.length; i++){
 	    height_fixed_coord_set[i] = {
 		left: Arrangement.coords[i].left,
-		top: (Arrangement.coords[i].top + Top)
+		top: (Arrangement.coords[i].top + WordsTopPx)
 	    }
 
 	}

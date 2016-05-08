@@ -571,7 +571,7 @@ snDraw.Game.Zones = {
 	}
 
 	// 5. Finally, calculate the sizes of all zones...
-	// function returns [{Top: , Height: }, {}, ...]
+	// ZoneSizes is data object like [{Top: , Height: }, {}, ...]
 	return {
 	    Unclaimed_D: Unclaimed_D,
 	    ArrangementsArray_noH: ArrangementsArray_noH,
@@ -621,7 +621,7 @@ snDraw.Game.Zones = {
 	}
 	
 	//return the array: [{Top: , Height: }, {}, ...] for all zones
-	return Positions.ArrangementsArray_noH;
+	return Positions;
     },
 
 
@@ -737,8 +737,7 @@ snDraw.Game.Zones = {
 	    var WordGroup = snDraw.Game.Words.getUnclaimedWordsList("via Grp");
 	}
 
-	var WordsTopPx = Top + ZoneProperties.WordBounds.topPadding;
-	var Arrangement = snDraw.Game.Words.WordArrangementSetHeight(WordArrangement_noH, WordsTopPx);
+	var Arrangement = snDraw.Game.Words.WordArrangementSetHeight(WordArrangement_noH, ZoneProperties.WordBounds, Top);
 	// (i) move each word to the new location.
 	// note the difference between "WordGroup.length" and "Arrangement.coords.length".
 	// The first excludes and animating new word which isn't yet formed into a Group.
