@@ -579,9 +579,14 @@ snDraw.Game.Zones = {
 	};
     },
 
-    AnimateResizeAllZones: function(ani_sty, exclude_this_zone){
+    
+    AnimateResizeAllZones: function(ani_sty, exclude_this_zone_by_i){
 	// 1. Get the positions and arrangements of everything...
 	var Positions = snDraw.Game.Zones.calculateAllPositionsArrangements();
+
+	//note, Positions is an object: {Unclaimed_D, ArrangementsArray_noH, ZoneSizes}
+	//note, ZoneSizes is an array: [{Top: , Height: }, {}, ...]
+
 	// 2. If present, move the unclaimed zone & its words
 	if(snDraw.Game.Zones.Unclaimed.exists){
 	    this.repositionZoneAndEnclWordsOnCanvas(snDraw.Game.Zones.Unclaimed,
@@ -596,14 +601,27 @@ snDraw.Game.Zones = {
 
 	// 4. Now move all of the player zones, and their contained words
 	for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
+
+	    //don't use animation if a zone is for exclusion...
+	    var pz_ani_sty = ani_sty;
+	    if(typeof(exclude_this_zone_by_i)=="number"){
+		if(i == exclude_this_zone_by_i){
+		    pz_ani_sty = null;
+		}
+	    }
+
+	    var pz_ani_sty = (i == exclude_this_zone_by_i) ? null : ani_sty;
 	    this.repositionZoneAndEnclWordsOnCanvas(snDraw.Game.Zones.PlayerZone[i],
 						    Positions.ArrangementsArray_noH[i],
 						    Positions.ZoneSizes[i].Top,
 						    Positions.ZoneSizes[i].Height,
 						    this.getZoneProperties("player"),
-						    ani_sty
+						    pz_ani_sty
 						   );
 	}
+	
+	//return the array: [{Top: , Height: }, {}, ...] for all zones
+	return Positions.ArrangementsArray_noH;
     },
 
 
@@ -642,14 +660,13 @@ snDraw.Game.Zones = {
     // the off-screen animation coordinates are simply determined from the Fabric object properties...
     InOutAnimateZoneBox: function(Zone, ani_sty, ani_entryexit, direction){
 
-	var B_Top = Zone_FabObjs[1].getTop; // here, we assume the top of the "Name" text of the zone it its top
+	var BoxObjs = Zone.Zone_FabObjs;
+	var B_Top = BoxObjs[1].getTop(); // here, we assume the top of the "Name" text of the zone it its top
 
 	//this is to do the reverse of "DetermineZoneFlexBoxHeight" and determine overall height from box height
 	var zonetype = Zone.exists == undefined ? "player" : "unclaimed";
 	var total_height_incrementor = -this.DetermineZoneFlexBoxHeight(0, this.getZoneProperties(zonetype).ZoneSty);
-	var B_Height = Zone_FabObjs[0].getHeight + total_height_incrementor;
-	
-	var BoxObjs = Zone.Zone_FabObjs;
+	var B_Height = BoxObjs[0].getHeight + total_height_incrementor;
 	
 	for(var i = 0; i < BoxObjs.length; i++){
 
@@ -688,7 +705,6 @@ snDraw.Game.Zones = {
 
 
 
-
     repositionZoneAndEnclWordsOnCanvas: function(Zone, WordArrangement_noH, Top, Height, ZoneProperties, ani_sty){
 	// (A) move the items of Zone box itself into their new positions
 	// copy - pasted...
@@ -696,14 +712,15 @@ snDraw.Game.Zones = {
 	var Zone_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneProperties.ZoneSty);
 	var flex_box_height = snDraw.Game.Zones.DetermineZoneFlexBoxHeight(Height, ZoneProperties.ZoneSty);
 
+	var B_animation = (ani_sty !== null);
 	// (i) move items actually making up the zone...
 	for (var j = 0; j < Zone_FabObjs.length; j++){
-	    snDraw.moveSwitchable(Zone_FabObjs[j], true, ani_sty,{
+	    snDraw.moveSwitchable(Zone_FabObjs[j], B_animation, ani_sty,{
 		top: Zone_Tops[j]
 	    });
 	}
 	// (ii) change HEIGHT of box outline (Zone_FabObjs[0] the only array item with variable height)
-	snDraw.moveSwitchable(Zone_FabObjs[0], true, ani_sty,{
+	snDraw.moveSwitchable(Zone_FabObjs[0], B_animation, ani_sty,{
 	    height: flex_box_height
 	});
 	// (iii) if client zone, move spell-pointer...
@@ -723,7 +740,9 @@ snDraw.Game.Zones = {
 	var WordsTopPx = Top + ZoneProperties.WordBounds.topPadding;
 	var Arrangement = snDraw.Game.Words.WordArrangementSetHeight(WordArrangement_noH, WordsTopPx);
 	// (i) move each word to the new location.
-	for (var j = 0; j < Arrangement.coords.length; j++){
+	// note the difference between "WordGroup.length" and "Arrangement.coords.length".
+	// The first excludes and animating new word which isn't yet formed into a Group.
+	for (var j = 0; j < WordGroup.length; j++){
 	    snDraw.moveSwitchable(WordGroup[j], true, ani_sty, Arrangement.coords[j]);
 	}
     },

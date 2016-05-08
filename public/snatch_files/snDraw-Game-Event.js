@@ -28,39 +28,9 @@ snDraw.Game.Event = {
 	for (var i = 0; i < players.length; i++){
 	    snDraw.Game.Words.TileGroupsArray[i] = [];
 	    for (var j = 0; j < players[i].words.length; j++){
-
-		//extract the tileIDs of the tiles that make up this word, and create a tile object array
-		// simultaneously remove singly tiles from the canvas. They will be put in a group, and the group will go on canvas
-		var WordTileArray = [];
-		for (var k = 0; k < players[i].words[j].length; k++){
-
-		    var TID = players[i].words[j][k];
-		    var TileObject = snDraw.Game.generateTileObject(tileset[TID], TID);
-		    canvas.remove(TileObject);
-		    WordTileArray.push(TileObject);
-
-		    //arrange into word based at origin
-		    TileObject.set({
-			left: (k * Spacings.tslg),
-			top: 0
-		    });
-		}
-		
-		//Form the Group for the word...
-		var WordGRP = new fabric.Group( WordTileArray, {
-		    left: 0, 
-		    top: 0,
-		    hasControls: false,
-		    hasBorders: false
-		});
-		canvas.add(WordGRP);
-
-		//Global references forwards and backwards
-		WordGRP.OwnerPlayer = players[i];
-		snDraw.Game.Words.TileGroupsArray[i].push(WordGRP);
+		snDraw.Game.Words.WordAsTileGroupAtOrigin(i, j, true, Spacings);
 	    }
 	}
-
 
 	// 5. Create the zones containers (this is NOT visually creating the zones)
 	snDraw.Game.Zones.PlayerZone = [];
@@ -163,7 +133,7 @@ snDraw.Game.Event = {
 
 	// 3. If necessary, squeeze everything downwards.
 	if(zone_resize_necesary){
-	    snDraw.Game.Zones.AnimateResizeAllZones(snDraw.ani.sty_Resize);
+	    snDraw.Game.Zones.AnimateResizeAllZones(snDraw.ani.sty_Resize, null, null);
 	}
 
 	// 4. Modify the "Turn Letter" button, based upon who turned the tile (start timer or cancel timer)
@@ -221,14 +191,10 @@ snDraw.Game.Event = {
 	    delete snDraw.Game.Words.TileGroupsArray[PIi][WIi];
 	}
 	// Remove the all references to Fabric Groups which are now empty of letter tiles, and words removed from raw data
-	for (var i = 0; i<players.length; i++){
+	for (var i = 0; i < players.length; i++){
 	    snDraw.Game.Words.TileGroupsArray[i].clean(undefined);
 	    players[i].words.clean(undefined);
 	}
-
-	// 2.2 update the players data structure:
-	snatching_player.words.push(tile_indices);
-
 
 	// 2.3 update tileset for letters now In Words, and detach any letters in grid (i.e. the Fabric Objects)
 	for(var i = 0; i < tile_indices.length; i++){
@@ -244,14 +210,28 @@ snDraw.Game.Event = {
 	// 3. Zone Handling upon Snatch
 	var client_is_snatcher = client_player_index == snatching_player.index;
 	var snatcher_first_word = snatching_player.words.length == 0;
+
+	// 2.2 update the players data structure:
+	snatching_player.words.push(tile_indices);
+
+	console.log("client_is_snatcher", client_is_snatcher);
+	console.log("snatcher_first_word", snatcher_first_word);
+
 	var new_zone = (!client_is_snatcher) && (snatcher_first_word);
 
-	// 3.1 Create a new zone container (this is NOT visually creating the new zone for the snatching player)
+	// 3.1 Create a new zone container, and additionally create the new zone on the canvas.
 	if(new_zone){
 	    snDraw.Game.Zones.PlayerZone.push({
 		player: snatching_player,
 		is_client: false
 	    });
+	    var new_zone_index = snDraw.Game.Zones.PlayerZone.length-1; 
+	    
+	    //put the new zone on the canvas (but with dummy dimentioning...)
+	    var NewZoneProperties = snDraw.Game.Zones.getZoneProperties(new_zone_index);
+	    var FAB = snDraw.Game.Zones.CreateNewZoneBoxOnCanvas(0, 0, NewZoneProperties);//provide null data for Top, Height
+	    snDraw.Game.Zones.PlayerZone[new_zone_index].Zone_FabObjs = FAB;
+
 	}
 
 	// 3.2 Delete zones if required
@@ -260,20 +240,54 @@ snDraw.Game.Event = {
 	    
 	    //proceed to remove zone_i if (A) there are no words in the zone and (B) it's a non-client player
 	    if((zone_i.player.words.length == 0)&&(!zone_i.is_client)){
-		
 		var empty_zone = snDraw.Game.Zones.PlayerZone.splice(i,1)[0];
 
-		snDraw.Game.Zones.InOutAnimateZoneBox(empty_zone, ani_sty, ani_entryexit, direction);
+		//animate OUT the zone which is for removal
+		snDraw.Game.Zones.InOutAnimateZoneBox(empty_zone, snDraw.ani.sty_Boot, "exit", "bottom");
 
 		i--;//because we spliced, counteract the increment of i.
-
-
-		//TODO - replace with function to animate OUT the zone box
-		//this.removeZoneBox(empty_zone);
-
-
 	    }
 	}
+
+	// 3.3 shift everything
+	// in terms of the exclusion parameters, two things to think about:
+	// (A) sometimes a new zone is created (never more than x1, and we don't want to animate its elements but do want to
+	// calculate its arrangement
+
+	// (B) always, a new word is added. We do want to include it in arrangement calculations, but don't want to attempt to
+	// move it into a position...
+	// no additional code needed to achieve (B) since, words are picked up by accessing
+
+	// Arrangements = {coords: [], word_width_px: [], breaks: []};
+	var ArrangementsArray_noH = snDraw.Game.Zones.AnimateResizeAllZones(snDraw.ani.sty_Resize, new_zone_index);
+
+	//animate the new zone coming in (this has to happen after the resize all, which determines correct size...)
+	if(new_zone){
+	    var NewZone = snDraw.Game.Zones.PlayerZone[new_zone_index];
+	    snDraw.Game.Zones.InOutAnimateZoneBox(NewZone, snDraw.ani.sty_Join, "entry", "left");
+	}
+
+	console.log("searching", snDraw.Game.Zones.PlayerZone, "for", snatching_player.index);
+	//Gahh. We need to determine the zone of the snatching player
+	for(var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
+	    if(snDraw.Game.Zones.PlayerZone[i].player.index == snatching_player.index){
+		var snatching_player_zone_index = i;
+	    }
+	}
+
+	console.log("snatching_player_zone_index", snatching_player_zone_index);
+	console.log("ArrangementsArray_noH[snatching_player_zone_index].coords", ArrangementsArray_noH[snatching_player_zone_index].coords);
+
+	//finally, animate the snatching of the snatched word...
+	var word_index = snatching_player.words.length - 1;
+	snDraw.Game.Words.AnimateWordCapture(snatching_player.index,
+					     word_index,
+					     ArrangementsArray_noH[snatching_player_zone_index].coords[word_index]
+					    );
+
+
+/*
+
 
 	//TODO Calculate all zone sizes. Animate the squeezing/stretching of all zones except the new one 
 
@@ -313,7 +327,7 @@ snDraw.Game.Event = {
 	snDraw.Game.Words.drawSingleCapturedWord(snatching_player,snatching_player.words.length - 1, true);
 	snDraw.Game.Spell.repositionSkeletal();
 
-
+*/
 
 
     },

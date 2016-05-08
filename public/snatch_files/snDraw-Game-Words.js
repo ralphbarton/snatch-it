@@ -186,31 +186,29 @@ snDraw.Game.Words = {
     },
 
 
-
-    AnimateWordCapture: function(WordTileArray, Coords, HorizonalBounds, Spacings, owner_player){
-	var word_length = WordTileArray.length;
+    AnimateWordCapture: function(player_index, word_index, Coords){
+	var Spacings = snDraw.Game.tileSpacings;
+	var word_length = players[player_index].words[word_index].length;
 	var w_width_px = this.word_width_px(word_length, Spacings);
 	
-	var wrapCoords = this.wordTilesWrap(Coords, HorizonalBounds, Spacings, my_width_px);
+	var ZoneProperties = snDraw.Game.Zones.getZoneProperties("player");
+	var wrapCoords = this.wordTilesWrap(Coords, ZoneProperties.WordBounds, Spacings, w_width_px);
 	if(wrapCoords){
 	    Coords = wrapCoords;
 	}
 
-	//set to the wrapped coodinates (TODO: will these actually be used?)
-	var x_plotter = Coords.left;
-	var y_plotter = Coords.top;
-
-	//remove any grid references of any tiles:
-	snDraw.Game.Grid.remove_Tile_references_from_grid(word_as_tile_index_array);
+	var word_by_TIDs = players[player_index].words[word_index];
 
 	var onComplete_groupLetters = function(){
-	    var WordGrp = snDraw.Game.Words.CreateWordAsNewTileGroupAtOrigin(WordTileArray, Spacings, owner_player);
+	    var WordGrp = snDraw.Game.Words.WordAsTileGroupAtOrigin(player_index, word_index, false, Spacings);
 	    //move into position...
 	    WordGrp.set(Coords);
 	};
 
 	var waveAnimateContext_WordTA = function (i){
 	    
+	    var TID = word_by_TIDs[i];
+	    var ThisTile = snDraw.Game.TileArray[TID];
 	    var my_animate_onComplete = (i == word_length-1) ? onComplete_groupLetters : true;
 	    snDraw.moveSwitchable(ThisTile, my_animate_onComplete, snDraw.ani.sty_Sing, Coords);
 	    Coords.left += Spacings.tslg; 
@@ -221,13 +219,47 @@ snDraw.Game.Words = {
 	    }
 	};
 	waveAnimateContext_WordTA(0);
-
-	return {
-	    left: (Coords.left + w_width_px + Spacing.wg),
-	    top: Coords.top
-	};//coordinates to use for next word...
     },
 
+    // this is mostly a side-effects only function...
+    WordAsTileGroupAtOrigin: function(player_index, word_index, B_create_tiles, Spacings){
+	//extract the tileIDs of the tiles that make up this word, and create a tile object array
+	// simultaneously remove singly tiles from the canvas. They will be put in a group, and the group will go on canvas
+	var WordTileArray = [];
+	var word_by_TIDs = players[player_index].words[word_index];
+
+	for (var k = 0; k < word_by_TIDs.length; k++){
+
+	    var TID = word_by_TIDs[k];
+	    if(B_create_tiles){
+		var TileObject = snDraw.Game.generateTileObject(tileset[TID], TID);
+	    }else{
+		var TileObject = snDraw.Game.TileArray[TID];
+	    }
+	    canvas.remove(TileObject);
+	    WordTileArray.push(TileObject);
+
+	    //arrange into word based at origin
+	    TileObject.set({
+		left: (k * Spacings.tslg),
+		top: 0
+	    });
+	}
+	
+	//Form the Group for the word...
+	var WordGRP = new fabric.Group( WordTileArray, {
+	    left: 0, 
+	    top: 0,
+	    hasControls: false,
+	    hasBorders: false
+	});
+	canvas.add(WordGRP);
+
+	//Global references forwards and backwards
+	WordGRP.OwnerPlayer = players[player_index];
+	snDraw.Game.Words.TileGroupsArray[player_index].push(WordGRP);
+	return WordGRP;
+    },
 
     // drawSingleCapturedWord & animateRepositionPlayerWords
     GenWordArrangement: function(words_list_as_tileIDs, HorizonalBounds, Spacings, justification){
