@@ -649,6 +649,7 @@ snDraw.Game.Zones = {
 	    var spell_Left = Zone_Lefts[6]; 
 	    var spell_Top = Zone_Tops[6];
 	    snDraw.Game.Spell.setSpellPosition(spell_Left, spell_Top, false, null);
+	    snDraw.Game.Spell.redrawResizedSpell();
 	}
 
 	return Zone_FabObjs;

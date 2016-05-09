@@ -38,6 +38,26 @@ snDraw.Game.Spell = {
 	}
     },
 
+    //for when tile size is changed.
+    redrawResizedSpell: function(){
+
+	//get the letter set
+	var letters_array = [];
+	for(var i=0; i < this.SkeletalLetters.length; i++){
+	    letters_array.push(this.SkeletalLetters[i].letter);
+	}
+
+	//remove all existing letters
+	for(var i=0; i < letters_array.length; i++){
+	    this.removeLetter();
+	}
+
+	//add letters back again.
+	for(var i=0; i < letters_array.length; i++){
+	    this.addLetter(letters_array[i]);
+	}
+    },
+
     //function formerly repositionSkeletal (with no parameters)
     setSpellPosition: function(newLeftPx, newTopPx, ani_oC, ani_sty){
 
@@ -51,6 +71,8 @@ snDraw.Game.Spell = {
 	}
     },
 
+    //note that the single argument for this function, 'removeLetter' is optional, and the last letter is removed if
+    //no parameter is provided.
     removeLetter: function(spell_index){
 	var RemSkeletal;
 	if(spell_index!==undefined){

@@ -246,6 +246,13 @@ snDraw.Game.Event = {
 	    }
 	}
 
+	// 3.25 Delete the Unclaimed Zone if required
+	var UnclaimedWordGroup = snDraw.Game.Words.getUnclaimedWordsList("via TID");
+	if((snDraw.Game.Zones.Unclaimed.exists)&&(UnclaimedWordGroup.length == 0)){
+	    snDraw.Game.Zones.InOutAnimateZoneBox(snDraw.Game.Zones.Unclaimed, snDraw.ani.sty_Resize, "exit", "right");
+	    snDraw.Game.Zones.Unclaimed.exists = false;
+	}
+
 	// 3.3 shift everything
 	// in terms of the exclusion parameters, two things to think about:
 	// (A) sometimes a new zone is created (never more than x1, and we don't want to animate its elements but do want to
@@ -254,8 +261,9 @@ snDraw.Game.Event = {
 	// (B) always, a new word is added. We do want to include it in arrangement calculations, but don't want to attempt to
 	// move it into a position...
 	// no additional code needed to achieve (B) since, words are picked up by accessing
-
 	// Arrangements = {coords: [], word_width_px: [], breaks: []};
+
+	/* PLEASE NOTE THAT THE FUNCTION BELOW DOES THE HUGE BULK OF THE WORK HERE */
 	var Positions = snDraw.Game.Zones.AnimateResizeAllZones(snDraw.ani.sty_Resize, new_zone_index);
 
 	//animate the new zone coming in (this has to happen after the resize all, which determines correct size...)
@@ -285,52 +293,6 @@ snDraw.Game.Event = {
 					     word_index,
 					     Arrangement.coords[word_index]
 					    );
-
-
-/*
-
-
-	//TODO Calculate all zone sizes. Animate the squeezing/stretching of all zones except the new one 
-
-	//TODO - add function to create and animate IN the newly defined zone box
-
-
-	// Animate the resizing of the zones 
-	var nZones = this.PlayerZone.length; //note that the immediately preceeding code may remove zones and change the length.
-	this.calculatePlayerZoneSizes();
-	if (new_zone){nZones--;}//don't make adjustment animations to any new final zone...
-
-	for(var i=0; i<nZones; i++){
-	    //second parameter true prevents it from attempting to shuffle the final word (already present as data), as it will not yet be existant as a fabric group 
-	    var zone_i = this.PlayerZone[i];
-	    var snatched_word_in_this_zone = zone_i.player.index == snatching_player.index;
-	    this.animateResizeZoneBox(zone_i);
-	    //shuffle the player's words to back fill the gap, in case one of their words was just snatched away.
-	    snDraw.Game.Words.animateRepositionPlayerWords(zone_i.player.index, snatched_word_in_this_zone);
-	}//loop
-
-	// does the player box need to be inserted onto the screen?
-	if(new_zone){
-	    //create new zone box...
-	    var PZ = snDraw.Game.Zones.PlayerZone;
-	    var FinalZone = PZ[PZ.length-1];
-	    snDraw.Game.Zones.createZoneBox(FinalZone,true);// Draws the BOX, second parameter is for animation.	
-	}
-
-
-
-
-
-	//OLD CODE, TAKEN FROM 'snatch-client.js'...
-	
-	//draw the new word into the player zone...
-	//the final parameter of this function call determines if animation is required (which we always have)
-	snDraw.Game.Words.drawSingleCapturedWord(snatching_player,snatching_player.words.length - 1, true);
-	snDraw.Game.Spell.repositionSkeletal();
-
-*/
-
-
     },
 
     Disconnection: function(){
