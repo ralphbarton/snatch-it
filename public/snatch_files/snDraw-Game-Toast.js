@@ -49,8 +49,17 @@ snDraw.Game.Toast = {
 
 	//code here is to determine the vertical position of the toast
 	// start it at its highest potential position
-	var toast_top = CP.y_next_word + (no_words ? 0 : snDraw.Game.v_spacer + DIM * 0.25) + DIM * 0.25;
-	for(var i=0; i < this.ToastRolling.length; i++){
+	var Client_Words_Grps = snDraw.Game.Words.TileGroupsArray[client_player_index];
+	var ClientZone_Title = snDraw.Game.Zones.PlayerZone[0].Zone_FabObjs[1];
+	var bottommost_word_px = ClientZone_Title.top + ClientZone_Title.height;
+	for(var i = 0; i < Client_Words_Grps.length; i++){
+	    var beneath_word_px = Client_Words_Grps[i].getTop() + snDraw.Game.tileSpacings.ts * 1.4;
+	    bottommost_word_px = Math.max(bottommost_word_px, beneath_word_px);
+	}
+
+	var toast_top = bottommost_word_px;//CP.y_next_word + (no_words ? 0 : snDraw.Game.v_spacer + DIM * 0.25) + DIM * 0.25;
+
+	for(var i = 0; i < this.ToastRolling.length; i++){
 	    var ExistingToastObj = this.ToastDictionary[this.ToastRolling[i]];
 	    //trap it in the loop by reverting i to zero until it escapes interference with any other Toasts...
 	    var Toast_i_top = ExistingToastObj.top;
