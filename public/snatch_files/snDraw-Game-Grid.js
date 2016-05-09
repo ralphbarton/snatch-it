@@ -189,10 +189,14 @@ snDraw.Game.Grid = {
 	//get to a row with space
 	row = 0;
 	while(true){
+	    //the philosophy here 'col' refers to an empty column in the row of the grid we have reached so far, and so
+	    //long as it is undefined, this means that no empty cell has been found.
 	    var col = undefined;
 	    var c_count = 0;
 	    while(col == undefined){//gets an empty column
-		if(this.TileGrid[row][c_count] === undefined){
+		// winge: why can't we just choose one of 'undefined' and 'null' to refer to unused locations in the array,
+		// and one of == and === for tests like this, and stick to some defined convention and improve code elegance???
+		if((this.TileGrid[row][c_count] === undefined)||(this.TileGrid[row][c_count] === null)){
 		    col = c_count;
 		}
 		c_count++;

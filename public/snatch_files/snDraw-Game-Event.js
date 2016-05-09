@@ -157,7 +157,11 @@ snDraw.Game.Event = {
 	console.log("words_used_list = " + JSON.stringify(words_used_list));
 
 	// 2. Firstly, on the canvas, detach all the letters involved in the new word
-	// also update underlying data to reflect the state update (i.e. updates "tileset" and "players")
+	// also update underlying data to reflect the state update (i.e. updates "tileset" and "players[i].words")
+
+	// 2.05. before mutating the data, this is the time to determine it it is "snatcher first word"
+	var client_is_snatcher = client_player_index == snatching_player.index;
+	var snatcher_first_word = snatching_player.words.length == 0;
 
 	// 2.1 Detach all tile objects from the words they're in
 	for (var i = 0; i < words_used_list.length; i++){
@@ -205,13 +209,10 @@ snDraw.Game.Event = {
 	//removal. This includes animation.
 	snDraw.Game.Grid.DetachLetterSetFromGrid(tile_indices, snDraw.ani.sty_Resize);
 
-
-	// 3. Zone Handling upon Snatch
-	var client_is_snatcher = client_player_index == snatching_player.index;
-	var snatcher_first_word = snatching_player.words.length == 0;
-
 	// 2.2 update the players data structure:
 	snatching_player.words.push(tile_indices);
+
+	// 3. Zone Handling upon Snatch
 
 	var new_zone = (!client_is_snatcher) && (snatcher_first_word);
 

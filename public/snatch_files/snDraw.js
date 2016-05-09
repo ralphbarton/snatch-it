@@ -28,19 +28,19 @@ var snDraw = {
 	},
 	sty_Sing: {
 	    easing: fabric.util.ease.easeOutQuart,
-	    duration: 200
+	    duration: 350
 	},
 	sty_Resize: {
 	    easing: fabric.util.ease.easeInOutCubic,
-	    duration: 1000
+	    duration: 1500
 	},
 	sty_Boot: {
 	    easing: fabric.util.ease.easeInCubic,
-	    duration: 1000
+	    duration: 700
 	},
 	sty_Join: {
 	    easing: fabric.util.ease.easeOutCubic,
-	    duration: 1000
+	    duration: 700
 	}
     },
     

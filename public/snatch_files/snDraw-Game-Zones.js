@@ -485,7 +485,7 @@ snDraw.Game.Zones = {
 	    titlepad: Tx * 10, // effectively, the indentation of the title	
 	    fontsize: Tx * 7, // refers to the font of the title
 	    fonthalfheight: Tx * 4, // refers to the offset between top of font and top surface of box
-	    w_vpad: Tx * 2.8, // vertical padding between top of word tiles and lower inside edge of box border
+	    w_vpad: Tx * 3.8, // vertical padding between top of word tiles and lower inside edge of box border
 	    you_w: Tx * 20, // scaling of the block saying "you"
 	    you_h: Tx * 10, // scaling of the block saying "you"
 	    you_fontsize: Tx * 9,
