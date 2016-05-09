@@ -42,7 +42,6 @@ snDraw.Game.Event = {
 	};
 
 	// 5.2 Add all players who who (A) have words, (B) aren't client and (C) aren't disconnected.
-	// Potentially add Unclaimed Zone
 	snDraw.Game.Zones.Unclaimed.playerslist = [];
 	snDraw.Game.Zones.Unclaimed.exists = false;
 	for (var i=0; i<players.length; i++){
@@ -52,7 +51,7 @@ snDraw.Game.Event = {
 			player: players[i],
 			is_client: false
 		    });
-		}else{
+		}else{//code within here creates the container for the unclaimed zone
 		    snDraw.Game.Zones.Unclaimed.exists = true;
 		    snDraw.Game.Zones.Unclaimed.playerslist.push(players[i]);
 		}
@@ -64,48 +63,41 @@ snDraw.Game.Event = {
 
 	// 7. Drawing the zones on the canvas, and moving the words into them...
 
-	// 7.1 Define a function which draws a zone filled with words on screen...
-	function generateZoneAndMoveWordsOnCanvas(Top, Height, ZoneProperties, WordGroup, WordArrangement_noH){
-
-	    var Zone_FabObjs = snDraw.Game.Zones.CreateNewZoneBoxOnCanvas(Top, Height, ZoneProperties);
-
-	    // place the words in the zone
-	    var Arrangement = snDraw.Game.Words.WordArrangementSetHeight(WordArrangement_noH, ZoneProperties.WordBounds, Top);
-	    for (var j = 0; j < Arrangement.coords.length; j++){
-		snDraw.moveSwitchable(WordGroup[j], false, null, Arrangement.coords[j]);
-	    }
-
-	    return Zone_FabObjs;
-	}
-
-	// 7.2 if an "unclaimed words zone" exists, then make this first.
+	// 7.1 if an "unclaimed words zone" exists, then make this first.
 	if(snDraw.Game.Zones.Unclaimed.exists){
 
-	    var FAB = generateZoneAndMoveWordsOnCanvas(Positions.Unclaimed_D.Top,
-						       Positions.Unclaimed_D.Height,
-						       snDraw.Game.Zones.getZoneProperties("unclaimed"),
-						       snDraw.Game.Words.getUnclaimedWordsList("via Grp"),
-						       Positions.Unclaimed_D.Arrangement_noH
-						      );
+	    var Top = Positions.Unclaimed_D.Top;
+	    var Height = Positions.Unclaimed_D.Height;
+	    var ZoneProperties = snDraw.Game.Zones.getZoneProperties("unclaimed");
+	    var WordGroup = snDraw.Game.Words.getUnclaimedWordsList("via Grp");
+	    var Arrangement_noH = Positions.Unclaimed_D.Arrangement_noH;
 
-	    //store a reference to the fabric ojects that make the zone box on the canvas
+	    // 7.2.1 Make the unclaimed zone box itself
+	    var FAB = snDraw.Game.Zones.CreateNewZoneBoxOnCanvas(Top, Height, ZoneProperties);
 	    snDraw.Game.Zones.Unclaimed.Zone_FabObjs = FAB;
+
+	    // 7.2.2 Put unclaimed words into arrangement
+	    snDraw.Game.Words.MoveWordsIntoArrangement(Top, ZoneProperties.WordBounds, WordGroup, Arrangement_noH);
 	}
 	
 
-	// 7.3 Now make all of the player zones.
+	// 7.2 Now make all of the player zones.
 	for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
+
 	    var player_index = snDraw.Game.Zones.PlayerZone[i].player.index;
 
-	    var FAB = generateZoneAndMoveWordsOnCanvas(Positions.ZoneSizes[i].Top,
-						       Positions.ZoneSizes[i].Height,
-						       snDraw.Game.Zones.getZoneProperties(i),
-						       snDraw.Game.Words.TileGroupsArray[player_index],
-						       Positions.ArrangementsArray_noH[i]
-						      );
+	    var Top = Positions.ZoneSizes[i].Top;
+	    var Height = Positions.ZoneSizes[i].Height;
+	    var ZoneProperties = snDraw.Game.Zones.getZoneProperties(i);
+	    var WordGroup = snDraw.Game.Words.TileGroupsArray[player_index];
+	    var Arrangement_noH = Positions.ArrangementsArray_noH[i];
 
-	    //store a reference to the fabric ojects that make the zone box on the canvas
-	    snDraw.Game.Zones.PlayerZone[i].Zone_FabObjs = FAB;
+	    // 7.2.1 Make the unclaimed zone box itself
+	    var FAB = snDraw.Game.Zones.CreateNewZoneBoxOnCanvas(Top, Height, ZoneProperties);
+	    snDraw.Game.Words.MoveWordsIntoArrangement(Top, WordBounds, WordGroup, WordArrangement_noH);
+
+	    // 7.2.2 Put unclaimed words into arrangement
+	    snDraw.Game.Words.MoveWordsIntoArrangement(Top, ZoneProperties.WordBounds, WordGroup, Arrangement_noH);
 	}
     },
     
@@ -152,9 +144,8 @@ snDraw.Game.Event = {
 	var client_is_snatcher = client_player_index == player_index;
 	if(client_is_snatcher){snDraw.Game.Spell.CancelWord();}
 
-	// 1.1 (log some data relevant to the SNATCH event. TODO: convert to Toasts)
-	console.log("TOAST: " + snatching_player.name + " has snatched a word, tile indices are:", tile_indices);    
-	console.log("words_used_list = " + JSON.stringify(words_used_list));
+	// 1.1 Toast to clarify what just got snatched (todo: this needs to be words).
+	snDraw.Game.Toast.showToast(snatching_player.name + " has snatched a word, tile indices are:", tile_indices);
 
 	// 2. Firstly, on the canvas, detach all the letters involved in the new word
 	// also update underlying data to reflect the state update (i.e. updates "tileset" and "players[i].words")
@@ -287,16 +278,47 @@ snDraw.Game.Event = {
 
 	//finally, animate the snatching of the snatched word...
 	var word_index = snatching_player.words.length - 1;
-	console.log("word_index", word_index);
-	console.log("target coords", Arrangement.coords[word_index]);
 	snDraw.Game.Words.AnimateWordCapture(snatching_player.index,
 					     word_index,
 					     Arrangement.coords[word_index]
 					    );
     },
 
-    Disconnection: function(){
-	return null;
+    Disconnection: function(player_index){
+
+	console.log("Player disconnetion message recieved, with player_index="+player_index);
+	var dis_plr = players[player_index];
+	dis_plr.is_disconnected = true;
+
+	snDraw.Game.Toast.showToast(dis_plr.name + " disconnected");
+
+	// An "Unclaimed Zone" will exist by the end of this function call, but does it exist at the beginning?
+	var unclaimed_zone_isNew = !snDraw.Game.Zones.Unclaimed.exists;
+	snDraw.Game.Zones.Unclaimed.exists = true;
+	snDraw.Game.Zones.Unclaimed.playerslist.push(players[i]);
+	
+
+
+	// Now that its existance is asserted via the zone containers, we can calculate all positions...
+
+	//at this point, physically create the zone on Canvas if necessary
+	if(unclaimed_zone_isNew){
+
+
+	    snDraw.Game.Zones.Unclaimed.exists = true;
+	    var FAB = generateZoneAndMoveWordsOnCanvas(0,// dummy 'Top'
+						       0,// dummy 'Height'
+						       snDraw.Game.Zones.getZoneProperties("unclaimed"),
+						       snDraw.Game.Words.getUnclaimedWordsList("via Grp"),
+						       undefined //this will surely fail: Dummy Arrangement_noH
+						      );
+
+	    //store a reference to the fabric ojects that make the zone box on the canvas
+	    snDraw.Game.Zones.Unclaimed.Zone_FabObjs = FAB;
+	}
+
+
+
     },
     
     Reconnection: function(){

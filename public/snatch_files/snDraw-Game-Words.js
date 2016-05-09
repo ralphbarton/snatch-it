@@ -186,6 +186,17 @@ snDraw.Game.Words = {
     },
 
 
+    MoveWordsIntoArrangement: function(Top, WordBounds, WordGroup, WordArrangement_noH, ani_sty){
+	// place the words in the zone
+	var Arrangement = this.WordArrangementSetHeight(WordArrangement_noH, WordBounds, Top);
+	// note the difference between "WordGroup.length" and "Arrangement.coords.length".
+	// The first excludes and animating new word which isn't yet formed into a Group.
+	for (var j = 0; j < WordGroup.length; j++){
+	    snDraw.moveSwitchable(WordGroup[j], false, null, Arrangement.coords[j]);
+	}
+    },
+
+
     AnimateWordCapture: function(player_index, word_index, Coords){
 	var Spacings = snDraw.Game.tileSpacings;
 	var word_length = players[player_index].words[word_index].length;

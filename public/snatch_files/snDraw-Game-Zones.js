@@ -738,10 +738,10 @@ snDraw.Game.Zones = {
 	    var WordGroup = snDraw.Game.Words.getUnclaimedWordsList("via Grp");
 	}
 
+	snDraw.Game.Words.MoveWordsIntoArrangement(Top, WordBounds, WordGroup, WordArrangement_noH, ani_sty);
+
 	var Arrangement = snDraw.Game.Words.WordArrangementSetHeight(WordArrangement_noH, ZoneProperties.WordBounds, Top);
 	// (i) move each word to the new location.
-	// note the difference between "WordGroup.length" and "Arrangement.coords.length".
-	// The first excludes and animating new word which isn't yet formed into a Group.
 	for (var j = 0; j < WordGroup.length; j++){
 	    snDraw.moveSwitchable(WordGroup[j], true, ani_sty, Arrangement.coords[j]);
 	}

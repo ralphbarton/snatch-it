@@ -99,15 +99,8 @@ socket.on('player wants reset', function(player_index){
     socket.emit('agree to reset', resetAssent);	
 });
 
-
 socket.on('player disconnected', function(player_index){
-    var dis_plr = players[player_index];
-    dis_plr.is_disconnected = true;
-
-    console.log("TOAST: " + dis_plr.name + " disconnected");
-
-    console.log("this message needs to be replace with additional code to handle this event...");
-
+    snDraw.Game.Event.Disconnection(player_index);
 });
 
 //this is message to Tell me that Alex has said "Reset" - inform of another players decision
