@@ -191,8 +191,9 @@ snDraw.Game.Words = {
 	var Arrangement = this.WordArrangementSetHeight(WordArrangement_noH, WordBounds, Top);
 	// note the difference between "WordGroup.length" and "Arrangement.coords.length".
 	// The first excludes and animating new word which isn't yet formed into a Group.
-	for (var j = 0; j < WordGroup.length; j++){
-	    snDraw.moveSwitchable(WordGroup[j], false, null, Arrangement.coords[j]);
+	var B_animation = (ani_sty == null);
+	for (var i = 0; i < WordGroup.length; i++){
+	    snDraw.moveSwitchable(WordGroup[i], B_animation, ani_sty, Arrangement.coords[i]);
 	}
     },
 

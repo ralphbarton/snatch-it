@@ -76,8 +76,8 @@ snDraw.Game.Event = {
 	    var FAB = snDraw.Game.Zones.CreateNewZoneBoxOnCanvas(Top, Height, ZoneProperties);
 	    snDraw.Game.Zones.Unclaimed.Zone_FabObjs = FAB;
 
-	    // 7.2.2 Put unclaimed words into arrangement
-	    snDraw.Game.Words.MoveWordsIntoArrangement(Top, ZoneProperties.WordBounds, WordGroup, Arrangement_noH);
+	    // 7.2.2 Put unclaimed words into arrangement (no animation)
+	    snDraw.Game.Words.MoveWordsIntoArrangement(Top, ZoneProperties.WordBounds, WordGroup, Arrangement_noH, null);
 	}
 	
 
@@ -94,10 +94,10 @@ snDraw.Game.Event = {
 
 	    // 7.2.1 Make the unclaimed zone box itself
 	    var FAB = snDraw.Game.Zones.CreateNewZoneBoxOnCanvas(Top, Height, ZoneProperties);
-	    snDraw.Game.Words.MoveWordsIntoArrangement(Top, WordBounds, WordGroup, WordArrangement_noH);
+	    snDraw.Game.Zones.PlayerZone[i].Zone_FabObjs = FAB;
 
-	    // 7.2.2 Put unclaimed words into arrangement
-	    snDraw.Game.Words.MoveWordsIntoArrangement(Top, ZoneProperties.WordBounds, WordGroup, Arrangement_noH);
+	    // 7.2.2 Put unclaimed words into arrangement (no animation)
+	    snDraw.Game.Words.MoveWordsIntoArrangement(Top, ZoneProperties.WordBounds, WordGroup, Arrangement_noH, null);
 	}
     },
     
@@ -293,30 +293,38 @@ snDraw.Game.Event = {
 	snDraw.Game.Toast.showToast(dis_plr.name + " disconnected");
 
 	// An "Unclaimed Zone" will exist by the end of this function call, but does it exist at the beginning?
-	var unclaimed_zone_isNew = !snDraw.Game.Zones.Unclaimed.exists;
-	snDraw.Game.Zones.Unclaimed.exists = true;
-	snDraw.Game.Zones.Unclaimed.playerslist.push(players[i]);
+	var b_dis_plr_has_words = dis_plr.words.length > 0;
+	var b_new_unclaimed_zone = !snDraw.Game.Zones.Unclaimed.exists && b_dis_plr_has_words;
+	snDraw.Game.Zones.Unclaimed.exists = snDraw.Game.Zones.Unclaimed.exists || b_dis_plr_has_words;
+	snDraw.Game.Zones.Unclaimed.playerslist.push(dis_plr);
 	
-
-
 	// Now that its existance is asserted via the zone containers, we can calculate all positions...
+	// Get the positions and arrangements of everything...
+
+	/* PLEASE NOTE THAT THE FUNCTION BELOW DOES THE HUGE BULK OF THE WORK HERE */
+	var unclaimed_excl_param = b_new_unclaimed_zone ? "unclaimed" : null;
+	var Positions = snDraw.Game.Zones.AnimateResizeAllZones(snDraw.ani.sty_Resize, unclaimed_excl_param);
 
 	//at this point, physically create the zone on Canvas if necessary
-	if(unclaimed_zone_isNew){
+	if(b_new_unclaimed_zone){
 
+	    // Unfortunately, the code below is copied and pasted...
+	    var Top = Positions.Unclaimed_D.Top;
+	    var Height = Positions.Unclaimed_D.Height;
+	    var ZoneProperties = snDraw.Game.Zones.getZoneProperties("unclaimed");
+	    var WordGroup = snDraw.Game.Words.getUnclaimedWordsList("via Grp");
+	    var Arrangement_noH = Positions.Unclaimed_D.Arrangement_noH;
 
-	    snDraw.Game.Zones.Unclaimed.exists = true;
-	    var FAB = generateZoneAndMoveWordsOnCanvas(0,// dummy 'Top'
-						       0,// dummy 'Height'
-						       snDraw.Game.Zones.getZoneProperties("unclaimed"),
-						       snDraw.Game.Words.getUnclaimedWordsList("via Grp"),
-						       undefined //this will surely fail: Dummy Arrangement_noH
-						      );
-
-	    //store a reference to the fabric ojects that make the zone box on the canvas
+	    // Make the unclaimed zone box itself
+	    var FAB = snDraw.Game.Zones.CreateNewZoneBoxOnCanvas(Top, Height, ZoneProperties);
 	    snDraw.Game.Zones.Unclaimed.Zone_FabObjs = FAB;
-	}
 
+	    // Put unclaimed words into arrangement (no animation)
+	    snDraw.Game.Words.MoveWordsIntoArrangement(Top, ZoneProperties.WordBounds, WordGroup, Arrangement_noH, null);
+
+	    //Finally, animate in the NEW unclaimed box:
+	    snDraw.Game.Zones.InOutAnimateZoneBox(snDraw.Game.Zones.Unclaimed, snDraw.ani.sty_Resize, "entry", "right");
+	}
 
 
     },

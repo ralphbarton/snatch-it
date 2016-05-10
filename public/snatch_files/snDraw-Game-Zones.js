@@ -588,29 +588,29 @@ snDraw.Game.Zones = {
 	//note, ZoneSizes is an array: [{Top: , Height: }, {}, ...]
 
 	// 2. If present, move the unclaimed zone & its words
-	if(snDraw.Game.Zones.Unclaimed.exists){
-	    this.repositionZoneAndEnclWordsOnCanvas(snDraw.Game.Zones.Unclaimed,
-						    Positions.Unclaimed_D.Arrangement_noH,
-						    Positions.Unclaimed_D.Top,
-						    Positions.Unclaimed_D.Height,
-						    this.getZoneProperties("unclaimed"),	
-						    ani_sty
-						   );
-	}
+	// note that if the unclaimed zone is excluded from resize, the entire step of:
+	// (a) animating the zone changing to the new size
+	// (b) animating the words into new positions
+	// is omitted altogther. this is because distinct animations are required for words and zone (the come together)
 
+	// by constrast a player zone, if new, always starts has zero words in it at the point this function is called
+	if(exclude_this_zone_by_i !== "unclaimed"){
+	    if(snDraw.Game.Zones.Unclaimed.exists){
+
+		this.repositionZoneAndEnclWordsOnCanvas(snDraw.Game.Zones.Unclaimed,
+							Positions.Unclaimed_D.Arrangement_noH,
+							Positions.Unclaimed_D.Top,
+							Positions.Unclaimed_D.Height,
+							this.getZoneProperties("unclaimed"),	
+							ani_sty
+						       );
+	    }
+	}
 
 	// 4. Now move all of the player zones, and their contained words
 	for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
 
-	    //don't use animation if a zone is for exclusion...
-	    var pz_ani_sty = ani_sty;
-	    if(typeof(exclude_this_zone_by_i)=="number"){
-		if(i == exclude_this_zone_by_i){
-		    pz_ani_sty = null;
-		}
-	    }
-
-	    var pz_ani_sty = (i == exclude_this_zone_by_i) ? null : ani_sty;
+	    var pz_ani_sty = (exclude_this_zone_by_i == i) ? null : ani_sty;
 	    this.repositionZoneAndEnclWordsOnCanvas(snDraw.Game.Zones.PlayerZone[i],
 						    Positions.ArrangementsArray_noH[i],
 						    Positions.ZoneSizes[i].Top,
@@ -619,6 +619,7 @@ snDraw.Game.Zones = {
 						    pz_ani_sty
 						   );
 	}
+
 	
 	//return the array: [{Top: , Height: }, {}, ...] for all zones
 	return Positions;
@@ -738,14 +739,10 @@ snDraw.Game.Zones = {
 	    var WordGroup = snDraw.Game.Words.getUnclaimedWordsList("via Grp");
 	}
 
-	snDraw.Game.Words.MoveWordsIntoArrangement(Top, WordBounds, WordGroup, WordArrangement_noH, ani_sty);
-
-	var Arrangement = snDraw.Game.Words.WordArrangementSetHeight(WordArrangement_noH, ZoneProperties.WordBounds, Top);
 	// (i) move each word to the new location.
-	for (var j = 0; j < WordGroup.length; j++){
-	    snDraw.moveSwitchable(WordGroup[j], true, ani_sty, Arrangement.coords[j]);
-	}
+	snDraw.Game.Words.MoveWordsIntoArrangement(Top, ZoneProperties.WordBounds, WordGroup, WordArrangement_noH, ani_sty);
     },
+
 
     getZoneProperties: function(zone_index){
 	// 7.2 - retrieve style information, for both player and unclaimed zones
