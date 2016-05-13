@@ -4,7 +4,6 @@ snDraw.Game.Words = {
     TileGroupsArray: [],
 
 
-
     //this is my most complex function, it uses recursion to achieve a letter-by-letter animation.
     drawSingleCapturedWord: function(myplayer, word_index, animate){
 	var x_plotter = myplayer.x_next_word;
@@ -191,7 +190,7 @@ snDraw.Game.Words = {
 	var Arrangement = this.WordArrangementSetHeight(WordArrangement_noH, WordBounds, Top);
 	// note the difference between "WordGroup.length" and "Arrangement.coords.length".
 	// The first excludes and animating new word which isn't yet formed into a Group.
-	var B_animation = (ani_sty == null);
+	var B_animation = (ani_sty != null);
 	for (var i = 0; i < WordGroup.length; i++){
 	    snDraw.moveSwitchable(WordGroup[i], B_animation, ani_sty, Arrangement.coords[i]);
 	}

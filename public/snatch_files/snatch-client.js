@@ -52,19 +52,10 @@ socket.on('full game state transmission', function(gameState){
 
 });//end of function to load game data
 
-socket.on('player has joined game', function(newPlayer){
-    
-    newPlayer.index = players.length;//take the length prior to pushing incorporates -1
-
-    //DO NOT FORGET, upon addition of a new player, to modify their data structure accordingly.
-    snDraw.Game.Words.TileGroupsArray[newPlayer.index]=[];//correctly create empty container
-    players.push(newPlayer);
-
-    //Don't need to redraw screen here. New player won't actually have any words (makes no visible difference)
-    console.log("TOAST: " + newPlayer.name + " has joined the game");
-
+//player joins game
+socket.on('player has joined game', function(player_object){
+    snDraw.Game.Event.Connection(player_object);
 });
-
 
 
 //when a new tile is sent from the server...

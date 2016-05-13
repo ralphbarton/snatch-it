@@ -178,5 +178,26 @@ snDraw.Game = {
 	else if(to_state=="shadow"){
 	    myTile.setOpacity(0.40);
 	}
+    },
+
+    TileArray_to_LettersArray: function(TileArray){
+	//get the letter set
+	var letters_array = [];
+	for(var i = 0; i < TileArray.length; i++){
+	    letters_array.push(TileArray[i].letter);
+	}
+	return letters_array;
+    },
+
+    TileIDArray_to_LettersString: function(TileIDArray){
+	//get the letter set
+	var letters_string = "";
+	for(var i = 0; i < TileIDArray.length; i++){
+	    var myTile = this.TileArray[TileIDArray[i]];
+	    letters_string += myTile.letter;
+	}
+	return letters_string;
     }
+
+
 };

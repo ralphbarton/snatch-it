@@ -144,15 +144,13 @@ snDraw.Game.Event = {
 	var client_is_snatcher = client_player_index == player_index;
 	if(client_is_snatcher){snDraw.Game.Spell.CancelWord();}
 
-	// 1.1 Toast to clarify what just got snatched (todo: this needs to be words).
-	snDraw.Game.Toast.showToast(snatching_player.name + " has snatched a word, tile indices are:", tile_indices);
-
 	// 2. Firstly, on the canvas, detach all the letters involved in the new word
 	// also update underlying data to reflect the state update (i.e. updates "tileset" and "players[i].words")
 
 	// 2.05. before mutating the data, this is the time to determine it it is "snatcher first word"
 	var client_is_snatcher = client_player_index == snatching_player.index;
 	var snatcher_first_word = snatching_player.words.length == 0;
+	var words_used_list_as_strings = [];
 
 	// 2.1 Detach all tile objects from the words they're in
 	for (var i = 0; i < words_used_list.length; i++){
@@ -161,6 +159,8 @@ snDraw.Game.Event = {
 
 	    //modify the players data structure:
 	    var removed_word_tileIDs = players[PIi].words[WIi];
+	    words_used_list_as_strings.push(snDraw.Game.TileIDArray_to_LettersString(removed_word_tileIDs));
+
 	    delete players[PIi].words[WIi];//just delete the array element now, purge the array of empy elements later
 
 	    //determine the group coordinates...
@@ -282,7 +282,30 @@ snDraw.Game.Event = {
 					     word_index,
 					     Arrangement.coords[word_index]
 					    );
+
+	// [xx] Toast to clarify what just got snatched
+	// this code generates an English sentance describing what just happened
+	// (add player's names??)
+	var snatched_word_str = snDraw.Game.TileIDArray_to_LettersString(tile_indices);
+	if(words_used_list_as_strings.length == 0){
+	    var ss_ee = ".";
+	}else if(words_used_list_as_strings.length == 1){
+	    var ss_ee = " taking the word " + words_used_list_as_strings[0];
+	}else if(words_used_list_as_strings.length > 1){
+	    var ss_ee = " by combining words ";
+	    var n_words = words_used_list_as_strings.length;
+	    for(var i = 0; i < n_words; i++){
+		ss_ee += words_used_list_as_strings;
+		if(i < (n_words-1)){
+		    ss_ee += ", ";
+		}else{
+		    ss_ee += ".";
+		}
+	    }
+	}
+	snDraw.Game.Toast.showToast(snatching_player.name + " has snatched the word " + snatched_word_str + ss_ee);
     },
+
 
     Disconnection: function(player_index){
 
@@ -290,7 +313,7 @@ snDraw.Game.Event = {
 	var dis_plr = players[player_index];
 	dis_plr.is_disconnected = true;
 
-	snDraw.Game.Toast.showToast(dis_plr.name + " disconnected");
+	snDraw.Game.Toast.showToast(dis_plr.name + " left");
 
 	// An "Unclaimed Zone" will exist by the end of this function call, but does it exist at the beginning?
 	var b_dis_plr_has_words = dis_plr.words.length > 0;
@@ -325,12 +348,18 @@ snDraw.Game.Event = {
 	    //Finally, animate in the NEW unclaimed box:
 	    snDraw.Game.Zones.InOutAnimateZoneBox(snDraw.Game.Zones.Unclaimed, snDraw.ani.sty_Resize, "entry", "right");
 	}
-
-
     },
     
-    Reconnection: function(){
+    Connection: function(player_object){
 
+	player_object.index = players.length;//take the length prior to pushing incorporates -1
+
+	//DO NOT FORGET, upon addition of a new player, to modify their data structure accordingly.
+	snDraw.Game.Words.TileGroupsArray[player_object.index]=[];//correctly create empty container
+	players.push(player_object);
+
+	//Add colour or something??
+	snDraw.Game.Toast.showToast(player_object.name + " joined");
     },
 
     resizeTimeoutID: undefined,

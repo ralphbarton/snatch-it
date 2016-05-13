@@ -41,11 +41,7 @@ snDraw.Game.Spell = {
     //for when tile size is changed.
     redrawResizedSpell: function(){
 
-	//get the letter set
-	var letters_array = [];
-	for(var i=0; i < this.SkeletalLetters.length; i++){
-	    letters_array.push(this.SkeletalLetters[i].letter);
-	}
+	var letters_array = snDraw.Game.TileArray_to_LettersArray(this.SkeletalLetters);
 
 	//remove all existing letters
 	for(var i=0; i < letters_array.length; i++){
@@ -163,10 +159,7 @@ snDraw.Game.Spell = {
 	if(this.SkeletalLetters.length<3){
 	    N_valid_moves = 0;//no valid moves involves fewer than 3 letters
 	}else{
-    	    var letters_array = [];
-	    for(var i=0; i < this.SkeletalLetters.length; i++){
-		letters_array.push(this.SkeletalLetters[i].letter);
-	    }
+	    var letters_array = snDraw.Game.TileArray_to_LettersArray(this.SkeletalLetters);
 	    var AssemblyData = Assembler.synthesiseSnatch(letters_array,true);
 	    var best_i_in_ASM = AssemblyData ? AssemblyData.best_i : undefined;
 
@@ -191,9 +184,8 @@ snDraw.Game.Spell = {
 		snDraw.Game.Toast.showToast("Words must be 3 letters or more");
 		return null;
 	    }
-	    for(var i=0; i < this.SkeletalLetters.length; i++){
-		letters_array.push(this.SkeletalLetters[i].letter);
-	    }
+	    var letters_array = snDraw.Game.TileArray_to_LettersArray(this.SkeletalLetters);
+
 	}else{//construct the letters array from user prompt...
 	    var snatch_string = prompt("Enter Word:");
 	    snatch_string = snatch_string.toUpperCase();
