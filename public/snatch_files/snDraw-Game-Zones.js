@@ -768,7 +768,15 @@ snDraw.Game.Zones = {
 		WordBounds: this.ZoneSty1.WordBlockBounds
 	    };
 	}
-    }
+    },
 
+
+    getZoneIndexOfPlayer: function(player_index){
+	for(var i = 0; i < this.PlayerZone.length; i++){
+	    if(this.PlayerZone[i].player.index == player_index){
+		return i;
+	    }
+	}
+    }
 
 };
