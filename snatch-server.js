@@ -24,6 +24,8 @@ module.exports = function (nTiles){
 	    var ci = playerDetails.color_index;
 	    var col = fiveColorsSent_socketKey[socket_key].cols[ci];
 	    
+	    var rPID = playerDetails.reclaiming_player_index;
+
 	    //return the unused colours to the list...
 	    if(fiveColorsSent_socketKey[socket_key].restore){
 		for(var i=0; i<5; i++){
@@ -33,17 +35,23 @@ module.exports = function (nTiles){
 	    }
 
 	    delete fiveColorsSent_socketKey[socket_key];
-
-	    var newPlayer = {
-		name : nm,
-		color : col,
-		words : [],
-		agrees_to_reset: false,
-		is_disconnected: false,
-		socket_key: socket_key
-	    };
-	    playerSet.push(newPlayer);
-	    player_index_from_socketKey_lkup[socket_key] = playerSet.length-1;
+	    
+	    if(rPID === undefined){
+		var newPlayer = {
+		    name : nm,
+		    color : col,
+		    words : [],
+		    agrees_to_reset: false,
+		    is_disconnected: false,
+		    socket_key: socket_key
+		};
+		playerSet.push(newPlayer);
+		player_index_from_socketKey_lkup[socket_key] = playerSet.length-1;
+	    }else{
+		playerSet[rPID].is_disconnected = false;
+		playerSet[rPID].socket_key = socket_key;
+		player_index_from_socketKey_lkup[socket_key] = rPID;
+	    }
 	},
 
 	removePlayer: function(socket_key) {

@@ -6,12 +6,14 @@ snDraw.Splash = {
     textObject_main: undefined,
     ringZoneTopPx: undefined,
     name_validated: false,
+    players_t: undefined,
 
-    triggerPromptScreen: function(colorChoices){
+    triggerPromptScreen: function(colorSet, players_t){
 	
 	//set the global objects
-	this.myFiveColors = colorChoices;
-	
+	this.myFiveColors = colorSet;
+	this.players_t = players_t;
+
 	//up until this point the canvas is transparent...
 	canvas.setBackgroundColor('white');
 
@@ -82,7 +84,34 @@ snDraw.Splash = {
 
     namePrompt: function(){
 	this.player_name = prompt("What is your name?");
-	this.name_validated = (this.player_name != null) && (this.player_name.length != 0);
+	var valid_str = (this.player_name != null) && (this.player_name.length != 0);
+
+	this.name_validated = valid_str;
+	if(valid_str){
+	    for(var i = 0; i < this.players_t.length; i++){
+		if (this.player_name == this.players_t[i].name){
+		    if(this.players_t[i].is_disconnected){
+			var X = confirm("A player \""+this.player_name+"\" was in this game but lost their session. They had "+this.players_t[i].words.length+" words. Reclaim now?");
+			if(X){
+			    //We have all the information needed...
+			    var rPID = this.reclaiming_player_index; 
+			    var playerDetailsObj = {
+				name: "As Before",
+				color_index: 999,
+				reclaiming_player_index: i
+			    };
+			    PLAYER_JOINED_WITH_DETAILS(playerDetailsObj);
+			}else{
+		    	    this.name_validated = false;
+			}	
+		    }else{
+			alert("There is already a player \""+this.player_name+"\" active in the game. Please choose a different name");
+			this.name_validated = false;
+		    }
+		}
+	    }
+	}
+
 	if (this.name_validated){
 	    this.renderPromptScreen();
 	}
@@ -215,7 +244,8 @@ snDraw.Splash = {
 	    //send the data to the server
 	    var playerDetailsObj = {
 		name: snDraw.Splash.player_name,
-		color_index: snDraw.Splash.BB_chosen_was
+		color_index: snDraw.Splash.BB_chosen_was,
+		reclaiming_player_index: undefined
 	    };
 	    PLAYER_JOINED_WITH_DETAILS(playerDetailsObj);
 	};

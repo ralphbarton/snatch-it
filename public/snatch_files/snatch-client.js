@@ -11,13 +11,16 @@ var dev = true;
 
 //initialise the Canvas
 
-socket.emit('player joining game', 0);
+socket.emit('client page load', 0);
 
-socket.on('player color choices', function(colorSet){
+socket.on('player color choices', function(msg_obj){
     snDraw.initialiseCanvas();
     snDraw.makeCanvasFitWholeWindow();
+
     //the colour set is an array with objects <fabric color>, length 5
-    snDraw.Splash.triggerPromptScreen(colorSet);
+    var colorSet = msg_obj.color_choice;
+    var players_t = msg_obj.players_t;
+    snDraw.Splash.triggerPromptScreen(colorSet, players_t);
 });
 
 
