@@ -722,6 +722,9 @@ snDraw.Game.Zones = {
 		snDraw.moveSwitchable(BoxObjs[i], function(){canvas.remove(BoxObjs[i]);}, ani_sty, offScreen_location);
 	    }
 	}
+
+	//
+	BoxObjs[1].bringForward();//so that Player Name shows above the line..
     },
 
 
