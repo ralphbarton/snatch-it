@@ -3,6 +3,8 @@ snDraw.Game.Toast = {
     ToastCounter: 0,//create an integer_key for each toast
     ToastDictionary: {},//for each toast's unique integer_key, hold the reference to its fabric object if this exists.
     ToastRolling: [],//rolling buffer (length up to 3 - tbc) holding the integer_key's for the dictionary above.
+    ToastTop_consumed_words: 0,
+    ToastTop_snatched_word: 0,
 
     boundDimention: function(value, px_total, frac){
 	if(frac.max != undefined){
@@ -49,15 +51,21 @@ snDraw.Game.Toast = {
 
 	//code here is to determine the vertical position of the toast
 	// start it at its highest potential position
-	var Client_Words_Grps = snDraw.Game.Words.TileGroupsArray[client_player_index];
 	var ClientZone_Title = snDraw.Game.Zones.PlayerZone[0].Zone_FabObjs[1];
-	var bottommost_word_px = ClientZone_Title.top + ClientZone_Title.height;
-	for(var i = 0; i < Client_Words_Grps.length; i++){
-	    var beneath_word_px = Client_Words_Grps[i].getTop() + snDraw.Game.tileSpacings.ts * 1.4;
-	    bottommost_word_px = Math.max(bottommost_word_px, beneath_word_px);
-	}
+	var toast_top = ClientZone_Title.top + ClientZone_Title.height;
 
-	var toast_top = bottommost_word_px;//CP.y_next_word + (no_words ? 0 : snDraw.Game.v_spacer + DIM * 0.25) + DIM * 0.25;
+	var Client_Words_Grps = snDraw.Game.Words.TileGroupsArray[client_player_index];
+
+	var ToastTop_current_client_words = 0;
+        for(var i = 0; i < Client_Words_Grps.length; i++){
+	    ToastTop_current_client_words = Math.max(ToastTop_current_client_words, Client_Words_Grps[i].getTop());
+        }
+
+
+	toast_top = Math.max(this.ToastTop_consumed_words + snDraw.Game.tileSpacings.ts * 1.4,
+			     this.ToastTop_snatched_word +  snDraw.Game.tileSpacings.ts * 1.4,
+			     ToastTop_current_client_words +  snDraw.Game.tileSpacings.ts * 1.4,
+			     toast_top);
 
 	for(var i = 0; i < this.ToastRolling.length; i++){
 	    var ExistingToastObj = this.ToastDictionary[this.ToastRolling[i]];
@@ -95,7 +103,7 @@ snDraw.Game.Toast = {
 	this.ToastDictionary[t_key] = ToastObj;
 	this.ToastRolling.push(t_key);
 	
-	var toast_duration = 1800;
+	var toast_duration = 3600;
 	setTimeout(function(){
 
 	    //update data structures

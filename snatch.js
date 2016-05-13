@@ -53,12 +53,14 @@ io.on('connection', function(socket){
 	var dis_pl_i = myGame.playerIndexFromSocket(socket.id);
 	//does a player with this socket ID still exist in the server's list anyway?
 
-	socket.broadcast.emit('player disconnected',dis_pl_i);
-	myGame.removePlayer(socket.id);
-
-	console.log('Player ' + dis_pl_i + ' disconnected (socket.id = ' + socket.id + ')');
+	if(dis_pl_i !== undefined){
+	    socket.broadcast.emit('player disconnected',dis_pl_i);
+	    myGame.removePlayer(socket.id);
+	    console.log('Player ' + dis_pl_i + ' disconnected (socket.id = ' + socket.id + ')');
+	}else{
+	    console.log('A websocket connection not associated with a player was closed (socket.id = ' + socket.id + ')');
+	}
     });
-
 
 
     //this is the first message a client will send...

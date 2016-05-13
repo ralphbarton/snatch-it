@@ -152,6 +152,9 @@ snDraw.Game.Event = {
 	var snatcher_first_word = snatching_player.words.length == 0;
 	var words_used_list_as_strings = [];
 
+	//the 'top' coordinate of the lowest (on-screen) consumed word of the client player...
+	snDraw.Game.Toast.ToastTop_consumed_words = 0;
+
 	// 2.1 Detach all tile objects from the words they're in
 	for (var i = 0; i < words_used_list.length; i++){
 	    var PIi = words_used_list[i].PI;
@@ -159,14 +162,21 @@ snDraw.Game.Event = {
 
 	    //modify the players data structure:
 	    var removed_word_tileIDs = players[PIi].words[WIi];
-	    words_used_list_as_strings.push(snDraw.Game.TileIDArray_to_LettersString(removed_word_tileIDs));
 
+	    // Take this opportunity of running through consumed words to generate them as a list of strings...
+	    words_used_list_as_strings.push(snDraw.Game.TileIDArray_to_LettersString(removed_word_tileIDs));
 	    delete players[PIi].words[WIi];//just delete the array element now, purge the array of empy elements later
 
 	    //determine the group coordinates...
 	    var StolenGRP = snDraw.Game.Words.TileGroupsArray[PIi][WIi];	    
 	    var Stolen_x_base = StolenGRP.getLeft(); 
 	    var Stolen_y_base = StolenGRP.getTop(); 
+
+	    // Take this opportunity of running through consumed word Groups to retain coordinates.
+	    // Part of the Toast Height Calc algorithm (Part A)
+	    if(PIi == client_player_index){
+	       snDraw.Game.Toast.ToastTop_consumed_words = Math.max(snDraw.Game.Toast.ToastTop_consumed_words, Stolen_y_base);  
+	    }
 
 	    //remove tiles from Group, and place in position as individual tiles:
 	    for (var j=0; j<removed_word_tileIDs.length; j++){
@@ -184,6 +194,7 @@ snDraw.Game.Event = {
 	    canvas.remove(StolenGRP);
 	    delete snDraw.Game.Words.TileGroupsArray[PIi][WIi];
 	}
+
 	// Remove the all references to Fabric Groups which are now empty of letter tiles, and words removed from raw data
 	for (var i = 0; i < players.length; i++){
 	    snDraw.Game.Words.TileGroupsArray[i].clean(undefined);
@@ -274,13 +285,23 @@ snDraw.Game.Event = {
 	var sp_Top = Positions.ZoneSizes[snatching_player_zone_index].Top;
 	var PlayerZoneProperties = snDraw.Game.Zones.getZoneProperties("player");
 
-	var Arrangement = snDraw.Game.Words.WordArrangementSetHeight(sp_Arrangement_noH, PlayerZoneProperties.WordBounds, sp_Top);
+	// get the arrangement of the Snatching player, in final position...
+	var sp_Arrangement = snDraw.Game.Words.WordArrangementSetHeight(sp_Arrangement_noH, PlayerZoneProperties.WordBounds, sp_Top);
+
+	// Part of the Toast Height Calc algorithm (Part C)
+	var snWo_top = 0;
+	if(client_is_snatcher){
+	    for(var i = 0; i < sp_Arrangement.coords.length; i++){
+		snWo_top = Math.max(snWo_top, sp_Arrangement.coords[i].top);
+	    }
+	}
+	snDraw.Game.Toast.ToastTop_snatched_word = snWo_top;
 
 	//finally, animate the snatching of the snatched word...
 	var word_index = snatching_player.words.length - 1;
 	snDraw.Game.Words.AnimateWordCapture(snatching_player.index,
 					     word_index,
-					     Arrangement.coords[word_index]
+					     sp_Arrangement.coords[word_index]
 					    );
 
 	// [xx] Toast to clarify what just got snatched
