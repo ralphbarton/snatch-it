@@ -608,6 +608,7 @@ snDraw.Game.Zones = {
 	}
 
 	// 4. Now move all of the player zones, and their contained words
+	var PlayerZoneProps = this.getZoneProperties("player");
 	for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
 
 	    var pz_ani_sty = (exclude_this_zone_by_i == i) ? null : ani_sty;
@@ -615,12 +616,30 @@ snDraw.Game.Zones = {
 						    Positions.ArrangementsArray_noH[i],
 						    Positions.ZoneSizes[i].Top,
 						    Positions.ZoneSizes[i].Height,
-						    this.getZoneProperties("player"),
+						    PlayerZoneProps,
 						    pz_ani_sty
 						   );
 	}
 
-	
+	// 5. Some side effect code to Alter where Toasts are positioned....
+
+	// 5.1 Set a Toast max-height parameter using the Final Zone position...
+	var Client_Zone_Size = Positions.ZoneSizes[0];
+	snDraw.Game.Toast.ToastTop_zone_inner_final = Client_Zone_Size.Top + PlayerZoneProps.ZoneSty.fontsize;	
+
+	// 5.2 set another Toast max-height parameter using the final word arrangement.
+	var cli_Arrangement_noH = Positions.ArrangementsArray_noH[0];
+	var pzwb = PlayerZoneProps.WordBounds;
+	var cli_Arrangement = snDraw.Game.Words.WordArrangementSetHeight(cli_Arrangement_noH, pzwb, Client_Zone_Size.Top);
+	var cli_coords = cli_Arrangement.coords;
+
+	var ToastTop_client_words = 0;
+        for(var i = 0; i < cli_coords.length; i++){
+	    ToastTop_client_words = Math.max(ToastTop_client_words, cli_coords[i].top);
+        }
+	snDraw.Game.Toast.ToastTop_client_words_final = ToastTop_client_words;
+
+
 	//return the array: [{Top: , Height: }, {}, ...] for all zones
 	return Positions;
     },

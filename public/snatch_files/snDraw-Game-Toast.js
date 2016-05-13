@@ -5,6 +5,15 @@ snDraw.Game.Toast = {
     ToastRolling: [],//rolling buffer (length up to 3 - tbc) holding the integer_key's for the dictionary above.
     ToastTop_consumed_words: 0,
     ToastTop_snatched_word: 0,
+    ToastTop_client_words_final: 0,
+    ToastTop_zone_inner_final: 0,
+
+    reset_ToastTop_params: function(){
+	this.ToastTop_consumed_words = 0;
+	this.ToastTop_snatched_word = 0;
+	this.ToastTop_zone_inner_final = 0;
+	this.ToastTop_client_words_final = 0;
+    },
 
     boundDimention: function(value, px_total, frac){
 	if(frac.max != undefined){
@@ -52,7 +61,7 @@ snDraw.Game.Toast = {
 	//code here is to determine the vertical position of the toast
 	// start it at its highest potential position
 	var ClientZone_Title = snDraw.Game.Zones.PlayerZone[0].Zone_FabObjs[1];
-	var toast_top = ClientZone_Title.top + ClientZone_Title.height;
+	var ToastTop_current_client_zone_top = ClientZone_Title.top + ClientZone_Title.height;
 
 	var Client_Words_Grps = snDraw.Game.Words.TileGroupsArray[client_player_index];
 
@@ -62,10 +71,13 @@ snDraw.Game.Toast = {
         }
 
 
-	toast_top = Math.max(this.ToastTop_consumed_words + snDraw.Game.tileSpacings.ts * 1.4,
-			     this.ToastTop_snatched_word +  snDraw.Game.tileSpacings.ts * 1.4,
-			     ToastTop_current_client_words +  snDraw.Game.tileSpacings.ts * 1.4,
-			     toast_top);
+	var toast_top = Math.max(this.ToastTop_consumed_words + snDraw.Game.tileSpacings.ts * 1.4,
+				 this.ToastTop_snatched_word + snDraw.Game.tileSpacings.ts * 1.4,
+				 this.ToastTop_zone_inner_final,
+				 this.ToastTop_client_words_final + snDraw.Game.tileSpacings.ts * 1.4,
+				 ToastTop_current_client_words +  snDraw.Game.tileSpacings.ts * 1.4,
+				 ToastTop_current_client_zone_top);
+	this.reset_ToastTop_params();
 
 	for(var i = 0; i < this.ToastRolling.length; i++){
 	    var ExistingToastObj = this.ToastDictionary[this.ToastRolling[i]];

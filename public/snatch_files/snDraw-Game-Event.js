@@ -330,10 +330,9 @@ snDraw.Game.Event = {
 	var dis_plr = players[player_index];
 	dis_plr.is_disconnected = true;
 
-	// An "Unclaimed Zone" will exist by the end of this function call, but does it exist at the beginning?
-	var b_dis_plr_has_words = dis_plr.words.length > 0;
+	// An "Unclaimed Zone" may exist by the end of this function call, but does it exist at the beginning?
 
-	if(b_dis_plr_has_words){// non-zero words of Disconnecting player is the condition for removing their zone
+	if(dis_plr.words.length > 0){// non-zero words of Disconnecting player is the condition for removing their zone
 
 	    var dis_plr_zone_index = snDraw.Game.Zones.getZoneIndexOfPlayer(player_index);
 
@@ -341,38 +340,38 @@ snDraw.Game.Event = {
 	    var dis_zone = snDraw.Game.Zones.PlayerZone.splice(dis_plr_zone_index,1)[0];
 	    snDraw.Game.Zones.InOutAnimateZoneBox(dis_zone, snDraw.ani.sty_Boot, "exit", "bottom");
 
-	}
+	    var b_new_unclaimed_zone = !snDraw.Game.Zones.Unclaimed.exists;
+	    snDraw.Game.Zones.Unclaimed.exists = true;
+	    snDraw.Game.Zones.Unclaimed.playerslist.push(dis_plr);
+	    
+	    // Now that its existance is asserted via the zone containers, we can calculate all positions...
+	    // Get the positions and arrangements of everything...
 
-	var b_new_unclaimed_zone = !snDraw.Game.Zones.Unclaimed.exists && b_dis_plr_has_words;
-	snDraw.Game.Zones.Unclaimed.exists = snDraw.Game.Zones.Unclaimed.exists || b_dis_plr_has_words;
-	snDraw.Game.Zones.Unclaimed.playerslist.push(dis_plr);
-	
-	// Now that its existance is asserted via the zone containers, we can calculate all positions...
-	// Get the positions and arrangements of everything...
+	    /* PLEASE NOTE THAT THE FUNCTION BELOW DOES THE HUGE BULK OF THE WORK HERE */
+	    var unclaimed_excl_param = b_new_unclaimed_zone ? "unclaimed" : null;
+	    var Positions = snDraw.Game.Zones.AnimateResizeAllZones(snDraw.ani.sty_Resize, unclaimed_excl_param);
 
-	/* PLEASE NOTE THAT THE FUNCTION BELOW DOES THE HUGE BULK OF THE WORK HERE */
-	var unclaimed_excl_param = b_new_unclaimed_zone ? "unclaimed" : null;
-	var Positions = snDraw.Game.Zones.AnimateResizeAllZones(snDraw.ani.sty_Resize, unclaimed_excl_param);
+	    //at this point, physically create the zone on Canvas if necessary
+	    if(b_new_unclaimed_zone){
 
-	//at this point, physically create the zone on Canvas if necessary
-	if(b_new_unclaimed_zone){
+		// Unfortunately, the code below is copied and pasted...
+		var Top = Positions.Unclaimed_D.Top;
+		var Height = Positions.Unclaimed_D.Height;
+		var ZoneProperties = snDraw.Game.Zones.getZoneProperties("unclaimed");
+		var WordGroup = snDraw.Game.Words.getUnclaimedWordsList("via Grp");
+		var Arrangement_noH = Positions.Unclaimed_D.Arrangement_noH;
 
-	    // Unfortunately, the code below is copied and pasted...
-	    var Top = Positions.Unclaimed_D.Top;
-	    var Height = Positions.Unclaimed_D.Height;
-	    var ZoneProperties = snDraw.Game.Zones.getZoneProperties("unclaimed");
-	    var WordGroup = snDraw.Game.Words.getUnclaimedWordsList("via Grp");
-	    var Arrangement_noH = Positions.Unclaimed_D.Arrangement_noH;
+		// Make the unclaimed zone box itself
+		var FAB = snDraw.Game.Zones.CreateNewZoneBoxOnCanvas(Top, Height, ZoneProperties);
+		snDraw.Game.Zones.Unclaimed.Zone_FabObjs = FAB;
 
-	    // Make the unclaimed zone box itself
-	    var FAB = snDraw.Game.Zones.CreateNewZoneBoxOnCanvas(Top, Height, ZoneProperties);
-	    snDraw.Game.Zones.Unclaimed.Zone_FabObjs = FAB;
+		// Put unclaimed words into arrangement (use the 'Resize' animation stlye)
+		var wb = ZoneProperties.WordBounds;
+		snDraw.Game.Words.MoveWordsIntoArrangement(Top, wb, WordGroup, Arrangement_noH, snDraw.ani.sty_Resize);
 
-	    // Put unclaimed words into arrangement (no animation)
-	    snDraw.Game.Words.MoveWordsIntoArrangement(Top, ZoneProperties.WordBounds, WordGroup, Arrangement_noH, null);
-
-	    // Animate in the NEW unclaimed box:
-	    snDraw.Game.Zones.InOutAnimateZoneBox(snDraw.Game.Zones.Unclaimed, snDraw.ani.sty_Resize, "entry", "right");
+		// Animate in the NEW unclaimed box:
+		snDraw.Game.Zones.InOutAnimateZoneBox(snDraw.Game.Zones.Unclaimed, snDraw.ani.sty_Resize, "entry", "right");
+	    }
 	}
 
 	// Finally, show the Toast. By doing this last, it means that the Toast fits with Final Zone sizing.
