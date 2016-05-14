@@ -379,16 +379,34 @@ snDraw.Game.Event = {
 
     },
     
-    Connection: function(player_object){
+    Connection: function(player_join_details){
 
-	player_object.index = players.length;//take the length prior to pushing incorporates -1
+	console.log("Player Joining...", JSON.stringify(player_join_details));
 
-	//DO NOT FORGET, upon addition of a new player, to modify their data structure accordingly.
-	snDraw.Game.Words.TileGroupsArray[player_object.index]=[];//correctly create empty container
-	players.push(player_object);
+	var rejoining_player_index = player_join_details.rejoin_PID;
+	if (rejoining_player_index !== undefined){
+	    // a player is rejoining...
+	    var rej_plr = players[rejoining_player_index];
+	    rej_plr.is_disconnected = false;
+	    
+	    if(rej_plr.words.length > 0){// non-zero words of Reconnecting player. Means a new player zone.
+		//may mean remove the unclaimed zone.
+		console.log("Additional code needed to handle the player rejoin with words Event...");
+	    }
 
-	//Add colour or something??
-	snDraw.Game.Toast.showToast(player_object.name + " joined");
+	}else{
+	    // a new player is joining...
+	    var player_object = player_join_details.player_object;
+	    player_object.index = players.length;//take the length prior to pushing incorporates -1
+
+	    //DO NOT FORGET, upon addition of a new player, to modify their data structure accordingly.
+	    snDraw.Game.Words.TileGroupsArray[player_object.index]=[];//correctly create empty container
+	    players.push(player_object);
+
+	    //Add colour or something??
+	    snDraw.Game.Toast.showToast(player_object.name + " joined");
+
+	}
     },
 
     resizeTimeoutID: undefined,
@@ -403,7 +421,6 @@ snDraw.Game.Event = {
 	    canvas.clear();
 	    snDraw.makeCanvasFitWholeWindow();
 	    snDraw.Game.Event.DrawAll();
-	    console.log("Toast: A window resize was executed");
 	    snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
 	}, 1000);
     }

@@ -89,15 +89,14 @@ snDraw.Splash = {
 	this.name_validated = valid_str;
 	if(valid_str){
 	    for(var i = 0; i < this.players_t.length; i++){
-		if (this.player_name == this.players_t[i].name){
+
+		if (this.player_name.toUpperCase() == this.players_t[i].name.toUpperCase()){
 		    if(this.players_t[i].is_disconnected){
 			var X = confirm("A player \""+this.player_name+"\" was in this game but lost their session. They had "+this.players_t[i].words.length+" words. Reclaim now?");
 			if(X){
 			    //We have all the information needed...
 			    var rPID = this.reclaiming_player_index; 
 			    var playerDetailsObj = {
-				name: "As Before",
-				color_index: 999,
 				reclaiming_player_index: i
 			    };
 			    PLAYER_JOINED_WITH_DETAILS(playerDetailsObj);

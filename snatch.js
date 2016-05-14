@@ -55,8 +55,9 @@ io.on('connection', function(socket){
 
 	if(dis_pl_i !== undefined){
 	    socket.broadcast.emit('player disconnected',dis_pl_i);
+	    var dis_pl_name = myGame.getPlayerObject(socket.id).name;
 	    myGame.removePlayer(socket.id);
-	    console.log('Player ' + dis_pl_i + ' disconnected (socket.id = ' + socket.id + ')');
+	    console.log('Player ' + dis_pl_i + ' (' + dis_pl_name + ') disconnected (socket.id = ' + socket.id + ')');
 	}else{
 	    console.log('A websocket connection not associated with a player was closed (socket.id = ' + socket.id + ')');
 	}
@@ -95,7 +96,13 @@ io.on('connection', function(socket){
 	socket.emit('full game state transmission', gameObj);//now just transmit to the new player
 	
 	//new joiner to the rest of the players
-	socket.broadcast.emit('player has joined game', myGame.getPlayerObject(socket.id) );
+	var rPID = details_obj.reclaiming_player_index;
+	if(rPID !== undefined){
+	    var player_join_details = {rejoin_PID: rPID};
+	}else{
+	    var player_join_details = {player_object: myGame.getPlayerObject(socket.id), rejoin_PID: undefined};
+	}
+	socket.broadcast.emit('player has joined game', player_join_details);
     });
 
     socket.on('reset request', function (blank_msg){

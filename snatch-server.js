@@ -20,23 +20,26 @@ module.exports = function (nTiles){
     //this is the collection of externally callable functions
     return{
 	addPlayer: function(playerDetails,socket_key) {//todo implement this
-	    var nm = playerDetails.name;
-	    var ci = playerDetails.color_index;
-	    var col = fiveColorsSent_socketKey[socket_key].cols[ci];
-	    
+
 	    var rPID = playerDetails.reclaiming_player_index;
-
-	    //return the unused colours to the list...
-	    if(fiveColorsSent_socketKey[socket_key].restore){
-		for(var i=0; i<5; i++){
-		    if(i == ci){continue;}
-		    my_color_palette.push(fiveColorsSent_socketKey[socket_key].cols[i]);
-		}
-	    }
-
-	    delete fiveColorsSent_socketKey[socket_key];
-	    
 	    if(rPID === undefined){
+
+		var FiveCols = fiveColorsSent_socketKey[socket_key];
+		if(FiveCols !== undefined){
+		    var ci = playerDetails.color_index;
+		    var col = FiveCols.cols[ci];
+
+		    //return the unused colours to the list...
+		    if(fiveColorsSent_socketKey[socket_key].restore){
+			for(var i=0; i<5; i++){
+			    if(i == ci){continue;}
+			    my_color_palette.push(fiveColorsSent_socketKey[socket_key].cols[i]);
+			}
+		    }
+		    delete fiveColorsSent_socketKey[socket_key];
+		}
+
+		var nm = playerDetails.name;
 		var newPlayer = {
 		    name : nm,
 		    color : col,
@@ -83,13 +86,10 @@ module.exports = function (nTiles){
 	},
 
 	getGameObject: function() {
-	    //in this case we are performing a deep copy of data, hence the use of the JSON function
-	    var playerSet_clone = JSON.parse(JSON.stringify(playerSet));
 
-	    //remove some server-side only attributes of the player objects before transmission...
-	    for (var i=0; i < playerSet_clone.length; i++){
-		delete playerSet_clone[i].agrees_to_reset;
-		delete playerSet_clone[i].socket_key;
+	    var playerSet_clone = [];
+	    for (var i=0; i < playerSet.length; i++){
+		playerSet_clone.push(this.getPlayerObject(i));
 	    }
 	    var turned_tiles = tileSet.slice(0,next_unturned_tile_i);
 	    var tile_stats = {n_tiles: tileSet.length, n_turned: next_unturned_tile_i};
@@ -101,8 +101,13 @@ module.exports = function (nTiles){
 	},
 
 	getPlayerObject: function(socket_key) {
-	    var PI = player_index_from_socketKey_lkup[socket_key];
-	    return playerSet[PI];
+	    // if socket key is actually a number (i.e. an array index), use it to index the player directly
+	    var PI = typeof(socket_key) == "number" ? socket_key : player_index_from_socketKey_lkup[socket_key];
+	    //in this case we are performing a deep copy of data, hence the use of the JSON function
+	    var player_clone = JSON.parse(JSON.stringify(playerSet[PI]));
+	    delete player_clone.agrees_to_reset;
+	    delete player_clone.socket_key;
+	    return player_clone;
 	},
 
 	getPlayerNameBySocket: function(socket_key) {

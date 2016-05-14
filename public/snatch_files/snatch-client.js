@@ -56,8 +56,8 @@ socket.on('full game state transmission', function(gameState){
 });//end of function to load game data
 
 //player joins game
-socket.on('player has joined game', function(player_object){
-    snDraw.Game.Event.Connection(player_object);
+socket.on('player has joined game', function(player_join_details){
+    snDraw.Game.Event.Connection(player_join_details);
 });
 
 
