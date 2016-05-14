@@ -39,7 +39,7 @@ var snDraw = {
 	    duration: 700
 	},
 	sty_Join: {
-	    easing: fabric.util.ease.easeOutCubic,
+	    easing: fabric.util.ease.easeInCubic,//easeOutCubic, //formerly OUT, this is an experiement...
 	    duration: 700
 	}
     },

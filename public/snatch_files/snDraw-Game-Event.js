@@ -124,7 +124,7 @@ snDraw.Game.Event = {
 
 	// 3. If necessary, squeeze everything downwards.
 	if(zone_resize_necesary){
-	    snDraw.Game.Zones.AnimateResizeAllZones(snDraw.ani.sty_Resize, null, null);
+	    snDraw.Game.Zones.AnimateResizeAllZones(snDraw.ani.sty_Resize, null);
 	}
 
 	// 4. Modify the "Turn Letter" button, based upon who turned the tile (start timer or cancel timer)
@@ -139,21 +139,18 @@ snDraw.Game.Event = {
 
     SnatchEvent: function(player_index, tile_indices, words_used_list){
 
-	// 1. Clear the Spell if it is the Client Snatching (this also sets some useful variables that are used in-among).
+	// 1. Clear the Spell if it is the Client Snatching. Set some variables used in this script.
 	var snatching_player = players[player_index];
 	var client_is_snatcher = client_player_index == player_index;
 	if(client_is_snatcher){snDraw.Game.Spell.CancelWord();}
-
-	// 2. Firstly, on the canvas, detach all the letters involved in the new word
-	// also update underlying data to reflect the state update (i.e. updates "tileset" and "players[i].words")
-
-	// 2.05. before mutating the data, this is the time to determine it it is "snatcher first word"
 	var client_is_snatcher = client_player_index == snatching_player.index;
 	var snatcher_first_word = snatching_player.words.length == 0;
-	var words_used_list_as_strings = [];
 
-	//the 'top' coordinate of the lowest (on-screen) consumed word of the client player...
-	snDraw.Game.Toast.ToastTop_consumed_words = 0;
+
+	// 2. Tile Detachment (from existing words & fresh). Tile & Words data structure update (incl. "tileset", "players[i].words")
+
+	var words_used_list_as_strings = []; // This is for generating the string-text of the toast explaining the SNATCH
+	snDraw.Game.Toast.ToastTop_consumed_words = 0;// this is to initiate 'top' coord for consumed words of client player...
 
 	// 2.1 Detach all tile objects from the words they're in
 	for (var i = 0; i < words_used_list.length; i++){
@@ -201,21 +198,22 @@ snDraw.Game.Event = {
 	    players[i].words.clean(undefined);
 	}
 
-	// 2.3 update tileset for letters now In Words, and detach any letters in grid (i.e. the Fabric Objects)
+	// 2.2 update tileset for letters now In Words, and detach any letters in grid (i.e. the Fabric Objects)
 	for(var i = 0; i < tile_indices.length; i++){
 	    var TID = tile_indices[i];
 	    tileset[TID].status = 'inword';
 	}
-	//note that there is handling in-place for when a tile index in the array we supply here is not actually in the grid.
-	//note also that this function will rearrange the tiles that remain in the grid, for efficient packing following the
-	//removal. This includes animation.
+
+	// 2.3 Detach tiles and animate compacting of the remainder
+	//note, function CAN cope when 'tile_indices' includes tiles not in grid. Animated rearrange (packing eff.) will follow removal
 	snDraw.Game.Grid.DetachLetterSetFromGrid(tile_indices, snDraw.ani.sty_Resize);
 
-	// 2.2 update the players data structure:
+	// 2.4 update the players data structure:
 	snatching_player.words.push(tile_indices);
 
-	// 3. Zone Handling upon Snatch
 
+
+	// 3. Zone Handling upon Snatch = add/remove zones, unclaimed zone handling, and the animated reshuffle.
 	var new_zone = (!client_is_snatcher) && (snatcher_first_word);
 
 	// 3.1 Create a new zone container, and additionally create the new zone on the canvas.
@@ -230,7 +228,6 @@ snDraw.Game.Event = {
 	    var NewZoneProperties = snDraw.Game.Zones.getZoneProperties(new_zone_index);
 	    var FAB = snDraw.Game.Zones.CreateNewZoneBoxOnCanvas(0, 0, NewZoneProperties);//provide null data for Top, Height
 	    snDraw.Game.Zones.PlayerZone[new_zone_index].Zone_FabObjs = FAB;
-
 	}
 
 	// 3.2 Delete zones if required
@@ -240,22 +237,21 @@ snDraw.Game.Event = {
 	    //proceed to remove zone_i if (A) there are no words in the zone and (B) it's a non-client player
 	    if((zone_i.player.words.length == 0)&&(!zone_i.is_client)){
 		var empty_zone = snDraw.Game.Zones.PlayerZone.splice(i,1)[0];
-
 		//animate OUT the zone which is for removal
 		snDraw.Game.Zones.InOutAnimateZoneBox(empty_zone, snDraw.ani.sty_Boot, "exit", "bottom");
-
 		i--;//because we spliced, counteract the increment of i.
 	    }
 	}
 
-	// 3.25 Delete the Unclaimed Zone if required
+	// 3.3 Delete the Unclaimed Zone if required
 	var UnclaimedWordGroup = snDraw.Game.Words.getUnclaimedWordsList("via TID");
 	if((snDraw.Game.Zones.Unclaimed.exists)&&(UnclaimedWordGroup.length == 0)){
 	    snDraw.Game.Zones.InOutAnimateZoneBox(snDraw.Game.Zones.Unclaimed, snDraw.ani.sty_Resize, "exit", "right");
 	    snDraw.Game.Zones.Unclaimed.exists = false;
 	}
 
-	// 3.3 shift everything
+	// 3.4 Animate the zones into their squeezed positions + animate in the new zone.
+
 	// in terms of the exclusion parameters, two things to think about:
 	// (A) sometimes a new zone is created (never more than x1, and we don't want to animate its elements but do want to
 	// calculate its arrangement
@@ -274,17 +270,26 @@ snDraw.Game.Event = {
 	    snDraw.Game.Zones.InOutAnimateZoneBox(NewZone, snDraw.ani.sty_Join, "entry", "left");
 	}
 
-	// Determine the zone of the snatching player
-	var snatching_player_zone_index = snDraw.Game.Zones.getZoneIndexOfPlayer(snatching_player.index);
+	// 3.5 'wave effect' animation of taking the tiles that make up the snatch.
 
+	// This is all to extract the word arrangement of the snatching player
+	var snatching_player_zone_index = snDraw.Game.Zones.getZoneIndexOfPlayer(snatching_player.index);
 	var sp_Arrangement_noH = Positions.ArrangementsArray_noH[snatching_player_zone_index];
 	var sp_Top = Positions.ZoneSizes[snatching_player_zone_index].Top;
 	var PlayerZoneProperties = snDraw.Game.Zones.getZoneProperties("player");
-
-	// get the arrangement of the Snatching player, in final position...
 	var sp_Arrangement = snDraw.Game.Words.WordArrangementSetHeight(sp_Arrangement_noH, PlayerZoneProperties.WordBounds, sp_Top);
+	//finally, animate the snatching of the snatched word...
+	var word_index = snatching_player.words.length - 1;
+	snDraw.Game.Words.AnimateWordCapture(snatching_player.index,
+					     word_index,
+					     sp_Arrangement.coords[word_index]
+					    );
 
-	// Part of the Toast Height Calc algorithm (Part C)
+
+	// 4. Relating to Toasts
+
+	// 4.1 in the case where the client has snatched, use the final coordinates of all their words to dictate toast position
+	// (query: would it be better to do this wor all cases, i.e. client not involved in snatch??? TODO: check answer.)
 	var snWo_top = 0;
 	if(client_is_snatcher){
 	    for(var i = 0; i < sp_Arrangement.coords.length; i++){
@@ -293,15 +298,7 @@ snDraw.Game.Event = {
 	}
 	snDraw.Game.Toast.ToastTop_snatched_word = snWo_top;
 
-	//finally, animate the snatching of the snatched word...
-	var word_index = snatching_player.words.length - 1;
-	snDraw.Game.Words.AnimateWordCapture(snatching_player.index,
-					     word_index,
-					     sp_Arrangement.coords[word_index]
-					    );
-
-	// [xx] Toast to clarify what just got snatched
-	// this code generates an English sentance describing what just happened
+	// 4.2 A toast to descibe the snatch in English
 	// (add player's names??)
 	var snatched_word_str = snDraw.Game.TileIDArray_to_LettersString(tile_indices);
 	if(words_used_list_as_strings.length == 0){
@@ -379,9 +376,8 @@ snDraw.Game.Event = {
 
     },
     
+    // note that this event is not triggered when 'connecting' the client themself, it is always someone else.
     Connection: function(player_join_details){
-
-	console.log("Player Joining...", JSON.stringify(player_join_details));
 
 	var rejoining_player_index = player_join_details.rejoin_PID;
 	if (rejoining_player_index !== undefined){
@@ -389,9 +385,54 @@ snDraw.Game.Event = {
 	    var rej_plr = players[rejoining_player_index];
 	    rej_plr.is_disconnected = false;
 	    
-	    if(rej_plr.words.length > 0){// non-zero words of Reconnecting player. Means a new player zone.
-		//may mean remove the unclaimed zone.
-		console.log("Additional code needed to handle the player rejoin with words Event...");
+	    if(rej_plr.words.length > 0){// non-zero words of Reconnecting player. Means a new player zone (A).
+		//may mean remove the unclaimed zone (B).
+
+		//////UNFORTUNATELY, MUCH OF the code below (i.e. next 25 lines or so) is copied from Section 3. of the snatch event //
+
+		//Create a new zone container
+		snDraw.Game.Zones.PlayerZone.push({
+		    player: rej_plr,
+		    is_client: false
+		});
+
+		// create the new zone on the canvas
+		var new_zone_index = snDraw.Game.Zones.PlayerZone.length-1; 
+		var NewZoneProperties = snDraw.Game.Zones.getZoneProperties(new_zone_index);
+		var FAB = snDraw.Game.Zones.CreateNewZoneBoxOnCanvas(0, 0, NewZoneProperties);//null data for Top, Height
+		snDraw.Game.Zones.PlayerZone[new_zone_index].Zone_FabObjs = FAB;
+
+		//remove the rejoined player from the list associated with the unclaimed zone...
+		var UL = snDraw.Game.Zones.Unclaimed.playerslist;
+		for(var i = 0; i < UL.length; i++){
+		    if(UL[i].index == rejoining_player_index){
+			UL.splice(i,1);//remove from list and discard this ref.
+		    }
+		}
+
+		// potentially delete Unclaimed Zone
+		var UnclaimedWordGroup = snDraw.Game.Words.getUnclaimedWordsList("via TID");
+		if((snDraw.Game.Zones.Unclaimed.exists)&&(UnclaimedWordGroup.length == 0)){
+		    snDraw.Game.Zones.InOutAnimateZoneBox(snDraw.Game.Zones.Unclaimed, snDraw.ani.sty_Resize, "exit", "right");
+		    snDraw.Game.Zones.Unclaimed.exists = false;
+		}
+
+		// squeeze & resize those zones...
+		var Positions = snDraw.Game.Zones.AnimateResizeAllZones(snDraw.ani.sty_Resize, new_zone_index);
+
+		// animate rejoining player's zone gliding in. (This has to happen after the resize all, which determines correct size.)
+		var NewZone = snDraw.Game.Zones.PlayerZone[new_zone_index];
+		snDraw.Game.Zones.InOutAnimateZoneBox(NewZone, snDraw.ani.sty_Join, "entry", "left");
+
+		// Also, animate all the reclaimed WORDS into the newly restored player box...
+		// Unfortunately, the code below is copied and pasted... TWICE!
+		var Top = Positions.ZoneSizes[new_zone_index].Top;
+		var Height = Positions.ZoneSizes[new_zone_index].Height;
+		var ZoneProperties = snDraw.Game.Zones.getZoneProperties(new_zone_index);
+		var WordGroup = snDraw.Game.Words.TileGroupsArray[rejoining_player_index];
+		var Arrangement_noH = Positions.ArrangementsArray_noH[new_zone_index];
+		var wb = ZoneProperties.WordBounds;
+		//snDraw.Game.Words.MoveWordsIntoArrangement(Top, wb, WordGroup, Arrangement_noH, snDraw.ani.sty_Resize);
 	    }
 
 	}else{

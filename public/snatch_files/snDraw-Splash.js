@@ -100,6 +100,8 @@ snDraw.Splash = {
 				reclaiming_player_index: i
 			    };
 			    PLAYER_JOINED_WITH_DETAILS(playerDetailsObj);
+			    //this is important, or leave it so that clicking will send a "player joined" even after splash screen...
+			    snDraw.Splash.removeKBmouseListeners();
 			}else{
 		    	    this.name_validated = false;
 			}	
@@ -220,7 +222,7 @@ snDraw.Splash = {
 
 	var onComplete_BBchosenReleased_animation = function(){
 
-	    snDraw.Splash.removeKBmouseListeners();	    
+	    snDraw.Splash.removeKBmouseListeners();
 
 	    var wait_str = "Waiting for server\nto send the state of the ongoing\nSNATCH-IT game...";
 	    var my_font_size = snDraw.canv_W * 0.055;
