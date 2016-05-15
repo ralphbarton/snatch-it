@@ -6,13 +6,9 @@ snDraw.Game.Mouse = {
 
     mDown: function (e) {
 
-	//for any click anywhere:
-	if(snDraw.Game.Controls.playersListWindowVisible){
-	    snDraw.Game.Controls.removePlayersListWindow();	//it's important this comes before the button handlers, or the window will get drawn then removed.
-	}
-
 	//Handle clicks landing on objects...
 	var targetObj = e.target;
+
 	if(targetObj !== undefined){
 
 	    //Handle clicks landing on tiles...

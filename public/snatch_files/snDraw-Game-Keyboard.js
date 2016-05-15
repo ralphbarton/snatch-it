@@ -41,9 +41,6 @@ snDraw.Game.Keyboard = {
 
 
 
-
-
-
 	if(snDraw.Game.Controls.playersListWindowVisible){
 	    snDraw.Game.Controls.removePlayersListWindow();	    
 	}else{
@@ -96,13 +93,11 @@ snDraw.Game.Keyboard = {
 	    }
 
 	    if(keyPressed == '8'){
-		var modal = document.getElementById('myModal');
-		modal.style.display = "block";
+		// no action, but keep in reserve for testing...
 	    }
 
 	    if(keyPressed == '7'){
-		var modal = document.getElementById('myModal');
-		modal.style.display = "none";
+		// no action, but keep in reserve for testing...
 	    }
 
 

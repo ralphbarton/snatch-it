@@ -1,21 +1,90 @@
 /* The Modal (background) */
-.modal {
+#modal_dark_sheet {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
     z-index: 1; /* Sit on top */
     left: 0;
     top: 0;
-    padding-top:200px;
+    padding-top: 25%;
     width: 100%; /* Full width */
     height: 100%; /* Full height */
-    background-color: rgba(22, 41, 40, 0.6); /* Black w/ opacity */
+    background-color: rgba(8, 23, 22, 0.8); /* Black w/ opacity */
     text-align: center;
 }
 
-.modal-content {
+#modal-content {
     margin: auto;
     position: relative;
-    background-color: grey;
-    border: 1px solid #888;
-    width: 50%;
+    background-color: #888;
+    display: inline-block;
+    width: auto;
+}
+
+
+
+#modal-header 
+{
+    background-color: #AAA;
+    padding: 2%;
+/*    border: 2px solid #FFF;*/
+    color: black;
+}
+
+#box-title{
+    font-size: 100%;
+    font-weight: bold;
+}
+
+/* The Close X only */
+#close {
+    margin-top: -2.5%;
+    margin-right: 1%;
+    color: white;
+    float: right;
+    font-size: 100%;
+    font-weight: bold;
+}
+
+#close:hover,
+#close:focus {
+    color: red;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#modal-body {
+    padding: 2px 16px;
+    font-size: 65%;
+}
+
+table {
+    border-collapse: collapse;
+    width: auto;
+}
+
+th, td {
+    padding: 8px;
+    text-align: center;
+    border-bottom: 1px solid #666;
+}
+
+td.final {
+    border-bottom: none;
+}
+
+th{
+    color: rgba(0,0,0, 0.7); /* Black w/ opacity */
+}
+
+td.pl-name{
+    text-align: left;
+}
+
+td.pl-score{
+    font-size: 120%;
+}
+
+#modal-footer {
+    padding: 2px 16px;
+    font-size: 45%;
 }

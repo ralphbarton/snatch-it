@@ -386,37 +386,39 @@ snDraw.Game.Controls = {
 	}
     },
 
-
     createPlayersListWindow: function(){
-	
-	this.playersListWindowVisible = true;
 
-	var DIM = snDraw.Game.tileSize * 1.35;
-	var stroke_px = DIM * 0.1;
-	var myZoneSmaller = Math.min(snDraw.canv_W,snDraw.canv_H); 
-	var font_size =  myZoneSmaller * 0.030;
+	//decide on some dimentions relative to tile size...
+	var ts = Math.round(snDraw.Game.tileSpacings.ts);
+	var cr = ts * 0.43; // corner radius
+	var v_gap = ts * 6; // vertical gap between box and top
+	var fsz = ts *0.7; // master font size
+	var sh = ts * 0.025; // for use in dimentions for shadow...master font size
 
-	var windowWidth = myZoneSmaller*0.8;
+	// make it visible...
+	var dark_sheet = $("#modal_dark_sheet");
+	dark_sheet.css("display", "block");
 
-	var windowBox = new fabric.Rect({
-	    width: windowWidth,
-	    height: snDraw.canv_H - DIM * 0.7,
-	    fill: '#AAA',
-	    stroke: snDraw.Game.fg_col,
-	    strokeWidth: stroke_px,
-	    rx: DIM * 0.18,
-	    ry: DIM * 0.18
-	});
+	//set other style attributes from the Javascript...
+	dark_sheet.css("padding-top", v_gap+"px");
+	dark_sheet.css("padding-top", v_gap+"px");
+	dark_sheet.css("font-size", fsz+"px");
 
-	var titleText = new fabric.Text("Players listing and scores",{
-	    left: windowWidth * 0.105,
-	    top: DIM * 0.3,
-	    fill: 'black',
-	    fontWeight: 'bold',
-	    fontSize: font_size * 1.85
-	});
+	$("#modal-content").css("border-radius", cr+"px");
+	// this line approximates     box-shadow: 4px 8px 10px 10px rgba(0,0,0,0.6);
+	$("#modal-content").css("box-shadow", 4*sh+"px "+8*sh+"px "+10*sh+"px "+10*sh+"px rgba(0,0,0,0.6)");
 
-	var playerObjList = [];
+	$("#modal-header").css("border-radius", cr+"px "+cr+"px 0 0");
+
+	//code to manipulate inner HTML (due to lck of knowledge of JQuery, here plain javascript...
+	var doc = document;
+	var modal_body = doc.getElementById("modal-body");
+	modal_body.innerHTML = "";
+
+
+
+
+	///////////////////////COPIED///////////////////////
 	var player_scores_list = [];
 	//extact scores from players stat structure:
 	for(var i = 0; i < players.length; i++){
@@ -435,57 +437,73 @@ snDraw.Game.Controls = {
 	}
 	player_scores_list.sort(comparePlayers);
 	player_scores_list.reverse();
+	///////////////////////COPIED///////////////////////
 
-	//use the scores list to generate the visuals
-	for(var i=0; i<player_scores_list.length; i++){
-	    //run through all players...
+	var fragment = doc.createDocumentFragment();
+
+	//Just create the table headings...
+	var tr = doc.createElement("tr");
+	var th1 = doc.createElement("th");
+	th1.innerHTML = "Name";
+	tr.appendChild(th1);
+
+	var th2 = doc.createElement("th");
+	th2.innerHTML = "Score";
+	tr.appendChild(th2);
+
+	//does not trigger reflow
+	fragment.appendChild(tr);
+	
+	var n_psl = player_scores_list.length;
+	for(var i = 0; i < n_psl; i++){
+
 	    var Plr = players[player_scores_list[i].p_index];
 
-	    var playerText = new fabric.Text((i+1)+ ". " + Plr.name,{
-		fill: 'black',
-		fontSize: font_size * 1.5
-	    });
+	    var tr = doc.createElement("tr");
+	    var td1 = doc.createElement("td");
+	    td1.innerHTML = (i+1)+ ". " + Plr.name;
+	    td1.className = "pl-name" + (i == n_psl-1?" final":"");
+	    tr.appendChild(td1);
 
-	    var playerScoreText = new fabric.Text(player_scores_list[i].score.toString(), {
-		left: myZoneSmaller * 0.40,
-		stroke: 'black',
-		fontWeight: (i<3?800:100),
-		strokeWidth: font_size * 0.05,
-		fill: (i<3? Plr.color : 'black'),//only the high scoring players get their colour, top 3.
-		fontSize: font_size * 1.8
-	    });
+	    var td2 = doc.createElement("td");
+	    td2.innerHTML = player_scores_list[i].score.toString();
+	    tr.appendChild(td2);
+	    td2.className = "pl-score" + (i == n_psl-1?" final":"");
+	    td2.style["font-weight"] = (i<3?800:100);
+	    td2.style["color"] = (i<3? Plr.color : 'black');
+	    if(i<3){
+		td2.style["text-shadow"] = "0px 0px "+fsz*0.05+"px black, 0px 0px "+fsz*0.1+"px black";
+	    }
 
-
-	    var playerRowGrp = new fabric.Group([playerText, playerScoreText], {
-		left: font_size * 2,
-		top: font_size * (i+2.5) * 1.5
-	    });
-
-
-	    playerObjList[i] = playerRowGrp;
+	    //does not trigger reflow
+	    fragment.appendChild(tr);
 
 	}
 
-	var visuals = [windowBox, titleText].concat(playerObjList);
+	var table = doc.createElement("table");
+	table.appendChild(fragment);
+	modal_body.appendChild(table);
 
-	ScoresWindow = new fabric.Group( visuals, {
-	    hasControls: false,
-	    hasBorders: false,
-	    selectable: false,
-	    top: DIM * 0.3,
-	    left: (snDraw.canv_W - windowWidth)/2
-	});
+	var removeScores = function() {
+	    $("#modal_dark_sheet").css("display", "none");
+	};
 
-	canvas.add(ScoresWindow);
-	canvas.renderAll();
+	document.getElementById("close").onclick = function() {
+	    snDraw.Game.Controls.removePlayersListWindow();
+	};
+
+	var ds = document.getElementById("modal_dark_sheet");
+	ds.onclick = function(event) {
+	    if (event.target == ds) {
+		snDraw.Game.Controls.removePlayersListWindow();
+	    }
+	};
+
     },
 
     removePlayersListWindow: function(){
-	if(this.playersListWindowVisible){
-	    console.log("removing the scores window...");
-	    canvas.remove(ScoresWindow);
-	    snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
-	    this.playersListWindowVisible = false;
-	}
+	$("#modal_dark_sheet").css("display", "none");
     }
+
+
 };
