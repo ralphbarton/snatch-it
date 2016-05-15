@@ -723,7 +723,6 @@ snDraw.Game.Zones = {
 	    }
 	}
 
-	//
 	BoxObjs[1].bringForward();//so that Player Name shows above the line..
     },
 
@@ -762,7 +761,11 @@ snDraw.Game.Zones = {
 	}
 
 	// (i) move each word to the new location.
-	snDraw.Game.Words.MoveWordsIntoArrangement(Top, ZoneProperties.WordBounds, WordGroup, WordArrangement_noH, ani_sty);
+	// whilst (what can only be called a hack) is in place to allow object placement without animation from a former size,
+	// (so that an entry animation can be used instead) in such cases as these, word movement is not desired at all...
+	if(B_animation){
+	    snDraw.Game.Words.MoveWordsIntoArrangement(Top, ZoneProperties.WordBounds, WordGroup, WordArrangement_noH, ani_sty);
+	}
     },
 
 

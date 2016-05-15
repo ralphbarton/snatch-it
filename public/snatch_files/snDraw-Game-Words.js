@@ -193,6 +193,8 @@ snDraw.Game.Words = {
 	var B_animation = (ani_sty != null);
 	for (var i = 0; i < WordGroup.length; i++){
 	    snDraw.moveSwitchable(WordGroup[i], B_animation, ani_sty, Arrangement.coords[i]);
+	    // aggressively bring words to front, which ensures all clicks land on them (as well as aesthetic)
+	    WordGroup[i].bringToFront();
 	}
     },
 

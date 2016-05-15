@@ -267,7 +267,7 @@ snDraw.Game.Event = {
 	//animate the new zone coming in (this has to happen after the resize all, which determines correct size...)
 	if(new_zone){
 	    var NewZone = snDraw.Game.Zones.PlayerZone[new_zone_index];
-	    snDraw.Game.Zones.InOutAnimateZoneBox(NewZone, snDraw.ani.sty_Join, "entry", "left");
+	    snDraw.Game.Zones.InOutAnimateZoneBox(NewZone, snDraw.ani.sty_Resize, "entry", "left");// strictly, animate to "snDraw.ani.sty_Join"
 	}
 
 	// 3.5 'wave effect' animation of taking the tiles that make up the snatch.
@@ -432,7 +432,7 @@ snDraw.Game.Event = {
 		var WordGroup = snDraw.Game.Words.TileGroupsArray[rejoining_player_index];
 		var Arrangement_noH = Positions.ArrangementsArray_noH[new_zone_index];
 		var wb = ZoneProperties.WordBounds;
-		//snDraw.Game.Words.MoveWordsIntoArrangement(Top, wb, WordGroup, Arrangement_noH, snDraw.ani.sty_Resize);
+		snDraw.Game.Words.MoveWordsIntoArrangement(Top, wb, WordGroup, Arrangement_noH, snDraw.ani.sty_Resize);
 	    }
 
 	}else{
