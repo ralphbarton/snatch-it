@@ -94,6 +94,18 @@ snDraw.Game.Keyboard = {
 	    if(keyPressed == '4'){
 		snDraw.Game.Controls.createPlayersListWindow();
 	    }
+
+	    if(keyPressed == '8'){
+		var modal = document.getElementById('myModal');
+		modal.style.display = "block";
+	    }
+
+	    if(keyPressed == '7'){
+		var modal = document.getElementById('myModal');
+		modal.style.display = "none";
+	    }
+
+
 	    /*
 	      if(myKeycode == 16){//shift key
 	      
