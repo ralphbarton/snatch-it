@@ -178,7 +178,6 @@ snDraw.Game.Controls = {
 	return buttonGrp;
     },
 
-
     updateTurnLetter_number: function(n_tiles_remaining){
 	var TurnButton = this.Button_Objs[1];
 	if(n_tiles_remaining>0){
@@ -370,7 +369,7 @@ snDraw.Game.Controls = {
 	}
     },
 
-
+    client_finished_game: false,
     turnLetterClickHandler: function(){
 	if(this.turnDisabled){
 	    console.log("TOAST: you must wait before you are allowed to take another turn. Number of seconds = [todo]");
@@ -380,18 +379,18 @@ snDraw.Game.Controls = {
 	    if(n_tiles_remaining>0){
 		TILE_TURN_REQUEST(); //request another tile...
 	    }else{
-		var really = confirm("Do you really want to finish the game?");
-		if(really){RESET_REQUEST();}
+		this.client_finished_game = true;
+		this.createPlayersListWindow();
+		
 	    }
 	}
     },
 
     createPlayersListWindow: function(){
 
-	//decide on some dimentions relative to tile size...
+	// 1. CSS style properties that must be determined using tile size...
 	var ts = Math.round(snDraw.Game.tileSpacings.ts);
 	var cr = ts * 0.43; // corner radius
-	var v_gap = ts * 6; // vertical gap between box and top
 	var fsz = ts *0.7; // master font size
 	var sh = ts * 0.025; // for use in dimentions for shadow...master font size
 
@@ -400,25 +399,17 @@ snDraw.Game.Controls = {
 	dark_sheet.css("display", "block");
 
 	//set other style attributes from the Javascript...
-	dark_sheet.css("padding-top", v_gap+"px");
-	dark_sheet.css("padding-top", v_gap+"px");
+	//dark_sheet.css("padding-top", v_gap+"px");
 	dark_sheet.css("font-size", fsz+"px");
 
 	$("#modal-content").css("border-radius", cr+"px");
 	// this line approximates     box-shadow: 4px 8px 10px 10px rgba(0,0,0,0.6);
 	$("#modal-content").css("box-shadow", 4*sh+"px "+8*sh+"px "+10*sh+"px "+10*sh+"px rgba(0,0,0,0.6)");
-
 	$("#modal-header").css("border-radius", cr+"px "+cr+"px 0 0");
+	$("#modal-footer").css("border-radius", "0 0 "+cr+"px "+cr+"px");
+	$("#modal-body").css("max-height", snDraw.canv_H * 0.8+"px");
 
-	//code to manipulate inner HTML (due to lck of knowledge of JQuery, here plain javascript...
-	var doc = document;
-	var modal_body = doc.getElementById("modal-body");
-	modal_body.innerHTML = "";
-
-
-
-
-	///////////////////////COPIED///////////////////////
+	// 3. Extract the data
 	var player_scores_list = [];
 	//extact scores from players stat structure:
 	for(var i = 0; i < players.length; i++){
@@ -437,8 +428,9 @@ snDraw.Game.Controls = {
 	}
 	player_scores_list.sort(comparePlayers);
 	player_scores_list.reverse();
-	///////////////////////COPIED///////////////////////
 
+	//code to manipulate inner HTML (due to lck of knowledge of JQuery, here plain javascript...
+	var doc = document;
 	var fragment = doc.createDocumentFragment();
 
 	//Just create the table headings...
@@ -482,11 +474,16 @@ snDraw.Game.Controls = {
 
 	var table = doc.createElement("table");
 	table.appendChild(fragment);
+
+	var modal_body = doc.getElementById("modal-body");
+	modal_body.innerHTML = "";
 	modal_body.appendChild(table);
 
-	var removeScores = function() {
-	    $("#modal_dark_sheet").css("display", "none");
-	};
+	$("#modal-footer").html("");
+	$("#modal-footer").append("<a href=\"#\" onclick=\"snDraw.Game.Controls.removePlayersListWindow()\">Close</a>");
+	if(this.client_finished_game == true){
+	    $("#modal-footer").append(" | <a href='/hardreset'>Another Game</a>");
+	}
 
 	document.getElementById("close").onclick = function() {
 	    snDraw.Game.Controls.removePlayersListWindow();

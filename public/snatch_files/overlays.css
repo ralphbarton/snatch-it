@@ -5,19 +5,19 @@
     z-index: 1; /* Sit on top */
     left: 0;
     top: 0;
-    padding-top: 25%;
     width: 100%; /* Full width */
     height: 100%; /* Full height */
     background-color: rgba(8, 23, 22, 0.8); /* Black w/ opacity */
-    text-align: center;
 }
 
 #modal-content {
-    margin: auto;
-    position: relative;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
     background-color: #888;
     display: inline-block;
     width: auto;
+    text-align: center;
 }
 
 
@@ -64,8 +64,8 @@ table {
 
 th, td {
     padding: 8px;
-    text-align: center;
     border-bottom: 1px solid #666;
+    white-space: nowrap;
 }
 
 td.final {
@@ -86,5 +86,14 @@ td.pl-score{
 
 #modal-footer {
     padding: 2px 16px;
-    font-size: 45%;
+    font-size: 55%;
+    padding: 5%;
+    background-color: #AAA;
+    white-space: nowrap;
+}
+
+a {
+    font-weight: bold;
+    color: black;
+    text-decoration: underline;
 }

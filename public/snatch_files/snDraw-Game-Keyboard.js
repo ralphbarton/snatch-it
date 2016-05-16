@@ -82,6 +82,8 @@ snDraw.Game.Keyboard = {
 	    if((myKeycode == 27)||(keyPressed == '1')){//escape key or number 1
 		// let this be cancel word
 		snDraw.Game.Spell.CancelWord();
+		//also removes score window if present...
+		snDraw.Game.Controls.removePlayersListWindow();
 	    }
 
 	    if(keyPressed == '2'){

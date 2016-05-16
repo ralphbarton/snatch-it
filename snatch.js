@@ -10,7 +10,8 @@ app.get('/', function(req, res){
 app.get('/hardreset', function(req, res){
     myGame = snatchSvr_factory(qty_tiles);//create a snatch game instance with 50 tiles...
     X = new Date();
-    res.send('Hard reset of the SNATCH server at ' + X);
+    Y = "<br/><br/> <a href=\"/\">Play SNATCH-IT</a>";
+    res.send('Hard reset of the SNATCH server at ' + X + Y);
 });
 
 
