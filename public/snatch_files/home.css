@@ -42,26 +42,26 @@ body {
     position: absolute;
     color: #9800C2;
     width: 98%;
-    top: 27%;
+    top: 29%;
 }
 
 #slogan2{
-    font-size: 120%;
-    margin-left: 10%;
+    font-size: 180%;
+    margin-left: 5%;
     position: absolute;
     top: 40%;
 }
 
 
 .button {
-    top: 60%;
+    top: 55%;
     position: absolute;
     display: block;
     text-align: center;
-    border: 2px solid #C20095;
+    border: 2px solid #B80028;
     font-size: 150%;
     border-radius: 15px;
-    width: 25%;
+    width: 30%;
     height: 15%;
     text-decoration: underline;
     padding-top: 10%;
@@ -69,13 +69,13 @@ body {
 
 #init{
     background-color: #147EDB;
-    left: 20%;
+    left: 12%;
 }
 
 
 #join{
     background-color: #EB8500;
-    left: 60%;
+    left: 57%;
 }
 
 a.white-link {
