@@ -386,28 +386,27 @@ snDraw.Game.Controls = {
 	}
     },
 
-    createPlayersListWindow: function(){
-
-	// 1. CSS style properties that must be determined using tile size...
+    scalePropertiesPlayersListWindow: function(){
+	
+	//things that scale with the Tile Size
 	var ts = Math.round(snDraw.Game.tileSpacings.ts);
-	var cr = ts * 0.43; // corner radius
-	var fsz = ts *0.7; // master font size
-	var sh = ts * 0.025; // for use in dimentions for shadow...master font size
+	var cr = ts * 0.30; // corner radius
+	var fsz = ts * 0.50; // master font size
 
-	// make it visible...
-	var dark_sheet = $("#modal_dark_sheet");
-	dark_sheet.css("display", "block");
-
-	//set other style attributes from the Javascript...
-	//dark_sheet.css("padding-top", v_gap+"px");
-	dark_sheet.css("font-size", fsz+"px");
-
+	//set style properties that depend on tile size...
+	$("#modal_dark_sheet").css("font-size", fsz+"px");
 	$("#modal-content").css("border-radius", cr+"px");
-	// this line approximates     box-shadow: 4px 8px 10px 10px rgba(0,0,0,0.6);
-	$("#modal-content").css("box-shadow", 4*sh+"px "+8*sh+"px "+10*sh+"px "+10*sh+"px rgba(0,0,0,0.6)");
 	$("#modal-header").css("border-radius", cr+"px "+cr+"px 0 0");
 	$("#modal-footer").css("border-radius", "0 0 "+cr+"px "+cr+"px");
 	$("#modal-body").css("max-height", snDraw.canv_H * 0.8+"px");
+
+	//change the scale associated with those words with a black haze.
+	$('.blacken').css({"text-shadow":"0px 0px "+fsz*0.05+"px black, 0px 0px "+fsz*0.1+"px black"});
+    },
+
+    createPlayersListWindow: function(){
+
+	this.scalePropertiesPlayersListWindow();
 
 	// 3. Extract the data
 	var player_scores_list = [];
@@ -460,12 +459,9 @@ snDraw.Game.Controls = {
 	    var td2 = doc.createElement("td");
 	    td2.innerHTML = player_scores_list[i].score.toString();
 	    tr.appendChild(td2);
-	    td2.className = "pl-score" + (i == n_psl-1?" final":"");
+	    td2.className = "pl-score" + (i<3?" blacken":"")+ (i == n_psl-1?" final":"");
 	    td2.style["font-weight"] = (i<3?800:100);
 	    td2.style["color"] = (i<3? Plr.color : 'black');
-	    if(i<3){
-		td2.style["text-shadow"] = "0px 0px "+fsz*0.05+"px black, 0px 0px "+fsz*0.1+"px black";
-	    }
 
 	    //does not trigger reflow
 	    fragment.appendChild(tr);
@@ -490,11 +486,21 @@ snDraw.Game.Controls = {
 	};
 
 	var ds = document.getElementById("modal_dark_sheet");
-	ds.onclick = function(event) {
-	    if (event.target == ds) {
-		snDraw.Game.Controls.removePlayersListWindow();
-	    }
-	};
+
+	//make it visible...
+	ds.style["display"] = "block";
+	//set scale if necessary...
+	this.scalePropertiesPlayersListWindow();
+
+	//only make the backround itself respond to clicks half a second after the scores have appeared (Touchscreen niggle fix)
+	ds.onclick = undefined;
+	setTimeout(function(){
+	    ds.onclick = function(event) {
+		if (event.target == ds) {
+		    snDraw.Game.Controls.removePlayersListWindow();
+		}
+	    };
+	}, 500); //measure the framerate over a 0.5 second period
 
     },
 

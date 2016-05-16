@@ -10,6 +10,7 @@ snDraw.Game.Event = {
 
 	// 2. Add the controls strip
 	snDraw.Game.Controls.createControls();
+	snDraw.Game.Controls.scalePropertiesPlayersListWindow();//if scores were present on resize, this changes some scale params
 
 	// 3. Create all the grid tiles...
 	snDraw.Game.Grid.InitialiseGrid(Spacings);
@@ -463,7 +464,7 @@ snDraw.Game.Event = {
 	    snDraw.makeCanvasFitWholeWindow();
 	    snDraw.Game.Event.DrawAll();
 	    snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
-	}, 1000);
+	}, 200); //inject 0.2 second delay ("size stablisation time") before redrawing all...
     }
 
 };
