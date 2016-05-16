@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Start a game of SNATCH!</title>
+    <link rel="stylesheet" type="text/css" href="home.css">
+    <script src="home.js"></script>
+      <script src="/../include/jquery-1.11.1.js"></script>
+  </head>
+  <body>
+
+    <div class="page" id="page1">
+
+      <div class="f_tile" id="t1">S</div>
+      <div class="f_tile" id="t2">N</div>
+      <div class="f_tile" id="t3">A</div>
+      <div class="f_tile" id="t4">T</div>
+      <div class="f_tile" id="t5">C</div>
+      <div class="f_tile" id="t6">H</div>
+      <div class="f_tile" id="t7">I</div>
+      <div class="f_tile" id="t8">T</div>
+
+      <div id="slogan1">the fast-paced anagram-spotting board game</div>
+
+      <div id="slogan2">...as a multiplayer in-browser game for you PC, tablet or smartphone...</div>
+
+      <div class="button" id="init">
+	<a href="#" class="white-link" onclick="initiate_game()">
+	  Initiate a game
+	</a>
+      </div>
+
+      <div class="button" id="join">
+      	<a href="#" class="white-link" onclick="join_game()">
+	  Join a game
+	</a>
+      </div>
+
+    </div>
+
+    <div class="page" id="page2">
+      You have passed to the INIT page
+	<a href="#" onclick="show_home()">
+	  home
+	</a>
+    </div>
+
+    <div class="page" id="page3">
+      You have passed to the Join page
+	<a href="#" onclick="show_home()">
+	  home
+	</a>
+    </div>
+
+
+  </body>
+</html>
