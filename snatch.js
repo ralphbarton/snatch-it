@@ -64,9 +64,21 @@ io.on('connection', function(socket){
 	}
     });
 
+    var rooms = {};
+    socket.on('request to init room', function (data){
+	//create a new room tag (no one added to room yet)
 
-    //this is the first message a client will send...
-    socket.on('client page load', function (blank_msg){
+    	socket.emit('your room tag', 0);
+    });
+
+    socket.on('request to join room', function (data){
+	//prepare list of rooms for sending...
+    	socket.emit('room tags list', [0,0]);
+    });
+
+
+
+    socket.on('room selected', function (choice){
 	//respond by providing a set of colours to choose between
 	console.log("'client page load' message sent by client");
 

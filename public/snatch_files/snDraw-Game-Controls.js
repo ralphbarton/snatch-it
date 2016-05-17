@@ -476,9 +476,9 @@ snDraw.Game.Controls = {
 	modal_body.appendChild(table);
 
 	$("#modal-footer").html("");
-	$("#modal-footer").append("<a href=\"#\" onclick=\"snDraw.Game.Controls.removePlayersListWindow()\">Close</a>");
+	$("#modal-footer").append("<a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Controls.removePlayersListWindow()\">Close</a>");
 	if(this.client_finished_game == true){
-	    $("#modal-footer").append(" | <a href='/hardreset'>Another Game</a>");
+	    $("#modal-footer").append(" | <a class=\"modal\" href='/hardreset'>Another Game</a>");
 	}
 
 	document.getElementById("close").onclick = function() {

@@ -93,12 +93,12 @@ td.pl-score{
     white-space: nowrap;
 }
 
-a {
+a.modal {
     font-weight: bold;
     color: black;
     text-decoration: underline;
 }
 
-a:hover{
+a.modal:hover{
     color: red;
 }

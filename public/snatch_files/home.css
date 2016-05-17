@@ -82,6 +82,6 @@ a.white-link {
     color: white;
 }
 
-a:hover{
+a.white-link:hover{
     font-weight: bold;
 }

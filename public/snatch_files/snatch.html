@@ -3,55 +3,111 @@
   <head>
     <title>Play SNATCH-IT</title>
     <meta name="viewport" content="user-scalable=no"/>
+
+    <!-- styles used in the Snatch game -->
     <link rel="stylesheet" type="text/css" href="snatch_files/overlays.css">
+
+    <!-- styles used by the homepage -->
+    <link rel="stylesheet" type="text/css" href="home.css">
+    <script src="home.js"></script>
+
+
+
+
+    <script src="fabric.js-1.5.0/dist/fabric.min.js"></script>
+    <script src="include/socket.io-1.2.0.js"></script>
+    <script src="include/jquery-1.11.1.js"></script>
+
+    <script src="snatch_files/fabric-wrap.js"></script>
+
+    <!-- JS files specific to Snatch game -->
+    <script src="snatch_files/snatch-client.js"></script>
+    <script src="snatch_files/snDraw.js"></script>
+    <script src="snatch_files/snDraw-Game.js"></script>
+    <script src="snatch_files/snDraw-Game-Controls.js"></script>
+    <script src="snatch_files/snDraw-Game-Event.js"></script>
+    <script src="snatch_files/snDraw-Game-Grid.js"></script>
+    <script src="snatch_files/snDraw-Game-Keyboard.js"></script>
+    <script src="snatch_files/snDraw-Game-Mouse.js"></script>
+    <script src="snatch_files/snDraw-Game-Spell.js"></script>
+    <script src="snatch_files/snDraw-Game-Toast.js"></script>
+    <script src="snatch_files/snDraw-Game-Turn.js"></script>
+    <script src="snatch_files/snDraw-Game-Words.js"></script>
+    <script src="snatch_files/snDraw-Game-Zones.js"></script>
+    <script src="snatch_files/snDraw-Splash.js"></script>
+    <script src="snatch_files/snatch-assembler.js"></script>
+
   </head>
 
 
-  <body bgcolor="#999" style="margin:0; padding:0;">
+  <body>
+
+    <!-- 1. Landing page -->
+    <div class="page" id="page1">
+
+      <div class="f_tile" id="t1">S</div>
+      <div class="f_tile" id="t2">N</div>
+      <div class="f_tile" id="t3">A</div>
+      <div class="f_tile" id="t4">T</div>
+      <div class="f_tile" id="t5">C</div>
+      <div class="f_tile" id="t6">H</div>
+      <div class="f_tile" id="t7">I</div>
+      <div class="f_tile" id="t8">T</div>
+
+      <div id="slogan1">the fast-paced anagram-spotting board game</div>
+
+      <div id="slogan2">...as a real-time multiplayer website for PC, tablet & smartphone...</div>
+
+      <div class="button" id="init">
+	<a href="#" class="white-link" onclick="initiate_game()">
+	  Initiate a game
+	</a>
+      </div>
+
+      <div class="button" id="join">
+      	<a href="#" class="white-link" onclick="join_game()">
+	  Join a game
+	</a>
+      </div>
+
+    </div>
+
+    <!-- 2. Create Game -->
+    <div class="page" id="page2">
+      You have passed to the INIT page
+      <a href="#" onclick="show_home()">
+	home
+      </a>
+    </div>
+
+    <!-- 3. Join an existing Game -->
+    <div class="page" id="page3">
+      You have passed to the Join page
+      <a href="#" onclick="show_home()">
+	home
+      </a>
+    </div>
+
+
+    <!-- 4. SNATCH game -->
+    <div class="page" id="page4">
 
       <div style="position: relative;">
 	<canvas id="c"></canvas>
       </div>
+      </div>
 
-      <script src="fabric.js-1.5.0/dist/fabric.min.js"></script>
-      <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.1.0/fabric.all.min.js" ></script> -->
-      <!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.5.0/fabric.min.js" ></script> -->
-      <script src="include/socket.io-1.2.0.js"></script>
-      <script src="include/jquery-1.11.1.js"></script>
-
-      <script src="snatch_files/fabric-wrap.js"></script>
-
-      <script src="snatch_files/snatch-client.js"></script>
-      <script src="snatch_files/snDraw.js"></script>
-      <script src="snatch_files/snDraw-Game.js"></script>
-      <script src="snatch_files/snDraw-Game-Controls.js"></script>
-      <script src="snatch_files/snDraw-Game-Event.js"></script>
-      <script src="snatch_files/snDraw-Game-Grid.js"></script>
-      <script src="snatch_files/snDraw-Game-Keyboard.js"></script>
-      <script src="snatch_files/snDraw-Game-Mouse.js"></script>
-      <script src="snatch_files/snDraw-Game-Spell.js"></script>
-      <script src="snatch_files/snDraw-Game-Toast.js"></script>
-      <script src="snatch_files/snDraw-Game-Turn.js"></script>
-      <script src="snatch_files/snDraw-Game-Words.js"></script>
-      <script src="snatch_files/snDraw-Game-Zones.js"></script>
-      <script src="snatch_files/snDraw-Splash.js"></script>
-      <script src="snatch_files/snatch-assembler.js"></script>
-
-
-
-    <!-- The Modal -->
+    <!-- 5. The Modal -->
     <div id="modal_dark_sheet">
 
       <!-- Modal content -->
       <div id="modal-content">
 	<div id="modal-header">
 	  <span id="close">×</span>
-	  <span id="box-title">Players</h2>
+	  <span id="box-title">Players</span>
 	</div>
 	<div id="modal-body">
-	  <p>Some text in the Modal Body</p>
-	  <p>This demonstration window box was caused by pressing the 8 key. Press the 7 key and it will disappear</p>
-	  <p>This is test code for future features.</p>
+	  text here is erased by some js before it is ever seen
 	</div>
 	<div id="modal-footer">
 	</div>
@@ -61,6 +117,6 @@
 
 
 
-    </body>
+  </body>
 
 </html>

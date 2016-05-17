@@ -11,8 +11,9 @@ var dev = true;
 
 //initialise the Canvas
 
-socket.emit('client page load', 0);
 
+
+//Provides data to allow player to reclaim name, make new name AND choose their color 
 socket.on('player color choices', function(msg_obj){
     snDraw.initialiseCanvas();
     snDraw.makeCanvasFitWholeWindow();
