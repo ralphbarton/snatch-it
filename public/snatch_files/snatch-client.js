@@ -15,6 +15,13 @@ var dev = true;
 
 //Provides data to allow player to reclaim name, make new name AND choose their color 
 socket.on('player color choices', function(msg_obj){
+
+    //code to hide any other 'pages' and show the Canvas that is the snatch game...
+    $("#page1").css("display", "none");
+    $("#page2").css("display", "none");
+    $("#page3").css("display", "none");
+    $("#page4").css("display", "block");
+
     snDraw.initialiseCanvas();
     snDraw.makeCanvasFitWholeWindow();
 

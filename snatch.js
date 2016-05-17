@@ -25,6 +25,8 @@ var qty_tiles = 100;
 var snatchSvr_factory = require('./snatch-server.js');
 var myGame = snatchSvr_factory(qty_tiles);//create a snatch game instance with 50 tiles...
 
+var SNATCH_GAMES = [];//a dictionary for game objects...
+
 var SDC_factory = require('./scrape_definition_client.js');
 var my_SDC = SDC_factory();
     
@@ -44,6 +46,12 @@ app.get('/definition/*', function(req, res){
     prev_word = word;
 });
 
+///This is an incomplete fragment...
+app.get('/join/*', function(req, res){
+    var frags = req.url.split('/');
+    var tag = frags[frags.length-1];
+});
+
 
 io.on('connection', function(socket){
 
@@ -60,25 +68,39 @@ io.on('connection', function(socket){
 	    myGame.removePlayer(socket.id);
 	    console.log('Player ' + dis_pl_i + ' (' + dis_pl_name + ') disconnected (socket.id = ' + socket.id + ')');
 	}else{
-	    console.log('A websocket connection not associated with a player was closed (socket.id = ' + socket.id + ')');
+	    console.log('Connection closed (socket.id = ' + socket.id + ') - no player associated...');
 	}
     });
 
     var rooms = {};
     socket.on('request to init room', function (data){
+
 	//create a new room tag (no one added to room yet)
 
-    	socket.emit('your room tag', 0);
+	var code = randomIndex = Math.floor(Math.random() * 1000);//from 0 to 999
+	var c1 = randomIndex = Math.floor(Math.random() * 5);//from 0 to 4
+
+	function pad(num, size) {
+	    var s = "000000000" + num;
+	    return s.substr(s.length-size);
+	}
+	var pcode = pad(code,3);
+
+	var v_words = ["purple","orange","green","golden","black"];
+	var my_tag = v_words[c1] + " " + pcode; 
+
+
+    	socket.emit('your room tag', my_tag);
     });
 
-    socket.on('request to join room', function (data){
+    socket.on('request rooms list', function (data){
 	//prepare list of rooms for sending...
-    	socket.emit('room tags list', [0,0]);
+    	socket.emit('rooms list', [0,0]);
     });
 
 
 
-    socket.on('room selected', function (choice){
+    socket.on('join room and start', function (choice){
 	//respond by providing a set of colours to choose between
 	console.log("'client page load' message sent by client");
 

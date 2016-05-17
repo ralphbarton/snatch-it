@@ -8,8 +8,8 @@
     <link rel="stylesheet" type="text/css" href="snatch_files/overlays.css">
 
     <!-- styles used by the homepage -->
-    <link rel="stylesheet" type="text/css" href="home.css">
-    <script src="home.js"></script>
+    <link rel="stylesheet" type="text/css" href="snatch_files/home.css">
+    <script src="snatch_files/home.js"></script>
 
 
 
@@ -74,8 +74,20 @@
 
     <!-- 2. Create Game -->
     <div class="page" id="page2">
-      You have passed to the INIT page
-      <a href="#" onclick="show_home()">
+      <p>A new SNATCH game has been initiated on the server.</p>
+      <p>The entry code for this game is: <div id="tag-box"></div></p>
+      <p>You can also send this link: 
+	<a href="#">
+	  [todo, make the custom link...]
+	</a>
+      </p>
+
+      <p>Click below to start game:</br>
+	<a href="#" class="red-link" onclick="start_game()">
+	  START!
+	</a>
+      </p>
+      <a class="homeb" href="#" onclick="show_home()">
 	home
       </a>
     </div>

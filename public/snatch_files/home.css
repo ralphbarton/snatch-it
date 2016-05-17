@@ -85,3 +85,42 @@ a.white-link {
 a.white-link:hover{
     font-weight: bold;
 }
+
+.homeb{
+    background-color: #B5E5E8;
+    display: block;
+    font-weight: bold;
+    text-align: center;
+    width: 90%
+}
+
+/*page 2 stuff*/
+#page2{
+    font-size: 150%;
+    padding: 8%; /* Show, initially*/
+}
+
+#tag-box{
+    background-color: #FCF0A9;
+    margin: 4%;
+    padding: 1%;
+    display: inline;
+    font-weight: bold;
+    color: #CC81E6;
+    font-size: 250%;
+    border: 1px blue dashed;
+}
+
+p {
+    margin: 3%;
+    display: block;
+}
+
+a.red-link {
+    font-size: 140%;   
+    color: red;
+}
+
+a.red-link:hover{
+    font-weight: bold;
+}
