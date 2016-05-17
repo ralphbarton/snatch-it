@@ -61,6 +61,11 @@ socket.on('full game state transmission', function(gameState){
     //draws the entire game state on the canvas from the data supplied
     snDraw.Game.Event.DrawAll();
 
+    //I hope this can't add the callback twice...
+    window.onresize = function(){
+	snDraw.Game.Event.WindowResize();
+    };
+
 });//end of function to load game data
 
 //player joins game
@@ -136,11 +141,6 @@ function PLAYER_JOINED_WITH_DETAILS(p){socket.emit('player joined with details',
 
 function TURN_MANY_TILES(p)           {socket.emit('many_tile_turn_hack', p);}
 
-
-
-window.onresize = function(){
-    snDraw.Game.Event.WindowResize();
-};
 
 
 
