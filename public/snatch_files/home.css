@@ -95,9 +95,9 @@ a.white-link:hover{
 }
 
 /*page 2 stuff*/
-#page2{
+#page2, #page3{
     font-size: 150%;
-    padding: 8%; /* Show, initially*/
+    padding: 8%;
 }
 
 #tag-box{

@@ -43,6 +43,9 @@ app.get('/join/*', function(req, res){
     var tag = frags[frags.length-1];
 });
 
+//a hash table...
+//note how it is global for all connection...
+var ActiveRoomsList = {};
 
 io.on('connection', function(socket){
 
@@ -71,7 +74,6 @@ io.on('connection', function(socket){
 	}
     });
 
-    var ActiveRoomsList = [];//a hash table...
     socket.on('request to init room', function (data){
 
 	//create a new room tag (no one added to room yet)
@@ -89,14 +91,15 @@ io.on('connection', function(socket){
 	var my_tag = v_words[c1] + " " + pcode; 
 
 	ActiveRoomsList[my_tag] = "initiated";
+	console.log("randomly generated new room tag: [" + my_tag + "]");
     	socket.emit('your room tag', my_tag);
     });
 
-    socket.on('request rooms list', function (data){
+    socket.on('request rooms list', function (no_data){
 	//prepare list of rooms for sending...
+	console.log("Rooms list sent to an anonymouse client...");
     	socket.emit('rooms list', ActiveRoomsList);
     });
-
 
 
     socket.on('join room and start', function (room_req){
@@ -199,9 +202,10 @@ io.on('connection', function(socket){
 
 
     socket.on('player submits word', function(tile_id_array){
-	console.log("Snatch Submission with letters: ",tile_id_array);
+	console.log("["+socket.ROOM+"]: Snatch submission with letters: ",tile_id_array);
 	var myGame = SNATCH_GAMES[socket.ROOM];
 	var SnatchResponse = myGame.playerSnatches(tile_id_array, socket.id)
+
 
 	if(SnatchResponse.val_check == 'accepted'){
 	    io.to(socket.ROOM).emit('snatch assert', SnatchResponse.SnatchUpdateMsg);	    
@@ -219,7 +223,7 @@ io.on('connection', function(socket){
 	var newTile_info = myGame.flipNextTile(socket.id);
 	io.to(socket.ROOM).emit('new turned tile', newTile_info);
 	if(newTile_info){
-	    console.log("PI=" + newTile_info.flipping_player + " flips tileID=" + newTile_info.tile_index + " (" + newTile_info.tile_letter + ")");
+	    console.log("["+socket.ROOM+"]: PI=" + newTile_info.flipping_player + " flips tileID=" + newTile_info.tile_index + " (" + newTile_info.tile_letter + ")");
 	}else{
 	    console.log("All tiles turned - flip message recieved...");
 	}

@@ -342,6 +342,7 @@ module.exports = function (nTiles){
 		console.log("Player " + i + "  has: " + JSON.stringify(playerSet[i].words));
 	    }
 	    console.log("--------\n");
+
 	    return Response;
 	},
 

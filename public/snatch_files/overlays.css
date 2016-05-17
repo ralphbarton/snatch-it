@@ -64,13 +64,13 @@ table {
     width: auto;
 }
 
-th, td {
+th.scores, td.scores {
     padding: 8px;
     border-bottom: 1px solid #666;
     white-space: nowrap;
 }
 
-td.final {
+td.scores-final {
     border-bottom: none;
 }
 
