@@ -66,12 +66,11 @@ table {
 
 th.scores, td.scores {
     padding: 8px;
-    border-bottom: 1px solid #666;
     white-space: nowrap;
 }
 
-td.scores-final {
-    border-bottom: none;
+th.scores-underline, td.scores-underline {
+    border-bottom: 1px solid #666;
 }
 
 th{

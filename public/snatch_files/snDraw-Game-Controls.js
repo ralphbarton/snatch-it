@@ -436,12 +436,12 @@ snDraw.Game.Controls = {
 	var tr = doc.createElement("tr");
 	var th1 = doc.createElement("th");
 	th1.innerHTML = "Name";
-	th1.className = "scores";
+	th1.className = "scores scores-underline";
 	tr.appendChild(th1);
 
 	var th2 = doc.createElement("th");
 	th2.innerHTML = "Score";
-	th2.className = "scores";
+	th2.className = "scores scores-underline";
 	tr.appendChild(th2);
 
 	//does not trigger reflow
@@ -455,13 +455,13 @@ snDraw.Game.Controls = {
 	    var tr = doc.createElement("tr");
 	    var td1 = doc.createElement("td");
 	    td1.innerHTML = (i+1)+ ". " + Plr.name;
-	    td1.className = "scores pl-name" + (i == n_psl-1?" final":"");
+	    td1.className = "scores pl-name" + (i != n_psl-1?" scores-underline":"");
 	    tr.appendChild(td1);
 
 	    var td2 = doc.createElement("td");
 	    td2.innerHTML = player_scores_list[i].score.toString();
 	    tr.appendChild(td2);
-	    td2.className = "scores pl-score" + (i<3?" blacken":"")+ (i == n_psl-1?" final":"");
+	    td2.className = "scores pl-score" + (i<3?" blacken":"")+ (i != n_psl-1?" scores-underline":"");
 	    td2.style["font-weight"] = (i<3?800:100);
 	    td2.style["color"] = (i<3? Plr.color : 'black');
 
