@@ -66,12 +66,19 @@ function add_listeners(){
 		fragment.appendChild(tr);
 	    }
 
-	    var table = doc.createElement("table");
-	    table.appendChild(fragment);
-
+	    console.log(rooms_array.length);
 	    var rooms_div = doc.getElementById("room-table");
-	    rooms_div.innerHTML = "";
-	    rooms_div.appendChild(table);
+	    if(rooms_array.length>0){
+
+		var table = doc.createElement("table");
+		table.appendChild(fragment);
+
+		rooms_div.innerHTML = "";
+		rooms_div.appendChild(table);
+	    }else{
+		rooms_div.innerHTML = "No games have been created.<br>Use the \"Initiate a game\" button to create one...";
+	    }
+
 	});
     }
 };
