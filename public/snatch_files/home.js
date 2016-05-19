@@ -41,34 +41,49 @@ function add_listeners(){
 	});
 
 	// create an HTML table for all the open games...
-	socket.on('rooms list', function(ActiveRoomsList){
+	socket.on('rooms list', function(rooms_data_array){
 	    //code here to construct the list of rooms on-screen
 	    // unfortunately, this is a massive chunk of copy-pasted code
 	    var doc = document;
 	    var fragment = doc.createDocumentFragment();
 	    //get the data
-	    var rooms_array = [];
-	    console.log(ActiveRoomsList);
-	    for (var key in ActiveRoomsList) {
-		if (ActiveRoomsList.hasOwnProperty(key)) {
-		    rooms_array.push(key);
-		}
-	    }
 
 	    //make the HTML elements constituting the table...
-	    for(var i = 0; i < rooms_array.length; i++){
+	    for(var i = 0; i < rooms_data_array.length; i++){
 
-		var r = rooms_array[i];
+		var r = rooms_data_array[i];
+		// r is an object {room_key: #, n_players: #, duration: #, n_tiles_turned: #}
 		var tr = doc.createElement("tr");
+
+		// Col 1
 		var td1 = doc.createElement("td");
-		td1.innerHTML = "<a href=\"#\" class=\"red-link\" onclick=\"start_game('"+r+"')\">"+r+"</a>";
+		td1.innerHTML = "<a href=\"#\" class=\"red-link\" onclick=\"start_game('"+r.room_key+"')\">"+r.room_key+"</a>";
+		td1.className = "b33";
 		tr.appendChild(td1);
+
+		// Col 2
+		var td1 = doc.createElement("td");
+		td1.innerHTML = r.n_tiles_turned + "% thru";
+		td1.className = "b33";
+		tr.appendChild(td1);
+
+		// Col 3
+		var td1 = doc.createElement("td");
+		td1.innerHTML = r.n_players + " players";
+		td1.className = "b33";
+		tr.appendChild(td1);
+
+		// Col 4
+		var td1 = doc.createElement("td");
+		td1.innerHTML = fuzzyTime(r.duration*1000) + " ago";
+		td1.className = "b33";
+		tr.appendChild(td1);
+
 		fragment.appendChild(tr);
 	    }
 
-	    console.log(rooms_array.length);
 	    var rooms_div = doc.getElementById("room-table");
-	    if(rooms_array.length>0){
+	    if(rooms_data_array.length>0){
 
 		var table = doc.createElement("table");
 		table.appendChild(fragment);
@@ -82,3 +97,27 @@ function add_listeners(){
 	});
     }
 };
+
+
+
+function fuzzyTime(my_duration) {
+    var msPerMinute = 60 * 1000;
+    var msPerHour = msPerMinute * 60;
+    var msPerDay = msPerHour * 24;
+    var msPerMonth = msPerDay * 30;
+    var msPerYear = msPerDay * 365;
+
+    if (my_duration < msPerMinute) {
+         return Math.round(my_duration/1000) + ' seconds';   
+    } else if (my_duration < msPerHour) {
+         return Math.round(my_duration/msPerMinute) + ' minutes';   
+    } else if (my_duration < msPerDay ) {
+         return Math.round(my_duration/msPerHour ) + ' hours';   
+    } else if (my_duration < msPerMonth) {
+         return 'approximately ' + Math.round(my_duration/msPerDay) + ' days';   
+    } else if (my_duration < msPerYear) {
+         return 'approximately ' + Math.round(my_duration/msPerMonth) + ' months';   
+    } else {
+         return 'approximately ' + Math.round(my_duration/msPerYear ) + ' years';   
+    }
+}

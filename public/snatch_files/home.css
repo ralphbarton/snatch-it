@@ -124,3 +124,9 @@ a.red-link {
 a.red-link:hover{
     font-weight: bold;
 }
+
+td.b33{
+    font-size: 60%;   
+    border: 1px dotted black;
+    padding: 4px;
+}
