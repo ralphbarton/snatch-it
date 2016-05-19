@@ -66,6 +66,9 @@ socket.on('full game state transmission', function(gameState){
 	snDraw.Game.Event.WindowResize();
     };
 
+    //start the hearbeat process now.
+    heartbeat_check();
+
 });//end of function to load game data
 
 //player joins game
@@ -122,8 +125,24 @@ socket.on('give client their player index', function(myIndex){
 });
 
 
+var heartbeat_status = "server acknowledged";
+function heartbeat_check(){
+    if(heartbeat_status != "server acknowledged"){
+	snDraw.Game.Controls.maybe_createConnectionLostWindow();
+    }
 
+    heartbeat_status = new Date;
+    socket.emit('client heartbeat', 0);
+    setTimeout(heartbeat_check, 1000 * 10);//every 10 seconds
 
+}
+
+socket.on('heartbeat server ack', function(){
+    if(typeof(heartbeat_status)=="object"){//just because Date is an object
+	console.log("The server responded to the ping in " + (new Date - heartbeat_status) + " ms");
+    }
+    heartbeat_status = "server acknowledged";
+});
 
 
 socket.on('snatch rejected', function(rejection_reason){

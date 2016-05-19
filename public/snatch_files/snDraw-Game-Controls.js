@@ -404,9 +404,7 @@ snDraw.Game.Controls = {
 	$('.blacken').css({"text-shadow":"0px 0px "+fsz*0.05+"px black, 0px 0px "+fsz*0.1+"px black"});
     },
 
-    createPlayersListWindow: function(){
-
-	this.scalePropertiesPlayersListWindow();
+    createPlayersListWindow_html_scores_table: function(){
 
 	// 3. Extract the data
 	var player_scores_list = [];
@@ -428,7 +426,6 @@ snDraw.Game.Controls = {
 	player_scores_list.sort(comparePlayers);
 	player_scores_list.reverse();
 
-	//code to manipulate inner HTML (due to lck of knowledge of JQuery, here plain javascript...
 	var doc = document;
 	var fragment = doc.createDocumentFragment();
 
@@ -473,26 +470,65 @@ snDraw.Game.Controls = {
 	var table = doc.createElement("table");
 	table.appendChild(fragment);
 
-	var modal_body = doc.getElementById("modal-body");
-	modal_body.innerHTML = "";
-	modal_body.appendChild(table);
+	return table;
+    },
 
+
+    createPlayersListWindow: function(){
+
+	this.scalePropertiesPlayersListWindow();
+
+	//Inject the Title
+	$("#box-title").html("Players");
+
+	//Clear body then inject scores table
+	var scores_table = this.createPlayersListWindow_html_scores_table();
+	$("#modal-body").html("").append(scores_table);
+
+	//Clear the footer then add the CLOSE and potentially PLAY AGAIN links...
 	$("#modal-footer").html("");
-	$("#modal-footer").append("<a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Controls.removePlayersListWindow()\">Close</a>");
+	var close_link = "<a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Controls.removePlayersListWindow()\">Close</a>";
+	$("#modal-footer").append(close_link);
 	if(this.client_finished_game == true){
 	    $("#modal-footer").append(" | <a class=\"modal\" href=\"#\" onclick=\"location.reload()\">Another Game</a>");
 	}
 
-	document.getElementById("close").onclick = function() {
-	    snDraw.Game.Controls.removePlayersListWindow();
-	};
+	// ineligant, but a second call is necessary to apply styles to objects that didn't exist earlier
+	this.scalePropertiesPlayersListWindow();
 
+	this.createPlayersListWindow_generic_make_appear();
+    },
+
+
+
+    maybe_createConnectionLostWindow: function(){
+
+	var x = $("#modal_dark_sheet").css('display');
+	if(x[0] == 'n'){ //this is an ugly/unreliable to check if display:none for the div!
+	    
+	    this.scalePropertiesPlayersListWindow();
+
+	    //Inject the Title
+	    $("#box-title").html("Connection to server lost");
+	    console.log($("#box-title").html());
+
+	    //Clear body then inject scores table
+	    $("#modal-body").html("A constant connection to the server is required during this multiplayer game");
+
+	    //link to refresh page
+	    $("#modal-footer").html("<a class=\"modal\" href=\"#\" onclick=\"location.reload()\">Start again</a>");
+
+	    this.createPlayersListWindow_generic_make_appear();
+	}
+    },
+
+
+
+    createPlayersListWindow_generic_make_appear: function(){
 	var ds = document.getElementById("modal_dark_sheet");
 
 	//make it visible...
 	ds.style["display"] = "block";
-	//set scale if necessary...
-	this.scalePropertiesPlayersListWindow();
 
 	//only make the backround itself respond to clicks half a second after the scores have appeared (Touchscreen niggle fix)
 	ds.onclick = undefined;
@@ -502,13 +538,16 @@ snDraw.Game.Controls = {
 		    snDraw.Game.Controls.removePlayersListWindow();
 		}
 	    };
-	}, 500); //measure the framerate over a 0.5 second period
+	}, 500);
 
+	//the x button closes the window...
+	document.getElementById("close").onclick = function() {
+	    snDraw.Game.Controls.removePlayersListWindow();
+	};
     },
 
     removePlayersListWindow: function(){
 	$("#modal_dark_sheet").css("display", "none");
     }
-
 
 };

@@ -63,8 +63,8 @@ function access_room(room_key){
     //Add a new timeout. Retain the reference.
     R.closeTimeoutID = setTimeout(function(){
 	close_room(room_key);
-//    }, 1000 * 60 * 60 * 3);//3 hours persistence
-    }, 1000 * 60 * 3);// 10 minues persistence
+    }, 1000 * 60 * 60 * 3);//3 hours persistence
+//    }, 1000 * 60 * 10);// 10 minues persistence
     console.log("["+room_key+"] - timout extended...");
 
     //Add
@@ -99,6 +99,10 @@ io.on('connection', function(socket){
 	}
     });
 
+    //the server pongs back the heartbeat message to the specific client that sent.
+    socket.on('client heartbeat', function(){
+    	socket.emit('heartbeat server ack', 0);
+    });
 
 
     socket.on('request to init room', function (data){
