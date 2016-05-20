@@ -106,7 +106,7 @@ snDraw.Game.Popup = {
 	$("#modal-body").html("").append(scores_table);
 
 	//Clear the footer then add the CLOSE and potentially PLAY AGAIN links...
-	var close_link = "<a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Controls.removePlayersListWindow()\">Close</a>";
+	var close_link = "<a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Popup.removePlayersListWindow()\">Close</a>";
 	$("#modal-footer").html("").append(close_link);
 	if(this.client_finished_game == true){
 	    $("#modal-footer").append(" | <a class=\"modal\" href=\"#\" onclick=\"location.reload()\">Another Game</a>");
@@ -159,7 +159,7 @@ snDraw.Game.Popup = {
 	    $("#modal-body").append("<a class=\"modal\" href=\"#\" onclick=\"location.reload()\">Quit this game</a>");
 
 	    //link to add a "close" link beneath...
-	    var close_link = "<a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Controls.removePlayersListWindow()\">Close</a>";
+	    var close_link = "<a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Popup.removePlayersListWindow()\">Close</a>";
 	    $("#modal-footer").html("").append(close_link);
 
 	    this.createPlayersListWindow_generic_make_appear();
@@ -179,14 +179,14 @@ snDraw.Game.Popup = {
 	setTimeout(function(){
 	    ds.onclick = function(event) {
 		if (event.target == ds) {
-		    snDraw.Game.Controls.removePlayersListWindow();
+		    snDraw.Game.Popup.removePlayersListWindow();
 		}
 	    };
 	}, 500);
 
 	//the x button closes the window...
 	document.getElementById("close").onclick = function() {
-	    snDraw.Game.Controls.removePlayersListWindow();
+	    snDraw.Game.Popup.removePlayersListWindow();
 	};
     },
 

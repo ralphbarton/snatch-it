@@ -123,7 +123,8 @@ function heartbeat_check(){
 
 socket.on('heartbeat server ack', function(){
     if(typeof(heartbeat_status)=="object"){//just because Date is an object
-	console.log("The server responded to the ping in " + (new Date - heartbeat_status) + " ms");
+	// we don't need a constant stream of ping duration messages.
+	//console.log("The server responded to the ping in " + (new Date - heartbeat_status) + " ms");
     }
     heartbeat_status = "server acknowledged";
 });

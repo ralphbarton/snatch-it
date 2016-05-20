@@ -1,7 +1,6 @@
 snDraw.Game.Toast = {
 
     ToastCounter: 0,//create an integer_key for each toast
-    ToastDictionary: {},//for each toast's unique integer_key, hold the reference to its fabric object if this exists.
     ToastRolling: [],//rolling buffer (length up to 3 - tbc) holding the integer_key's for the dictionary above.
     ToastTop_consumed_words: 0,
     ToastTop_snatched_word: 0,
@@ -26,50 +25,26 @@ snDraw.Game.Toast = {
     },
 
     showToast: function(my_string){
+
+	//how do we reference back to this Toast (important in the placement process...)?
+	var t_key = "toast-n" + this.ToastCounter; 
+	this.ToastCounter++;
 	
-	var CP = players[client_player_index];
-	var DIM = snDraw.Game.tileSize;
-	var no_words = CP.words.length == 0;
+	this.ToastRolling.push(t_key); // rolling is a []
 
+	//Actually the div of the new Toast class...
+	var $NewToast = $( "<div/>", {id: t_key}).addClass("ToastGrey ToastCentral ToastIn").text(my_string);
+	$("#page4").append($NewToast);
 
-	var toast_width = this.boundDimention(DIM * 8, snDraw.canv_W, {min: 0.6, max: 0.9});
-	var toast_left = (snDraw.canv_W - toast_width)/2;
-	var toast_height = DIM * 0.8;
-
-	var ToastText_raw = new fabric.Text(my_string, {
-	    left: toast_left + DIM * 0.3,
-	    top: 0,//can only be calculated once object exists...
-	    width: toast_width - DIM * 0.6,
-	    fill: 'rgba(255,255,255,0.7)',
-	    fontSize: DIM * 0.42
-	});
-	var ToastText = wrapCanvasText(ToastText_raw, canvas, toast_width - DIM * 0.6, DIM * 2, 'left');
-
-	var ToastBox = new fabric.Rect({
-	    left: toast_left,
-	    top: 0,//can only be calculated once object exists...
-	    width: toast_width,
-	    height: ToastText.getHeight() + DIM * 0.2,
-	    fill: 'rgba(0,0,192,0.5)',
-	    rx: DIM * 0.4,
-	    ry: DIM * 0.4,
-	    shadow: 'rgba(100,150,0,0.8) 4px 4px 10px'//this pixes need to scale with screen size
-	});
-
-	var toast_spacing = DIM * 0.18;
-
-	//code here is to determine the vertical position of the toast
-	// start it at its highest potential position
+	var toast_spacing = snDraw.Game.tileSpacings.ts * 0.18;
+	//Determine the vertical position of the toast (start it at its highest potential position)
 	var ClientZone_Title = snDraw.Game.Zones.PlayerZone[0].Zone_FabObjs[1];
 	var ToastTop_current_client_zone_top = ClientZone_Title.top + ClientZone_Title.height;
-
 	var Client_Words_Grps = snDraw.Game.Words.TileGroupsArray[client_player_index];
-
 	var ToastTop_current_client_words = 0;
         for(var i = 0; i < Client_Words_Grps.length; i++){
 	    ToastTop_current_client_words = Math.max(ToastTop_current_client_words, Client_Words_Grps[i].getTop());
         }
-
 
 	var toast_top = Math.max(this.ToastTop_consumed_words + snDraw.Game.tileSpacings.ts * 1.4,
 				 this.ToastTop_snatched_word + snDraw.Game.tileSpacings.ts * 1.4,
@@ -79,59 +54,49 @@ snDraw.Game.Toast = {
 				 ToastTop_current_client_zone_top);
 	this.reset_ToastTop_params();
 
+	//Now this bit relates to fitting it around toasts which may already be there...
 	for(var i = 0; i < this.ToastRolling.length; i++){
-	    var ExistingToastObj = this.ToastDictionary[this.ToastRolling[i]];
+	    var t_key_i = this.ToastRolling[i];
+	    var $ExistingToast = $("#"+t_key_i);
+
+
 	    //trap it in the loop by reverting i to zero until it escapes interference with any other Toasts...
-	    var Toast_i_top = ExistingToastObj.top;
-	    var Toast_i_bot = ExistingToastObj.top + ExistingToastObj.height + toast_spacing;
-	    var toast_bot = toast_top + ToastBox.height + toast_spacing;
+	    var Toast_i_top = $ExistingToast.position().top;
+	    var Toast_i_height = $ExistingToast.outerHeight();
+	    var Toast_i_bot = Toast_i_top + Toast_i_height + toast_spacing;
+	    var toast_height = $NewToast.outerHeight();
+	    var toast_bot = toast_top + toast_height + toast_spacing;
 	    //a smaller vertical coordinate means higher up on screen...
 	    //is there interference
+
 	    if((Toast_i_top <= toast_bot)&&(Toast_i_bot >= toast_top)){//Interference detected
 		toast_top = Toast_i_bot + 0.5;//shuffle down the candidate position
 		i = -1;//reset the loop (it will get imcremented, so must here make it -1.
 	    }else{
-
+		// huh?
 	    }
 	}
 
-	ToastBox.setTop(toast_top);
-	ToastText.setTop(toast_top + DIM * 0.1);
-	
-	var objects = [ToastBox, ToastText];
+	$NewToast.css("top", (toast_top + "px"));
 
-	var ToastObj = new fabric.Group( objects, {
-	    hasControls: false,
-	    hasBorders: false,
-	    selectable: false
-	});
 
-	//Now that the Toast Object is *created*, take steps to add it (and its references)...
-
-	var t_key = this.ToastCounter.toString(); 
-	ToastObj.toast_uid = t_key;
-	this.ToastCounter++;
-	
-	this.ToastDictionary[t_key] = ToastObj;
-	this.ToastRolling.push(t_key);
-	
 	var toast_duration = 3600;
 	setTimeout(function(){
-
-	    //update data structures
-	    var roll_index = snDraw.Game.Toast.ToastRolling.indexOf(t_key);
-	    snDraw.Game.Toast.ToastRolling.splice(roll_index, 1);
-
-	    delete snDraw.Game.Toast.ToastDictionary[t_key];
 	    
-	    //update canvas
-	    canvas.remove(ToastObj);
-	    canvas.renderAll();
+	    $("#"+t_key).removeClass("ToastIn");
+	    $("#"+t_key).addClass("ToastOut");
+
+	    setTimeout(function(){
+
+		//find the array index of the toast concerned (by its key)
+		var roll_index = snDraw.Game.Toast.ToastRolling.indexOf(t_key);
+		//remove this toast key from the array: it is GONE!
+		snDraw.Game.Toast.ToastRolling.splice(roll_index, 1);
+		$("#"+t_key).remove();
+
+	    }, 400 + 10);//delete 10ms after fade out is complete.
+
 	}, toast_duration);
 
-
-
-	canvas.add(ToastObj);
-	canvas.renderAll();
     }
-}
+};

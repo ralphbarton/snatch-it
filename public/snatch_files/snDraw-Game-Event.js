@@ -434,6 +434,10 @@ snDraw.Game.Event = {
 		var Arrangement_noH = Positions.ArrangementsArray_noH[new_zone_index];
 		var wb = ZoneProperties.WordBounds;
 		snDraw.Game.Words.MoveWordsIntoArrangement(Top, wb, WordGroup, Arrangement_noH, snDraw.ani.sty_Resize);
+
+		snDraw.Game.Toast.showToast(rej_plr.name + " rejoined, reclaiming "+rej_plr.words.length+" words");
+	    }else{
+		snDraw.Game.Toast.showToast(rej_plr.name + " rejoined");
 	    }
 
 	}else{
@@ -447,7 +451,6 @@ snDraw.Game.Event = {
 
 	    //Add colour or something??
 	    snDraw.Game.Toast.showToast(player_object.name + " joined");
-
 	}
     },
 
