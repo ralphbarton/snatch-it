@@ -18,12 +18,13 @@ var snatchSvr_factory = require('./snatch-server.js');
 
 var SDC_factory = require('./scrape_definition_client.js');
 var my_SDC = SDC_factory();
+
+var keygen  = require('./vivid_keygen.js')();
     
 var prev_result = undefined;
 var prev_word = undefined;
 my_SDC.rEvent.on('searchComplete', function(result){
     prev_result = result;
-
 });
 
 app.get('/definition/*', function(req, res){
@@ -116,7 +117,11 @@ io.on('connection', function(socket){
 	}
 	var pcode = pad(code,3);
 	var v_words = ["purple","orange","green","golden","black"];
-	var room_key = v_words[c1] + " " + pcode; 
+	//var room_key = v_words[c1] + " " + pcode; 
+
+	var K6 = keygen();
+	//todo use 
+	var room_key = K6.key;
 
 	// 2. Now create a new room instance, referenced by the tag
 	RoomTable[room_key] = {
