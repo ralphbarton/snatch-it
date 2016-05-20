@@ -41,8 +41,8 @@ snDraw.Game.Keyboard = {
 
 
 
-	if(snDraw.Game.Controls.playersListWindowVisible){
-	    snDraw.Game.Controls.removePlayersListWindow();	    
+	if(snDraw.Game.Popup.popup_in_foreground){
+	    snDraw.Game.Popup.removePlayersListWindow();	    
 	}else{
 	    if( (myKeycode >= 65) && (myKeycode <= 90) ){//any letter key
 		
@@ -83,7 +83,7 @@ snDraw.Game.Keyboard = {
 		// let this be cancel word
 		snDraw.Game.Spell.CancelWord();
 		//also removes score window if present...
-		snDraw.Game.Controls.removePlayersListWindow();
+		snDraw.Game.Popup.removePlayersListWindow();
 	    }
 
 	    if(keyPressed == '2'){
@@ -91,7 +91,7 @@ snDraw.Game.Keyboard = {
 	    }
 
 	    if(keyPressed == '4'){
-		snDraw.Game.Controls.createPlayersListWindow();
+		snDraw.Game.Popup.createPlayersListWindow();
 	    }
 
 	    if(keyPressed == '8'){

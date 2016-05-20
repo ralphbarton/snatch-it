@@ -112,7 +112,7 @@ socket.on('give client their player index', function(myIndex){
 var heartbeat_status = "server acknowledged";
 function heartbeat_check(){
     if(heartbeat_status != "server acknowledged"){
-	snDraw.Game.Controls.maybe_createConnectionLostWindow();
+	snDraw.Game.Popup.maybe_createConnectionLostWindow();
     }
 
     heartbeat_status = new Date;

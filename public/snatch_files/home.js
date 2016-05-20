@@ -4,6 +4,7 @@ var room_tag = undefined;
 function initiate_game(){
     $("#page1").css("display", "none");
     $("#page2").css("display", "block");
+    $("#page3").css("display", "none");
     add_listeners();
     socket.emit('request to init room', 0);
 };
@@ -91,7 +92,7 @@ function add_listeners(){
 		rooms_div.innerHTML = "";
 		rooms_div.appendChild(table);
 	    }else{
-		rooms_div.innerHTML = "No games have been created.<br>Use the \"Initiate a game\" button to create one...";
+		rooms_div.innerHTML = "<p class=\"b34\"> No games have been created.<br> Click here to <a href=\"#\" class=\"red-link\" onclick=\"initiate_game()\">initiate a new game</a>.</p>";
 	    }
 
 	});

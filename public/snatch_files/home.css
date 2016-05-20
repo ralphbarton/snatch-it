@@ -130,3 +130,9 @@ td.b33{
     border: 1px dotted black;
     padding: 4px;
 }
+
+p.b34{
+    font-size: 75%;   
+    color: #009;
+    padding: 10px;
+}

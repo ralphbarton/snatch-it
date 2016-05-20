@@ -10,7 +10,7 @@ snDraw.Game.Event = {
 
 	// 2. Add the controls strip
 	snDraw.Game.Controls.createControls();
-	snDraw.Game.Controls.scalePropertiesPlayersListWindow();//if scores were present on resize, this changes some scale params
+	snDraw.Game.Popup.scalePropertiesPlayersListWindow();//if scores were present on resize, this changes some scale params
 
 	// 3. Create all the grid tiles...
 	snDraw.Game.Grid.InitialiseGrid(Spacings);

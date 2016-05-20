@@ -140,11 +140,11 @@ snDraw.Game.Mouse = {
 	}	    
 	if(control_index == 3){
 	    // Actions for "View Scores" Button click
-	    snDraw.Game.Controls.createPlayersListWindow();
+	    snDraw.Game.Popup.createPlayersListWindow();
 	}
 	if(control_index == 4){
 	    // Actions for "Reset Game" Button click
-	    snDraw.Game.Controls.create_GameSettings_Window();
+	    snDraw.Game.Popup.create_GameSettings_Window();
 	}
     }
 };
