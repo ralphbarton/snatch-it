@@ -486,9 +486,8 @@ snDraw.Game.Controls = {
 	$("#modal-body").html("").append(scores_table);
 
 	//Clear the footer then add the CLOSE and potentially PLAY AGAIN links...
-	$("#modal-footer").html("");
 	var close_link = "<a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Controls.removePlayersListWindow()\">Close</a>";
-	$("#modal-footer").append(close_link);
+	$("#modal-footer").html("").append(close_link);
 	if(this.client_finished_game == true){
 	    $("#modal-footer").append(" | <a class=\"modal\" href=\"#\" onclick=\"location.reload()\">Another Game</a>");
 	}
@@ -513,10 +512,35 @@ snDraw.Game.Controls = {
 	    console.log($("#box-title").html());
 
 	    //Clear body then inject scores table
-	    $("#modal-body").html("A constant connection to the server is required during this multiplayer game");
+	    $("#modal-body").html("<p>A constant connection to the server is required during this multiplayer game.</p>");
+	    $("#modal-body").append("<p>By going back to the home page, you should be able to rejoin the same game using the <b>join</b> option.</p>");
 
 	    //link to refresh page
-	    $("#modal-footer").html("<a class=\"modal\" href=\"#\" onclick=\"location.reload()\">Start again</a>");
+	    $("#modal-footer").html("<a class=\"modal\" href=\"#\" onclick=\"location.reload()\">Rejoin</a>");
+
+	    this.createPlayersListWindow_generic_make_appear();
+	}
+    },
+
+
+    create_GameSettings_Window: function(){
+
+	var x = $("#modal_dark_sheet").css('display');
+	if(x[0] == 'n'){ //this is an ugly/unreliable to check if display:none for the div!
+	    
+	    this.scalePropertiesPlayersListWindow();
+
+	    //Inject the Title
+	    $("#box-title").html("Options");
+	    console.log($("#box-title").html());
+
+	    //Clear body then inject scores table
+	    $("#modal-body").html("note to self: add some options in this space...");
+	    $("#modal-body").append("<a class=\"modal\" href=\"#\" onclick=\"location.reload()\">Quit this game</a>");
+
+	    //link to add a "close" link beneath...
+	    var close_link = "<a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Controls.removePlayersListWindow()\">Close</a>";
+	    $("#modal-footer").html("").append(close_link);
 
 	    this.createPlayersListWindow_generic_make_appear();
 	}

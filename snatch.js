@@ -220,39 +220,6 @@ io.on('connection', function(socket){
 	socket.broadcast.to(socket.room_key).emit('player has joined game', player_join_details);
     });
 
-    socket.on('reset request', function (blank_msg){
-	var myGame = RoomTable[socket.room_key].GameInstance;
-	var all_one_agree = myGame.playerAgreesToReset(socket.id);//the return value indicates whether all players agree to the reset
-	if (all_one_agree){
-	    myGame.resetGame(qty_tiles);
-	    //now sent out the new game object:
-	    var gameObj = myGame.getGameObject();
-	    io.to(socket.room_key).emit('full game state transmission', gameObj);
-	}
-	else{//in the case where there are other players...
-	    var pl_i = myGame.playerIndexFromSocket(socket.id);
-	    socket.broadcast.to(socket.room_key).emit('player wants reset', pl_i);
-	}
-    });
-
-
-
-    //client requests to turn over a tile
-    socket.on('agree to reset', function(agrees){
-	var myGame = RoomTable[socket.room_key].GameInstance;
-	var pl_i = myGame.playerIndexFromSocket(socket.id);
-	socket.broadcast.to(socket.room_key).emit('player response to reset request', {player_index: pl_i, response: agrees});
-	if(agrees){
-	    var reset_agreement = myGame.playerAgreesToReset(socket.id);//the return value indicates whether all players agree to the reset
-	    if (reset_agreement){
-		myGame.resetGame(qty_tiles);
-		//now sent out the new game object:
-		var gameObj = myGame.getGameObject();
-		io.to(socket.room_key).emit('full game state transmission', gameObj);
-	    }
-	}
-    });
-
 
 
     socket.on('player submits word', function(tile_id_array){

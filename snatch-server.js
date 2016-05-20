@@ -44,7 +44,6 @@ module.exports = function (nTiles){
 		    name : nm,
 		    color : col,
 		    words : [],
-		    agrees_to_reset: false,
 		    is_disconnected: false,
 		    socket_key: socket_key
 		};
@@ -105,7 +104,6 @@ module.exports = function (nTiles){
 	    var PI = typeof(socket_key) == "number" ? socket_key : player_index_from_socketKey_lkup[socket_key];
 	    //in this case we are performing a deep copy of data, hence the use of the JSON function
 	    var player_clone = JSON.parse(JSON.stringify(playerSet[PI]));
-	    delete player_clone.agrees_to_reset;
 	    delete player_clone.socket_key;
 	    return player_clone;
 	},
@@ -131,6 +129,7 @@ module.exports = function (nTiles){
 	    }
 	},
 	
+	//I don't believe this function is used, by design...
 	resetGame: function(nTiles) {
 	    tileSet = generateNewRandomTileSet(nTiles);
 	    my_color_palette = shuffle(color_palette);
@@ -143,29 +142,10 @@ module.exports = function (nTiles){
 	    for (i=0; i<playerSet.length; i++){
 		playerSet[i].words = [];//empty...
 	    }
-
-	    //resetore all players to not yet agreeing to the next reset request
-	    for (i=0;i<playerSet.length;i++){
-		playerSet[i].agrees_to_reset = false;
-	    }
-
 	},
 
 	playerIndexFromSocket: function(socket_key) {
 	    return player_index_from_socketKey_lkup[socket_key];
-	},
-
-	playerAgreesToReset: function(socket_key) {
-	    // this function takes as input the socket_key of a player who wishes to reset.
-	    // it returns true iff every player is willing to reset.
-	    var PI = player_index_from_socketKey_lkup[socket_key];
-	    playerSet[PI].agrees_to_reset = true;
-	    var lets_reset = true;
-	    for (i=0;i<playerSet.length;i++){
-		lets_reset = lets_reset && playerSet[i].agrees_to_reset;
-	    }
-	    console.log(playerSet.length,lets_reset);
-	    return lets_reset;
 	},
 
 	snatchWordValidation: function(tile_id_array){

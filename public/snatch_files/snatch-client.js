@@ -35,10 +35,8 @@ socket.on('player color choices', function(msg_obj){
 
 ///upon arrival, process the transmitted game state from the server
 socket.on('full game state transmission', function(gameState){
-    //the message is sent on the following events:
-    // (1) a player has just joined the game (they just chose a color)
-    // (2) a player has requested reset and they are the only player
-    // (3) a player has agreed to a reset request, and now everyone agrees...
+    // According to the latest Design, this event only occurs once per client session
+    // there is no reset etc causing retransmission of the game state.
 
     //this will clear the message "waiting for the server..."
     snDraw.Game.TileArray = [];
@@ -101,24 +99,10 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
 });
 
 
-
-
-socket.on('player wants reset', function(player_index){
-    var player_name = players[player_index].name;
-    var resetAssent = confirm(player_name + " has requested to reset the game. Do you want to reset the game?");
-    socket.emit('agree to reset', resetAssent);	
-});
-
 socket.on('player disconnected', function(player_index){
     snDraw.Game.Event.Disconnection(player_index);
 });
 
-//this is message to Tell me that Alex has said "Reset" - inform of another players decision
-socket.on('player response to reset request', function(responseObj){
-    var p_name = players[responseObj.player_index].name;
-    var p_a = responseObj.response;
-    console.log("TOAST: " + p_name + " responded to reset request with the answer: " + p_a);
-});
 
 socket.on('give client their player index', function(myIndex){
     client_player_index = myIndex;
@@ -154,7 +138,6 @@ socket.on('snatch rejected', function(rejection_reason){
 });
 
 function PLAYER_SUBMITS_WORD(p)       {socket.emit('player submits word', p);}
-function RESET_REQUEST()              {socket.emit('reset request', 0);}
 function TILE_TURN_REQUEST()          {socket.emit('tile turn request', 0);}
 function PLAYER_JOINED_WITH_DETAILS(p){socket.emit('player joined with details', p);}
 

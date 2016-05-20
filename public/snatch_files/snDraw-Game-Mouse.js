@@ -144,8 +144,7 @@ snDraw.Game.Mouse = {
 	}
 	if(control_index == 4){
 	    // Actions for "Reset Game" Button click
-	    var really = confirm("Do you really want to reset this game?");
-	    if(really){RESET_REQUEST();}
+	    snDraw.Game.Controls.create_GameSettings_Window();
 	}
     }
 };

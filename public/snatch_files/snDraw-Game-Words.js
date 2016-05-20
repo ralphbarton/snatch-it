@@ -216,7 +216,8 @@ snDraw.Game.Words = {
 	var onComplete_groupLetters = function(){
 	    var WordGrp = snDraw.Game.Words.WordAsTileGroupAtOrigin(player_index, word_index, false, Spacings);
 	    //move into position...
-	    WordGrp.set(TargetCoords_clone);//messy syntax in lieu of whatever jquery clones an object...
+	    // remember, one of the benefits of this 'moveSwitchable' function is to remove/re-add for D&D zone behaviour
+	    snDraw.moveSwitchable(WordGrp, false, null, TargetCoords_clone);
 	};
 
 	var waveAnimateContext_WordTA = function (i){
