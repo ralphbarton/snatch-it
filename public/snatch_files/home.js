@@ -89,16 +89,22 @@ function add_listeners(){
 		var table = doc.createElement("table");
 		table.appendChild(fragment);
 
+		// clear the contents of the DEV then fill it with the table
+		// this will always be triggered by the rooms list message..
 		rooms_div.innerHTML = "";
 		rooms_div.appendChild(table);
 	    }else{
 		rooms_div.innerHTML = "<p class=\"b34\"> No games have been created.<br> Click here to <a href=\"#\" class=\"red-link\" onclick=\"initiate_game()\">initiate a new game</a>.</p>";
 	    }
 
+	    //add a time-delay;
+	    setTimeout(function(){
+		socket.emit('request rooms list', 0);
+	    }, 1000 * 60 * 5);//in 5 minutes time, re-execute the function with updated information...
+
 	});
     }
 };
-
 
 
 function fuzzyTime(my_duration) {

@@ -38,7 +38,6 @@ bitter
 brilliant
 frozen
 toasted
-baked
 boiled
 barbecued
 fried
@@ -99,3 +98,5 @@ twisted
 lucky
 dangerous
 suspicious
+rocky
+spotted

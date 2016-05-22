@@ -380,8 +380,7 @@ snDraw.Game.Controls = {
 		TILE_TURN_REQUEST(); //request another tile...
 	    }else{
 		this.client_finished_game = true;
-		this.createPlayersListWindow();
-		
+		snDraw.Game.Popup.createPlayersListWindow();
 	    }
 	}
     }
