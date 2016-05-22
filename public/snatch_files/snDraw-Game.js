@@ -97,6 +97,21 @@ snDraw.Game = {
 	return this.tileSpacings;
     },
 
+    //this function returns true if value has been changed...
+    setTileRatSizeFromNTiles: function(n_tiles){
+	var old_Ratio_tile = this.Ratio_tile;
+	if(n_tiles < 30){
+	    this.Ratio_tile = 0.65;
+	}else if(n_tiles < 65){
+	    this.Ratio_tile = 0.37;
+	}else{
+	    this.Ratio_tile = 0.28;
+	}
+	return this.Ratio_tile != old_Ratio_tile;
+
+    },
+
+
     generateTileObject: function(tile,tile_id){
 
 	//parameter controlling the proportions of the tiles (boarder, font size)

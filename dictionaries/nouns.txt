@@ -64,6 +64,10 @@ wallpaper
 windowsill
 cheeseburger
 planet
+galaxy
+library
+starship
+museum
 bonfire
 ladder
 spatula
@@ -80,8 +84,9 @@ dandelion
 needle
 thread
 button
-rope
-string
+timber
+shoestring
+footprints
 calender
 cabinet
 theater
@@ -95,8 +100,8 @@ garage
 hammer
 scissors
 attic
-footprints
 raincoat
 boots
 gloves
 slippers
+

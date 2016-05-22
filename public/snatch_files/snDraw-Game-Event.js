@@ -100,6 +100,9 @@ snDraw.Game.Event = {
 	    // 7.2.2 Put unclaimed words into arrangement (no animation)
 	    snDraw.Game.Words.MoveWordsIntoArrangement(Top, ZoneProperties.WordBounds, WordGroup, Arrangement_noH, null);
 	}
+
+	//After draw operation, actually draw the frame on-screen...
+	snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
     },
     
     TileTurn: function(player_index, tile_index, letter){
@@ -115,6 +118,15 @@ snDraw.Game.Event = {
 	var n_tiles_remaining = tilestats.n_tiles - tileset.length;
 	snDraw.Game.Controls.updateTurnLetter_number(n_tiles_remaining);
 
+	// 1.2 maybe modify tile size...
+	var tile_size_change = snDraw.Game.setTileRatSizeFromNTiles(tilestats.n_turned);
+	if (tile_size_change){	
+	    setTimeout(function(){
+		canvas.clear();
+		snDraw.Game.Event.DrawAll();
+		snDraw.Game.Toast.showToast("Display scale adjusted to fit tiles on screen");
+	    }, 2000); //2 seconds after turn, apply the resize. This avoids interference with animate in tile...
+	}
 
 	// 2. Determine if zones need to be squeezed because the tile grid has grown vertically...
 	var old_grid_bottom_px = snDraw.Game.Grid.GetGridBottomPx();
@@ -466,7 +478,6 @@ snDraw.Game.Event = {
 	    canvas.clear();
 	    snDraw.makeCanvasFitWholeWindow();
 	    snDraw.Game.Event.DrawAll();
-	    snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
 	}, 200); //inject 0.2 second delay ("size stablisation time") before redrawing all...
     }
 

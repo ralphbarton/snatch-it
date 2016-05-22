@@ -100,7 +100,7 @@ function add_listeners(){
 	    //add a time-delay;
 	    setTimeout(function(){
 		socket.emit('request rooms list', 0);
-	    }, 1000 * 60 * 5);//in 5 minutes time, re-execute the function with updated information...
+	    }, 1000 * 60 * 1);//in 1 minutes time, re-execute the function with updated information...
 
 	});
     }

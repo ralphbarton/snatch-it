@@ -7,7 +7,7 @@ var tilestats = {};//global reference - for server data...
 
 var client_player_index = undefined;
 
-var dev = true;
+var dev = false; // select whether development more is active or not
 
 //initialise the Canvas
 
@@ -57,6 +57,7 @@ socket.on('full game state transmission', function(gameState){
     }
 
     //draws the entire game state on the canvas from the data supplied
+    snDraw.Game.setTileRatSizeFromNTiles(tilestats.n_turned);// set starting size for tiles (due to existing game progress)
     snDraw.Game.Event.DrawAll();
 
     //I hope this can't add the callback twice...
