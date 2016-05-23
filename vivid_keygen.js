@@ -34,13 +34,47 @@ module.exports = function (){
 
     console.log("Vivid keygen instance created")
 
-    return function(){
-	var N1 = randomIndex = Math.floor(Math.random() * 100);//from 0 to 99
-	var N2 = randomIndex = Math.floor(Math.random() * 100);//from 0 to 99
-	return {
-	    pin: (100*N1 + N2),
-	    key: (words1[N1] + " " + words2[N2])
-	};
+    var pin_to_word_key = {};
+    var word_key_to_pin = {};
+
+    return {
+	getPIN: function(){
+	    var max_iter = 100000;
+	    while(max_iter > 0){//trap until a free pin is found
+		var N1 = randomIndex = Math.floor(Math.random() * 100);//from 0 to 99
+		var N2 = randomIndex = Math.floor(Math.random() * 100);//from 0 to 99
+		
+		var pin = (100*N1 + N2);
+		var key = (words1[N1] + " " + words2[N2]);
+
+		if(pin_to_word_key[pin] == undefined){
+		    pin_to_word_key[pin] = key;
+		    word_key_to_pin[key] = pin;
+		    break;
+		}
+
+		max_iter--;
+		if(max_iter < 0){
+		    console.log("Failed to generate a unique code. Have 10,000 codes aleady been requested?");
+		    return undefined;
+		}
+	    }
+	    return {
+		pin: pin,
+		key: key
+	    };
+	},
+	getWORDKEYfromPIN: function(pin){return pin_to_word_key[pin];},
+	getPINfromWORDKEY: function(key){return word_key_to_pin[key];},
+	freePIN: function(pin){
+	    if(pin_to_word_key[pin] == undefined){
+		console.log("A bug in this code has caused the attempted deletion of a key which doesn't exist: '"+pin+"'");
+	    }else{
+		var key = pin_to_word_key[pin];
+		delete pin_to_word_key[pin];
+		delete word_key_to_pin[key];
+	    }
+	}
     };
 };
 

@@ -1,4 +1,4 @@
-module.exports = function (nTiles){
+module.exports = function (nTiles, WordChecker){
 
     //generate un unshuffled array using letter frequencies
     var tileSet = generateNewRandomTileSet(nTiles);
@@ -10,10 +10,6 @@ module.exports = function (nTiles){
 
     var tile_ownership = [];
     var next_unturned_tile_i = 0;
-
-    var WC_factory = require('./word_check.js');
-    var WordChecker = WC_factory('./dictionaries/sowpods.txt',0);
-
 
     console.log("created snatch game instance on server");
 

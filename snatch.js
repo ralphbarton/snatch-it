@@ -5,22 +5,33 @@ var io = require('socket.io')(http);
 
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/public/snatch_files/snatch.html');
+    console.log("req.headers['x-forwarded-for'] returns: ", req.headers['x-forwarded-for']);
+    console.log("req.connection.remoteAddress returns: ", req.connection.remoteAddress);
 });
 
 
 
-
-
+//serve all public files as static webserver functionality...
 app.use(express.static('public'));
 
 var qty_tiles = 100;
+
+// import the "snatch-server" module
 var snatchSvr_factory = require('./snatch-server.js');
 
+// Import the "word definition auto-searcher" module
 var SDC_factory = require('./scrape_definition_client.js');
 var my_SDC = SDC_factory();
 
+// Import the unique vivid-word key generator
 var keygen  = require('./vivid_keygen.js')();
-    
+
+// Load the SOWPODS dictionary...
+var WC_factory = require('./word_check.js');
+var WordChecker = WC_factory('./dictionaries/sowpods.txt',0);
+
+ 
+// code to enable web-facing testing of the word Definition tool
 var prev_result = undefined;
 var prev_word = undefined;
 my_SDC.rEvent.on('searchComplete', function(result){
@@ -48,7 +59,9 @@ var RoomTable = {};
 
 
 function close_room(room_key){
-    console.log("Closing room ["+room_key+"] due to inactivity");
+    var pin = getPINfromWORDKEY(room_key);
+    console.log("Closing room ["+room_key+"] / ["+pin+"] due to inactivity");
+    keygen.freePIN(pin);
     delete RoomTable[room_key];
     io.to(room_key).emit('room closed', 0);
 }
@@ -72,6 +85,10 @@ function access_room(room_key){
     R.timeLastAccessed = new Date;
 
 }
+
+
+
+
 
 io.on('connection', function(socket){
 
@@ -119,9 +136,9 @@ io.on('connection', function(socket){
 	var v_words = ["purple","orange","green","golden","black"];
 	//var room_key = v_words[c1] + " " + pcode; 
 
-	var K6 = keygen();
+	var key_deets = keygen.getPIN();
 	//todo use 
-	var room_key = K6.key;
+	var room_key = key_deets.key;
 
 	// 2. Now create a new room instance, referenced by the tag
 	RoomTable[room_key] = {
@@ -129,7 +146,7 @@ io.on('connection', function(socket){
 	    closeTimeoutID: undefined,
 	    timeStarted: (new Date),
 	    timeAccessed: undefined,
-	    GameInstance: snatchSvr_factory(qty_tiles)
+	    GameInstance: snatchSvr_factory(qty_tiles, WordChecker)
 	};
 	access_room(room_key);//this perhaps ought to be part of constructor. Needed to put timeout in place.
 

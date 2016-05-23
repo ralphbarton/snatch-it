@@ -124,7 +124,7 @@ snDraw.Game.Event = {
 	    setTimeout(function(){
 		canvas.clear();
 		snDraw.Game.Event.DrawAll();
-		snDraw.Game.Toast.showToast("Display scale adjusted to fit tiles on screen");
+		snDraw.Game.Toast.showToast("Scale changed to fit more letters due to game progress.");
 	    }, 2000); //2 seconds after turn, apply the resize. This avoids interference with animate in tile...
 	}
 
