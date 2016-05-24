@@ -5,8 +5,6 @@ var io = require('socket.io')(http);
 
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/public/snatch_files/snatch.html');
-    console.log("req.headers['x-forwarded-for'] returns: ", req.headers['x-forwarded-for']);
-    console.log("req.connection.remoteAddress returns: ", req.connection.remoteAddress);
 });
 
 
@@ -87,13 +85,17 @@ function access_room(room_key){
 }
 
 
-
-
+// todo introduce IP based logging.
+var ip_history = {};
 
 io.on('connection', function(socket){
 
     //basic logging
-    console.log('a user connected, with ID: '+socket.id);
+    var client_ip = socket.handshake.headers['x-real-ip'];
+    var client_ua = parse_user_agent(socket.handshake.headers['user-agent']);
+
+    console.log('A user at ip = ' + client_ip + ' connected with socket.id: ' + socket.id);
+    console.log(client_ua);
 
     socket.on('disconnect', function(){
 
@@ -234,11 +236,15 @@ io.on('connection', function(socket){
 	
 	//new joiner to the rest of the players
 	var rPID = details_obj.reclaiming_player_index;
-	if(rPID !== undefined){
-	    var player_join_details = {rejoin_PID: rPID};
-	}else{
-	    var player_join_details = {player_object: myGame.getPlayerObject(socket.id), rejoin_PID: undefined};
+	var player_join_details = {
+	    rejoin_PID: rPID,
+	    device_type: device_intepret(client_ua)
+	};
+
+	if(rPID == undefined){
+	    player_join_details["player_object"] = myGame.getPlayerObject(socket.id);
 	}
+
 	socket.broadcast.to(socket.room_key).emit('player has joined game', player_join_details);
     });
 
@@ -315,3 +321,88 @@ tileID=" + tileID_first + " to tileID=" + tileID_final + ". The letters are: " +
 
 http.listen(3008,'127.0.0.1');
 console.log('Snatch server, listening on 127.0.0.1:3008');
+
+
+function parse_user_agent(ua){
+    //bit of code taken from https://jsfiddle.net/oriadam/ncb4n882/
+    //it cannot distinguish my Android tablet from my Android phone, but it'll do...
+    var
+    browser = /Edge\/\d+/.test(ua) ? 'ed' : /MSIE 9/.test(ua) ? 'ie9' : /MSIE 10/.test(ua) ? 'ie10' : /MSIE 11/.test(ua) ? 'ie11' : /MSIE\s\d/.test(ua) ? 'ie?' : /rv\:11/.test(ua) ? 'ie11' : /Firefox\W\d/.test(ua) ? 'ff' : /Chrome\W\d/.test(ua) ? 'gc' : /Chromium\W\d/.test(ua) ? 'oc' : /\bSafari\W\d/.test(ua) ? 'sa' : /\bOpera\W\d/.test(ua) ? 'op' : /\bOPR\W\d/i.test(ua) ? 'op' : typeof MSPointerEvent !== 'undefined' ? 'ie?' : '',
+    os = /Windows NT 10/.test(ua) ? "win10" : /Windows NT 6\.0/.test(ua) ? "winvista" : /Windows NT 6\.1/.test(ua) ? "win7" : /Windows NT 6\.\d/.test(ua) ? "win8" : /Windows NT 5\.1/.test(ua) ? "winxp" : /Windows NT [1-5]\./.test(ua) ? "winnt" : /Mac/.test(ua) ? "mac" : /Linux/.test(ua) ? "linux" : /X11/.test(ua) ? "nix" : "",
+    mobile = /IEMobile|Windows Phone|Lumia/i.test(ua) ? 'w' : /iPhone|iP[oa]d/.test(ua) ? 'i' : /Android/.test(ua) ? 'a' : /BlackBerry|PlayBook|BB10/.test(ua) ? 'b' : /Mobile Safari/.test(ua) ? 's' : /webOS|Mobile|Tablet|Opera Mini|\bCrMo\/|Opera Mobi/i.test(ua) ? 1 : 0,
+    tablet = /Tablet|iPad/i.test(ua);
+
+    // create a JS object from the parsed userAgent string...
+    return {
+	browser: browser,
+	os: os,
+	mobile: mobile,
+	tablet: tablet
+    };
+}
+
+function device_intepret(ua_obj){
+
+    console.log("ua_obj",ua_obj);
+
+    browser_convert = {
+	"ed": "Microsoft Edge",
+	"ie9": "Explorer 9",
+	"ie10": "Explorer 10",
+	"ie11": "Explorer 11",
+	"ie?": "Explorer of unknown version",
+	"ff": "Firefox",
+	"gc": "Google Chrome",
+	"oc": "Chromium",
+	"sa": "Safari",
+	"op": "Opera"
+    };
+    conv_b = browser_convert[ua_obj.browser];
+
+    os_convert = {
+	"win7": "Windows 7",
+	"win8": "Windows 8",
+	"win9": "Windows 9",
+	"win10": "Windows 10",
+	"winvista": "Windows Vista",
+	"winxp": "Windows XP",
+	"winnt": "Windows NT",
+	"mac": "Apple",
+	"linux": "Linux",
+	"nix": "Nix"
+    };
+    conv_o = os_convert[ua_obj.os];
+
+    mobile_convert = {
+	"0": "Not mobile/tablet",
+	"w": "Nokia or other Windows Phone",
+	"i": "iOS - iPhone or iPad",
+	"a": "Android",
+	"b": "Blackberry",
+	"s": "Safari on non-iphone",
+	"1": "Other mobile or undetected"
+    };
+
+    //The string returned needs to stand in place of X in the sentence: "Alex connected on X"
+    switch (ua_obj.tablet){
+    case true:
+	return "a tablet";
+    case false:
+	switch (ua_obj.mobile) {// confusingly, this variable may be type string or integer in the different cases...
+	case 0:
+	    return "a desktop computer ("+conv_o+"/"+conv_b+")";
+	case "w":
+	    return "mobile (Windows phone)";
+	case "i":
+	    return "mobile (iPhone)";
+	case "a":
+	    return "mobile (Android)";
+	case "b":
+	    return "mobile (Blackberry)";
+	case "s":
+	    return "mobile (Safari on non-iphone)";
+	case 1://I assume this is 1 as an integer...
+	    return "mobile";
+	}
+    }
+}

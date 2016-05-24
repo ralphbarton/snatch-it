@@ -449,7 +449,7 @@ snDraw.Game.Event = {
 
 		snDraw.Game.Toast.showToast(rej_plr.name + " rejoined, reclaiming "+rej_plr.words.length+" words");
 	    }else{
-		snDraw.Game.Toast.showToast(rej_plr.name + " rejoined");
+		snDraw.Game.Toast.showToast(rej_plr.name + " rejoined (on "+player_join_details.device_type+")");
 	    }
 
 	}else{
@@ -462,7 +462,7 @@ snDraw.Game.Event = {
 	    players.push(player_object);
 
 	    //Add colour or something??
-	    snDraw.Game.Toast.showToast(player_object.name + " joined");
+	    snDraw.Game.Toast.showToast(player_object.name + " joined (on "+player_join_details.device_type+")");
 	}
     },
 

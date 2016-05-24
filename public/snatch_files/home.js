@@ -97,10 +97,12 @@ function add_listeners(){
 		rooms_div.innerHTML = "<p class=\"b34\"> No games have been created.<br> Click here to <a href=\"#\" class=\"red-link\" onclick=\"initiate_game()\">initiate a new game</a>.</p>";
 	    }
 
-	    //add a time-delay;
-	    setTimeout(function(){
-		socket.emit('request rooms list', 0);
-	    }, 1000 * 60 * 1);//in 1 minutes time, re-execute the function with updated information...
+	    //add a time-delay to refresh page contents (conditional on page being in foreground)...
+	    if($("#page3").css("display")=="block"){
+		setTimeout(function(){
+		    socket.emit('request rooms list', 0);
+		}, 1000 * 60 * 1);//in 1 minutes time, re-execute the function with updated information...
+	    }
 
 	});
     }
