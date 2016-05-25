@@ -390,15 +390,15 @@ function device_intepret(ua_obj){
     case false:
 	switch (ua_obj.mobile) {// confusingly, this variable may be type string or integer in the different cases...
 	case 0:
-	    return "a desktop computer ("+conv_o+"/"+conv_b+")";
+	    return "a desktop computer ("+conv_o+" / "+conv_b+")";
 	case "w":
 	    return "mobile (Windows phone)";
 	case "i":
-	    return "mobile (iPhone)";
+	    return "mobile (iPhone / "+conv_b+")";
 	case "a":
-	    return "mobile (Android)";
+	    return "mobile (Android / "+conv_b+")";
 	case "b":
-	    return "mobile (Blackberry)";
+	    return "mobile (Blackberry / "+conv_b+")";
 	case "s":
 	    return "mobile (Safari on non-iphone)";
 	case 1://I assume this is 1 as an integer...

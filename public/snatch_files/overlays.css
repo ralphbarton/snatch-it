@@ -114,15 +114,11 @@ a.modal:hover{
     background:linear-gradient(to bottom, #38444a 5%, #1d2329 100%);
     filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#38444a', endColorstr='#1d2329',GradientType=0);
     background-color:#38444a;
-    -moz-border-radius:7px;
-    -webkit-border-radius:7px;
-    border-radius:7px;
     border:1px solid #0b0e07;
     display:inline-block;
     cursor:pointer;
     color:#fff045;
     font-family:Arial;
-    font-size:15px;
     padding:9px 23px;
     text-decoration:none;
     text-shadow:1px 1px 1px #000000;
@@ -130,8 +126,8 @@ a.modal:hover{
 
 .ToastCentral {
     position: absolute;
-    width: 50%;
-    left: 25%;
+    width: 62%;
+    left: 15%;
 }
 
 .ToastIn {

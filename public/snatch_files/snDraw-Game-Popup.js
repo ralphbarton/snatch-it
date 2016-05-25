@@ -108,7 +108,7 @@ snDraw.Game.Popup = {
 	//Clear the footer then add the CLOSE and potentially PLAY AGAIN links...
 	var close_link = "<a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Popup.removePlayersListWindow()\">Close</a>";
 	$("#modal-footer").html("").append(close_link);
-	if(this.client_finished_game == true){
+	if(snDraw.Game.Controls.client_finished_game == true){
 	    $("#modal-footer").append(" | <a class=\"modal\" href=\"#\" onclick=\"location.reload()\">Another Game</a>");
 	}
 
@@ -154,7 +154,7 @@ snDraw.Game.Popup = {
 	    $("#box-title").html("Options");
 	    console.log($("#box-title").html());
 
-	    //Clear body then inject scores table
+	    //Clear body then inject some content (in this case the options)
 	    $("#modal-body").html("note to self: add some options in this space...");
 	    $("#modal-body").append("<a class=\"modal\" href=\"#\" onclick=\"location.reload()\">Quit this game</a>");
 

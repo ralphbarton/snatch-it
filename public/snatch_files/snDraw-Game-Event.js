@@ -3,14 +3,15 @@ snDraw.Game.Event = {
     //this function is called upon entry into the game and anything that requires redraw of all (such as window resize)
     DrawAll: function(){
 
-	// 1. Determine Scale Constants & set background...
+	// 1. Set Background. Determine various scale constants (based ultimately on screen dimentions)
+	canvas.setBackgroundColor(snDraw.Game.bg_col);
+
 	var Spacings = snDraw.Game.calculateRenderingDimentionConstants();
 	snDraw.Game.Zones.SetZoneStyleScalingsFromTileSize(Spacings.ts);
-	canvas.setBackgroundColor(snDraw.Game.bg_col);
+	snDraw.Game.Popup.scalePropertiesPlayersListWindow();//if scores were present on resize, this changes some scale params
 
 	// 2. Add the controls strip
 	snDraw.Game.Controls.createControls();
-	snDraw.Game.Popup.scalePropertiesPlayersListWindow();//if scores were present on resize, this changes some scale params
 
 	// 3. Create all the grid tiles...
 	snDraw.Game.Grid.InitialiseGrid(Spacings);
@@ -124,7 +125,7 @@ snDraw.Game.Event = {
 	    setTimeout(function(){
 		canvas.clear();
 		snDraw.Game.Event.DrawAll();
-		snDraw.Game.Toast.showToast("Scale changed to fit more letters due to game progress.");
+		snDraw.Game.Toast.showToast("Scale changed to fit tiles...");
 	    }, 2000); //2 seconds after turn, apply the resize. This avoids interference with animate in tile...
 	}
 
@@ -449,7 +450,7 @@ snDraw.Game.Event = {
 
 		snDraw.Game.Toast.showToast(rej_plr.name + " rejoined, reclaiming "+rej_plr.words.length+" words");
 	    }else{
-		snDraw.Game.Toast.showToast(rej_plr.name + " rejoined (on "+player_join_details.device_type+")");
+		snDraw.Game.Toast.showToast(rej_plr.name + " rejoined on " + player_join_details.device_type);
 	    }
 
 	}else{
@@ -462,7 +463,7 @@ snDraw.Game.Event = {
 	    players.push(player_object);
 
 	    //Add colour or something??
-	    snDraw.Game.Toast.showToast(player_object.name + " joined (on "+player_join_details.device_type+")");
+	    snDraw.Game.Toast.showToast(player_object.name + " joined on " + player_join_details.device_type);
 	}
     },
 

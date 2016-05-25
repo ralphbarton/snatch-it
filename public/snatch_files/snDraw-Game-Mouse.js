@@ -3,6 +3,7 @@ snDraw.Game.Mouse = {
     //these variables are supposedly the class members...
     x_pickup: undefined,
     y_pickup: undefined,
+    anti_controls_dblclick: [],
 
     mDown: function (e) {
 
@@ -32,7 +33,13 @@ snDraw.Game.Mouse = {
 	    var control_index = targetObj.gameButtonID;
 	    if(control_index !== undefined){ //implies the click landed on a button...
 		snDraw.Game.Controls.buttonRecolor(targetObj,"press"); // visual
-		this.callGameControlHandler(control_index);
+
+		//bulked up with anti double click code...
+		if(this.anti_controls_dblclick[control_index] !== true){
+		    this.callGameControlHandler(control_index);
+		}
+		this.anti_controls_dblclick[control_index] = true;
+		setTimeout(function(){snDraw.Game.Mouse.anti_controls_dblclick[control_index] = false;}, 500);
 	    }
 	}
     },

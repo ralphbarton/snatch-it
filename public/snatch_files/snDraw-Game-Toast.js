@@ -79,8 +79,18 @@ snDraw.Game.Toast = {
 
 	$NewToast.css("top", (toast_top + "px"));
 
+	//toasts scaling (there are some more...)
+	//TODO: this styling code which applies to all toasts should be elsewhere
+	// why can't I use jQuery to change the properties of the CSS class universally whilst no objects of that class exist?
+	var ts = snDraw.Game.tileSpacings.ts;
+	$NewToast.css("font-size", (ts*0.35)+"px");
+	$NewToast.css("-moz-border-radius", (ts*0.1)+"px");
+	$NewToast.css("-webkit-border-radius", (ts*0.1)+"px");
+	$NewToast.css("border-radius", (ts*0.1)+"px");
 
-	var toast_duration = 3600;
+
+
+	var toast_duration = 4000;
 	setTimeout(function(){
 	    
 	    $("#"+t_key).removeClass("ToastIn");

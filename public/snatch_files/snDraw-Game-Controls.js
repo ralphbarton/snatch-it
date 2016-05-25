@@ -372,16 +372,21 @@ snDraw.Game.Controls = {
     client_finished_game: false,
     turnLetterClickHandler: function(){
 	if(this.turnDisabled){
-	    console.log("TOAST: you must wait before you are allowed to take another turn. Number of seconds = [todo]");
-	}else{
-	    this.setButtonDisabled(1, true);//Disable the "turn letter" button...
+	    snDraw.Game.Toast.showToast("[x.x] seconds until \"Turn Letter\" enabled");
+	}else if(this.client_finished_game == false){
 	    var n_tiles_remaining = tilestats.n_tiles-tileset.length;
 	    if(n_tiles_remaining>0){
+		this.setButtonDisabled(1, true);//Disable the "turn letter" button...
 		TILE_TURN_REQUEST(); //request another tile...
 	    }else{
 		this.client_finished_game = true;
 		snDraw.Game.Popup.createPlayersListWindow();
+		//set text
+		var TurnButton = this.Button_Objs[1];
+		TurnButton.item(1).setText("Exit");
 	    }
+	}else{//this is after the client has clicked "finish", and button text is now "Exit"
+	    location.reload();
 	}
     }
 };
