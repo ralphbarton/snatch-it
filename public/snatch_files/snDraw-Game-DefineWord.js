@@ -17,12 +17,13 @@ snDraw.Game.DefineWord = {
     },
 
     delayedDefinitionToast: function (WordGrp) {
+	clearTimeout(this.my_toast_callback);
 	var id = this.get_WI_PI(WordGrp);
 	var word_str = snDraw.Game.TileIDArray_to_LettersString(players[id.PI].words[id.WI]);
 
 	var confirmation_time = 800;
 	this.my_toast_callback = setTimeout(function(){
-	    snDraw.Game.Toast.showToast(word_str + ": " + this.word_dictionary[word_str]);
+	    snDraw.Game.Toast.showToast(word_str + ": " + snDraw.Game.DefineWord.word_dictionary[word_str]);
 	}, confirmation_time);
 	
     },

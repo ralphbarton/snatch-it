@@ -140,7 +140,7 @@ socket.on('word definitions dictionary', function(word_dictionary){
 });
 
 //add an extra word to the client side copy of the dictionary
-socket.on('word definitions dictionary', function(w_def){
+socket.on('new word definition', function(w_def){
     snDraw.Game.DefineWord.word_dictionary[w_def.word] = w_def.definition;
 });
 
