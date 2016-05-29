@@ -32,8 +32,13 @@ var WordChecker = WC_factory('./dictionaries/sowpods.txt',0);
 // code to enable web-facing testing of the word Definition tool
 var prev_result = undefined;
 var prev_word = undefined;
+var word_dictionary = {};
 my_SDC.rEvent.on('searchComplete', function(result){
     prev_result = result;
+    // this does not limit definitions to rooms.
+    // Work needed for this whole aspect of linking reponse to original asynchronous request
+    io.emit('new word definition', {word: prev_word, definition: prev_result});	    
+    word_dictionary[prev_word] = prev_result;
 });
 
 app.get('/definition/*', function(req, res){
@@ -95,7 +100,6 @@ io.on('connection', function(socket){
     var client_ua = parse_user_agent(socket.handshake.headers['user-agent']);
 
     console.log('A user at ip = ' + client_ip + ' connected with socket.id: ' + socket.id);
-    console.log(client_ua);
 
     socket.on('disconnect', function(){
 
@@ -233,6 +237,7 @@ io.on('connection', function(socket){
 	//gamestate to the new joiner
 	var gameObj = myGame.getGameObject();
 	socket.emit('full game state transmission', gameObj);//now just transmit to the new player
+	socket.emit('word definitions dictionary', word_dictionary);
 	
 	//new joiner to the rest of the players
 	var rPID = details_obj.reclaiming_player_index;
@@ -259,8 +264,19 @@ io.on('connection', function(socket){
 
 	if(SnatchResponse.val_check == 'accepted'){
 	    io.to(socket.room_key).emit('snatch assert', SnatchResponse.SnatchUpdateMsg);	    
+	    
+	    // also, we now take the chance to look up the accepted work in the real dictionary (web-scrape a website)
+	    // response of the scrape-script with trigger further (anonymous) actions
+	    var word_str = myGame.TileIDArray_to_LettersString(tile_id_array);
+	    my_SDC.lookup_definition(word_str);
+	    console.log("Web-scraping defintion of word " + word_str);
+	    prev_word = word_str;
+
 	}else{
-	    socket.emit('snatch rejected', SnatchResponse.val_check);
+	    //don't bother sending the duplicate mesage back to client...
+	    if(SnatchResponse.val_check != 'duplicate'){
+		socket.emit('snatch rejected', SnatchResponse.val_check);
+	    }
 	}
     });
 
@@ -352,7 +368,7 @@ function device_intepret(ua_obj){
 	"ie11": "Explorer 11",
 	"ie?": "Explorer of unknown version",
 	"ff": "Firefox",
-	"gc": "Google Chrome",
+	"gc": "Chrome",
 	"oc": "Chromium",
 	"sa": "Safari",
 	"op": "Opera"
@@ -394,11 +410,12 @@ function device_intepret(ua_obj){
 	case "w":
 	    return "mobile (Windows phone)";
 	case "i":
-	    return "mobile (iPhone / "+conv_b+")";
+	    return "mobile (iPhone)";
 	case "a":
-	    return "mobile (Android / "+conv_b+")";
+	    return "mobile (Android)";// since it always seems to detect the browser as Chrome on an Andoid, even using
+	    //something else, I did not think there was much point in browser detection in the mobile case.
 	case "b":
-	    return "mobile (Blackberry / "+conv_b+")";
+	    return "mobile (Blackberry)";
 	case "s":
 	    return "mobile (Safari on non-iphone)";
 	case 1://I assume this is 1 as an integer...

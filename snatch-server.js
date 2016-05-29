@@ -3,6 +3,7 @@ module.exports = function (nTiles, WordChecker){
     //generate un unshuffled array using letter frequencies
     var tileSet = generateNewRandomTileSet(nTiles);
     var playerSet = [];//this would be an empty player set for game start
+    var player_previous_snatch_tileIDs = [];
     var player_index_from_socketKey_lkup = [];
     var my_color_palette = shuffle(generateDistributedRandomColorSet(12));
     var emergency_colors = shuffle(my_color_palette.slice(0));//duplicated data
@@ -144,7 +145,7 @@ module.exports = function (nTiles, WordChecker){
 	    return player_index_from_socketKey_lkup[socket_key];
 	},
 
-	snatchWordValidation: function(tile_id_array){
+	snatchWordValidation: function(player_index, tile_id_array){
 
 	    if(tile_id_array == null){
 		return {validity: 'null word sent...'};
@@ -154,6 +155,16 @@ module.exports = function (nTiles, WordChecker){
 	    if(tile_id_array.length < 3){
 		return {validity: 'insufficient length'};
 	    }
+
+	    //the last snatch message from this player was the very same tileset...
+	    var duplicate_tilegroup_msg = false;
+	    if (player_previous_snatch_tileIDs[player_index] != undefined){//there may not have been a prev snatch for this plr
+		if(player_previous_snatch_tileIDs[player_index].equals(tile_id_array)){
+		    duplicate_tilegroup_msg = true;
+		}
+	    }
+	    //record the value this tile IDs submission for next time...
+	    player_previous_snatch_tileIDs[player_index] = tile_id_array;
 
 	    //Dictionary check... (reconstruct word as string)
 	    var STR = "";
@@ -232,7 +243,12 @@ module.exports = function (nTiles, WordChecker){
 		}
 		//just tagging in this extra check: reject if length is not increased...
 		if(wordlength_i == tile_id_array.length){
-		    return {validity: 'invalid: word length unchanged (at ' + wordlength_i + ' letters)'};
+		    if(!duplicate_tilegroup_msg){
+			return {validity: 'invalid: word length unchanged (at ' + wordlength_i + ' letters)'};
+		    }else{
+			//note that we only raise the duplication error if the duplicate move is not valid. It may be valid
+			return {validity: 'duplicate'};
+		    }
 		}
 	    }
 
@@ -245,11 +261,11 @@ module.exports = function (nTiles, WordChecker){
 	playerSnatches: function(tile_id_array,socket_key) {
 	    var PI = player_index_from_socketKey_lkup[socket_key];
 	    var Response = {};
-	    var validation_results = this.snatchWordValidation(tile_id_array);
+	    var validation_results = this.snatchWordValidation(PI, tile_id_array);
 	    Response.val_check = validation_results.validity;
 
 	    //check the snatch is valid:
-	    if( Response.val_check == 'accepted'){// snatch accepted
+	    if(Response.val_check == 'accepted'){// snatch accepted
 	    	console.log("Player " + PI + " SNATCH accepted.");
 		var words_consumed = validation_results.words_consumed;
 		var words_consumed_orig = JSON.parse(JSON.stringify(words_consumed));
@@ -340,6 +356,18 @@ module.exports = function (nTiles, WordChecker){
 
 	    fiveColorsSent_socketKey[socket_key].cols = mySet;//remove 5 colours from the palette
 	    return mySet;
+	},
+
+	//this is copy-pasted client side code...
+	TileIDArray_to_LettersString: function(TileIDArray){
+	    //get the letter set
+	    var letters_string = "";
+	    for(var i = 0; i < TileIDArray.length; i++){
+		var TI = TileIDArray[i];
+		var myletter = tileSet[TI].letter;
+		letters_string += myletter;
+	    }
+	    return letters_string;
 	},
 
 
@@ -531,3 +559,39 @@ function contains(a, obj) {
     }
     return false;
 }
+
+
+
+////////////////////////////////////////
+//todo: this is just code tagged onto the end of the file. doing this is a bit messy...
+////////////////////////////////////////
+
+// Warn if overriding existing method
+if(Array.prototype.equals)
+    console.warn("Overriding existing Array.prototype.equals. Possible causes: New API defines the method, there's a framework conflict or you've got double inclusions in your code.");
+// attach the .equals method to Array's prototype to call it on any array
+Array.prototype.equals = function (array) {
+    // if the other array is a falsy value, return
+    if (!array)
+        return false;
+
+    // compare lengths - can save a lot of time 
+    if (this.length != array.length)
+        return false;
+
+    for (var i = 0, l=this.length; i < l; i++) {
+        // Check if we have nested arrays
+        if (this[i] instanceof Array && array[i] instanceof Array) {
+            // recurse into the nested arrays
+            if (!this[i].equals(array[i]))
+                return false;       
+        }           
+        else if (this[i] != array[i]) { 
+            // Warning - two different object instances will never be equal: {x:20} != {x:20}
+            return false;   
+        }           
+    }       
+    return true;
+}
+// Hide method from for-in loops
+Object.defineProperty(Array.prototype, "equals", {enumerable: false});

@@ -25,6 +25,7 @@ snDraw.Game.Mouse = {
 	    //Handle clicks that land on a word...
 	    var word_owner = targetObj.OwnerPlayer;
 	    if(word_owner!==undefined){//mouse down on a word 
+		snDraw.Game.DefineWord.delayedDefinitionToast(targetObj);
 		this.x_pickup = targetObj.getLeft();
 		this.y_pickup = targetObj.getTop();
 	    }
@@ -62,8 +63,8 @@ snDraw.Game.Mouse = {
 
 	    //Handle click releases over a word...
 	    var word_owner = targetObj.OwnerPlayer;
-	    if(word_owner !== undefined){//mouse down on a word 
-		
+	    if(word_owner !== undefined){//mouse up on a word 
+		snDraw.Game.DefineWord.clearDefinitionToast(targetObj);
 		//clicks released over a word that had previously been clicked on (i.e. picked up)
 		if(this.x_pickup !== undefined){
 		    snDraw.moveSwitchable(targetObj, true, snDraw.ani.sty_Anag,{
@@ -96,6 +97,12 @@ snDraw.Game.Mouse = {
 	    if(control_index !== undefined){ 
 		snDraw.Game.Controls.buttonRecolor(targetObj,"hover");
 	    }
+
+	    //Handle mouse pointer passing onto a word...
+	    var word_owner = targetObj.OwnerPlayer;
+	    if(word_owner !== undefined){//mouse over a word 
+		snDraw.Game.DefineWord.delayedDefinitionToast(targetObj);
+	    }
 	}
     },
 
@@ -110,6 +117,13 @@ snDraw.Game.Mouse = {
 	    if(control_index !== undefined){ 
 		snDraw.Game.Controls.buttonRecolor(targetObj,"normal");
 	    }
+
+	    //Handle mouse pointer moving off a word...
+	    var word_owner = targetObj.OwnerPlayer;
+	    if(word_owner !== undefined){//mouse down on a word 
+		snDraw.Game.DefineWord.clearDefinitionToast(targetObj);
+	    }
+
 	}
     },
 

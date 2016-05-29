@@ -130,13 +130,18 @@ socket.on('heartbeat server ack', function(){
     heartbeat_status = "server acknowledged";
 });
 
-
 socket.on('snatch rejected', function(rejection_reason){
-    
-    //a toast here
-    //issue 114 - we decided: Don't clear word upon a failed snatch...
-    //snDraw.Game.Spell.CancelWord();
     snDraw.Game.Toast.showToast("Move invalid: " + rejection_reason);
+});
+
+//overwrite entire dictionary with server copy (will happen only on game load)
+socket.on('word definitions dictionary', function(word_dictionary){
+    snDraw.Game.DefineWord.word_dictionary = word_dictionary;
+});
+
+//add an extra word to the client side copy of the dictionary
+socket.on('word definitions dictionary', function(w_def){
+    snDraw.Game.DefineWord.word_dictionary[w_def.word] = w_def.definition;
 });
 
 function PLAYER_SUBMITS_WORD(p)       {socket.emit('player submits word', p);}
