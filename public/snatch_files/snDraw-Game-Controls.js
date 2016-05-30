@@ -408,7 +408,11 @@ snDraw.Game.Controls = {
 		$("#q12").html(time_remaining);
 
 		var t_active = snDraw.Game.Toast.Active_byKey[snDraw.Game.Controls.turn_tk];
-		if(t_active){
+		if (time_remaining == 0){
+		    snDraw.Game.Toast.setToastRemTimeout(snDraw.Game.Controls.turn_tk,true);//the true means clear fast...
+		    // to not hold a reference to a now deleted toast.
+		    snDraw.Game.Controls.turn_tk = undefined;
+		}else if(t_active){
 		    //recursive call...
 		    setTimeout(toast_time_updater, 1000/ndo);
 		}else{

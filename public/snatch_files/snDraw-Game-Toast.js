@@ -97,7 +97,7 @@ snDraw.Game.Toast = {
     timeoutIDs: {},
     Active_byKey: {},
 
-    setToastRemTimeout: function(t_key){//this will remove any existing timeouts to remove the toast indexed by t_key
+    setToastRemTimeout: function(t_key, fast){//this will remove any existing timeouts to remove the toast indexed by t_key
 	var toast_duration = 4000;
 	var new_timoutID = setTimeout(function(){
 	    
@@ -115,7 +115,7 @@ snDraw.Game.Toast = {
 
 	    }, 400 + 10);//delete 10ms after fade out is complete.
 
-	}, toast_duration);
+	}, fast?10:toast_duration);
 
 	var old_timeoutID = this.timeoutIDs[t_key];
 	this.timeoutIDs[t_key] = new_timoutID;
