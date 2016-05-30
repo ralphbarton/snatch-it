@@ -371,25 +371,53 @@ snDraw.Game.Controls = {
     },
 
     client_finished_game: false,
+    turn_tk: undefined,//toast key for the Toast relating to turning letter...
+    bolden_counter: 0,
     turnLetterClickHandler: function(){
 	if(this.turnDisabled){
-	    //toast non-duplicating and contents to update...
-	    var toast_str = "<span id=\"q12\">[x.x]</span> seconds until you can turn another letter";
-	    var toast_present = snDraw.Game.Toast.showToast(toast_str);
 
-	    function time_cascader (){
-		var time_start = this.turnDisabled_start;
-		var time_dur = this.turnDisabled_dur;
-		var time_now = new Date();
+	    if(this.turn_tk != undefined){
+		//the "turn" toast is already on-screen. Extent its timeout
+		snDraw.Game.Toast.setToastRemTimeout(this.turn_tk);
 
-		$("#q12").html($NewToast);
-		if(toast_present()){
-		    setTimeout(,);
-		    time_cascader
+		//here is also the opportunity for boldening the message!!
+		if(this.bolden_counter == 1){
+		    $("#q12").css("font-weight", "bold");
+		}else if(this.bolden_counter == 2){
+		    $("#q12").css("color", "red");
+		}
+
+	    }else{//create the new Toast
+		var toast_str = "<span id=\"q12\">[x.x]</span> seconds until you can turn another letter";
+		this.turn_tk = snDraw.Game.Toast.showToast(toast_str);
+		this.bolden_counter = 0;
+	    }
+	    this.bolden_counter++;
+
+	    //in all cases, Toast contents need to update...
+	    function toast_time_updater (){
+		var date_start = snDraw.Game.Controls.turnDisabled_start;
+		var time_dur = snDraw.Game.Controls.turnDisabled_dur;
+		var date_now = new Date();
+		
+		var time_remaining = Math.max(time_dur - (date_now - date_start)/1000, 0);
+		var ndo = 5;
+		//create the string for time remaining
+		time_remaining = (Math.round(time_remaining * ndo) / ndo).toFixed(1);
+
+		$("#q12").html(time_remaining);
+
+		var t_active = snDraw.Game.Toast.Active_byKey[snDraw.Game.Controls.turn_tk];
+		if(t_active){
+		    //recursive call...
+		    setTimeout(toast_time_updater, 1000/ndo);
+		}else{
+		    // to not hold a reference to a now deleted toast.
+		    snDraw.Game.Controls.turn_tk = undefined;
 		}
 	    };
-	    //
-	    time_cascader();
+
+	    toast_time_updater();
 
 
 	}else if(this.client_finished_game == false){

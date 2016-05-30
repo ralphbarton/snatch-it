@@ -33,7 +33,7 @@ snDraw.Game.Toast = {
 	this.ToastRolling.push(t_key); // rolling is a []
 
 	//Actually the div of the new Toast class...
-	var $NewToast = $( "<div/>", {id: t_key}).addClass("ToastGrey ToastCentral ToastIn").text(my_string);
+	var $NewToast = $( "<div/>", {id: t_key}).addClass("ToastGrey ToastCentral ToastIn").html(my_string);
 	$("#page4").append($NewToast);
 
 	var toast_spacing = snDraw.Game.tileSpacings.ts * 0.18;
@@ -88,10 +88,18 @@ snDraw.Game.Toast = {
 	$NewToast.css("-webkit-border-radius", (ts*0.1)+"px");
 	$NewToast.css("border-radius", (ts*0.1)+"px");
 
+	this.setToastRemTimeout(t_key);
+	return t_key;
+    },
 
 
+    //these hash tables use t_key as their keys
+    timeoutIDs: {},
+    Active_byKey: {},
+
+    setToastRemTimeout: function(t_key){//this will remove any existing timeouts to remove the toast indexed by t_key
 	var toast_duration = 4000;
-	setTimeout(function(){
+	var new_timoutID = setTimeout(function(){
 	    
 	    $("#"+t_key).removeClass("ToastIn");
 	    $("#"+t_key).addClass("ToastOut");
@@ -103,10 +111,16 @@ snDraw.Game.Toast = {
 		//remove this toast key from the array: it is GONE!
 		snDraw.Game.Toast.ToastRolling.splice(roll_index, 1);
 		$("#"+t_key).remove();
+		snDraw.Game.Toast.Active_byKey[t_key] = false;
 
 	    }, 400 + 10);//delete 10ms after fade out is complete.
 
 	}, toast_duration);
 
+	var old_timeoutID = this.timeoutIDs[t_key];
+	this.timeoutIDs[t_key] = new_timoutID;
+	clearTimeout(old_timeoutID);
+	this.Active_byKey[t_key] = true;
     }
+
 };
