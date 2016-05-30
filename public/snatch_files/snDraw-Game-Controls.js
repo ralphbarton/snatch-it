@@ -292,6 +292,8 @@ snDraw.Game.Controls = {
 	snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
     },
 
+    turnDisabled_dur: undefined,
+    turnDisabled_start: undefined,
     startTurnDisableTimeout: function(){
 	
 	if(this.turnDisabled){//the function irrelivant if the turn is not already disabled...
@@ -305,7 +307,7 @@ snDraw.Game.Controls = {
 	    var fast_flip = (players.length < 2) || (n_words == 0);
 
 	    //How long (in seconds) should it take for the button to become available again?
-	    var dur = (dev || fast_flip) ? 1 : 10;//minimise wait in development mode...
+	    this.turnDisabled_dur = (dev || fast_flip) ? 1 : 10;//minimise wait in development mode...
 
 	    //make the outline of the button coloured.
 	    var RoundedRec = this.Button_Objs[1].item(0);
@@ -315,12 +317,10 @@ snDraw.Game.Controls = {
 
 	    var corners_r = snDraw.Game.tileSize * 0.12;
 
-	    //this is the exact number of pixels of the perimeter of the rounded cornered rectangle (test by making the 1.0 slightly smaller!)
+	    //the exact number of pixels of perimeter of rounded cornered rectangle (test by making the 1.0 slightly smaller!)
 	    var l_tot = ((RoundedRec.getWidth() + RoundedRec.getHeight()) * 2 + 2*corners_r*(Math.PI-4.0))* 1.0;
-	    var fps = (1000/snDraw.frameperiod_measured);//TODO: fps is not fixed for different platforms. It needs to be measured upon page load.
-	    var f_tot = Math.round(dur*fps,0);//whole number of frames...
 	    
-	    var start_time = (new Date()).getTime();
+	    this.turnDisabled_start = (new Date()).getTime();
 
 	    RoundedRec.setStrokeDashArray([0, l_tot]);
 
@@ -328,7 +328,8 @@ snDraw.Game.Controls = {
 	    snDraw.FrameTargetsArray.push({
 		frame: function(){
 		    var time_now = (new Date()).getTime();
-		    var progress_fraction = (time_now-start_time) / (1000 * dur);
+		    var time_start = snDraw.Game.Controls.turnDisabled_start;
+		    var progress_fraction = (time_now - time_start) / (1000 * snDraw.Game.Controls.turnDisabled_dur);
 		    var solid_len = progress_fraction * l_tot;
 		    RoundedRec.setStrokeDashArray([solid_len, l_tot-solid_len]);
 		    if((progress_fraction>=1)||(snDraw.Game.Controls.cancelTurnDisabled)){//animation completed...
@@ -372,7 +373,25 @@ snDraw.Game.Controls = {
     client_finished_game: false,
     turnLetterClickHandler: function(){
 	if(this.turnDisabled){
-	    snDraw.Game.Toast.showToast("[x.x] seconds until \"Turn Letter\" enabled");
+	    //toast non-duplicating and contents to update...
+	    var toast_str = "<span id=\"q12\">[x.x]</span> seconds until you can turn another letter";
+	    var toast_present = snDraw.Game.Toast.showToast(toast_str);
+
+	    function time_cascader (){
+		var time_start = this.turnDisabled_start;
+		var time_dur = this.turnDisabled_dur;
+		var time_now = new Date();
+
+		$("#q12").html($NewToast);
+		if(toast_present()){
+		    setTimeout(,);
+		    time_cascader
+		}
+	    };
+	    //
+	    time_cascader();
+
+
 	}else if(this.client_finished_game == false){
 	    var n_tiles_remaining = tilestats.n_tiles-tileset.length;
 	    if(n_tiles_remaining>0){
