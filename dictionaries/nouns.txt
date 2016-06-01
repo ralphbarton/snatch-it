@@ -16,7 +16,6 @@ piglet
 duckling
 lizard
 jungle
-rabbit
 squirrel
 shark
 kitten

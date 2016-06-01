@@ -43,6 +43,8 @@
 
 
   <body>
+    <!-- for when the page is served with the intention of directly joining a game -->
+    #pin#
 
     <!-- 1. Landing page -->
     <div class="page" id="page1">

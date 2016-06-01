@@ -15,6 +15,10 @@ body {
     display: block; /* Show, initially*/
 }
 
+.pin{
+    display: none;
+}
+
 .f_tile {
     top: 15%;
     position: absolute;

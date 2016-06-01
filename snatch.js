@@ -3,10 +3,32 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+
+//the following 11 lines of code taken from http://expressjs.com/en/advanced/developing-template-engines.html
+var fs = require('fs'); // this engine requires the fs module
+app.engine('ntl', function (filePath, options, callback) { // define the template engine
+  fs.readFile(filePath, function (err, content) {
+    if (err) return callback(new Error(err));
+    // this is an extremely simple template engine
+    var rendered = content.toString().replace('#pin#', '<div class="pin">'+ options.pin +'</div>');
+    return callback(null, rendered);
+  });
+});
+app.set('views', './views'); // specify the views directory
+app.set('view engine', 'ntl'); // register the template engine
+
+
+
+app.get('/', function (req, res) {
+  res.render('snatch', { pin: (new Date())});
+});
+
+
+/*  original serve main page...
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/public/snatch_files/snatch.html');
 });
-
+*/
 
 
 //serve all public files as static webserver functionality...
