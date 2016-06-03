@@ -106,3 +106,9 @@ umbrella
 javelin
 volcano
 arena
+cathedral
+icicle
+gargoyle
+chamber
+castle
+fortress

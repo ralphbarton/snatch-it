@@ -57,7 +57,7 @@ body {
 }
 
 
-.button {
+.splod_button {
     top: 55%;
     position: absolute;
     display: block;
@@ -66,9 +66,9 @@ body {
     font-size: 150%;
     border-radius: 15px;
     width: 30%;
-    height: 15%;
+    height: 20%;
     text-decoration: underline;
-    padding-top: 10%;
+    padding-top: 6%;
 }
 
 #init{
@@ -100,23 +100,24 @@ a.white-link:hover{
 
 /*page 2 stuff*/
 #page2, #page3{
-    font-size: 150%;
-    padding: 8%;
+    font-size: 120%;
+    padding: 2%;
+    width: 90%;
 }
 
-#tag-box{
+.identifying-box{
     background-color: #FCF0A9;
     margin: 4%;
     padding: 1%;
     display: inline;
     font-weight: bold;
     color: #CC81E6;
-    font-size: 250%;
+    font-size: 200%;
     border: 1px blue dashed;
 }
 
 p {
-    margin: 3%;
+    margin: 2.2%;
     display: block;
 }
 
@@ -131,12 +132,25 @@ a.red-link:hover{
 
 td.b33{
     font-size: 60%;   
-    border: 1px dotted black;
+    border: 2px dotted #999;
     padding: 4px;
+}
+
+#room-table{
+    margin: 5px;
 }
 
 p.b34{
     font-size: 75%;   
     color: #009;
     padding: 10px;
+}
+
+#k1{
+    width: 350px;
+}
+
+.details2{
+    margin-left: 4%;
+    font-size: 80%;   
 }

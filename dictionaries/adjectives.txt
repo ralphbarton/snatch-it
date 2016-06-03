@@ -1,7 +1,7 @@
 golden
 silver
 blue
-green
+greenish
 purple
 orange
 lilac
@@ -51,7 +51,6 @@ artistic
 luminous
 carefree
 casual
-courteous
 decisive
 delicate
 dignified
@@ -107,3 +106,8 @@ explosive
 flaming
 glowing
 immobile
+crinkly
+darkening
+subsiding
+glistening
+crumbling

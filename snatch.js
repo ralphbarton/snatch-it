@@ -10,7 +10,7 @@ app.engine('ntl', function (filePath, options, callback) { // define the templat
   fs.readFile(filePath, function (err, content) {
     if (err) return callback(new Error(err));
     // this is an extremely simple template engine
-    var rendered = content.toString().replace('#pin#', '<div class="pin">'+ options.pin +'</div>');
+    var rendered = content.toString().replace('#pin#', '<div id="pin">'+ options.pin +'</div>');
     return callback(null, rendered);
   });
 });
@@ -195,7 +195,7 @@ io.on('connection', function(socket){
 	access_room(room_pin);//this perhaps ought to be part of constructor. Needed to put timeout in place.
 
 	console.log("New game created: ", key_deets);
-    	socket.emit('your room tag', room_pin);
+    	socket.emit('new game pin and key', key_deets);
     });
 
 
@@ -235,6 +235,9 @@ io.on('connection', function(socket){
 	var myRoom = rooms_table[room_pin];
 
 	if(myRoom !== undefined){
+
+	    //note this is only for non-undefined room
+	    access_room(room_pin);
 	    
 	    //just add a custom property to the socket object.
 	    socket.room_pin = room_pin;
@@ -255,7 +258,7 @@ io.on('connection', function(socket){
 	}else{
 	    console.log("somehow, the client requested an non-existant room");
 	}
-	access_room(socket.room_pin);
+
     });
 
 

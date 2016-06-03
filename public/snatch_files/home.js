@@ -1,4 +1,14 @@
-var room_tag = undefined;
+var room_pin = undefined;
+
+// in the case where the pin is populated in the page that has just downloaded, this means the client must send a message to
+// the server...
+window.onload = function() {
+    var pin = $("#pin").html();
+    if((!isNaN(pin)) && (pin.length==4)){//test it is a 4 digit numeric string...
+	start_game(pin);
+    }
+};
+
 
 //initiate game exchange
 function initiate_game(){
@@ -24,8 +34,8 @@ function show_home(){
     $("#page3").css("display", "none");
 };
 
-function start_game(room_tag_2){
-    socket.emit('join room and start', (room_tag_2!=undefined?room_tag_2:room_tag));
+function start_game(room_pin_2){
+    socket.emit('join room and start', (room_pin_2 != undefined ? room_pin_2 : room_pin));
 };
 
 
@@ -36,9 +46,11 @@ function add_listeners(){
     if(listeners_need_adding){
 	listeners_need_adding=false;
 	//show the randomly generated room code on-screen
-	socket.on('your room tag', function(msg_obj){
-	    room_tag = msg_obj;
-	    $("#tag-box").html(msg_obj);
+	socket.on('new game pin and key', function(key_deets){
+	    room_pin = key_deets.pin;
+	    $("#game-key-box").html(key_deets.key);
+	    $("#game-pin-box").html(key_deets.pin);
+	    $("#k2").val("http://www.snatch-it.rocks/join=" + key_deets.pin);
 	});
 
 	// create an HTML table for all the open games...
@@ -58,23 +70,29 @@ function add_listeners(){
 
 		// Col 1
 		var td1 = doc.createElement("td");
-		td1.innerHTML = "<a href=\"#\" class=\"red-link\" onclick=\"start_game('"+r.room_key+"')\">"+r.room_key+"</a>";
+		td1.innerHTML = r.room_pin;
 		td1.className = "b33";
 		tr.appendChild(td1);
 
 		// Col 2
 		var td1 = doc.createElement("td");
-		td1.innerHTML = r.n_tiles_turned + "% thru";
+		td1.innerHTML = "<a href=\"#\" class=\"red-link\" onclick=\"start_game('"+r.room_pin+"')\">"+r.room_key+"</a>";
 		td1.className = "b33";
 		tr.appendChild(td1);
 
 		// Col 3
 		var td1 = doc.createElement("td");
-		td1.innerHTML = r.n_players + " players";
+		td1.innerHTML = r.n_tiles_turned + "% thru";
 		td1.className = "b33";
 		tr.appendChild(td1);
 
 		// Col 4
+		var td1 = doc.createElement("td");
+		td1.innerHTML = r.n_players + " players";
+		td1.className = "b33";
+		tr.appendChild(td1);
+
+		// Col 5
 		var td1 = doc.createElement("td");
 		td1.innerHTML = fuzzyTime(r.duration*1000) + " ago";
 		td1.className = "b33";
