@@ -1,0 +1,202 @@
+* {
+  box-sizing: border-box;
+}
+.input-group {
+  display: table;
+  width: 100%;
+}
+button, input, select, textarea {
+  font-style: inherit;
+  font-variant: inherit;
+  font-weight: inherit;
+  font-stretch: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  font-family: inherit;
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+}
+button, input {
+  overflow-x: visible;
+  overflow-y: visible;
+}
+input, select, textarea, button {
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  font-stretch: normal;
+  font-size: 13px;
+  line-height: 1.4;
+  font-family: Helvetica, arial, nimbussansl, liberationsans, freesans, clean, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+}
+.form-control, .form-select {
+  min-height: 34px;
+  padding-top: 7px;
+  padding-right: 8px;
+  padding-bottom: 7px;
+  padding-left: 8px;
+  font-size: 13px;
+  color: rgb(51, 51, 51);
+  vertical-align: middle;
+  background-color: rgb(255, 255, 255);
+  background-repeat-x: no-repeat;
+  background-repeat-y: no-repeat;
+  background-position-x: right 8px;
+  background-position-y: top 50%;
+  border-top-width: 1px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+  border-top-style: solid;
+  border-right-style: solid;
+  border-bottom-style: solid;
+  border-left-style: solid;
+  border-top-color: rgb(221, 221, 221);
+  border-right-color: rgb(221, 221, 221);
+  border-bottom-color: rgb(221, 221, 221);
+  border-left-color: rgb(221, 221, 221);
+  border-image-source: initial;
+  border-image-slice: initial;
+  border-image-width: initial;
+  border-image-outset: initial;
+  border-image-repeat: initial;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+  outline-color: initial;
+  outline-style: none;
+  outline-width: initial;
+  box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 2px inset;
+}
+.input-sm {
+  min-height: 26px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  font-size: 12px;
+}
+.input-monospace {
+  font-family: Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+}
+.input-group .form-control {
+  position: relative;
+  width: 100%;
+}
+.input-group .form-control:focus {
+  z-index: 2;
+}
+.input-group .form-control, .input-group-button {
+  display: table-cell;
+}
+.input-group-button {
+  width: 1%;
+  vertical-align: middle;
+}
+button, select {
+  text-transform: none;
+}
+button, html [type="button"], [type="reset"], [type="submit"] {
+  -webkit-appearance: button;
+}
+button {
+  cursor: pointer;
+}
+.btn {
+  position: relative;
+  display: inline-block;
+  padding-top: 6px;
+  padding-right: 12px;
+  padding-bottom: 6px;
+  padding-left: 12px;
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 20px;
+  color: rgb(51, 51, 51);
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  background-color: rgb(238, 238, 238);
+  background-image: linear-gradient(rgb(252, 252, 252), rgb(238, 238, 238));
+  border-top-width: 1px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+  border-top-style: solid;
+  border-right-style: solid;
+  border-bottom-style: solid;
+  border-left-style: solid;
+  border-top-color: rgb(213, 213, 213);
+  border-right-color: rgb(213, 213, 213);
+  border-bottom-color: rgb(213, 213, 213);
+  border-left-color: rgb(213, 213, 213);
+  border-image-source: initial;
+  border-image-slice: initial;
+  border-image-width: initial;
+  border-image-outset: initial;
+  border-image-repeat: initial;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+  -webkit-appearance: none;
+}
+.btn:focus {
+  text-decoration: none;
+  border-top-color: rgb(81, 167, 232);
+  border-right-color: rgb(81, 167, 232);
+  border-bottom-color: rgb(81, 167, 232);
+  border-left-color: rgb(81, 167, 232);
+  outline-color: initial;
+  outline-style: none;
+  outline-width: initial;
+  box-shadow: rgba(81, 167, 232, 0.498039) 0px 0px 5px;
+}
+.btn-sm {
+  padding-top: 2px;
+  padding-right: 10px;
+  padding-bottom: 2px;
+  padding-left: 10px;
+}
+.input-group-button:first-child .btn {
+  margin-right: -1px;
+}
+.input-group-button:last-child .btn {
+  margin-left: -1px;
+}
+svg:not(:root) {
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+.btn .octicon {
+  vertical-align: text-top;
+}
+.octicon {
+  display: inline-block;
+  vertical-align: text-top;
+  fill: currentcolor;
+}
+
+
+.breadcrumb .zeroclipboard-button {
+	display:inline-block;
+	margin-left:5px
+}
+
+.copyable-terminal-button .zeroclipboard-button {
+	float:right
+}
+.copyable-terminal-button .zeroclipboard-button .octicon {
+	padding-left:1px;
+	margin:0 auto
+}
+.url-box-clippy .zeroclipboard-button {
+	margin-left:0 !important;
+	border-left:0;
+	border-radius:0 3px 3px 0
+}
+.file-navigation-option .zeroclipboard-button {
+	padding-right:8px
+}
