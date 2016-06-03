@@ -32,6 +32,11 @@ module.exports = function (){
 	shuffle(words2);
     });
 
+    function pad(num, size) {
+        var s = "000000000" + num;
+        return s.substr(s.length-size);
+    }
+
     console.log("Vivid keygen instance created")
 
     var pin_to_word_key = {};
@@ -44,7 +49,8 @@ module.exports = function (){
 		var N1 = randomIndex = Math.floor(Math.random() * 100);//from 0 to 99
 		var N2 = randomIndex = Math.floor(Math.random() * 100);//from 0 to 99
 		
-		var pin = (100*N1 + N2);
+		var num_pin = (100*N1 + N2);
+		var pin = pad(num_pin,4);
 		var key = (words1[N1] + " " + words2[N2]);
 
 		if(pin_to_word_key[pin] == undefined){

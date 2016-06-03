@@ -18,19 +18,6 @@ app.set('views', './views'); // specify the views directory
 app.set('view engine', 'ntl'); // register the template engine
 
 
-
-app.get('/', function (req, res) {
-  res.render('snatch', { pin: (new Date())});
-});
-
-
-/*  original serve main page...
-app.get('/', function(req, res){
-    res.sendFile(__dirname + '/public/snatch_files/snatch.html');
-});
-*/
-
-
 //serve all public files as static webserver functionality...
 app.use(express.static('public'));
 
@@ -63,6 +50,40 @@ my_SDC.rEvent.on('searchComplete', function(result){
     word_dictionary[prev_word] = prev_result;
 });
 
+
+
+//route 1 - no path...
+app.get('/', function (req, res) {
+  res.render('snatch', { pin: ""});
+});
+
+//route 2 - join path...
+app.get('/join=*', function (req, res) {
+    var frags = req.url.split('=');
+    var pin_supplied = frags[frags.length-1];
+    if((!isNaN(pin_supplied)) && (pin_supplied.length==4)){//test it is a 4 digit numeric string...
+
+	//verify this pin has already been created...
+	if(rooms_table[pin_supplied] !== undefined){
+	    res.render('snatch', { pin: pin_supplied});
+	    access_room(pin_supplied);//extend time out due to link usage.
+	}else{
+	    res.send('Join request with ' + pin_supplied + ' failed - no such game open.');
+	}
+
+    }else{
+	res.send(pin_supplied + ' was not detected as a 4 digit pin of an open game');
+    }
+});
+
+
+/*  original serve main page...
+app.get('/', function(req, res){
+    res.sendFile(__dirname + '/public/snatch_files/snatch.html');
+});
+*/
+
+//route 3 - for testing of the definition scraping...
 app.get('/definition/*', function(req, res){
     var frags = req.url.split('/');
     var word = frags[frags.length-1];
@@ -72,27 +93,31 @@ app.get('/definition/*', function(req, res){
     prev_word = word;
 });
 
-///This is an incomplete fragment...
-app.get('/join/*', function(req, res){
-    var frags = req.url.split('/');
-    var tag = frags[frags.length-1];
-});
+// a hash table, note how it is global for all connection. It contains details for a particular room, they are:
+/*
+  {
+  status: str,
+  room_key: str,
+  closeTimeoutID: int,
+  timeStarted: Date,
+  timeAccessed: Date,
+  GameInstance: Obj
+  }
+*/
 
-//a hash table...
-//note how it is global for all connection...
-var RoomTable = {};
+// note that the keys of this associative array are values taken by room_pin e.g. "1234"
+var rooms_table = {};
 
 
-function close_room(room_key){
-    var pin = getPINfromWORDKEY(room_key);
-    console.log("Closing room ["+room_key+"] / ["+pin+"] due to inactivity");
-    keygen.freePIN(pin);
-    delete RoomTable[room_key];
-    io.to(room_key).emit('room closed', 0);
+function close_room(room_pin){
+    console.log("Closing room [" + rooms_table[room_pin].room_key + "] / [" + room_pin + "] due to inactivity");
+    keygen.freePIN(room_pin);
+    delete rooms_table[room_pin];
+    io.to(room_pin).emit('room closed', 0);//probably no one gets this message anyhow.
 }
 
-function access_room(room_key){
-    var R = RoomTable[room_key];
+function access_room(room_pin){
+    var R = rooms_table[room_pin];
 
     //clear the old timeout by reference...
     if(R.closeTimeoutID !== undefined){
@@ -101,10 +126,10 @@ function access_room(room_key){
 
     //Add a new timeout. Retain the reference.
     R.closeTimeoutID = setTimeout(function(){
-	close_room(room_key);
+	close_room(room_pin);
     }, 1000 * 60 * 60 * 3);//3 hours persistence
 //    }, 1000 * 60 * 10);// 10 minues persistence
-    console.log("["+room_key+"] - timout extended...");
+    console.log("["+room_pin+"] - timout extended...");
 
     //Add
     R.timeLastAccessed = new Date;
@@ -125,18 +150,18 @@ io.on('connection', function(socket){
 
     socket.on('disconnect', function(){
 
-	if(socket.room_key){
-	    var myGame = RoomTable[socket.room_key].GameInstance;
+	if(socket.room_pin){
+	    var myGame = rooms_table[socket.room_pin].GameInstance;
 	}
 	if(myGame){
 	    var dis_pl_i = myGame.playerIndexFromSocket(socket.id);
 	}
 
-	// only if (1) the socket is assigned a .room_key property (2) a game exist there (should always be true...)
+	// only if (1) the socket is assigned a .room_pin property (2) a game exist there (should always be true...)
 	// (3) the client at the socket actually entered the game and became a player.
 	if(dis_pl_i !== undefined){
 	    var dis_pl_i = myGame.playerIndexFromSocket(socket.id);
-	    socket.broadcast.to(socket.room_key).emit('player disconnected',dis_pl_i);
+	    socket.broadcast.to(socket.room_pin).emit('player disconnected',dis_pl_i);
 	    var dis_pl_name = myGame.getPlayerObject(socket.id).name;
 	    myGame.removePlayer(socket.id);
 	    console.log('Player ' + dis_pl_i + ' (' + dis_pl_name + ') disconnected (socket.id = ' + socket.id + ')');
@@ -153,33 +178,24 @@ io.on('connection', function(socket){
 
     socket.on('request to init room', function (data){
 
-	// 1. Here is some quick and dirty code to generate a tag.
-	var code = randomIndex = Math.floor(Math.random() * 1000);//from 0 to 999
-	var c1 = randomIndex = Math.floor(Math.random() * 5);//from 0 to 4
-	function pad(num, size) {
-	    var s = "000000000" + num;
-	    return s.substr(s.length-size);
-	}
-	var pcode = pad(code,3);
-	var v_words = ["purple","orange","green","golden","black"];
-	//var room_key = v_words[c1] + " " + pcode; 
-
+	// create a new unique tag... the form will be {key: "word word", pin: 1234}
 	var key_deets = keygen.getPIN();
 	//todo use 
-	var room_key = key_deets.key;
+	var room_pin = key_deets.pin;
 
-	// 2. Now create a new room instance, referenced by the tag
-	RoomTable[room_key] = {
+	// 2. Now create a new room instance, referenced by the room_pin
+	rooms_table[room_pin] = {
 	    status: "new",
+	    room_key: key_deets.key,
 	    closeTimeoutID: undefined,
 	    timeStarted: (new Date),
 	    timeAccessed: undefined,
 	    GameInstance: snatchSvr_factory(qty_tiles, WordChecker)
 	};
-	access_room(room_key);//this perhaps ought to be part of constructor. Needed to put timeout in place.
+	access_room(room_pin);//this perhaps ought to be part of constructor. Needed to put timeout in place.
 
-	console.log("New game created, tag: [" + room_key + "]");
-    	socket.emit('your room tag', room_key);
+	console.log("New game created: ", key_deets);
+    	socket.emit('your room tag', room_pin);
     });
 
 
@@ -189,14 +205,15 @@ io.on('connection', function(socket){
 
 	//convert the hash table into a list for the client to display...
 	var rooms_data_array = [];
-	for (var room_key in RoomTable) {
-	    if (RoomTable.hasOwnProperty(room_key)) {
+	for (var room_pin in rooms_table) {
+	    if (rooms_table.hasOwnProperty(room_pin)) {
 
-		var R = RoomTable[room_key];
+		var R = rooms_table[room_pin];
 		var gameObj = R.GameInstance.getGameObject();
 
 		rooms_data_array.push({
-		    room_key: room_key,
+		    room_key: R.room_key,
+		    room_pin: room_pin,
 		    n_players: (gameObj.playerSet.length),
 		    duration: (new Date - R.timeStarted)/1000,
 		    n_tiles_turned: (gameObj.tile_stats.n_turned)
@@ -211,18 +228,18 @@ io.on('connection', function(socket){
 
 
 
-    socket.on('join room and start', function (room_key){
+    socket.on('join room and start', function (room_pin){
 
 	//respond by providing a set of colours to choose between
-	console.log("'join room and start' message recieved. Room = " + room_key);
-	var myRoom = RoomTable[room_key];
+	console.log("'join room and start' message recieved. Room = " + room_pin);
+	var myRoom = rooms_table[room_pin];
 
 	if(myRoom !== undefined){
 	    
 	    //just add a custom property to the socket object.
-	    socket.room_key = room_key;
+	    socket.room_pin = room_pin;
 	    //this causes the socket to be subscribed to room-specific broadcasts...
-	    socket.join(room_key);
+	    socket.join(room_pin);
 	    myRoom.status = "joined";
 
 	    var myGame = myRoom.GameInstance;
@@ -238,18 +255,18 @@ io.on('connection', function(socket){
 	}else{
 	    console.log("somehow, the client requested an non-existant room");
 	}
-	access_room(socket.room_key);
+	access_room(socket.room_pin);
     });
 
 
 
     //client provides player details, which is also a request for the full game state
     socket.on('player joined with details', function (details_obj){
-	access_room(socket.room_key); // log that the game was accessed
+	access_room(socket.room_pin); // log that the game was accessed
 
 	//this newly joined player can be added to the game...
 	console.log('player joined with details : ' + JSON.stringify(details_obj));
-	var myGame = RoomTable[socket.room_key].GameInstance;
+	var myGame = rooms_table[socket.room_pin].GameInstance;
 	myGame.addPlayer(details_obj, socket.id);
 
 	//index to the new joiner
@@ -272,20 +289,20 @@ io.on('connection', function(socket){
 	    player_join_details["player_object"] = myGame.getPlayerObject(socket.id);
 	}
 
-	socket.broadcast.to(socket.room_key).emit('player has joined game', player_join_details);
+	socket.broadcast.to(socket.room_pin).emit('player has joined game', player_join_details);
     });
 
 
 
     socket.on('player submits word', function(tile_id_array){
-	access_room(socket.room_key); // log that the game was accessed
+	access_room(socket.room_pin); // log that the game was accessed
 
-	console.log("["+socket.room_key+"]: Snatch submission with letters: ",tile_id_array);
-	var myGame = RoomTable[socket.room_key].GameInstance;
+	console.log("["+socket.room_pin+"]: Snatch submission with letters: ",tile_id_array);
+	var myGame = rooms_table[socket.room_pin].GameInstance;
 	var SnatchResponse = myGame.playerSnatches(tile_id_array, socket.id)
 
 	if(SnatchResponse.val_check == 'accepted'){
-	    io.to(socket.room_key).emit('snatch assert', SnatchResponse.SnatchUpdateMsg);	    
+	    io.to(socket.room_pin).emit('snatch assert', SnatchResponse.SnatchUpdateMsg);	    
 	    
 	    // also, we now take the chance to look up the accepted work in the real dictionary (web-scrape a website)
 	    // response of the scrape-script with trigger further (anonymous) actions
@@ -307,12 +324,12 @@ io.on('connection', function(socket){
 
     //client requests to turn over a tile
     socket.on('tile turn request', function(blank_msg){
-	access_room(socket.room_key); // log that the game was accessed
-	var myGame = RoomTable[socket.room_key].GameInstance;
+	access_room(socket.room_pin); // log that the game was accessed
+	var myGame = rooms_table[socket.room_pin].GameInstance;
 	var newTile_info = myGame.flipNextTile(socket.id);
-	io.to(socket.room_key).emit('new turned tile', newTile_info);
+	io.to(socket.room_pin).emit('new turned tile', newTile_info);
 	if(newTile_info){
-	    console.log("["+socket.room_key+"]: PI=" + newTile_info.flipping_player + " flips tileID=" + newTile_info.tile_index + " (" + newTile_info.tile_letter + ")");
+	    console.log("["+socket.room_pin+"]: PI=" + newTile_info.flipping_player + " flips tileID=" + newTile_info.tile_index + " (" + newTile_info.tile_letter + ")");
 	}else{
 	    console.log("All tiles turned - flip message recieved...");
 	}
@@ -322,7 +339,7 @@ io.on('connection', function(socket){
     //client requests to turn over a tile
     socket.on('many_tile_turn_hack', function(n_tiles){
 
-	var myGame = RoomTable[socket.room_key].GameInstance;
+	var myGame = rooms_table[socket.room_pin].GameInstance;
 
 	var letters = [];
 	var tileID_first = undefined;
@@ -333,7 +350,7 @@ io.on('connection', function(socket){
 	var R1 = function(i){
 	    var newTile_info = myGame.flipNextTile(socket.id);
 	    if(newTile_info){
-		io.to(socket.room_key).emit('new turned tile', newTile_info);
+		io.to(socket.room_pin).emit('new turned tile', newTile_info);
 		letters.push(newTile_info.tile_letter);
 		tileID_final = newTile_info.tile_index
 		fl_player = newTile_info.flipping_player;
