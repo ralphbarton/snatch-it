@@ -95,30 +95,48 @@ a.white-link:hover{
     display: block;
     font-weight: bold;
     text-align: center;
-    width: 90%
+    width: 100%
 }
 
 /*page 2 stuff*/
 #page2, #page3{
     font-size: 120%;
     padding: 2%;
-    width: 90%;
+    width: 100%;
 }
 
 .identifying-box{
     background-color: #FCF0A9;
-    margin: 4%;
     padding: 1%;
     display: inline;
     font-weight: bold;
     color: #CC81E6;
     font-size: 200%;
-    border: 1px blue dashed;
+    border: 1px dashed blue;
 }
 
 p {
-    margin: 2.2%;
+    margin-bottom: 2.2%;
+}
+
+
+
+.p1 {
+    margin-bottom: 2.2%;
+    padding: 1% 0;
     display: block;
+}
+
+.box02 {
+    display: inline-block;
+    width: auto;
+    text-align: right;
+    font-size: 70%;
+}
+
+.box03 {
+    display: inline-block;
+    margin: 4px 2px;
 }
 
 a.red-link {
@@ -147,7 +165,7 @@ p.b34{
 }
 
 #k1{
-    width: 350px;
+    width: 440px;
 }
 
 .details2{

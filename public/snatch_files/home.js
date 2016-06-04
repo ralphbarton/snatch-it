@@ -1,4 +1,5 @@
 var room_pin = undefined;
+var room_key = undefined;
 
 // in the case where the pin is populated in the page that has just downloaded, this means the client must send a message to
 // the server...
@@ -38,6 +39,13 @@ function start_game(room_pin_2){
     socket.emit('join room and start', (room_pin_2 != undefined ? room_pin_2 : room_pin));
 };
 
+function gen_link_as_key(){
+    $("#k2").val("http://www.snatch-it.rocks/join=" + room_key.replace(" ","-"));// this is the "input" element
+};
+
+function gen_link_as_pin(){
+    $("#k2").val("http://www.snatch-it.rocks/join=" + room_pin);// this is the "input" element
+};
 
 
 var listeners_need_adding = true;
@@ -45,12 +53,32 @@ function add_listeners(){
 
     if(listeners_need_adding){
 	listeners_need_adding=false;
+
 	//show the randomly generated room code on-screen
 	socket.on('new game pin and key', function(key_deets){
 	    room_pin = key_deets.pin;
+	    room_key = key_deets.key;
 	    $("#game-key-box").html(key_deets.key);
 	    $("#game-pin-box").html(key_deets.pin);
-	    $("#k2").val("http://www.snatch-it.rocks/join=" + key_deets.pin);
+	    $("#k2").val("http://www.snatch-it.rocks/join=" + key_deets.pin);// this is the "input" element
+
+	    // this is the "button" element
+	    var copy_button = $('#k4');
+	    var link_text = $('#k2');
+
+	    //add listener to button which copies upon a click...
+	    copy_button.click(function(event) {
+		link_text.select();
+
+		try {
+		    var successful = document.execCommand('copy');
+		    var msg = successful ? 'successful' : 'unsuccessful';
+		    console.log('Copying text command was ' + msg);
+		} catch (err) {
+		    console.log('Oops, unable to copy');
+		}
+	    });
+
 	});
 
 	// create an HTML table for all the open games...
