@@ -1,16 +1,6 @@
 var room_pin = undefined;
 var room_key = undefined;
 
-// in the case where the pin is populated in the page that has just downloaded, this means the client must send a message to
-// the server...
-window.onload = function() {
-    var pin = $("#pin").html();
-    if((!isNaN(pin)) && (pin.length==4)){//test it is a 4 digit numeric string...
-	start_game(pin);
-    }
-};
-
-
 //initiate game exchange
 function initiate_game(){
     $("#page1").css("display", "none");
@@ -35,10 +25,6 @@ function show_home(){
     $("#page3").css("display", "none");
 };
 
-function start_game(room_pin_2){
-    socket.emit('join room and start', (room_pin_2 != undefined ? room_pin_2 : room_pin));
-};
-
 function gen_link_as_key(){
     $("#k2").val("http://www.snatch-it.rocks/join=" + room_key.replace(" ","-"));// this is the "input" element
 };
@@ -60,6 +46,8 @@ function add_listeners(){
 	    room_key = key_deets.key;
 	    $("#game-key-box").html(key_deets.key);
 	    $("#game-pin-box").html(key_deets.pin);
+	    $("#start-btn-placeholder").html("<a href=\"/join="+room_pin+"\" class=\"red-link\">START</a>");
+
 	    $("#k2").val("http://www.snatch-it.rocks/join=" + key_deets.pin);// this is the "input" element
 
 	    // this is the "button" element
@@ -104,7 +92,7 @@ function add_listeners(){
 
 		// Col 2
 		var td1 = doc.createElement("td");
-		td1.innerHTML = "<a href=\"#\" class=\"red-link\" onclick=\"start_game('"+r.room_pin+"')\">"+r.room_key+"</a>";
+		td1.innerHTML = "<a href=\"/join="+r.room_pin+"\" class=\"red-link\">"+r.room_key+"</a>";
 		td1.className = "b33";
 		tr.appendChild(td1);
 

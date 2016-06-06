@@ -15,14 +15,9 @@ var dev = false; // select whether development more is active or not
 window.onload = function() {
     var pin = $("#pin").html();
     if((!isNaN(pin)) && (pin.length==4)){//test it is a 4 digit numeric string...
-	start_game(pin);
+	socket.emit('join room and start', pin);
     }
 };
-
-function start_game(room_pin_2){
-    socket.emit('join room and start', (room_pin_2 != undefined ? room_pin_2 : room_pin));
-};
-
 
 //Provides data to allow player to reclaim name, make new name AND choose their color 
 socket.on('player color choices', function(msg_obj){
