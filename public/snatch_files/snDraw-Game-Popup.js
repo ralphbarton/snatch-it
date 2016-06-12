@@ -129,14 +129,9 @@ snDraw.Game.Popup = {
 
 	    //Inject the Title
 	    $("#box-title").html("Connection to server lost");
-	    console.log($("#box-title").html());
 
-	    //Clear body then inject scores table
-	    $("#modal-body").html("<p>A constant connection to the server is required during this multiplayer game.</p>");
-	    $("#modal-body").append("<p>By going back to the home page, you should be able to rejoin the same game using the <b>join</b> option.</p>");
-
-	    //link to refresh page
-	    $("#modal-footer").html("<a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Popup.gotoHomePage()\">Rejoin</a>");
+	    /////todo - visibility based content display for modal-body
+	    /////todo - visibility based content display for modal-footer
 
 	    this.createPlayersListWindow_generic_make_appear();
 	}
@@ -152,20 +147,13 @@ snDraw.Game.Popup = {
 
 	    //Inject the Title
 	    $("#box-title").html("Options");
-	    console.log($("#box-title").html());
 
-	    //Clear body then inject some content (in this case the options)
-	    $("#modal-body").html("note to self: add some options in this space...");
-	    $("#modal-body").append("<a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Popup.gotoHomePage()\">Quit this game</a>");
-
-	    //link to add a "close" link beneath...
-	    var close_link = "<a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Popup.removePlayersListWindow()\">Close</a>";
-	    $("#modal-footer").html("").append(close_link);
+	    /////todo - visibility based content display for modal-body
+	    /////todo - visibility based content display for modal-footer
 
 	    this.createPlayersListWindow_generic_make_appear();
 	}
     },
-
 
 
     createPlayersListWindow_generic_make_appear: function(){

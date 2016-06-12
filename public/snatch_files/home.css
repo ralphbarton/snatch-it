@@ -102,24 +102,10 @@ p {
     margin-bottom: 2.2%;
 }
 
-
-
 .p1 {
     margin-bottom: 2.2%;
     padding: 1% 0;
     display: block;
-}
-
-.box02 {
-    display: inline-block;
-    width: auto;
-    text-align: right;
-    font-size: 70%;
-}
-
-.box03 {
-    display: inline-block;
-    margin: 4px 2px;
 }
 
 a.red-link {
@@ -145,10 +131,6 @@ p.b34{
     font-size: 75%;   
     color: #009;
     padding: 10px;
-}
-
-#k1{
-    width: 440px;
 }
 
 .details2{

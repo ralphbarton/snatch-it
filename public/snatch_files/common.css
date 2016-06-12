@@ -10,3 +10,28 @@ body {
     width: 100%;
     height: 100%;
 }
+
+
+/* Manually coded margins/styling for the ZeroClippboard */
+.box02 {
+    display: inline-block;
+    width: auto;
+    text-align: right;
+}
+
+.box03 {
+    display: inline-block;
+    font-size: 70%;
+    margin-top: 12px;/*my usage of this line represents failure to properly understand CSS nested margins, for now...*/
+    margin-bottom: 3px;
+    margin-right: 2px;
+}
+
+.box04 {
+    float: left;
+    margin-bottom: 12px;
+}
+
+#k1{
+    width: 440px;
+}

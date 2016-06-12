@@ -13,6 +13,7 @@
     <script src="include/socket.io-1.2.0.js"></script>
 
     <!-- js used by the homepage -->
+    <script src="snatch_files/common.js"></script>
     <script src="snatch_files/home.js"></script>
 
   </head>
@@ -64,9 +65,11 @@
 
 	<p>Other players can join by visiting the “join” section of the SNATCH-IT site and selecting the games listing.<br></p>
 
-	<div class="p2">Shareable link into game:<br>
-
+	<div id="copyable-container">
 	  <div class="box02">
+	    <div class="box04">
+	      Shareable link into game:
+	    </div>
 	    <div class="box03">
 	      <a href="#" onclick="gen_link_as_key()">
 		key</a>
