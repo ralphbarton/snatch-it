@@ -10,7 +10,8 @@ app.engine('ntl', function (filePath, options, callback) { // define the templat
   fs.readFile(filePath, function (err, content) {
     if (err) return callback(new Error(err));
     // this is an extremely simple template engine
-    var rendered = content.toString().replace('#pin#', '<div id="pin">'+ options.pin +'</div>');
+    var rendered = content.toString().replace('#identity#', '<div id="pin">' + options.pin + 
+					      '</div>\n<div id="key">'+ options.key +'</div>\n');
     return callback(null, rendered);
   });
 });
@@ -61,19 +62,30 @@ app.get('/', function(req, res){
 //route 2 - join path...
 app.get('/join=*', function (req, res) {
     var frags = req.url.split('=');
-    var pin_supplied = frags[frags.length-1];
-    if((!isNaN(pin_supplied)) && (pin_supplied.length==4)){//test it is a 4 digit numeric string...
+    var identity_supplied = frags[frags.length-1];
+    if((!isNaN(identity_supplied)) && (identity_supplied.length==4)){//first test: is it a 4 digit numeric string?
 
 	//verify this pin has already been created...
-	if(rooms_table[pin_supplied] !== undefined){
-	    res.render('snatch', { pin: pin_supplied});
-	    access_room(pin_supplied);//extend time out due to link usage.
+	if(rooms_table[identity_supplied] !== undefined){
+	    var dash_key = rooms_table[identity_supplied].room_key.replace(" ","-");
+	    res.render('snatch', { pin: identity_supplied, key: dash_key });
+	    access_room(identity_supplied);//extend time out due to link usage.
 	}else{
-	    res.send('Join request with ' + pin_supplied + ' failed - no such game open.');
+	    res.send('Join request with ' + identity_supplied + ' (detected as PIN) failed - no such game open.');
 	}
 
+    }else if(/^[a-zA-Z-]+$/.test(identity_supplied)){//second test: is it a string composed only of letters and '-'?
+	var no_dash_key = identity_supplied.replace("-"," ");
+	var retrieved_pin = keygen.getPINfromWORDKEY(no_dash_key);
+	if (retrieved_pin != undefined){
+	    var dash_key = rooms_table[retrieved_pin].room_key.replace(" ","-");
+	    res.render('snatch', { pin: retrieved_pin, key: dash_key });
+	    access_room(retrieved_pin);//extend time out due to link usage.
+	}else{
+	    res.send('Join request with ' + identity_supplied + ' (detected as KEY) failed - no such game open.');
+	}
     }else{
-	res.send(pin_supplied + ' was not detected as a 4 digit pin of an open game');
+	res.send(identity_supplied + ' was not detected as a 4 digit pin or a word key');
     }
 });
 

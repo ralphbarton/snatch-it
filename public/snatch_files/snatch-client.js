@@ -12,10 +12,13 @@ var dev = false; // select whether development more is active or not
 /// TO DO: REORGANISE THIS...
 // in the case where the pin is populated in the page that has just downloaded, this means the client must send a message to
 // the server...
+var room_pin = undefined;
+var room_key = undefined;
 window.onload = function() {
-    var pin = $("#pin").html();
-    if((!isNaN(pin)) && (pin.length==4)){//test it is a 4 digit numeric string...
-	socket.emit('join room and start', pin);
+    room_pin = $("#pin").html();
+    room_key = $("#key").html();
+    if((!isNaN(room_pin)) && (room_pin.length==4)){//test it is a 4 digit numeric string...
+	socket.emit('join room and start', room_pin);
     }
 };
 

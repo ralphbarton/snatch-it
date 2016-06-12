@@ -41,26 +41,9 @@ function add_listeners(){
 	    $("#game-key-box").html(key_deets.key);
 	    $("#game-pin-box").html(key_deets.pin);
 	    $("#start-btn-placeholder").html("<a href=\"/join="+room_pin+"\" class=\"red-link\">START</a>");
-
-	    $("#k2").val("http://www.snatch-it.rocks/join=" + key_deets.pin);// this is the "input" element
-
-	    // this is the "button" element
-	    var copy_button = $('#k4');
-	    var link_text = $('#k2');
-
-	    //add listener to button which copies upon a click...
-	    copy_button.click(function(event) {
-		link_text.select();
-
-		try {
-		    var successful = document.execCommand('copy');
-		    var msg = successful ? 'successful' : 'unsuccessful';
-		    console.log('Copying text command was ' + msg);
-		} catch (err) {
-		    console.log('Oops, unable to copy');
-		}
-	    });
-
+	    
+	    //make the copy-paste stuff work...
+	    initiate_copy_box();
 	});
 
 	// create an HTML table for all the open games...

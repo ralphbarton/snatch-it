@@ -1,5 +1,5 @@
 /* For the game page... i.e. make the canvas fullscreen */
-#pin{
+#pin, #key{
     display: none;
 }
 
