@@ -1,3 +1,13 @@
+/* For the game page... i.e. make the canvas fullscreen */
+#pin{
+    display: none;
+}
+
+#canv-inside{
+    display: block; /* Show, initially*/
+}
+
+
 /* The Modal (background) */
 #modal_dark_sheet {
     display: none; /* Hidden by default */

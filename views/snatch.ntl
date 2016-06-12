@@ -5,6 +5,7 @@
     <meta name="viewport" content="user-scalable=no"/>
 
     <!-- styles used in the Snatch game -->
+    <link rel="stylesheet" type="text/css" href="snatch_files/common.css">
     <link rel="stylesheet" type="text/css" href="snatch_files/overlays.css">
     <link rel="stylesheet" type="text/css" href="snatch_files/zeroclipboard.css">
 
@@ -39,10 +40,10 @@
     #pin#
 
     <!-- The game canvas....-->
-      <div style="position: relative;">
-	<canvas id="c"></canvas>
-      </div>
+    <div class="page" id="canv-inside">
+      <canvas id="c"></canvas>
     </div>
+
 
     <!-- 5. The Modal -->
     <div id="modal_dark_sheet">

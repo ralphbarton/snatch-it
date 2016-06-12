@@ -1,3 +1,5 @@
+var socket = io();
+
 var room_pin = undefined;
 var room_key = undefined;
 

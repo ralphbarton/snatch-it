@@ -1,22 +1,5 @@
-body {
-    background-color: #BBB;
-}
-
-.page{
-    display: none;
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-}
-
 #page1{
     display: block; /* Show, initially*/
-}
-
-.pin{
-    display: none;
 }
 
 .f_tile {

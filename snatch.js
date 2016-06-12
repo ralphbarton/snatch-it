@@ -53,9 +53,10 @@ my_SDC.rEvent.on('searchComplete', function(result){
 
 
 //route 1 - no path...
-app.get('/', function (req, res) {
-  res.render('snatch', { pin: ""});
+app.get('/', function(req, res){
+    res.sendFile(__dirname + '/public/snatch_files/home.html');
 });
+
 
 //route 2 - join path...
 app.get('/join=*', function (req, res) {
@@ -75,13 +76,6 @@ app.get('/join=*', function (req, res) {
 	res.send(pin_supplied + ' was not detected as a 4 digit pin of an open game');
     }
 });
-
-
-/*  original serve main page...
-app.get('/', function(req, res){
-    res.sendFile(__dirname + '/public/snatch_files/snatch.html');
-});
-*/
 
 //route 3 - for testing of the definition scraping...
 app.get('/definition/*', function(req, res){
