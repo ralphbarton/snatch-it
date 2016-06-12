@@ -437,7 +437,7 @@ snDraw.Game.Controls = {
 		TurnButton.item(1).setText("Exit");
 	    }
 	}else{//this is after the client has clicked "finish", and button text is now "Exit"
-	    location.reload();
+	    snDraw.Game.Popup.gotoHomePage();
 	}
     }
 };

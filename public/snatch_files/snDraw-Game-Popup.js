@@ -109,7 +109,7 @@ snDraw.Game.Popup = {
 	var close_link = "<a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Popup.removePlayersListWindow()\">Close</a>";
 	$("#modal-footer").html("").append(close_link);
 	if(snDraw.Game.Controls.client_finished_game == true){
-	    $("#modal-footer").append(" | <a class=\"modal\" href=\"#\" onclick=\"location.reload()\">Another Game</a>");
+	    $("#modal-footer").append(" | <a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Popup.gotoHomePage()\">Another Game</a>");
 	}
 
 	// ineligant, but a second call is necessary to apply styles to objects that didn't exist earlier
@@ -136,7 +136,7 @@ snDraw.Game.Popup = {
 	    $("#modal-body").append("<p>By going back to the home page, you should be able to rejoin the same game using the <b>join</b> option.</p>");
 
 	    //link to refresh page
-	    $("#modal-footer").html("<a class=\"modal\" href=\"#\" onclick=\"location.reload()\">Rejoin</a>");
+	    $("#modal-footer").html("<a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Popup.gotoHomePage()\">Rejoin</a>");
 
 	    this.createPlayersListWindow_generic_make_appear();
 	}
@@ -156,7 +156,7 @@ snDraw.Game.Popup = {
 
 	    //Clear body then inject some content (in this case the options)
 	    $("#modal-body").html("note to self: add some options in this space...");
-	    $("#modal-body").append("<a class=\"modal\" href=\"#\" onclick=\"location.reload()\">Quit this game</a>");
+	    $("#modal-body").append("<a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Popup.gotoHomePage()\">Quit this game</a>");
 
 	    //link to add a "close" link beneath...
 	    var close_link = "<a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Popup.removePlayersListWindow()\">Close</a>";
@@ -193,7 +193,12 @@ snDraw.Game.Popup = {
 
     removePlayersListWindow: function(){
 	$("#modal_dark_sheet").css("display", "none");
-    }
+    },
 
+    gotoHomePage: function(){
+	var homeURL = window.location.href.split('join')[0];
+	window.location.href = homeURL;
+	
+    }
 
 };

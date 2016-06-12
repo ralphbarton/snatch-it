@@ -34,7 +34,7 @@ snDraw.Game.Toast = {
 
 	//Actually the div of the new Toast class...
 	var $NewToast = $( "<div/>", {id: t_key}).addClass("ToastGrey ToastCentral ToastIn").html(my_string);
-	$("#page4").append($NewToast);
+	$("#canv-inside").append($NewToast);
 
 	var toast_spacing = snDraw.Game.tileSpacings.ts * 0.18;
 	//Determine the vertical position of the toast (start it at its highest potential position)
