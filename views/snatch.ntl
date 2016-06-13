@@ -109,20 +109,17 @@
 		</div>
 	      </div>
 	    </div>
+
+	    note to self: add some options in this space...
+	    <a class="modal" href="#" onclick="snDraw.Game.Popup.gotoHomePage()">Quit this game</a>
+
 	  </div>
 
 	  <!-- modal-body-lost-connection -->
-	  <div id="modal-body-content2">
+	  <div id="modal-body-lost-connection">
 	    <p>A constant connection to the server is required during this multiplayer game.</p>
 	    <p>By going back to the home page, you should be able to rejoin the same game using the <b>join</b> option.</p>
 	  </div>
-
-	  <!-- modal-body-options-menu -->
-	  <div id="modal-body-content3">
-	    note to self: add some options in this space...
-	    <a class="modal" href="#" onclick="snDraw.Game.Popup.gotoHomePage()">Quit this game</a>
-	  </div>
-
 
 	</div>
 
