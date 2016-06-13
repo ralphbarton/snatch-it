@@ -35,10 +35,11 @@ var my_SDC = SDC_factory();
 var keygen  = require('./vivid_keygen.js')();
 
 // Load the SOWPODS dictionary...
-var WC_factory = require('./word_check.js');
-var WordChecker = WC_factory('./dictionaries/sowpods.txt',0);
+var WDT_factory = require('./word_check.js');
+var WordDictionaryTools = WDT_factory('./dictionaries/sowpods.txt');
 
  
+//START OF experimental code secion
 // code to enable web-facing testing of the word Definition tool
 var prev_result = undefined;
 var prev_word = undefined;
@@ -50,6 +51,37 @@ my_SDC.rEvent.on('searchComplete', function(result){
     io.emit('new word definition', {word: prev_word, definition: prev_result});	    
     word_dictionary[prev_word] = prev_result;
 });
+
+
+//route 3 - for testing of the definition scraping...
+app.get('/definition/*', function(req, res){
+    var frags = req.url.split('/');
+    var word = frags[frags.length-1];
+    my_SDC.lookup_definition(word);
+    res.send('You have just looked up: ' + word + '. <br> Previously, you\
+ looked up ' + prev_word + ' and a search result was:<br>' + prev_result);
+    prev_word = word;
+});
+
+//route 4 - to get random words...
+app.get('/sowpods-rsubset/*', function(req, res){
+    var frags = req.url.split('/');
+    var final_arg = frags[frags.length-1];
+    var n_words_req = parseInt(final_arg);
+    
+    var sowpods_array = WordDictionaryTools.get_word_list();
+    var result = "List of "+n_words_req+" words from the SOWPODS dictionary:<br><br>";
+
+    for(var i=0; i < n_words_req; i++){
+	var rand_index = Math.floor(Math.random() * sowpods_array.length);
+	result += sowpods_array[rand_index] + "<br>";
+    }
+    res.send(result);
+
+});
+
+
+//END OF experimental code secion
 
 
 
@@ -87,16 +119,6 @@ app.get('/join=*', function (req, res) {
     }else{
 	res.send(identity_supplied + ' was not detected as a 4 digit pin or a word key');
     }
-});
-
-//route 3 - for testing of the definition scraping...
-app.get('/definition/*', function(req, res){
-    var frags = req.url.split('/');
-    var word = frags[frags.length-1];
-    my_SDC.lookup_definition(word);
-    res.send('You have just looked up: ' + word + '. <br> Previously, you\
- looked up ' + prev_word + ' and a search result was:<br>' + prev_result);
-    prev_word = word;
 });
 
 // a hash table, note how it is global for all connection. It contains details for a particular room, they are:
@@ -196,7 +218,7 @@ io.on('connection', function(socket){
 	    closeTimeoutID: undefined,
 	    timeStarted: (new Date),
 	    timeAccessed: undefined,
-	    GameInstance: snatchSvr_factory(qty_tiles, WordChecker)
+	    GameInstance: snatchSvr_factory(qty_tiles, WordDictionaryTools.in_dictionary)
 	};
 	access_room(room_pin);//this perhaps ought to be part of constructor. Needed to put timeout in place.
 

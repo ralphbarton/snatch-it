@@ -1,6 +1,7 @@
-module.exports = function (d_path, d_index){//todo change to d_path ARRAY
+module.exports = function (d_path){//todo change to d_path ARRAY
 
     var Dictionary = {};
+    var WordsArray = [];
     var t_start = new Date();
     fs = require('fs');
     fs.readFile(d_path, 'utf8', function (err,data) {
@@ -20,10 +21,10 @@ module.exports = function (d_path, d_index){//todo change to d_path ARRAY
 	    var myWord = lines[i].toUpperCase();
 	    
 	    if (Dictionary[myWord] == undefined){
-		Dictionary[myWord] = [];
+		Dictionary[myWord] = true;
 	    }
+	    WordsArray.push(myWord);
 
-	    Dictionary[myWord][d_index] = true;
 	}
 
 	var t_finish = new Date();
@@ -31,7 +32,11 @@ module.exports = function (d_path, d_index){//todo change to d_path ARRAY
 	console.log(n_words + " words loaded into memory for rapid checking in " + dur + " milliseconds");
     });
 
-    return function(word){
-	return Dictionary[word.toUpperCase()] !== undefined;
+    return {
+	in_dictionary: function(word) {
+	    return Dictionary[word.toUpperCase()] !== undefined;
+	},
+	
+	get_word_list: function() {return WordsArray;}
     };
-};
+}
