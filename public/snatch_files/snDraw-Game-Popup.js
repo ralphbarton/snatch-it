@@ -101,16 +101,14 @@ snDraw.Game.Popup = {
 	//Inject the Title
 	$("#box-title").html("Players");
 
-	//Clear body then inject scores table
+	//Setting Modal BODY
+	this.showModalContent("#modal-body", "modal-body-scores-table");
 	var scores_table = this.createPlayersListWindow_html_scores_table();
-	$("#modal-body").html("").append(scores_table);
+	$("#modal-body-scores-table").html("").append(scores_table);//dynamic content generation.
 
-	//Clear the footer then add the CLOSE and potentially PLAY AGAIN links...
-	var close_link = "<a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Popup.removePlayersListWindow()\">Close</a>";
-	$("#modal-footer").html("").append(close_link);
-	if(snDraw.Game.Controls.client_finished_game == true){
-	    $("#modal-footer").append(" | <a class=\"modal\" href=\"#\" onclick=\"snDraw.Game.Popup.gotoHomePage()\">Another Game</a>");
-	}
+	//Setting Modal FOOTER
+	var fin = snDraw.Game.Controls.client_finished_game;
+	this.showModalContent("#modal-footer", fin ? "modal-footer-close-replay" : "modal-footer-simple-close");
 
 	// ineligant, but a second call is necessary to apply styles to objects that didn't exist earlier
 	this.scalePropertiesPlayersListWindow();
@@ -130,8 +128,9 @@ snDraw.Game.Popup = {
 	    //Inject the Title
 	    $("#box-title").html("Connection to server lost");
 
-	    /////todo - visibility based content display for modal-body
-	    /////todo - visibility based content display for modal-footer
+	    //change div visibility to set content for **Connection Lost**
+	    this.showModalContent("#modal-body", "modal-body-lost-connection");
+	    this.showModalContent("#modal-footer", "modal-footer-rejoin");
 
 	    this.createPlayersListWindow_generic_make_appear();
 	}
@@ -148,8 +147,10 @@ snDraw.Game.Popup = {
 	    //Inject the Title
 	    $("#box-title").html("Options");
 
-	    /////todo - visibility based content display for modal-body
-	    /////todo - visibility based content display for modal-footer
+	    //change div visibility to set content for the **Options menu**
+	    this.showModalContent("#modal-body", "modal-body-options-menu");
+	    this.showModalContent("#modal-footer", "modal-footer-simple-close");
+	    initiate_copy_box();
 
 	    this.createPlayersListWindow_generic_make_appear();
 	}
@@ -183,10 +184,20 @@ snDraw.Game.Popup = {
 	$("#modal_dark_sheet").css("display", "none");
     },
 
+    showModalContent: function(section, content_id){
+	$(section).children().each(function(){
+	    var div_id = $(this).attr('id');
+	    var set_disp = "none";
+	    if(div_id == content_id){
+		set_disp = "block";
+	    }
+	    $(this).css("display", set_disp);
+	});
+    },
+
     gotoHomePage: function(){
 	var homeURL = window.location.href.split('join')[0];
 	window.location.href = homeURL;
 	
     }
-
 };

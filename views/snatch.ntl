@@ -61,8 +61,19 @@
 
 	<div id="modal-body"> <!-- Objects within the Modal Body (numbered, with switchable visibility) -->
 
-	  <!-- 5.1. The easy-copy link... -->
-	  <div id="modal-body-content1">
+	  <!-- Here is a list of the different things for the modal-body:
+	       
+	       modal-body-scores-table
+	       modal-body-lost-connection
+	       modal-body-options-menu
+	    
+	    -->
+
+	  <!-- modal-body-scores-table (note that this always has to be generated dynamically) -->
+	  <div id="modal-body-scores-table"></div>
+
+	  <!-- modal-body-options-menu -->
+	  <div id="modal-body-options-menu">
 	    <div id="copyable-container">
 	      <div class="box02">
 		<div class="box04">
@@ -100,13 +111,13 @@
 	    </div>
 	  </div>
 
-	  <!-- 5.2. Message content for Connection lost -->
+	  <!-- modal-body-lost-connection -->
 	  <div id="modal-body-content2">
 	    <p>A constant connection to the server is required during this multiplayer game.</p>
 	    <p>By going back to the home page, you should be able to rejoin the same game using the <b>join</b> option.</p>
 	  </div>
 
-	  <!-- 5.3. Message content for Connection lost -->
+	  <!-- modal-body-options-menu -->
 	  <div id="modal-body-content3">
 	    note to self: add some options in this space...
 	    <a class="modal" href="#" onclick="snDraw.Game.Popup.gotoHomePage()">Quit this game</a>
@@ -114,16 +125,34 @@
 
 
 	</div>
+
+
+
+
 	<div id="modal-footer">
 
-	  <!-- 5.1. Footer for options menu -->
-	  <div id="modal-footer-content1">
+	  <!-- Here is a list of the different things for the modal-footer:
+
+	       modal-footer-simple-close
+	       modal-footer-rejoin
+	       modal-footer-close-replay
+	    
+	    -->
+
+	  <!-- 6.1. Footer for options menu -->
+	  <div id="modal-footer-simple-close">
 	    <a class="modal" href="#" onclick="snDraw.Game.Popup.removePlayersListWindow()">Close</a>
 	  </div>	  
 
-	  <!-- 5.2. Footer for Connection lost -->
-	  <div id="modal-footer-content2">
+	  <!-- 6.2. Footer for Connection lost -->
+	  <div id="modal-footer-rejoin">
 	    <a class="modal" href="#" onclick="snDraw.Game.Popup.gotoHomePage()">Rejoin</a>
+	  </div>
+
+	  <!-- 6.2. Footer for Connection lost -->
+	  <div id="modal-footer-close-replay">
+	    <a class="modal" href="#" onclick="snDraw.Game.Popup.removePlayersListWindow()">Close</a>
+	    | <a class="modal" href="#" onclick="snDraw.Game.Popup.gotoHomePage()">Another Game</a>
 	  </div>
 
 	</div>
