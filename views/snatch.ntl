@@ -138,7 +138,7 @@
 
 	  <!-- 6.1. Footer for options menu -->
 	  <div id="modal-footer-simple-close">
-	    <a class="modal" href="#" onclick="snDraw.Game.Popup.removePlayersListWindow()">Close</a>
+	    <a class="modal" href="#" onclick="snDraw.Game.Popup.hideModal()">Close</a>
 	  </div>	  
 
 	  <!-- 6.2. Footer for Connection lost -->
@@ -148,7 +148,7 @@
 
 	  <!-- 6.2. Footer for Connection lost -->
 	  <div id="modal-footer-close-replay">
-	    <a class="modal" href="#" onclick="snDraw.Game.Popup.removePlayersListWindow()">Close</a>
+	    <a class="modal" href="#" onclick="snDraw.Game.Popup.hideModal()">Close</a>
 	    | <a class="modal" href="#" onclick="snDraw.Game.Popup.gotoHomePage()">Another Game</a>
 	  </div>
 

@@ -3,10 +3,9 @@ snDraw.Game.Popup = {
     //Properties of this class...
     popup_in_foreground: false,
 
-
     //Methods of this class...
     
-    scalePropertiesPlayersListWindow: function(){
+    calcModalScale: function(){
 	
 	//things that scale with the Tile Size
 	var ts = Math.round(snDraw.Game.tileSpacings.ts);
@@ -24,7 +23,7 @@ snDraw.Game.Popup = {
 	$('.blacken').css({"text-shadow":"0px 0px "+fsz*0.05+"px black, 0px 0px "+fsz*0.1+"px black"});
     },
 
-    createPlayersListWindow_html_scores_table: function(){
+    generate_scores_table_html_element: function(){
 
 	// 3. Extract the data
 	var player_scores_list = [];
@@ -93,98 +92,88 @@ snDraw.Game.Popup = {
 	return table;
     },
 
-
-    createPlayersListWindow: function(){
-
-	this.scalePropertiesPlayersListWindow();
-
-	//Inject the Title
-	$("#box-title").html("Players");
-
-	//Setting Modal BODY
-	this.showModalContent("#modal-body", "modal-body-scores-table");
-	var scores_table = this.createPlayersListWindow_html_scores_table();
-	$("#modal-body-scores-table").html("").append(scores_table);//dynamic content generation.
-
-	//Setting Modal FOOTER
-	var fin = snDraw.Game.Controls.client_finished_game;
-	this.showModalContent("#modal-footer", fin ? "modal-footer-close-replay" : "modal-footer-simple-close");
-
-	// ineligant, but a second call is necessary to apply styles to objects that didn't exist earlier
-	this.scalePropertiesPlayersListWindow();
-
-	this.createPlayersListWindow_generic_make_appear();
-    },
-
-
-
-    maybe_createConnectionLostWindow: function(){
-
-	var x = $("#modal_dark_sheet").css('display');
-	if(x[0] == 'n'){ //this is an ugly/unreliable to check if display:none for the div!
+    openModal: function(type){
+	var Title = "my Title";
+	var Body = "my content id";
+	var Footer = "my footer id";
+	if(type=="scores"){
 	    
-	    this.scalePropertiesPlayersListWindow();
+	    Title = "Players";
+	    Body = "modal-body-scores-table";
+	    Footer = snDraw.Game.Controls.client_finished_game ? "modal-footer-close-replay" : "modal-footer-simple-close"; 
 
-	    //Inject the Title
-	    $("#box-title").html("Connection to server lost");
+	    // dynamically change content by regenerating the scores table...
+	    $("#modal-body-scores-table").html(this.generate_scores_table_html_element());
 
-	    //change div visibility to set content for **Connection Lost**
-	    this.showModalContent("#modal-body", "modal-body-lost-connection");
-	    this.showModalContent("#modal-footer", "modal-footer-rejoin");
+	}else if(type=="options"){
 
-	    this.createPlayersListWindow_generic_make_appear();
-	}
-    },
-
-
-    create_GameSettings_Window: function(){
-
-	var x = $("#modal_dark_sheet").css('display');
-	if(x[0] == 'n'){ //this is an ugly/unreliable to check if display:none for the div!
+	    Title = "Options";
+	    Body = "modal-body-options-menu";
+	    Footer = "modal-footer-simple-close";
 	    
-	    this.scalePropertiesPlayersListWindow();
-
-	    //Inject the Title
-	    $("#box-title").html("Options");
-
-	    //change div visibility to set content for the **Options menu**
-	    this.showModalContent("#modal-body", "modal-body-options-menu");
-	    this.showModalContent("#modal-footer", "modal-footer-simple-close");
+	    //dynamic.
 	    initiate_copy_box();
 
-	    this.createPlayersListWindow_generic_make_appear();
+	}else if(type=="connection"){
+
+	    Title = "Connection to server lost";
+	    Body = "modal-body-lost-connection";
+	    Footer = "modal-footer-rejoin";
+
+
 	}
+
+	//Inject the Title
+	$("#box-title").html(Title);
+	//Setting Modal BODY
+	this.setVisibleModalContent("#modal-body", Body);
+	this.setVisibleModalContent("#modal-footer", Footer);
+
+	// only activate if not already present. The other possibility is that modal's content will have been replaced live.
+	if(this.popup_in_foreground == false){
+	    this.activateModal();
+	}
+
+	//record which popup is currently on display...
+	this.popup_in_foreground = type;
+
+
     },
 
+    // Generic stuff required for presence of the modal
+    activateModal: function(){
 
-    createPlayersListWindow_generic_make_appear: function(){
+	// 1. Reveal the DIV which is the dark background with message on it
 	var ds = document.getElementById("modal_dark_sheet");
-
-	//make it visible...
 	ds.style["display"] = "block";
 
-	//only make the backround itself respond to clicks half a second after the scores have appeared (Touchscreen niggle fix)
+	// 2. clicking the background closes the message
+	// the behavior takes half a second to become active (Touchscreen niggle fix)
 	ds.onclick = undefined;
 	setTimeout(function(){
 	    ds.onclick = function(event) {
 		if (event.target == ds) {
-		    snDraw.Game.Popup.removePlayersListWindow();
+		    snDraw.Game.Popup.hideModal();
 		}
 	    };
 	}, 500);
 
-	//the x button closes the window...
+	// 3. the x button closes the window...
 	document.getElementById("close").onclick = function() {
-	    snDraw.Game.Popup.removePlayersListWindow();
+	    snDraw.Game.Popup.hideModal();
 	};
+
+	// 4. set the scale correctly:
+	this.calcModalScale();
+
     },
 
-
-    removePlayersListWindow: function(){
+    hideModal: function(){
 	$("#modal_dark_sheet").css("display", "none");
+	this.popup_in_foreground = false;
     },
 
-    showModalContent: function(section, content_id){
+    setVisibleModalContent: function(section, content_id){
 	$(section).children().each(function(){
 	    var div_id = $(this).attr('id');
 	    var set_disp = "none";

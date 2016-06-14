@@ -161,11 +161,11 @@ snDraw.Game.Mouse = {
 	}	    
 	if(control_index == 3){
 	    // Actions for "View Scores" Button click
-	    snDraw.Game.Popup.createPlayersListWindow();
+	    snDraw.Game.Popup.openModal("scores");
 	}
 	if(control_index == 4){
-	    // Actions for "Reset Game" Button click
-	    snDraw.Game.Popup.create_GameSettings_Window();
+	    // Actions for "options" Button click
+	    snDraw.Game.Popup.openModal("options");
 	}
     }
 };

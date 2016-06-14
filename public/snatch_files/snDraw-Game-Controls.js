@@ -431,7 +431,7 @@ snDraw.Game.Controls = {
 		TILE_TURN_REQUEST(); //request another tile...
 	    }else{
 		this.client_finished_game = true;
-		snDraw.Game.Popup.createPlayersListWindow();
+		snDraw.Game.Popup.openModal("scores");
 		//set text
 		var TurnButton = this.Button_Objs[1];
 		TurnButton.item(1).setText("Exit");

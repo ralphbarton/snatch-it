@@ -8,7 +8,7 @@ snDraw.Game.Event = {
 
 	var Spacings = snDraw.Game.calculateRenderingDimentionConstants();
 	snDraw.Game.Zones.SetZoneStyleScalingsFromTileSize(Spacings.ts);
-	snDraw.Game.Popup.scalePropertiesPlayersListWindow();//if scores were present on resize, this changes some scale params
+	snDraw.Game.Popup.calcModalScale();//if scores were present on resize, this changes some scale params
 
 	// 2. Add the controls strip
 	snDraw.Game.Controls.createControls();

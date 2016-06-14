@@ -70,7 +70,7 @@ socket.on('full game state transmission', function(gameState){
     };
 
     //start the hearbeat process now.
-    heartbeat_check();
+    emit_heartbeat();
 
 });//end of function to load game data
 
@@ -114,24 +114,31 @@ socket.on('give client their player index', function(myIndex){
 });
 
 
-var heartbeat_status = "server acknowledged";
+var heartbeat_status = undefined;
 function heartbeat_check(){
     if(heartbeat_status != "server acknowledged"){
-	snDraw.Game.Popup.maybe_createConnectionLostWindow();
+	snDraw.Game.Popup.openModal("connection");
     }
 
     heartbeat_status = new Date;
     socket.emit('client heartbeat', 0);
-    setTimeout(heartbeat_check, 1000 * 10);//every 10 seconds
+    setTimeout(heartbeat_check, 1000 * 4);//every 10 seconds
 
 }
 
+function emit_heartbeat(){
+    socket.emit('client heartbeat', 0);
+    setTimeout(heartbeat_check, 1000 * 4);// in 4 seconds, check receipt...
+}
+
 socket.on('heartbeat server ack', function(){
-    if(typeof(heartbeat_status)=="object"){//just because Date is an object
-	// we don't need a constant stream of ping duration messages.
-	//console.log("The server responded to the ping in " + (new Date - heartbeat_status) + " ms");
-    }
+    //1. clear the "connection lost" message if it is present
+
+    //2. record receipt of the server's response...
     heartbeat_status = "server acknowledged";
+
+    //3. in 4 seconds, send another heartbeat message...
+    setTimeout(emit_heartbeat, 1000 * 4);
 });
 
 socket.on('snatch rejected', function(rejection_reason){
