@@ -343,7 +343,7 @@ io.on('connection', function(socket){
 	    prev_word = word_str;
 
 	}else{
-	    //don't bother sending the duplicate mesage back to client...
+	    // where client snatch request is rejected because it is duplicate & invalid, don't even respond
 	    if(SnatchResponse.val_check != 'duplicate'){
 		socket.emit('snatch rejected', SnatchResponse.val_check);
 	    }

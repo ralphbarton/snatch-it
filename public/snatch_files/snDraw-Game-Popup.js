@@ -92,6 +92,7 @@ snDraw.Game.Popup = {
 	return table;
     },
 
+    modal_content_updater_timeout: undefined,
     openModal: function(type){
 	var Title = "my Title";
 	var Body = "my content id";
@@ -116,10 +117,16 @@ snDraw.Game.Popup = {
 
 	}else if(type=="connection"){
 
-	    Title = "Connection to server lost";
+	    Title = "Connection Lost";
 	    Body = "modal-body-lost-connection";
 	    Footer = "modal-footer-rejoin";
 
+	    //dynamic.
+	    function update_latency_html(){
+		$("#connection-latency").html(Math.round(get_max_latency()/1000,1));
+		snDraw.Game.Popup.modal_content_updater_timeout = setTimeout(update_latency_html, 1000);
+	    }
+	    update_latency_html();//herby start the chain...	    
 
 	}
 
@@ -170,6 +177,7 @@ snDraw.Game.Popup = {
 
     hideModal: function(){
 	$("#modal_dark_sheet").css("display", "none");
+	clearTimeout(this.modal_content_updater_timeout);
 	this.popup_in_foreground = false;
     },
 

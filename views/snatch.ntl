@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="snatch_files/common.css">
     <link rel="stylesheet" type="text/css" href="snatch_files/overlays.css">
     <link rel="stylesheet" type="text/css" href="snatch_files/zeroclipboard.css">
+    <link rel="stylesheet" type="text/css" href="snatch_files/loader.css">
 
     <!-- library / framework JS -->
     <script src="fabric.js-1.5.0/dist/fabric.min.js"></script>
@@ -19,6 +20,8 @@
 
     <!-- JS files specific to Snatch game -->
     <script src="snatch_files/snatch-client.js"></script>
+    <script src="snatch_files/snatch-message-latency.js"></script>
+
     <script src="snatch_files/snDraw.js"></script>
     <script src="snatch_files/snDraw-Game.js"></script>
     <script src="snatch_files/snDraw-Game-Controls.js"></script>
@@ -111,14 +114,17 @@
 	    </div>
 
 	    note to self: add some options in this space...
-	    <a class="modal" href="#" onclick="snDraw.Game.Popup.gotoHomePage()">Quit this game</a>
+	    <a class="modal" href="#" onclick="snDraw.Game.Popup.gotoHomePage()">Start a new name</a>
 
 	  </div>
 
 	  <!-- modal-body-lost-connection -->
 	  <div id="modal-body-lost-connection">
-	    <p>A constant connection to the server is required during this multiplayer game.</p>
-	    <p>By going back to the home page, you should be able to rejoin the same game using the <b>join</b> option.</p>
+	    <p>In order to play, your device must exchange messages with a server so that everyone sees everyone else's moves.</p>
+	    <div class="loader">Loading...</div>
+<p>The has now been a <span id="connection-latency">[too many]</span> second delay in receiving a response from the server. Do you have a low quality Internet connection?</p>
+
+	      <p>It may help to rejoin this game. If you enter the same name you can reclaim your words.</p>
 	  </div>
 
 	</div>
@@ -143,10 +149,11 @@
 
 	  <!-- 6.2. Footer for Connection lost -->
 	  <div id="modal-footer-rejoin">
-	    <a class="modal" href="#" onclick="snDraw.Game.Popup.gotoHomePage()">Rejoin</a>
+	    <a class="modal" href="#" onclick="snDraw.Game.Popup.hideModal()">Wait</a>
+	    | <a class="modal" href="#" onclick="location.reload()">Rejoin</a>
 	  </div>
 
-	  <!-- 6.2. Footer for Connection lost -->
+	  <!-- 6.2. Footer for Game finished -->
 	  <div id="modal-footer-close-replay">
 	    <a class="modal" href="#" onclick="snDraw.Game.Popup.hideModal()">Close</a>
 	    | <a class="modal" href="#" onclick="snDraw.Game.Popup.gotoHomePage()">Another Game</a>

@@ -80,9 +80,24 @@ socket.on('player has joined game', function(player_join_details){
 });
 
 
+
+function emit_heartbeat(){
+    log_message_transmit("hb");
+    socket.emit('client heartbeat', 0);
+}
+
+socket.on('heartbeat server ack', function(){
+    log_message_ack("hb");
+    setTimeout(emit_heartbeat, 1000 * 10);
+});
+
+
+
+
+
 //when a new tile is sent from the server...
 socket.on('new turned tile', function(newTile_info){
-
+    log_message_ack("turn");
     var player_index = newTile_info.flipping_player;
     var tile_index = newTile_info.tile_index;
     var letter = newTile_info.tile_letter;
@@ -93,7 +108,7 @@ socket.on('new turned tile', function(newTile_info){
 
 
 socket.on('snatch assert', function(SnatchUpdateMsg){
-
+    log_message_ack("snatch");
     //Process the incoming data: 
     var player_index = SnatchUpdateMsg.player_index;
     var tile_indices = SnatchUpdateMsg.tile_id_array
@@ -114,36 +129,11 @@ socket.on('give client their player index', function(myIndex){
 });
 
 
-var heartbeat_status = undefined;
-function heartbeat_check(){
-    if(heartbeat_status != "server acknowledged"){
-	snDraw.Game.Popup.openModal("connection");
-    }
-
-    heartbeat_status = new Date;
-    socket.emit('client heartbeat', 0);
-    setTimeout(heartbeat_check, 1000 * 4);//every 10 seconds
-
-}
-
-function emit_heartbeat(){
-    socket.emit('client heartbeat', 0);
-    setTimeout(heartbeat_check, 1000 * 4);// in 4 seconds, check receipt...
-}
-
-socket.on('heartbeat server ack', function(){
-    //1. clear the "connection lost" message if it is present
-
-    //2. record receipt of the server's response...
-    heartbeat_status = "server acknowledged";
-
-    //3. in 4 seconds, send another heartbeat message...
-    setTimeout(emit_heartbeat, 1000 * 4);
-});
-
 socket.on('snatch rejected', function(rejection_reason){
+    log_message_ack("snatch");
     snDraw.Game.Toast.showToast("Move invalid: " + rejection_reason);
 });
+
 
 //overwrite entire dictionary with server copy (will happen only on game load)
 socket.on('word definitions dictionary', function(word_dictionary){
@@ -155,8 +145,8 @@ socket.on('new word definition', function(w_def){
     snDraw.Game.DefineWord.word_dictionary[w_def.word] = w_def.definition;
 });
 
-function PLAYER_SUBMITS_WORD(p)       {socket.emit('player submits word', p);}
-function TILE_TURN_REQUEST()          {socket.emit('tile turn request', 0);}
+function PLAYER_SUBMITS_WORD(p)       {log_message_transmit("snatch"); socket.emit('player submits word', p);}
+function TILE_TURN_REQUEST()          {log_message_transmit("turn");   socket.emit('tile turn request', 0);}
 function PLAYER_JOINED_WITH_DETAILS(p){socket.emit('player joined with details', p);}
 
 function TURN_MANY_TILES(p)           {socket.emit('many_tile_turn_hack', p);}
