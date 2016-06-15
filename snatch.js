@@ -10,8 +10,7 @@ app.engine('ntl', function (filePath, options, callback) { // define the templat
   fs.readFile(filePath, function (err, content) {
     if (err) return callback(new Error(err));
     // this is an extremely simple template engine
-    var rendered = content.toString().replace('#identity#', '<div id="pin">' + options.pin + 
-					      '</div>\n<div id="key">'+ options.key +'</div>\n');
+    var rendered = content.toString().replace('#identity-html#', options.identity_html);
     return callback(null, rendered);
   });
 });
@@ -95,29 +94,32 @@ app.get('/', function(req, res){
 app.get('/join=*', function (req, res) {
     var frags = req.url.split('=');
     var identity_supplied = frags[frags.length-1];
-    if((!isNaN(identity_supplied)) && (identity_supplied.length==4)){//first test: is it a 4 digit numeric string?
 
-	//verify this pin has already been created...
-	if(rooms_table[identity_supplied] !== undefined){
-	    var dash_key = rooms_table[identity_supplied].room_key.replace(" ","-");
-	    res.render('snatch', { pin: identity_supplied, key: dash_key });
-	    access_room(identity_supplied);//extend time out due to link usage.
-	}else{
-	    res.send('Join request with ' + identity_supplied + ' (detected as PIN) failed - no such game open.');
+    var valid_pin = undefined;
+    var dash_key = undefined;//i.e. pink-elephant
+    var space_key = undefined;//i.e. pink elephant
+
+    // this code leads to setting of 'valid_pin' and 'dash_key'
+    if((!isNaN(identity_supplied)) && (identity_supplied.length==4)){// first test: is it a 4 digit numeric string?
+	if(rooms_table[identity_supplied] !== undefined){// is it a PIN of an existant game?
+	    var valid_pin = identity_supplied;
+	    var dash_key = rooms_table[valid_pin].room_key.replace(" ","-");
 	}
-
     }else if(/^[a-zA-Z-]+$/.test(identity_supplied)){//second test: is it a string composed only of letters and '-'?
-	var no_dash_key = identity_supplied.replace("-"," ");
-	var retrieved_pin = keygen.getPINfromWORDKEY(no_dash_key);
-	if (retrieved_pin != undefined){
-	    var dash_key = rooms_table[retrieved_pin].room_key.replace(" ","-");
-	    res.render('snatch', { pin: retrieved_pin, key: dash_key });
-	    access_room(retrieved_pin);//extend time out due to link usage.
-	}else{
-	    res.send('Join request with ' + identity_supplied + ' (detected as KEY) failed - no such game open.');
+	space_key = identity_supplied.replace("-"," ");
+	valid_pin = keygen.getPINfromWORDKEY(space_key);
+	if (valid_pin != undefined){
+	    dash_key = rooms_table[valid_pin].room_key.replace(" ","-");//conversion back-forth may fix capitalisation
 	}
+    }
+
+    if(valid_pin != undefined){
+	var my_html = '<div id="pin">' + valid_pin + '</div>\n<div id="key">'+ dash_key +'</div>\n';
+	res.render('snatch', {identity_html: my_html});
+	access_room(valid_pin);//extend time out due to link usage.
     }else{
-	res.send(identity_supplied + ' was not detected as a 4 digit pin or a word key');
+	console.log(identity_supplied + ' was not detected as a valid game identity. Homepage served instead');
+	res.sendFile(__dirname + '/public/snatch_files/home.html');
     }
 });
 

@@ -44,7 +44,7 @@
 
   <body>
     <!-- for when the page is served with the intention of directly joining a game -->
-    #identity#
+    #identity-html#
 
     <!-- The game canvas....-->
     <div class="page" id="canv-inside">
