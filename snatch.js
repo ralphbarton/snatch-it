@@ -10,7 +10,7 @@ app.engine('ntl', function (filePath, options, callback) { // define the templat
   fs.readFile(filePath, function (err, content) {
     if (err) return callback(new Error(err));
     // this is an extremely simple template engine
-    var rendered = content.toString().replace('#identity-html#', options.identity_html);
+    var rendered = content.toString().replace('#identity-html#', options.identity_html).replace('#html-1#', options.html1);
     return callback(null, rendered);
   });
 });
@@ -69,14 +69,32 @@ app.get('/sowpods-rsubset/*', function(req, res){
     var n_words_req = parseInt(final_arg);
     
     var sowpods_array = WordDictionaryTools.get_word_list();
-    var result = "List of "+n_words_req+" words from the SOWPODS dictionary:<br><br>";
+    var HTM = '<div class="table-title">\
+<h3>List of '+n_words_req+' words from the SOWPODS dictionary:</h3>\
+</div>\n';
+
+    HTM += '<table class="table-fill">\
+<thead>\
+<tr>\
+<th class="text-left">Word</th>\
+<th class="text-left">Web-scraped definition...</th>\
+</tr>\
+</thead>\
+<tbody class="table-hover">';
 
     for(var i=0; i < n_words_req; i++){
 	var rand_index = Math.floor(Math.random() * sowpods_array.length);
-	result += sowpods_array[rand_index] + "<br>";
+	var rand_word = sowpods_array[rand_index];
+	HTM += '\n<tr>\
+\n\t<td class="text-left">'+rand_word+'</td>\
+\n\t<td class="text-left"><span id="defn-'+rand_word+'">no definition recieved</span></td>\
+\n</tr>\n';
     }
-    res.send(result);
 
+    HTM += '</tbody>\
+</table>';
+
+    res.render('dictionary-tester', {html1: HTM});
 });
 
 

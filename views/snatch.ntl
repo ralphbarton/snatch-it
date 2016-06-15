@@ -162,7 +162,7 @@
 	  <!-- modal-body-lost-connection -->
 	  <div id="modal-body-lost-connection">
 	    <p>In order to play, your device must exchange messages with a server so that everyone sees everyone else's moves.</p>
-	    <div class="loader">Loading...</div>
+	    <div class="loader">Network Latency...</div>
 <p>The has now been a <span id="connection-latency">[too many]</span> second delay in receiving a response from the server. Do you have a low quality Internet connection?</p>
 
 	      <p>It may help to rejoin this game. If you enter the same name you can reclaim your words.</p>
