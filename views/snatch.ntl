@@ -113,7 +113,48 @@
 	      </div>
 	    </div>
 
-	    note to self: add some options in this space...
+	    <p> 
+	      <input type="checkbox">
+	      Enable Challenge feature on word meaning
+	    </p>
+
+	    <p> 
+	      <input type="checkbox">
+	      Enforce meaning-change rule
+	    </p>
+
+	    <p> 
+	      Turns rule
+	      <select>
+		<option>Stricly rotating</option>
+		<option>Individual timouts</option>
+		<option>5 second letter spew</option>
+		<option>10 second letter spew</option>
+		<option>free for all</option>
+	      </select>
+	    </p> 
+
+	    <p> 
+	      <input type="checkbox">
+	      Use flip-upon snatch rule
+	    </p>
+
+	    <p> 
+	      Dictionary
+	      <select>
+		<option>None</option>
+		<option>Sowpods</option>
+		<option>Top 60k words</option>
+	      </select>
+	    </p>
+
+	    <p> 
+	      <input type="checkbox">
+	      Apply penalty for words not in dictionary
+	    </p>
+
+
+
 	    <a class="modal" href="#" onclick="snDraw.Game.Popup.gotoHomePage()">Start a new name</a>
 
 	  </div>

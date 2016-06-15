@@ -88,7 +88,7 @@ function emit_heartbeat(){
 
 socket.on('heartbeat server ack', function(){
     log_message_ack("hb");
-    setTimeout(emit_heartbeat, 1000 * 10);
+    setTimeout(emit_heartbeat, 1000 * 10);// 10 seconds after the ACK of the heartbeat, send another...
 });
 
 

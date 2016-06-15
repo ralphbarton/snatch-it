@@ -2,8 +2,9 @@ var MessageLog = {};
 function log_message_transmit(key){
     MessageLog[key] = {timestamp: new Date,
 		       ack: false};
-    //in 4 seconds time, check if a response was recieved...
-    setTimeout(message_arrival_check, 1000 * 4);
+
+    //in 2.5 seconds time, check if a response was recieved...
+    setTimeout(message_arrival_check, 1000 * 2.5);
 }
 
 
@@ -34,8 +35,8 @@ function get_max_latency(){
 
 function message_arrival_check(){
     
-    //if any message has been waiting for more than 3 seconds, complain
-    if(get_max_latency() > 3000){
+    //if any message has been waiting for more than 2 seconds, complain
+    if(get_max_latency() > 2000){
 	snDraw.Game.Popup.openModal("connection");
     }
 
