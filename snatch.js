@@ -40,13 +40,17 @@ var WordDictionaryTools = WDT_factory('./dictionaries/sowpods.txt');
  
 //START OF experimental code secion
 // code to enable web-facing testing of the word Definition tool
-var prev_result = undefined;
-var prev_word = undefined;
 var word_dictionary = {};
+var prev_word = undefined;
+var prev_result = undefined;
 my_SDC.rEvent.on('searchComplete', function(result){
-    prev_result = result;
+    var BSres = JSON.parse(result);
+    prev_word = BSres.word;
+    prev_result = BSres.defn;
+
     // this does not limit definitions to rooms.
     // Work needed for this whole aspect of linking reponse to original asynchronous request
+    console.log("BS search completed for word : " + prev_word);
     io.emit('new word definition', {word: prev_word, definition: prev_result});	    
     word_dictionary[prev_word] = prev_result;
 });
@@ -59,7 +63,6 @@ app.get('/definition/*', function(req, res){
     my_SDC.lookup_definition(word);
     res.send('You have just looked up: ' + word + '. <br> Previously, you\
  looked up ' + prev_word + ' and a search result was:<br>' + prev_result);
-    prev_word = word;
 });
 
 //route 4 - to get random words...
@@ -85,6 +88,9 @@ app.get('/sowpods-rsubset/*', function(req, res){
     for(var i=0; i < n_words_req; i++){
 	var rand_index = Math.floor(Math.random() * sowpods_array.length);
 	var rand_word = sowpods_array[rand_index];
+
+	my_SDC.lookup_definition(rand_word);
+
 	HTM += '\n<tr>\
 \n\t<td class="text-left">'+rand_word+'</td>\
 \n\t<td class="text-left"><span id="defn-'+rand_word+'">no definition recieved</span></td>\

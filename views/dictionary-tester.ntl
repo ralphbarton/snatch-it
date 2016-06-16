@@ -8,11 +8,12 @@
     <link rel="stylesheet" type="text/css" href="/../snatch_files/table-style.css">
 
     <!-- library / framework JS -->
-    <script src="include/socket.io-1.2.0.js"></script>
-    <script src="include/jquery-1.11.1.js"></script>
+    <script src="/../include/socket.io-1.2.0.js"></script>
+    <script src="/../include/jquery-1.11.1.js"></script>
 
     <!-- my JS -->
-    <script src="snatch_files/common.js"></script>
+    <script src="/../snatch_files/common.js"></script>
+    <script src="/../snatch_files/dictionary-tester.js"></script>
 
   </head>
 
