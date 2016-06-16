@@ -1,7 +1,7 @@
 from autobahn.twisted.websocket import WebSocketServerProtocol, \
     WebSocketServerFactory
 
-import bs4, urllib, re
+import bs4, urllib, re, json
 
 
 def www_word_lookup(search_word):
@@ -9,23 +9,27 @@ def www_word_lookup(search_word):
     r = urllib.urlopen('http://www.dictionary.com/browse/' + search_word).read()
     soup = bs4.BeautifulSoup(r, "html.parser")
 
-    Y = soup.body.find(id="source-luna").find_all('div')
+    A = soup.body.find(id="source-luna")
+    if A is not None:
 
-    n_definitions = 0
-    topdef = None
-    for y in Y:
-        if 'class' in y.attrs:
-            if y['class'][0] == 'def-content':
-                n_definitions = n_definitions +1
-                if not y.string is None:
-                    topdef = re.sub(r'[^a-zA-Z,.;\(\)\- ]','', y.string).strip() 
-                    break
+        Y = A.find_all('div')
 
-    if topdef == None:
-        return 'no definition found'
+        n_definitions = 0
+        topdef = None
+        for y in Y:
+            if 'class' in y.attrs:
+                if y['class'][0] == 'def-content':
+                    n_definitions = n_definitions +1
+                    if not y.string is None:
+                        topdef = re.sub(r'[^a-zA-Z,.;\(\)\- ]','', y.string).strip() 
+                        break
+
+        if topdef == None:
+            return 'no definition found'
+        else:
+            return topdef
     else:
-        return topdef
-
+        return 'unexpected page structure on dictionary.com'
 
 class MyServerProtocol(WebSocketServerProtocol):
 
@@ -42,21 +46,13 @@ class MyServerProtocol(WebSocketServerProtocol):
             my_query = payload.decode('utf8')
             
             #this is a blocking function call
-            my_definition = www_word_lookup(my_query)
-            print my_definition
-            u_def = unicode(my_definition)
+            my_definition = www_word_lookup(my_query) #returns unicode, needs conversion
             str_def = my_definition.encode('ascii','ignore')
 
-            print type(payload)
-            print type(payload) == bytes
-
-            print type(my_definition)
-            print type(my_definition) == bytes
-
-            print type(str_def)
-            print type(str_def) == bytes
-            self.sendMessage(payload, isBinary)
-            self.sendMessage(str_def, isBinary)
+            print("Looked up: " + my_query)
+            print("Found: " + str_def)
+            result_in_json = json.dumps({'word': my_query, 'defn':str_def})
+            self.sendMessage(result_in_json, False)
 
 
     def onClose(self, wasClean, code, reason):
