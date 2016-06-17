@@ -173,21 +173,25 @@ function close_room(room_pin){
 function access_room(room_pin){
     var R = rooms_table[room_pin];
 
-    //clear the old timeout by reference...
-    if(R.closeTimeoutID !== undefined){
-	clearTimeout(R.closeTimeoutID);
+    if(R !== undefined){
+	//clear the old timeout by reference...
+	//suppose this the first access of an existant room. Nothing to clear
+	if(R.closeTimeoutID !== undefined){
+	    clearTimeout(R.closeTimeoutID);
+	}
+
+	//Add a new timeout. Retain the reference.
+	R.closeTimeoutID = setTimeout(function(){
+	    close_room(room_pin);
+	}, 1000 * 60 * 60 * 3);//3 hours persistence
+	//    }, 1000 * 60 * 10);// 10 minues persistence
+	console.log("["+room_pin+"] - timout extended...");
+
+	//Add
+	R.timeLastAccessed = new Date;
+    }else{
+	console.log("message recieved for non-existant room ["+room_pin+"]... no action taken");
     }
-
-    //Add a new timeout. Retain the reference.
-    R.closeTimeoutID = setTimeout(function(){
-	close_room(room_pin);
-    }, 1000 * 60 * 60 * 3);//3 hours persistence
-//    }, 1000 * 60 * 10);// 10 minues persistence
-    console.log("["+room_pin+"] - timout extended...");
-
-    //Add
-    R.timeLastAccessed = new Date;
-
 }
 
 

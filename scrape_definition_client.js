@@ -10,7 +10,7 @@ module.exports = function (){
 
 	lookup_definition: function(word){
             if (client.readyState === client.OPEN) {
-		console.log('Beautiful Soup: looking up ' + word);
+		console.log('Beautiful Soup: now passing word "' + word + '" to Python via WS');
 		client.send(word);
             }
 	}
