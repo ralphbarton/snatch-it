@@ -57,14 +57,13 @@ snDraw.Game = {
     },
 
     tileSpacings: undefined,
+    stdDimention: undefined,
     calculateRenderingDimentionConstants: function(){    //this function relies upon a defined number of tiles, which is only after game state is loaded...
 	var N_pixels = snDraw.canv_W * snDraw.canv_H;
 	var Tile_pixels = N_pixels * this.Ratio_tile / tilestats.n_tiles;
-	var tile_dim = Math.sqrt(Tile_pixels);
-	var grid_letter_spacing = 0.14;
+	this.tileSize = Math.round(Math.sqrt(Tile_pixels));
+	this.stdDimention = Math.round(Math.sqrt(N_pixels * 0.0037));
 
-	this.tileSize = Math.round(tile_dim);
-	
 	this.marginUnit = this.tileSize*0.13;
 	/*this.textMarginUnit = this.tileSize*0.2;*/ // though others are now redundant too...
 	this.stroke_px = Math.round(this.marginUnit * 0.5);
@@ -73,7 +72,7 @@ snDraw.Game = {
 	this.h_spacer = this.tileSize * 1.04;
 	this.v_spacer = this.tileSize * 1.12;
 	this.x_plotter_R = 2 * this.marginUnit + this.stroke_px;
-	this.tile_space_px = this.tileSize * grid_letter_spacing;
+	this.tile_space_px = this.tileSize * 0.14;
 	this.client_col = players[client_player_index].color;
 
 	var TSI = this.tileSize; // tile side inside (this excludes the size of the border)

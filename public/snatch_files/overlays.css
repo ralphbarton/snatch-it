@@ -61,7 +61,7 @@
 }
 
 #modal-body {
-    padding: 2px 16px;
+    padding: 2px 8px;
     font-size: 65%;
     border-top: 1px solid #CCC;
     border-bottom: 1px solid #CCC;
@@ -82,6 +82,14 @@ a.modal {
 a.modal:hover{
     color: red;
 }
+
+/* 1.1 specific menus... */
+
+#modal-body-options-menu{
+    text-align: left;
+    font-size: 12pt;
+}
+
 
 
 /* 2. the scores window */
@@ -187,7 +195,7 @@ td.pl-score{
 /* 5. Instructions styling */
 .rules-container {
     width: 600px;
-    height: 600px;
+    height: 495px;
     margin-bottom:30px;
 }
 
@@ -196,8 +204,8 @@ td.pl-score{
     font-family: Arial, Helvetica, sans-serif;
     text-align: left;
     width: 600px;
-    height: 600px;
-    padding: 5px 75px;
+    height: 495px;
+    padding: 3px 65px;
 }
 
 .rutxt-tile{

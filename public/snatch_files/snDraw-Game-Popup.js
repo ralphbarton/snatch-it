@@ -8,7 +8,7 @@ snDraw.Game.Popup = {
     calcModalScale: function(){
 	
 	//things that scale with the Tile Size
-	var ts = Math.round(snDraw.Game.tileSpacings.ts);
+	var ts = Math.round(snDraw.Game.stdDimention);
 	var cr = ts * 0.30; // corner radius
 	var fsz = ts * 0.50; // master font size
 

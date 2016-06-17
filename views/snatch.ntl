@@ -81,10 +81,13 @@
 
 	  <!-- modal-body-options-menu -->
 	  <div id="modal-body-options-menu">
+	    <p> 
+	      See <a class="modal" href="#" onclick="snDraw.Game.Popup.openModal('rules')">instructions</a> for Snatch-it
+	    </p> 
 	    <div id="copyable-container">
 	      <div class="box02">
 		<div class="box04">
-		  Here is a shareable link into this game:
+		  Link into this game:
 		</div>
 		<div class="box03">
 		  <a href="#" onclick="gen_link_as_key()">
@@ -116,8 +119,6 @@
 		</div>
 	      </div>
 	    </div>
-
-	    Click here to <a class="modal" href="#" onclick="snDraw.Game.Popup.openModal('rules')">view rules</a>
 
 	    <p> 
 	      <input type="checkbox">
