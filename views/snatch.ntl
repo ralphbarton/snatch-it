@@ -167,11 +167,12 @@
 
 	  <!-- modal-body-lost-connection -->
 	  <div id="modal-body-lost-connection">
-	    <p>In order to play, your device must exchange messages with a server so that everyone sees everyone else's moves.</p>
+	    <p>During play, your device must exchange messages with a server.</p>
 	    <div class="loader">Network Latency...</div>
-	    <p>The has now been a <span id="connection-latency">[too many]</span> second delay in receiving a response from the server. Do you have a low quality Internet connection?</p>
+	    <p>There has now been a delay of <span id="connection-latency">[too many]</span> seconds receiving a response to a message. Is there a problem with your Internet?</p>
 
-	    <p>It may help to rejoin this game. If you enter the same name you can reclaim your words.</p>
+	    <p>If the delay lasts longer than a minute, the page will auto-refresh. You can click rejoin to do this now.</p>
+	    <p>To reclaim you words upon reconnect, you must enter your name exactly as before.</p>
 	  </div>
 
 	  <div id="modal-body-flickity-rules">
@@ -236,9 +237,17 @@
 		<p>
 		  <span class="rutxt-h1">Snatching</span></p>
 		<p>
-		  On a PC to &ldquo;shout out&rdquo; a word is done by typing it out and hitting the <span class="rutxt-key">Enter</span> key. <span class="rutxt-key">Backspace</span> and <span class="rutxt-key">Escape</span> can be used to clear a letter or the whole word typed, if a is a mistake is made.</p>
+		  On a PC &ldquo;shout out&rdquo; a word by typing it out and hitting <span class="rutxt-key">Enter</span>.</p>
 		<p>
-		  On a touch-screen or using a mouse, tap on the letters that make your word in order. Then, tap/click the <span class="rutxt-button">Snatch-it</span> button, or <span class="rutxt-button">Cancel</span> to clear</span> the entire word spelt so far.</p>
+		  If you make a mistake (or someone else is quicker!) use <span class="rutxt-key">Backspace</span> to clear a letter or <span class="rutxt-key">Escape</span> to clear the whole word typed.</p>
+		<p>
+		  If using these 'special' keys has unwanted effects in your browser, alternatives are numeric keys: <span class="rutxt-key">1</span> clear spell <span class="rutxt-key">2</span> turn a new letter <span class="rutxt-key">3</span> snatch <span class="rutxt-key">4</span> show scores <span class="rutxt-key">5</span> backspace.</p>
+		<p>
+		  <span class="rutxt-key">Backspace</span> to clear a letter or <span class="rutxt-key">Escape</span> to clear the whole word typed.</p>
+		<p>
+		  On a touch-screen or using a mouse, tap on the letters that make your word in order. Then tap/click <span class="rutxt-button">Snatch-it</span>.</p>
+		<p>
+		  Use <span class="rutxt-button">Cancel</span> to clear entire text so far spelt out.</p>
 		<p>
 		  <span class="rutxt-italic-bold">
 		    You have now read enough to be able to play. Additional information, rules and scoring are on the next 3 pages.

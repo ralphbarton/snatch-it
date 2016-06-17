@@ -8,7 +8,7 @@
 }
 
 
-/* The Modal (background) */
+/* 1. The core styling of the Modal Window */
 #modal_dark_sheet {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
@@ -43,8 +43,8 @@
     font-weight: bold;
 }
 
-/* The Close X only */
-#close {
+
+#close {/* The Close X */
     margin-top: -2.5%;
     margin-right: 2%;
     color: black;
@@ -67,6 +67,24 @@
     border-bottom: 1px solid #CCC;
 }
 
+#modal-footer {
+    padding: 2px 16px;
+    font-size: 75%;
+    white-space: nowrap;
+}
+
+a.modal {
+    font-weight: bold;
+    color: black;
+    text-decoration: underline;
+}
+
+a.modal:hover{
+    color: red;
+}
+
+
+/* 2. the scores window */
 table {
     border-collapse: collapse;
     width: auto;
@@ -93,21 +111,13 @@ td.pl-score{
     font-size: 120%;
 }
 
-#modal-footer {
-    padding: 2px 16px;
-    font-size: 75%;
-    white-space: nowrap;
-}
 
-a.modal {
+/* 3. the latency message */
+#connection-latency{
     font-weight: bold;
-    color: black;
-    text-decoration: underline;
 }
 
-a.modal:hover{
-    color: red;
-}
+/* 4. TOASTS styling */
 
 .ToastGrey {
     -moz-box-shadow:inset 0px -3px 7px 0px #545454;
@@ -174,7 +184,7 @@ a.modal:hover{
 }
 
 
-/* CSS specifically for the 'rules' dialogue of SNATCH */
+/* 5. Instructions styling */
 .rules-container {
     width: 600px;
     height: 600px;
