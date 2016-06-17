@@ -10,6 +10,10 @@
     <link rel="stylesheet" type="text/css" href="snatch_files/zeroclipboard.css">
     <link rel="stylesheet" type="text/css" href="snatch_files/loader.css">
 
+    <!-- the JS and CSS for the 'flickity' flickable carousel -->
+    <link rel="stylesheet" href="include/flickity/flickity.css" media="screen">
+    <script src="include/flickity/flickity.pkgd.js"></script>
+
     <!-- library / framework JS -->
     <script src="fabric.js-1.5.0/dist/fabric.min.js"></script>
     <script src="include/socket.io-1.2.0.js"></script>
@@ -69,7 +73,7 @@
 	       modal-body-scores-table
 	       modal-body-lost-connection
 	       modal-body-options-menu
-	    
+	       modal-body-flickity-rules
 	    -->
 
 	  <!-- modal-body-scores-table (note that this always has to be generated dynamically) -->
@@ -112,6 +116,8 @@
 		</div>
 	      </div>
 	    </div>
+
+	    Click here to <a class="modal" href="#" onclick="snDraw.Game.Popup.openModal('rules')">view rules</a>
 
 	    <p> 
 	      <input type="checkbox">
@@ -163,11 +169,134 @@
 	  <div id="modal-body-lost-connection">
 	    <p>In order to play, your device must exchange messages with a server so that everyone sees everyone else's moves.</p>
 	    <div class="loader">Network Latency...</div>
-<p>The has now been a <span id="connection-latency">[too many]</span> second delay in receiving a response from the server. Do you have a low quality Internet connection?</p>
+	    <p>The has now been a <span id="connection-latency">[too many]</span> second delay in receiving a response from the server. Do you have a low quality Internet connection?</p>
 
-	      <p>It may help to rejoin this game. If you enter the same name you can reclaim your words.</p>
+	    <p>It may help to rejoin this game. If you enter the same name you can reclaim your words.</p>
 	  </div>
 
+	  <div id="modal-body-flickity-rules">
+
+	    <div class="carousel js-flickity rules-container">
+
+	      <!-- Rules 1 -->
+	      <div class="carousel-cell rules-cell">
+		<p>
+		  <span class="rutxt-italic-bold">Snatch-it </span>is a game of spotting word from their letters as fast as possible... and then stealing them!</p>
+		<p>
+		  The original version involves a set of 100 plastic letter-tiles, a table-top and nothing more!</p>
+		<p>
+		  It&#39;s a game for at least 2 players. There&#39;s not really an upper limit on the number of people that can play.</p>
+
+		<p><span class="rutxt-h1">To play</span></p>
+
+		<ol class="rutxt-list">
+		  <li><span class="rutxt-list-item">
+		      Start with all the tiles face down on the table.</span></li>
+		  <li><span class="rutxt-list-item">
+		      Using some system of turns, the players flip the tiles one-by-one revealing letters.</span></li>
+		  <li><span class="rutxt-list-item">
+		      As soon as enough letters are flipped to make a word, shout out that word and claim it for your own. <br><br>For example, suppose letters <span class="rutxt-tile">T</span>, <span class="rutxt-tile">K</span>, <span class="rutxt-tile">H</span> then <span class="rutxt-tile">A</span> get flipped, in that order. I then shout out &ldquo;hat&rdquo; and claim those 3 letters as my own, taking the word <span class="rutxt-word"><span class="rutxt-tile">H</span><span class="rutxt-tile">A</span><span class="rutxt-tile">T</span></span>. The <span class="rutxt-tile">K</span> remains unclaimed in the central area.</span></li>
+		</ol>
+	      </div>
+
+	      <!-- Rules 2 -->
+	      <div class="carousel-cell rules-cell">
+		<ol class="rutxt-list">
+		  <li value="4"><span class="rutxt-list-item">
+		    Now we continue flipping letters. Another <span class="rutxt-tile">A</span> comes up, and then an <span class="rutxt-tile">N</span>. When you see the <span class="rutxt-tile">N</span>, you shout out <span class="rutxt-word"><span class="rutxt-tile">T</span><span class="rutxt-tile">H</span><span class="rutxt-tile">A</span><span class="rutxt-tile">N</span></span> and claim it. This word is made by combining the <span class="rutxt-tile">N</span> with the letters of my word <span class="rutxt-word"><span class="rutxt-tile">H</span><span class="rutxt-tile">A</span><span class="rutxt-tile">T</span></span>. I have just lost that word, would would have contributed to my final score.</span></li>
+		  <li><span class="rutxt-list-item">
+		    Before any more letters are turned, I spot the word &ldquo;thank&rdquo;. Now I snatch your &ldquo;than&rdquo; and it becomes my <span class="rutxt-word"><span class="rutxt-tile">T</span><span class="rutxt-tile">H</span><span class="rutxt-tile">A</span><span class="rutxt-tile">N</span><span class="rutxt-tile">K</span></span></span></li>
+		  </ol>
+		<p><span class="rutxt-h1">
+		    To summarise these rules:</span></p>
+		<ul>
+		  <li>
+		    Once letters have been grouped (i.e. made into a word), those letters can never be separated. For example, the word <span class="rutxt-word"><span class="rutxt-tile">T</span><span class="rutxt-tile">A</span><span class="rutxt-tile">N</span><span class="rutxt-tile">K</span></span> could not be snatched in the example above, because it would mean removing the <span class="rutxt-tile">H</span> from the grouping.</li>
+		  <li>
+		    A snatch move must extend the length of a word. It cannot only be an anagram.</li>
+		  <li>
+		    A snatch move can combine any combination of free letters and your own or other peoples&#39; words. Two or more words can be combined without introducing free letters, or multiple free letters can be included at once. The only restriction is that the resulting word must be an actual word.</li>
+		  </ul>
+	      </div>
+
+	      <!-- Rules 3 -->
+	      <div class="carousel-cell rules-cell">
+		<p>
+		  <span class="rutxt-italic-bold">In this web-based incarnation of the game</span>, players open a webpage on their PC, tablet or smart-phone. Using the Internet, the pages running on their devices are all <span class="rutxt-italic-bold">synced</span> such that they all display the same state of play. By using codes to identify games, multiple separate games can be played at once.</p>
+		<p>
+		  The game web-page supports both mouse and keyboard controls, as well as touch control on devices with a touch screen. Players using a physical keyboard will be at an advantage over players with touch-screen devices - typing is faster! Nonethless, all types of device can interoperate.</p>
+		<p>
+		  <span class="rutxt-h1">Flipping</span></p>
+		<p>
+		  On a PC, press the <span class="rutxt-key">space</span> key to flip a new letter. Alternatively, tap or click the <span class="rutxt-button">Turn Letter (100)</span> at the top of the screen. Indicated in brackets is the number of  unturned letters tiles that remain.</p>
+	      </div>
+
+	      <!-- Rules 4 -->
+	      <div class="carousel-cell rules-cell">
+		<p>
+		  <span class="rutxt-h1">Snatching</span></p>
+		<p>
+		  On a PC to &ldquo;shout out&rdquo; a word is done by typing it out and hitting the <span class="rutxt-key">Enter</span> key. <span class="rutxt-key">Backspace</span> and <span class="rutxt-key">Escape</span> can be used to clear a letter or the whole word typed, if a is a mistake is made.</p>
+		<p>
+		  On a touch-screen or using a mouse, tap on the letters that make your word in order. Then, tap/click the <span class="rutxt-button">Snatch-it</span> button, or <span class="rutxt-button">Cancel</span> to clear</span> the entire word spelt so far.</p>
+		<p>
+		  <span class="rutxt-italic-bold">
+		    You have now read enough to be able to play. Additional information, rules and scoring are on the next 2 pages.
+		  </span>
+		</p>
+	      </div>
+
+	      <!-- Rules 5 -->
+	      <div class="carousel-cell rules-cell">
+		<p>
+		  <span class="rutxt-h1">Submitting words at the same time</span></p>
+		<p>
+		  It is not physically possible for two players to submit the same (or interfering words) at exactly the same time because one of them must have clicked <span class="rutxt-button">snatch-it</span> some fraction of a second before the other.</p>
+		<p>
+		  In practice, network latency (i.e. how long does it take messages about game-play to reach the server, which adjudicates the game) is variable. This will most affect whose move is interpreted first. The remote computer processes and broadcasts the results of messages strictly in the order that they are received.</p>
+		<p>
+		  <span class="rutxt-h1">Stem change rule</span></p>
+		<p>
+		  An optional rule is to require that a snatch alters the meaning of a word. This prevents repetitive boring play such as adding an &#39;S&#39; to every verb and noun. So ARM could be snatched as RAMS but not as ARMS. LODGE could not be snatched as LODGED; VOW could not be snatch as AVOW but could be snatched as VOWEL. And I don&#39;t think VOID could be snatched as AVOID.</p>
+		<p>
+		  Players could simply agree to this rule, or, the computer can block non-stem change snatches. This feature is available, but be warned that it may not be totally consistent and fair (the algorithm is still at beta stage).</p>
+	      </div>
+
+	      <!-- Rules 6 -->
+	      <div class="carousel-cell rules-cell">
+		<p>
+		  <span class="rutxt-h1">Dictionary checking</span></p>
+		<p>
+		  Words are checked against a dictionary, i.e. computer determines if word submitted is a real word.</p>
+		<p>
+		  <span class="rutxt-h1">Challenge rule</span></p>
+		<p>
+		  Some people think it should not be allowed to snatch a word - even if it is in the dictionary - if you do not know its meaning. Thus, there is an optional game feature where, after someone has snatched a word, you can challenge them. Within 60 seconds of this, they will have to select its definition from a list of definitions generated by the computer. If select correctly, they keep the disputed word and are given a randomly chosen word from the challenger&#39;s words. Otherwise, the challenger claims the word whose definition was not known.</p>
+	      </div>
+
+	      <!-- Rules 6 -->
+	      <div class="carousel-cell rules-cell">
+		<p>
+		  <span class="rutxt-h1">Turns rule</span></p>
+		<p>
+		  The rate of turning letters determines the pace of game-play, and several different options are available, varying exactly what will trigger flipping of letters</p>
+		<ul>
+		  <li>
+		    <span class="rutxt-italic-bold">Strictly rotating</span> - players take it in turns to choose a moment to flip, and must always wait for the player before them in the circle</li>
+		  <li>
+		    <span class="rutxt-italic-bold">Individual timeouts</span> - each player can turn letters at a maximum rate of 1 per 10 seconds.</li>
+		  <li>
+		    <span class="rutxt-italic-bold">Individual timeouts, reset by anyone else&#39;s flipping</span> - (this is default) after turning a tile, you wait either for 10 seconds or for any other player to flip a tile (whichever is sooner) and they you can turn again.</li>
+		  <li>
+		    <span class="rutxt-italic-bold">5 second letter spew</span> - The computer delivers new tiles one every 5 seconds</li>
+		  <li>
+		    <span class="rutxt-italic-bold">free for all</span> - players turn letters without restriction</li>
+		</ul>
+	      </div>
+	    </div>
+
+
+	  </div>
 	</div>
 
 
@@ -204,8 +333,6 @@
       </div>
 
     </div>
-
-
 
   </body>
 
