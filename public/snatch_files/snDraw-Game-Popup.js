@@ -129,7 +129,7 @@ snDraw.Game.Popup = {
 	    update_latency_html();//herby start the chain...	    
 
 	}else if(type=="rules"){
-	    Title = "Rules";
+	    Title = "Instructions";
 	    Body = "modal-body-flickity-rules";
 	    Footer = "modal-footer-simple-close";
 	}

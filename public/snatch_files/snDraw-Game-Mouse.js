@@ -64,13 +64,17 @@ snDraw.Game.Mouse = {
 	    //Handle click releases over a word...
 	    var word_owner = targetObj.OwnerPlayer;
 	    if(word_owner !== undefined){//mouse up on a word 
-		snDraw.Game.DefineWord.clearDefinitionToast(targetObj);
+		snDraw.Game.DefineWord.cancelDelayedDefinitionToast(targetObj);
 		//clicks released over a word that had previously been clicked on (i.e. picked up)
 		if(this.x_pickup !== undefined){
 		    snDraw.moveSwitchable(targetObj, true, snDraw.ani.sty_Anag,{
 			left: this.x_pickup,
 			top: this.y_pickup
 		    });
+		    //don't store this stale information after a click release.
+		    //(Important as it may be used to determine if drag is in progress...)
+		    this.x_pickup = undefined;
+		    this.y_pickup = undefined;
 		}
 		//This is to trigger an "add letter to speller" for mouse-up upon a word...
 		//determine the letter...
@@ -121,7 +125,7 @@ snDraw.Game.Mouse = {
 	    //Handle mouse pointer moving off a word...
 	    var word_owner = targetObj.OwnerPlayer;
 	    if(word_owner !== undefined){//mouse down on a word 
-		snDraw.Game.DefineWord.clearDefinitionToast(targetObj);
+		snDraw.Game.DefineWord.cancelDelayedDefinitionToast(targetObj);
 	    }
 
 	}

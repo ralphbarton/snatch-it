@@ -229,7 +229,9 @@
 		<p>
 		  <span class="rutxt-h1">Flipping</span></p>
 		<p>
-		  On a PC, press the <span class="rutxt-key">space</span> key to flip a new letter. Alternatively, tap or click the <span class="rutxt-button">Turn Letter (100)</span> at the top of the screen. Indicated in brackets is the number of  unturned letters tiles that remain.</p>
+		  On a PC, press the <span class="rutxt-key">space</span> key to flip a new letter.</p>
+		<p>
+		  On a tablet or smart-phone, tap the <span class="rutxt-button">Turn Letter (100)</span> button at the top of the screen. Indicated in brackets is how many unturned letters tiles remain.</p>
 	      </div>
 
 	      <!-- Rules 4 -->
@@ -241,9 +243,7 @@
 		<p>
 		  If you make a mistake (or someone else is quicker!) use <span class="rutxt-key">Backspace</span> to clear a letter or <span class="rutxt-key">Escape</span> to clear the whole word typed.</p>
 		<p>
-		  If using these 'special' keys has unwanted effects in your browser, alternatives are numeric keys: <span class="rutxt-key">1</span> clear spell <span class="rutxt-key">2</span> turn a new letter <span class="rutxt-key">3</span> snatch <span class="rutxt-key">4</span> show scores <span class="rutxt-key">5</span> backspace.</p>
-		<p>
-		  <span class="rutxt-key">Backspace</span> to clear a letter or <span class="rutxt-key">Escape</span> to clear the whole word typed.</p>
+		  In some browsers, the keys above have pre-assigned functions that interfere with the game. In this case, an alternative is to use the numeric keys. Their functions are assigned as follows: <span class="rutxt-key">1</span> clear spell <span class="rutxt-key">2</span> turn a new letter <span class="rutxt-key">3</span> snatch <span class="rutxt-key">4</span> show scores <span class="rutxt-key">5</span> backspace.</p>
 		<p>
 		  On a touch-screen or using a mouse, tap on the letters that make your word in order. Then tap/click <span class="rutxt-button">Snatch-it</span>.</p>
 		<p>
