@@ -123,7 +123,23 @@ snDraw.Game.Popup = {
 
 	    //dynamic.
 	    function update_latency_html(){
-		$("#connection-latency").html(Math.round(get_max_latency()/1000,1));
+		var L = get_max_latency();
+
+		switch(L.m_key) {
+		case "turn":
+		    //bluish
+		    $(".loader").css("color", "#3B3369");
+		    break;
+		case "snatch":
+		    //greenish
+		    $(".loader").css("color", "#336956");
+		    break;
+		default:
+		    //redish
+		    $(".loader").css("color", "#693346");
+		} 
+
+		$("#connection-latency").html(L.latency);
 		snDraw.Game.Popup.modal_content_updater_timeout = setTimeout(update_latency_html, 1000);
 	    }
 	    update_latency_html();//herby start the chain...	    
