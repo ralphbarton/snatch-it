@@ -72,13 +72,14 @@ tr {
   font-weight:normal;
   text-shadow: 0 1px 1px rgba(256, 256, 256, 0.1);
 }
- 
+
+/* I don't like the mouseover color inversion it is too much
 tr:hover td {
   background:#4E5066;
   color:#FFFFFF;
   border-top: 1px solid #22262e;
   border-bottom: 1px solid #22262e;
-}
+}*/
  
 tr:first-child {
   border-top:none;
@@ -91,10 +92,12 @@ tr:last-child {
 tr:nth-child(odd) td {
   background:#EBEBEB;
 }
- 
+
+/* I don't like the mouseover color inversion it is too much
 tr:nth-child(odd):hover td {
   background:#4E5066;
 }
+*/
 
 tr:last-child td:first-child {
   border-bottom-left-radius:3px;
@@ -106,7 +109,7 @@ tr:last-child td:last-child {
  
 td {
   background:#FFFFFF;
-  padding: 3px 8px;
+  padding: 2px 6px;
   text-align:left;
   vertical-align:middle;
   font-weight:300;
@@ -141,4 +144,50 @@ td.text-center {
 
 td.text-right {
   text-align: right;
+}
+
+/* Additional styles due to structured scrape-results list...*/
+
+.defn-container {
+    padding: 1px;
+}
+
+.defn-blob {
+    border: 1px solid black;
+    padding: 1px;
+    float: left;
+    border-radius: 50%;
+    width: 11px;
+    height: 11px;
+    box-shadow: 0px 0px 3px 1px #000;
+    margin: 3px 0px;
+}
+
+.blob-green {
+    background-color: #57D609;
+}
+
+.blob-red {
+    background-color: #E85D00;
+}
+
+.blob-dark {
+    background-color: #850731;
+}
+
+.defn-source {
+    color: #8A8FA8;
+    font-size: 9px;
+    font-weight: bold;
+    margin-left: 23px;
+}
+
+.defn-source-ln {
+    color: #8191E6;
+}
+
+.defn-text {
+    margin-left: 35px;
+    font-size: 14px;
+    color: #474A5C;
 }
