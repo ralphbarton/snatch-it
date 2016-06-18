@@ -34,8 +34,12 @@ snDraw.Game.Spell = {
 
 		//'logical validity' of the word in the spell may have changed. Recolour button accordingly
 		this.indicateN_validMoves_onButton();
+		return true;
 	    }
 	}
+
+	//indicates whether a letter was actually added...
+	return false;
     },
 
     //for when tile size is changed.

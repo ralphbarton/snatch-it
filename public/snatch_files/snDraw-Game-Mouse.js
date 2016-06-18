@@ -78,8 +78,8 @@ snDraw.Game.Mouse = {
 		}
 		//This is to trigger an "add letter to speller" for mouse-up upon a word...
 		//determine the letter...
-		var myHitTileObj = this.getTile_fromMouseOnWord(e);
-		this.spellAddLetter_noDoubleClick(myHitTileObj);
+		var myHitTile_deets = this.getTile_fromMouseOnWord(e);
+		this.spellAddLetter_noDoubleClick(myHitTile_deets.TileObj, myHitTile_deets.TileCoords);
 	    }
 	    
 	    //Handle click releases over a Game Control
@@ -135,19 +135,68 @@ snDraw.Game.Mouse = {
 	var pointer = canvas.getPointer(mouse_event.e);
 	var wordObj = mouse_event.target;
 	var x_extent = pointer.x - wordObj.getLeft();
-	var index = Math.floor(x_extent/snDraw.Game.tileSize);
+	var index = Math.floor(x_extent/snDraw.Game.tileSpacings.tslg);
 	var index_upper = wordObj._objects.length;
 	index = Math.min(index, index_upper-1);
-	return wordObj.item(index);
+	return {
+	    TileObj: wordObj.item(index),
+	    TileCoords: {
+		x: (wordObj.getLeft() + index * snDraw.Game.tileSpacings.tslg),
+		y: wordObj.getTop()
+	    }
+	};
     },
 
-    spellAddLetter_noDoubleClick: function (myTile) {
+    spellAddLetter_noDoubleClick: function (myTile, WRDtile_coords) {
 	//only allow the addition of the letter if it wasn't recently clicked...
 	if (myTile.recentClick != true){
-	    snDraw.Game.Spell.addLetter(myTile.letter);
+	    var spl_add = snDraw.Game.Spell.addLetter(myTile.letter);
 	    myTile.recentClick = true;
-	    setTimeout(function(){myTile.recentClick = false;}, 500);
+	    var rem_spot = this.showSpotOnTile(myTile, WRDtile_coords, spl_add);
+
+	    setTimeout(function(){
+		myTile.recentClick = false;
+		rem_spot();
+	    }, 250);
 	}
+    },
+
+    //returns a function at will, when called, remove this spot.
+    showSpotOnTile: function (myTile, WRDtile_coords, spl_add) {
+	//draw a little spot...
+	var rzz = snDraw.Game.tileSize * 0.2;
+	var rad = rzz * (spl_add ? 1.0 : 0.6);
+	var dot_fill = spl_add ? players[client_player_index].color : '#999';
+
+	if(WRDtile_coords){
+	    var spot_left = WRDtile_coords.x;
+	    var spot_top = WRDtile_coords.y;
+	}else{
+	    var spot_left = myTile.getLeft();
+	    var spot_top = myTile.getTop();
+	}
+	spot_left += rzz/2;
+	spot_top += rzz/2;
+
+	var mySpark = new fabric.Circle({
+	    radius: rad,
+	    fill: dot_fill,
+	    left: spot_left,
+	    top: spot_top,
+	    stroke: '#000',
+	    strokeWidth: 1,
+	    hasControls: false,
+	    hasBorders: false,
+	    selectable: false
+	});
+	canvas.add(mySpark);
+	snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+
+	return function(){
+	    //delete that little spot...
+	    canvas.remove(mySpark);
+	    snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+	};
     },
 
     callGameControlHandler: function (control_index) {
