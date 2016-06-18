@@ -16,26 +16,19 @@ snDraw.Game.DefineWord = {
 	return {PI: player.index, WI:WI};
     },
 
-    delayedDefinitionToast: function (WordGrp) {
+    delayedDefinitionToast: function (WordGrp, mouse_is_down) {
 	clearTimeout(this.my_toast_callback);
 	var id = this.get_WI_PI(WordGrp);
 	var word_str = snDraw.Game.TileIDArray_to_LettersString(players[id.PI].words[id.WI]);
 
-	function cartesian_distance(x,y){
-	    return Math.round(Math.sqrt(x*x + y*y),0);
-	}
-
 	var confirmation_time = 600;
 	this.my_toast_callback = setTimeout(function(){
 	    //at point of (potentially) displaying the toast, check coordinates are not changed...
-	    var movement_in_drag = false;
-	    if(snDraw.Game.Mouse.x_pickup !== undefined){ // implies drag even it progress.
-		var dx = snDraw.Game.Mouse.x_pickup - WordGrp.getLeft();
-		var dy = snDraw.Game.Mouse.y_pickup - WordGrp.getTop();
-		movement_in_drag = cartesian_distance(dx,dy) > 0.3 * snDraw.Game.tileSpacings.ts;
-	    }
-	    if( !movement_in_drag ){
+	    if( !snDraw.Game.Mouse.is_movedSincePickup(WordGrp) ){
 		snDraw.Game.Toast.showToast(word_str + ": " + snDraw.Game.DefineWord.word_dictionary[word_str]);
+		if(mouse_is_down){
+		    snDraw.Game.Mouse.defn_toast_shown_since_mouse_down = true;
+		}
 	    }
 	}, confirmation_time);
 	

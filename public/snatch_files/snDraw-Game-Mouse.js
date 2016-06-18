@@ -5,7 +5,10 @@ snDraw.Game.Mouse = {
     y_pickup: undefined,
     anti_controls_dblclick: [],
 
+    defn_toast_shown_since_mouse_down: false,
     mDown: function (e) {
+
+	this.defn_toast_shown_since_mouse_down = false;
 
 	//Handle clicks landing on objects...
 	var targetObj = e.target;
@@ -25,7 +28,7 @@ snDraw.Game.Mouse = {
 	    //Handle clicks that land on a word...
 	    var word_owner = targetObj.OwnerPlayer;
 	    if(word_owner!==undefined){//mouse down on a word 
-		snDraw.Game.DefineWord.delayedDefinitionToast(targetObj);
+		snDraw.Game.DefineWord.delayedDefinitionToast(targetObj, true);
 		this.x_pickup = targetObj.getLeft();
 		this.y_pickup = targetObj.getTop();
 	    }
@@ -45,6 +48,7 @@ snDraw.Game.Mouse = {
 	}
     },
 
+    
     mUp: function (e) {
 
 	//Handle click releases over objects...
@@ -71,15 +75,22 @@ snDraw.Game.Mouse = {
 			left: this.x_pickup,
 			top: this.y_pickup
 		    });
-		    //don't store this stale information after a click release.
-		    //(Important as it may be used to determine if drag is in progress...)
-		    this.x_pickup = undefined;
-		    this.y_pickup = undefined;
 		}
 		//This is to trigger an "add letter to speller" for mouse-up upon a word...
-		//determine the letter...
-		var myHitTile_deets = this.getTile_fromMouseOnWord(e);
-		this.spellAddLetter_noDoubleClick(myHitTile_deets.TileObj, myHitTile_deets.TileCoords);
+		//this is not required if a definition toast has already been shown for the word OR if word has moved
+		if( (!this.defn_toast_shown_since_mouse_down) && (!this.is_movedSincePickup(targetObj))){
+
+		    //determine the letter...
+		    var myHitTile_deets = this.getTile_fromMouseOnWord(e);
+		    this.spellAddLetter_noDoubleClick(myHitTile_deets.TileObj, myHitTile_deets.TileCoords);
+
+		}
+		//don't store this stale information after a click release.
+		//(Important as it may be used to determine if drag is in progress...)
+		// also important - do this in the final section of mouse-up-on-word
+		this.x_pickup = undefined;
+		this.y_pickup = undefined;
+
 	    }
 	    
 	    //Handle click releases over a Game Control
@@ -105,7 +116,7 @@ snDraw.Game.Mouse = {
 	    //Handle mouse pointer passing onto a word...
 	    var word_owner = targetObj.OwnerPlayer;
 	    if(word_owner !== undefined){//mouse over a word 
-		snDraw.Game.DefineWord.delayedDefinitionToast(targetObj);
+		snDraw.Game.DefineWord.delayedDefinitionToast(targetObj, false);
 	    }
 	}
     },
@@ -124,7 +135,7 @@ snDraw.Game.Mouse = {
 
 	    //Handle mouse pointer moving off a word...
 	    var word_owner = targetObj.OwnerPlayer;
-	    if(word_owner !== undefined){//mouse down on a word 
+	    if(word_owner !== undefined){//mouse moving off a word 
 		snDraw.Game.DefineWord.cancelDelayedDefinitionToast(targetObj);
 	    }
 
@@ -197,6 +208,23 @@ snDraw.Game.Mouse = {
 	    canvas.remove(mySpark);
 	    snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
 	};
+    },
+
+    //also returns false if the object is not picked up...
+    is_movedSincePickup: function (my_obj) {
+
+	function cartesian_distance(x,y){
+	    return Math.round(Math.sqrt(x*x + y*y),0);
+	}
+
+	var movement_in_drag = false;
+	if(snDraw.Game.Mouse.x_pickup !== undefined){ // implies drag even it progress.
+
+	    var dx = this.x_pickup - my_obj.getLeft();
+	    var dy = this.y_pickup - my_obj.getTop();
+	    movement_in_drag = cartesian_distance(dx,dy) > 0.3 * snDraw.Game.tileSpacings.ts;
+	}
+	return movement_in_drag;
     },
 
     callGameControlHandler: function (control_index) {
