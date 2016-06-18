@@ -9,6 +9,9 @@
     <link rel="stylesheet" type="text/css" href="snatch_files/overlays.css">
     <link rel="stylesheet" type="text/css" href="snatch_files/zeroclipboard.css">
     <link rel="stylesheet" type="text/css" href="snatch_files/loader.css">
+    <link rel="stylesheet" type="text/css" href="snatch_files/css-deck-bright-push-buttons.css">
+
+
 
     <!-- the JS and CSS for the 'flickity' flickable carousel -->
     <link rel="stylesheet" href="include/flickity/flickity.css" media="screen">
@@ -81,9 +84,12 @@
 
 	  <!-- modal-body-options-menu -->
 	  <div id="modal-body-options-menu">
-	    <p> 
-	      See <a class="modal" href="#" onclick="snDraw.Game.Popup.openModal('rules')">instructions</a> for Snatch-it
+
+	    <p class="p-button-center">
+	      <a class="button gray alt" href="#" onclick="snDraw.Game.Popup.openModal('rules')">See Instructions</a>
+	      <a class="button gray alt" href="#" onclick="snDraw.Game.Popup.gotoHomePage()">Leave this Game</a>
 	    </p> 
+
 	    <div id="copyable-container">
 	      <div class="box02">
 		<div class="box04">
@@ -159,10 +165,6 @@
 	      <input type="checkbox">
 	      Apply penalty for words not in dictionary
 	    </p>
-
-
-
-	    <a class="modal" href="#" onclick="snDraw.Game.Popup.gotoHomePage()">Start a new name</a>
 
 	  </div>
 

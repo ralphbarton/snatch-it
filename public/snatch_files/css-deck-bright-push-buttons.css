@@ -1,0 +1,91 @@
+.button {
+  display: inline-block;
+  position: relative;
+  height: 33px;
+  line-height: 33px;
+  padding: 0 12px;
+  margin: 0 5px;
+  font-size: 15px;
+  color: white;
+  text-decoration: none;
+  text-shadow: 0 -1px rgba(0, 0, 0, 0.3);
+  border: 2px solid;
+  border-radius: 7px;
+  outline: 0;
+  -webkit-box-shadow: 0 2px 1px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.25);
+}
+
+.button:before, .button:after {
+  content: '';
+  position: absolute;
+}
+
+.button:before {
+  top: -5px;
+  bottom: -5px;
+  left: -5px;
+  right: -5px;
+  z-index: -1;
+  border-radius: 9px;
+}
+
+.button:after {
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 0;
+  border-radius: 7px;
+}
+
+.button.alt {
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.button.alt:before {
+  display: none;
+}
+
+.column.gray {
+  background: #9e9e9e;
+}
+
+.button.gray {
+  background: #999999;
+  border-color: #787878 #757575 #666666;
+  background-image: -webkit-linear-gradient(top, #adadad 0%, #a6a6a6 50%, #999999 50%, #8e7b7c 100%);
+  background-image: -moz-linear-gradient(top, #adadad 0%, #a6a6a6 50%, #999999 50%, #8e7b7c 100%);
+  background-image: -o-linear-gradient(top, #adadad 0%, #a6a6a6 50%, #999999 50%, #8e7b7c 100%);
+  background-image: linear-gradient(to bottom, #adadad 0%, #a6a6a6 50%, #999999 50%, #8e7b7c 100%);
+}
+
+.button.gray:before {
+  background: #b6afaf;
+  background-image: -webkit-linear-gradient(top, #8b8484, #c2b7b7);
+  background-image: -moz-linear-gradient(top, #8b8484, #c2b7b7);
+  background-image: -o-linear-gradient(top, #8b8484, #c2b7b7);
+  background-image: linear-gradient(to bottom, #8b8484, #c2b7b7);
+}
+
+.button.gray:active {
+  background: #a6a6a6;
+  background-image: -webkit-linear-gradient(top, #8a7577 0%, #a1a1a1 60%, #a6a6a6 100%);
+  background-image: -moz-linear-gradient(top, #8a7577 0%, #a1a1a1 60%, #a6a6a6 100%);
+  background-image: -o-linear-gradient(top, #8a7577 0%, #a1a1a1 60%, #a6a6a6 100%);
+  background-image: linear-gradient(to bottom, #8a7577 0%, #a1a1a1 60%, #a6a6a6 100%);
+}
+
+.button.gray:active:after {
+  border-color: #a6a6a6;
+}
+
+.lt-ie9 .button:before {
+  display: none;
+}
+
+.p-button-center {
+    text-align: center;
+}
