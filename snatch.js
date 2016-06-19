@@ -45,8 +45,16 @@ var prev_word = undefined;
 var prev_result = undefined;
 my_SDC.rEvent.on('searchComplete', function(result){
     var BSres = JSON.parse(result);
-    prev_word = BSres.word;
-    prev_result = BSres.defn;
+/*  {
+	word_queried: <string>
+	word_defined: <string>
+	n_definitions: <int>
+	DefnList: <Array>
+    }*/
+    prev_word = BSres.word_queried;
+    
+    prev_result = BSres.DefnList.length>0 ? BSres.DefnList[0] : "No entry in dictionary.com";
+    //prev_result = JSON.stringify(BSres.DefnList);
 
     // this does not limit definitions to rooms.
     // Work needed for this whole aspect of linking reponse to original asynchronous request
