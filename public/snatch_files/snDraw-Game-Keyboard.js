@@ -42,7 +42,18 @@ snDraw.Game.Keyboard = {
 
 
 	if(snDraw.Game.Popup.popup_in_foreground){
-	    snDraw.Game.Popup.hideModal();	    
+	    if(snDraw.Game.Popup.popup_in_foreground == "rules"){
+		if(myKeycode == 37){//left
+		    flkty.previous();
+		}else if(myKeycode == 39){//right
+		    flkty.next();
+		}else{
+		    snDraw.Game.Popup.hideModal();
+		}
+	    }else{
+		snDraw.Game.Popup.hideModal();   
+	    }
+
 	}else{
 	    if( (myKeycode >= 65) && (myKeycode <= 90) ){//any letter key
 		

@@ -180,7 +180,7 @@
 
 	  <div id="modal-body-flickity-rules">
 
-	    <div class="carousel js-flickity rules-container">
+	    <div class="carousel rules-container">
 
 	      <!-- Rules 1 -->
 	      <div class="carousel-cell rules-cell">

@@ -14,12 +14,17 @@ var dev = false; // select whether development more is active or not
 // the server...
 var room_pin = undefined;
 var room_key = undefined;
+var flkty = undefined;
 window.onload = function() {
     room_pin = $("#pin").html();
     room_key = $("#key").html();
     if((!isNaN(room_pin)) && (room_pin.length==4)){//test it is a 4 digit numeric string...
 	socket.emit('join room and start', room_pin);
     }
+    flkty = new Flickity('.carousel', {
+	// options
+	accessibility: false // this is to disable inbuilt kb arrow handling, because I'm doing arrow handling.
+    });
 };
 
 //Provides data to allow player to reclaim name, make new name AND choose their color 

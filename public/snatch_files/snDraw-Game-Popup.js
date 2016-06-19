@@ -148,6 +148,9 @@ snDraw.Game.Popup = {
 	    Title = "Instructions";
 	    Body = "modal-body-flickity-rules";
 	    Footer = "modal-footer-simple-close";
+
+	    flkty.select( 0 );//revert to page 1
+
 	}
 
 	//Inject the Title
