@@ -59,7 +59,7 @@ my_SDC.rEvent.on('searchComplete', function(result){
     // this does not limit definitions to rooms.
     // Work needed for this whole aspect of linking reponse to original asynchronous request
     console.log("BS search completed for word : " + prev_word);
-    io.emit('new word definition', {word: prev_word, definition: prev_result});	    
+    io.emit('new word definition', BSres);	    
     word_dictionary[prev_word] = prev_result;
 });
 

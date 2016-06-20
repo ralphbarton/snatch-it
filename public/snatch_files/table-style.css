@@ -11,7 +11,7 @@ body {
 div.table-title {
    display: block;
   margin: auto;
-  max-width: 600px;
+  max-width: 65%;
   padding:5px;
   width: 100%;
 }
@@ -35,7 +35,7 @@ div.table-title {
   border-collapse: collapse;
   height: 320px;
   margin: auto;
-  max-width: 600px;
+  max-width: 85%;
   padding:5px;
   width: 100%;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
@@ -168,11 +168,11 @@ td.text-right {
 }
 
 .blob-red {
-    background-color: #E85D00;
+    background-color: #DB2C04;
 }
 
-.blob-dark {
-    background-color: #850731;
+.blob-pale {
+    background-color: #D1EB6C;
 }
 
 .defn-source {
@@ -188,6 +188,40 @@ td.text-right {
 
 .defn-text {
     margin-left: 35px;
+    margin-top: 6px;
+    padding-left: 3px;
     font-size: 14px;
     color: #474A5C;
+    border-width: 1px 1px 1px 3px;
+    border-style: none none dotted solid;
+    border-color: #9B9FB3;
+}
+
+.defn-qty {
+    text-align: right;
+    font-size: 11px;
+    color: #9899A3;
+}
+
+.ln-red{
+    color: #F27C7C;
+}
+
+
+.dbox-italic{
+    font-style: italic;
+}
+
+.dbox-bold{
+    font-weight: 400;
+}
+
+.def-block{
+    font-size: 13px;
+    color: #7FA391;
+    font-weight: 400;
+}
+
+.definition a{
+    color: #2C64BF;
 }
