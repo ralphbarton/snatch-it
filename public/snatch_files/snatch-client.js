@@ -146,8 +146,22 @@ socket.on('word definitions dictionary', function(word_dictionary){
 });
 
 //add an extra word to the client side copy of the dictionary
-socket.on('new word definition', function(w_def){
-    snDraw.Game.DefineWord.word_dictionary[w_def.word] = w_def.definition;
+socket.on('new word definition', function(W_DEF){
+/*  {
+	word_queried: <string>
+	word_defined: <string>
+	n_definitions: <int>
+	DefnList: <Array>
+    }*/
+
+    var word = W_DEF.word_queried;
+
+    var definition = "a defintion was not extracted from dictionary.com";
+    if (W_DEF.DefnList.length > 0){
+	definition = W_DEF.DefnList[0];
+    }
+
+    snDraw.Game.DefineWord.word_dictionary[word] = definition;
 });
 
 function PLAYER_SUBMITS_WORD(p)       {log_message_transmit("snatch"); socket.emit('player submits word', p);}
