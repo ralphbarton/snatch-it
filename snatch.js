@@ -78,7 +78,10 @@ app.get('/sowpods-rsubset/*', function(req, res){
     var frags = req.url.split('/');
     var final_arg = frags[frags.length-1];
     var n_words_req = parseInt(final_arg);
-    
+
+    var N_WORDS_MAX = 350
+    n_words_req = Math.min(n_words_req, N_WORDS_MAX);
+
     var sowpods_array = WordDictionaryTools.get_word_list();
     var HTM = '<div class="table-title">\
 <h3>List of '+n_words_req+' words from the SOWPODS dictionary:</h3>\

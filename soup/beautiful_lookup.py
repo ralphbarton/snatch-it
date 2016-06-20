@@ -90,12 +90,26 @@ class MyServerProtocol(WebSocketServerProtocol):
 
             #define a callback to (1) parse webpage (2) respond with result
             def sendme(x):
+                print("==webpage retrieved, responding to query "+my_query+"==")
                 print ("Parsing HTML then sending WS response to query: " + my_query)
                 result_in_json = json_from_whole_page(x, my_query)
                 self.sendMessage(result_in_json, False)
 
+            def dictfail(x):
+                print("==webpage retrieval FAILED for query "+my_query+"==")
+                print(x)
+
+                self.sendMessage(json.dumps({
+'word_queried': my_query,
+'word_defined': '---',
+'n_definitions': 0,
+'DefnList': []
+}), False)
+
             # GET webpage, and involke callback upon reciept of data
-            client.getPage('http://www.dictionary.com/browse/' + payload).addCallback(sendme)
+            grabber = client.getPage('http://www.dictionary.com/browse/' + payload)
+            grabber.addCallback(sendme)
+            grabber.addErrback(dictfail)
 
 
     def onClose(self, wasClean, code, reason):
