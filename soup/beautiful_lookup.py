@@ -4,13 +4,22 @@ from autobahn.twisted.websocket import WebSocketServerProtocol, \
 
 #from pyquery import PyQuery as pq
 
-import bs4, urllib, re, json
+from twisted.web import client
+from twisted.internet import reactor
+
+import bs4, json
 
 
-def www_word_lookup(search_word):
+#def json_reply(html_string)
 
-    r = urllib.urlopen('http://www.dictionary.com/browse/' + search_word).read()
-    soup = bs4.BeautifulSoup(r, "html.parser")
+#def async_lookup_json_reply(protocol_object, search_word):
+
+#    json_reply
+
+
+def json_from_whole_page(page_html, search_word):
+
+    soup = bs4.BeautifulSoup(page_html, "html.parser")
 
     DefinitionHTML_list = []
     main_content_tag = soup.body.find('section', id="source-luna")
@@ -55,13 +64,10 @@ def www_word_lookup(search_word):
                     del tag['data-syllable']
                
                 nice_html_frag = defn_div.prettify().replace(u"–",u"-")
-                print("======")
-                print(nice_html_frag)
-                print("======")
-                nice_html_frag2 = nice_html_frag.encode('ascii','ignore')
+                nice_html_frag2 = nice_html_frag.encode('ascii','ignore') #unicode, needs conversion
                 DefinitionHTML_list.append(nice_html_frag2)
 
-    return json.dumps({
+                return json.dumps({
 'word_queried': search_word,
 'word_defined': word_actual,
 'n_definitions': n_definitions,
@@ -80,14 +86,16 @@ class MyServerProtocol(WebSocketServerProtocol):
     def onMessage(self, payload, isBinary):
         #we're not interested in the messages that are binary, we should never recieve them here...
         if not isBinary:
-
             my_query = payload.decode('utf8')
-            
-            #this is a blocking function call
-            result_in_json = www_word_lookup(my_query) #returns unicode, needs conversion
-            print(result_in_json)
 
-            self.sendMessage(result_in_json, False)
+            #define a callback to (1) parse webpage (2) respond with result
+            def sendme(x):
+                print ("Parsing HTML then sending WS response to query: " + my_query)
+                result_in_json = json_from_whole_page(x, my_query)
+                self.sendMessage(result_in_json, False)
+
+            # GET webpage, and involke callback upon reciept of data
+            client.getPage('http://www.dictionary.com/browse/' + payload).addCallback(sendme)
 
 
     def onClose(self, wasClean, code, reason):
