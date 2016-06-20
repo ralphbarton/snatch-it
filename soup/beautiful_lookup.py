@@ -67,7 +67,7 @@ def json_from_whole_page(page_html, search_word):
                 nice_html_frag2 = nice_html_frag.encode('ascii','ignore') #unicode, needs conversion
                 DefinitionHTML_list.append(nice_html_frag2)
 
-            return json.dumps({
+    return json.dumps({
 'word_queried': search_word,
 'word_defined': word_actual,
 'n_definitions': n_definitions,
