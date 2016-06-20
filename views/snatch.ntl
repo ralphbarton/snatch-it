@@ -170,9 +170,9 @@
 
 	  <!-- modal-body-lost-connection -->
 	  <div id="modal-body-lost-connection">
-	    <p>During play, your device must exchange messages with a server.</p>
+	    <p>Your device exchanges messages with a server during play...</p>
 	    <div class="loader">Network Latency...</div>
-	    <p>There has now been a delay of <span id="connection-latency">[too many]</span> seconds receiving a response to a message. Is there a problem with your Internet?</p>
+	    <p>There has now been a <span id="connection-latency">[too many]</span> second delay receiving a response to a message. Is there a problem with your Internet?</p>
 
 	    <p>If the delay lasts longer than a minute, the page will auto-refresh. You can click rejoin to do this now.</p>
 	    <p>To reclaim you words upon reconnect, you must enter your name exactly as before.</p>

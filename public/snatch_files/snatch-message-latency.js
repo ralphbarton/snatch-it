@@ -1,24 +1,40 @@
 var MessageLog = {};
-function log_message_transmit(key){
+
+var T_latency_for_popup = 1.90; //units of seconds (exactly this latency would just enter "a bit" slow)
+var T_latency_thres1 = 2.90; //units of seconds (exactly this latency would just enter SLOW)
+var T_latency_thres2 = 5.50; //units of seconds (exactly this latency would just enter "extremely" slow)
+
+function log_message_transmit(key){// function writes to global data
     MessageLog[key] = {timestamp: new Date,
 		       ack: false};
 
     //in 2.5 seconds time, check if a response was recieved...
-    setTimeout(message_arrival_check, 1000 * 2.5);
+    setTimeout(message_arrival_check, 1000 * T_latency_for_popup + 1 );//theshold must be surpassed when checked
 }
 
 
-function log_message_ack(key){
+function log_message_ack(key){// function writes to global data
     MessageLog[key].ack = true;
 
     // Clear the "connection lost" message if it is present
     if(snDraw.Game.Popup.popup_in_foreground == "connection"){
 	snDraw.Game.Popup.hideModal();
-	snDraw.Game.Toast.showToast("Internet connection is functional but slow...");
+
+	//comment numerically on the latency...
+	var L = get_max_latency();
+	var lat = L.latency;
+	var q_te = "slightly ";
+	if (lat > T_latency_thres2){
+	    var q_te = "extremely ";
+	}else if(lat > T_latency_thres1){
+	    var q_te = "";
+	}
+
+	snDraw.Game.Toast.showToast("Internet connection is functional but "+q_te+"slow... ("+lat.toFixed(1)+" seconds)");
     }
 }
 
-function get_max_latency(){
+function get_max_latency(){// function has no side-effects 
     var time_now = new Date;
 
     //for any message that is currently unanswered, how long have we been waiting? Get the max...
@@ -33,7 +49,7 @@ function get_max_latency(){
     }
     
     return {
-	latency: Math.round(max_latency/1000,1),
+	latency: (max_latency / 1000),
 	m_key: max_key
     }
 }
@@ -41,7 +57,7 @@ function get_max_latency(){
 function message_arrival_check(){
     
     //if any message has been waiting for more than 2 seconds, complain
-    if(get_max_latency().latency > 2.0){//UNITS OF SECONDS...
+    if(get_max_latency().latency >= T_latency_for_popup){//UNITS OF SECONDS...
 	snDraw.Game.Popup.openModal("connection");
     }
 

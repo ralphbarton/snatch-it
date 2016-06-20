@@ -117,7 +117,7 @@ snDraw.Game.Popup = {
 
 	}else if(type=="connection"){
 
-	    Title = "Connection Lost";
+	    Title = "Connectivity Problem";
 	    Body = "modal-body-lost-connection";
 	    Footer = "modal-footer-rejoin";
 
@@ -139,7 +139,7 @@ snDraw.Game.Popup = {
 		    $(".loader").css("color", "#693346");
 		} 
 
-		$("#connection-latency").html(L.latency);
+		$("#connection-latency").html(L.latency.toFixed(0));
 		snDraw.Game.Popup.modal_content_updater_timeout = setTimeout(update_latency_html, 1000);
 	    }
 	    update_latency_html();//herby start the chain...	    
