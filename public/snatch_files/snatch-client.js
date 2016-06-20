@@ -74,6 +74,9 @@ socket.on('full game state transmission', function(gameState){
 	snDraw.Game.Event.WindowResize();
     };
 
+    //show a welcome toast
+    snDraw.Game.Toast.join_message();
+
     //start the hearbeat process now.
     emit_heartbeat();
 

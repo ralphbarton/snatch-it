@@ -24,7 +24,7 @@ snDraw.Game.Toast = {
 	return value
     },
 
-    showToast: function(my_string){
+    showToast: function(my_string, options){
 
 	//how do we reference back to this Toast (important in the placement process...)?
 	var t_key = "toast-n" + this.ToastCounter; 
@@ -121,6 +121,42 @@ snDraw.Game.Toast = {
 	this.timeoutIDs[t_key] = new_timoutID;
 	clearTimeout(old_timeoutID);
 	this.Active_byKey[t_key] = true;
+    },
+
+    join_message: function(){
+	// (I've put a moment of delay here. Probably UNNECESSARY TO USE TIMEOUT
+	setTimeout(function(){
+	    var pss = players.length;
+	    var pss_inac = 0;
+
+	    for(var i = 0; i < players.length; i++){
+		if (players[i].is_disconnected){
+		    pss_inac++;
+		}
+	    }
+
+	    var pss_oth = pss-pss_inac-1;
+	    var partipicants = [];
+	    var singular = false;
+	    if(pss_inac>0){
+		partipicants.push(pss_inac + " disconnected player"+(pss_inac==1?"":"s"));
+		if(pss_inac==1){singular=true;}
+	    }
+	    if(pss_oth>0){
+		partipicants.push(pss_oth + " active player"+(pss_oth==1?"":"s"));
+		if(pss_oth>1){singular=false;}
+	    }
+
+	    var msg = "You are the only player in this game";
+	    var sss = singular?"is ":"are ";
+	    if(partipicants.length==1){
+		var msg = "There " + sss + partipicants[0] + " and you in this game";
+	    }else if(partipicants.length==2){
+		var msg = "There " + sss + partipicants[0] + ", " + partipicants[1] + " and you in this game";
+	    }
+
+	    snDraw.Game.Toast.showToast(msg);
+	}, 20);
     }
 
 };
