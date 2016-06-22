@@ -6,10 +6,12 @@
     <!-- styles used in the Snatch game -->
     <link rel="stylesheet" type="text/css" href="/../snatch_files/common.css">
     <link rel="stylesheet" type="text/css" href="/../snatch_files/table-style.css">
+    <link rel="stylesheet" type="text/css" href="/../include/space-age-searchbox.css">
 
     <!-- library / framework JS -->
     <script src="/../include/socket.io-1.2.0.js"></script>
     <script src="/../include/jquery-1.11.1.js"></script>
+    <script src="/../include/modernizr-1.6.min_.js"></script>
 
     <!-- my JS -->
     <script src="/../snatch_files/common.js"></script>
@@ -19,7 +21,23 @@
 
 
   <body>
-  
+
+    <script>
+
+      function mySubmitFunction()
+      {
+      console.log($("#search").val());
+      return false;
+      }
+
+    </script>
+
+    <!--  -->
+    <form id="searchbox" onsubmit="return mySubmitFunction()">
+      <input id="search" type="text" placeholder="Type here">
+      <input id="submit" type="submit" value="Search">
+    </form>
+    
     #html-1#
 
   </body>
