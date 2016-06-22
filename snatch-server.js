@@ -13,9 +13,16 @@ module.exports = function (nTiles, WordChecker){
     var next_unturned_tile_i = 0;
 
     console.log("created snatch game instance on server");
+    var cum_hash = 12345;
 
     //this is the collection of externally callable functions
     return{
+	build_hash: function(obj){
+	    var hash_me = JSON.stringify(obj) + cum_hash.toString();
+	    cum_hash = Math.abs(hash_me.hashCode() % 100000); // 5 digit hash
+	    return cum_hash;
+	},
+
 	addPlayer: function(playerDetails,socket_key) {//todo implement this
 
 	    var rPID = playerDetails.reclaiming_player_index;
@@ -92,7 +99,8 @@ module.exports = function (nTiles, WordChecker){
 	    return {
 		playerSet: playerSet_clone,
 		turned_tiles: turned_tiles,
-		tile_stats: tile_stats
+		tile_stats: tile_stats,
+		state_hash: cum_hash
 	    }; 
 	},
 
@@ -595,3 +603,16 @@ Array.prototype.equals = function (array) {
 }
 // Hide method from for-in loops
 Object.defineProperty(Array.prototype, "equals", {enumerable: false});
+
+
+//add hashing capability
+String.prototype.hashCode = function() {
+  var hash = 0, i, chr, len;
+  if (this.length === 0) return hash;
+  for (i = 0, len = this.length; i < len; i++) {
+    chr   = this.charCodeAt(i);
+    hash  = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+};

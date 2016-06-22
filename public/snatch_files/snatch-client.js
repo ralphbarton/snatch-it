@@ -59,6 +59,8 @@ socket.on('full game state transmission', function(gameState){
     players = gameState.playerSet;
     tileset = gameState.turned_tiles;
     tilestats = gameState.tile_stats;
+    cum_MSG_hash = gameState.state_hash;
+    console.log(cum_MSG_hash);
 
     for(var i = 0; i < players.length; i++){
 	players[i].index = i;
@@ -231,6 +233,33 @@ function commonElements(arr1, arr2){
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
+
+//add hashing capability
+String.prototype.hashCode = function() {
+  var hash = 0, i, chr, len;
+  if (this.length === 0) return hash;
+  for (i = 0, len = this.length; i < len; i++) {
+    chr   = this.charCodeAt(i);
+    hash  = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+};
+
+var cum_MSG_hash = 0;
+function build_MSG_hash(obj, expected_hash){
+    var hash_me = JSON.stringify(obj) + cum_MSG_hash.toString();
+    cum_MSG_hash = Math.abs(hash_me.hashCode() % 100000); // 5 digit hash
+
+    //this is the client-side only bit, which checks...
+    if(obj.expected_hash != cum_MSG_hash){
+	snDraw.Game.Toast.showToast("Game is out-of-sync with the server. Refresh page for up-to-date view.");
+    }else{
+	console.log("Hurrah, hashes match...");
+    }
+}
+
+
 
 
 // Prevent the backspace key from navigating back.

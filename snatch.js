@@ -374,6 +374,10 @@ io.on('connection', function(socket){
 	var SnatchResponse = myGame.playerSnatches(tile_id_array, socket.id)
 
 	if(SnatchResponse.val_check == 'accepted'){
+
+	    // HASHING - keep the next 3 lines of code together
+	    var current_hash = myGame.build_hash(SnatchResponse.SnatchUpdateMsg.tile_id_array);
+	    SnatchResponse.SnatchUpdateMsg.HH = current_hash;
 	    io.to(socket.room_pin).emit('snatch assert', SnatchResponse.SnatchUpdateMsg);	    
 	    
 	    // also, we now take the chance to look up the accepted work in the real dictionary (web-scrape a website)
@@ -399,7 +403,12 @@ io.on('connection', function(socket){
 	access_room(socket.room_pin); // log that the game was accessed
 	var myGame = rooms_table[socket.room_pin].GameInstance;
 	var newTile_info = myGame.flipNextTile(socket.id);
+
+	// HASHING - keep the next 3 lines of code together
+	var current_hash = myGame.build_hash(newTile_info.tile_letter);
+	newTile_info.HH = current_hash;
 	io.to(socket.room_pin).emit('new turned tile', newTile_info);
+
 	if(newTile_info){
 	    console.log("["+socket.room_pin+"]: PI=" + newTile_info.flipping_player + " flips tileID=" + newTile_info.tile_index + " (" + newTile_info.tile_letter + ")");
 	}else{
