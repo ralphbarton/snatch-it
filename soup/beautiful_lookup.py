@@ -2,25 +2,29 @@
 from autobahn.twisted.websocket import WebSocketServerProtocol, \
     WebSocketServerFactory
 
-#from pyquery import PyQuery as pq
-
 from twisted.web import client
 from twisted.internet import reactor
-
 import bs4, json
 
 
-#def json_reply(html_string)
-
-#def async_lookup_json_reply(protocol_object, search_word):
-
-#    json_reply
-
-
-def json_from_whole_page(page_html, search_word):
-
+def collinsdictionary_com__digest(page_html, search_word):
     soup = bs4.BeautifulSoup(page_html, "html.parser")
+    main_content_tag = soup.select('div.content.definitions.ced')[0]
 
+    GramGrp_spans = main_content_tag.find_all('span', class_="hom")
+    ww = 0
+    for gg_span in GramGrp_spans:
+        print ("==================")
+        #print(gg_span)
+        gg_descriptor_txt = gg_span.find('span', class_=" gramGrp").get_text()
+        Defn_spans = gg_span.find_all('span', class_="def")
+        for defn_span in Defn_spans:
+            defn_txt = defn_span.get_text()
+            print(gg_descriptor_txt + "====" + defn_txt)
+
+
+def dictionary_com__digest(page_html, search_word):
+    soup = bs4.BeautifulSoup(page_html, "html.parser")
     DefinitionHTML_list = []
     main_content_tag = soup.body.find('section', id="source-luna")
     word_actual = '---'
@@ -75,6 +79,15 @@ def json_from_whole_page(page_html, search_word):
 })
 
 
+
+
+
+
+
+
+
+
+
 class MyServerProtocol(WebSocketServerProtocol):
 
     def onConnect(self, request):
@@ -88,28 +101,47 @@ class MyServerProtocol(WebSocketServerProtocol):
         if not isBinary:
             my_query = payload.decode('utf8')
 
-            #define a callback to (1) parse webpage (2) respond with result
-            def sendme(x):
-                print("==webpage retrieved, responding to query "+my_query+"==")
-                print ("Parsing HTML then sending WS response to query: " + my_query)
-                result_in_json = json_from_whole_page(x, my_query)
-                self.sendMessage(result_in_json, False)
-
-            def dictfail(x):
-                print("==webpage retrieval FAILED for query "+my_query+"==")
-                print(x)
-
-                self.sendMessage(json.dumps({
+            null_response = json.dumps({
 'word_queried': my_query,
 'word_defined': '---',
 'n_definitions': 0,
 'DefnList': []
-}), False)
+})
+
+            #define a callback to (1) parse webpage (2) respond with result
+            def dictionary_com__handler(html_string):
+                print("==webpage retrieved (dictionary.com), responding to query "+my_query+"==")
+                print ("Parsing HTML then sending WS response to query: " + my_query)
+                jsn = dictionary_com__digest(html_string, my_query)
+                self.sendMessage(jsn, False)
+
+            def collinsdictionary_com__handler(html_string):
+                print("==webpage retrieved (collinsdictionary.com), responding to query "+my_query+"==")
+                print ("Parsing HTML then sending WS response to query: " + my_query)
+                jsn = collinsdictionary_com__digest(html_string, my_query)
+                #not ready for this.
+                #self.sendMessage(jsn, False)
+
+            def dictionary_com__fail(error_obj):
+                print("==webpage retrieval FAILED (dictionary.com) for query "+my_query+"==")
+                print(error_obj)
+                self.sendMessage(x, False)
+
+            def collinsdictionary_com__fail(error_obj):
+                print("==webpage retrieval FAILED (collinsdictionary.com) for query "+my_query+"==")
+                print(error_obj)
+                self.sendMessage(x, False)
 
             # GET webpage, and involke callback upon reciept of data
-            grabber = client.getPage('http://www.dictionary.com/browse/' + payload)
-            grabber.addCallback(sendme)
-            grabber.addErrback(dictfail)
+            #grabber_1 = client.getPage('http://www.dictionary.com/browse/' + payload)
+            #grabber_1.addCallback(dictionary_com__handler)
+            #grabber_1.addErrback(dictionary_com__fail)
+
+            # GET webpage, and involke callback upon reciept of data
+            grabber_2 = client.getPage('http://www.collinsdictionary.com/dictionary/english/' + payload)
+            grabber_2.addCallback(collinsdictionary_com__handler)
+            grabber_2.addErrback(collinsdictionary_com__fail)
+
 
 
     def onClose(self, wasClean, code, reason):
