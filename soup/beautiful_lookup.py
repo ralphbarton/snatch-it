@@ -19,7 +19,10 @@ def collinsdictionary_com__digest(page_html, search_word):
         gg_descriptor_txt = gg_span.find('span', class_=" gramGrp").get_text()
         Defn_spans = gg_span.find_all('span', class_="def")
         for defn_span in Defn_spans:
-            defn_txt = defn_span.get_text()
+            #strip out like half the words in the defintion being links...
+            for linktag in defn_span.find_all('a', attrs={"type": "def"}):
+                linktag.unwrap()
+            defn_txt = defn_span.prettify()
             print(gg_descriptor_txt + "====" + defn_txt)
 
 
