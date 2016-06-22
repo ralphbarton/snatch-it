@@ -22,16 +22,6 @@
 
   <body>
 
-    <script>
-
-      function mySubmitFunction()
-      {
-      console.log($("#search").val());
-      return false;
-      }
-
-    </script>
-
     <!--  -->
     <form id="searchbox" onsubmit="return mySubmitFunction()">
       <input id="search" type="text" placeholder="Type here">

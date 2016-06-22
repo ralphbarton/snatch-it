@@ -104,7 +104,7 @@ app.get('/sowpods-rsubset/*', function(req, res){
 
 	HTM += '\n<tr>\
 \n\t<td class="text-left">'+rand_word+'</td>\
-\n\t<td class="text-left"><span id="defn-'+rand_word+'">no definition recieved</span></td>\
+\n\t<td class="text-left"><span id="defn-'+rand_word.toUpperCase()+'">no definition recieved</span></td>\
 \n</tr>\n';
     }
 
@@ -244,6 +244,10 @@ io.on('connection', function(socket){
     	socket.emit('heartbeat server ack', 0);
     });
 
+    //this is not used by the actual snatch game because lookup is tied to snatching
+    socket.on('look up definition', function(word){
+	my_SDC.lookup_definition(word);
+    });
 
     socket.on('request to init room', function (data){
 
