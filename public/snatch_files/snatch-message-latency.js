@@ -14,6 +14,9 @@ function log_message_transmit(key){// function writes to global data
 
 
 function log_message_ack(key){// function writes to global data
+
+    var L = get_max_latency();
+    //This resets the flag which indicates that a message has not been recieved. Must grab latency beforehand...
     MessageLog[key].ack = true;
 
     // Clear the "connection lost" message if it is present
@@ -21,7 +24,6 @@ function log_message_ack(key){// function writes to global data
 	snDraw.Game.Popup.hideModal();
 
 	//comment numerically on the latency...
-	var L = get_max_latency();
 	var lat = L.latency;
 	var q_te = "slightly ";
 	if (lat > T_latency_thres2){
@@ -33,6 +35,7 @@ function log_message_ack(key){// function writes to global data
 	snDraw.Game.Toast.showToast("Internet connection is functional but "+q_te+"slow... ("+lat.toFixed(1)+" seconds)");
     }
 }
+
 
 function get_max_latency(){// function has no side-effects 
     var time_now = new Date;
