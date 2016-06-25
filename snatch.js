@@ -200,8 +200,10 @@ function access_room(room_pin){
 
 	//Add
 	R.timeLastAccessed = new Date;
+	return true;
     }else{
 	console.log("message recieved for non-existant room ["+room_pin+"]... no action taken");
+	return false;
     }
 }
 
@@ -241,6 +243,7 @@ io.on('connection', function(socket){
 
     //the server pongs back the heartbeat message to the specific client that sent.
     socket.on('client heartbeat', function(){
+	if(!access_room(socket.room_pin)){return;}; // log that the game was accessed. 
     	socket.emit('heartbeat server ack', 0);
     });
 
@@ -371,7 +374,7 @@ io.on('connection', function(socket){
 
 
     socket.on('player submits word', function(tile_id_array){
-	access_room(socket.room_pin); // log that the game was accessed
+	if(!access_room(socket.room_pin)){return;}; // log that the game was accessed. Terminate if invalid
 
 	console.log("["+socket.room_pin+"]: Snatch submission with letters: ",tile_id_array);
 	var myGame = rooms_table[socket.room_pin].GameInstance;
@@ -404,7 +407,9 @@ io.on('connection', function(socket){
 
     //client requests to turn over a tile
     socket.on('tile turn request', function(blank_msg){
-	access_room(socket.room_pin); // log that the game was accessed
+	// This will terminate function if the room no longer exists
+	if(!access_room(socket.room_pin)){return;}; // log that the game was accessed. 
+
 	var myGame = rooms_table[socket.room_pin].GameInstance;
 	var newTile_info = myGame.flipNextTile(socket.id);
 
