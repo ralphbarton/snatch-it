@@ -1,7 +1,5 @@
 var socket = io();
 
-var d_src = ["http://www.dictionary.com/browse/", "http://www.thefreedictionary.com/"];
-
 socket.on('new word definition', function(W_DEF){
 /*  {
 	word_queried: <string>
@@ -22,7 +20,8 @@ socket.on('new word definition', function(W_DEF){
 	var ln_word = (!no_defn && w_change) ? W_DEF.word_defined.toLowerCase() : W_DEF.word_queried.toLowerCase();
 
 	var RAG = "green";
-	var lin = '<a class="defn-source-ln" href="' + d_src[0] + ln_word + '" target="_blank">' + d_src[0] + '<span class="' + w_class + '">' + ln_word + '</span>' + '</a>';
+	var d_url = W_DEF.properties.source;
+	var lin = '<a class="defn-source-ln" href="' + d_url + ln_word + '" target="_blank">' + d_url + '<span class="' + w_class + '">' + ln_word + '</span>' + '</a>';
 	var src_cm = 'Extracted from ' + lin;
 
 	if(no_defn){

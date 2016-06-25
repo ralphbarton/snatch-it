@@ -11,149 +11,152 @@ import bs4, json
 # "dbox-italic"
 # "dbox-bold"
 # "def-block"
-        
+
+
+qty_defn = 3        
 
 def collinsdictionary_com__digest(page_html, search_word):
     soup = bs4.BeautifulSoup(page_html, "html.parser")
-    main_content_tag = soup.select('div.content.definitions.ced')[0]
+
+    word_actual = ""
     DefinitionHTML_list = []
 
-    GG_array = []
-    defn_html_frag_dict = {}
+    wrd_header = soup.find('div', class_="entry_header")
+    if wrd_header != None:
+        word_actual = wrd_header.find('h1').get_text()
+        frequency_note = wrd_header.find('div', class_="word-frequency-img")["title"]
 
-    # 'hom' spans are containers for each gramatical group...
-    temp_count = 0
-    for direct_child_SENSE_TAG in main_content_tag.select("span.hom > span.sense"):
-        # Note: the 'direct_child_SENSE_TAG' is the tag we manipulate the content of, before finally returning...
-
-        gg_main = direct_child_SENSE_TAG.parent.find('span', class_=" gramGrp").get_text()
-        gg_sub_tag  = direct_child_SENSE_TAG.find('span', class_=" gramGrp")
-        gg_sub = "" if gg_sub_tag == None else " " + gg_sub_tag.get_text()
-        gg_descriptor_txt = gg_main + gg_sub
-
-        # 1. TOTAL REMOVAL of tags....
-        # 1.1 remove "sensenum" tag (but only the FIRST found)
-        direct_child_SENSE_TAG.find('span', class_="sensenum").decompose()
-        # 1.2 remove the gramGrp tag
-        for x in direct_child_SENSE_TAG.find_all('span', class_="gramGrp"):
-            x.decompose()
-
-        # 2. UNWRAPPING of tags...
-        # 2.1 all "def" tags...
-        for span_def in direct_child_SENSE_TAG.find_all('span', class_="def"):
-            span_def.unwrap()
-        # 2.2 all "xr" tags
-        for x in direct_child_SENSE_TAG.find_all('span', class_="xr"):
-            x.unwrap()
-        # 2.3 <a> type="def" tags - excessive linkiness...
-        for x in direct_child_SENSE_TAG.find_all('a', attrs={"type": "def"}):
-            x.unwrap()
-        # 2.4 all "form" tags
-        for x in direct_child_SENSE_TAG.find_all('span', class_="form"):
-            x.unwrap()
-
+        # Word's defintions content
+        main_content_tag = soup.select('div.content.definitions.ced')[0]
         
+        GG_array = []
+        defn_html_frag_dict = {}
+
+        # 'hom' spans are containers for each gramatical group...
+        n_definitions = 0
+        for direct_child_SENSE_TAG in main_content_tag.select("span.hom > span.sense"):
+            # Note: the 'direct_child_SENSE_TAG' is the tag we manipulate the content of, before finally returning...
+
+            gg_main = direct_child_SENSE_TAG.parent.find('span', class_=" gramGrp").get_text()
+            gg_sub_tag  = direct_child_SENSE_TAG.find('span', class_=" gramGrp")
+            gg_sub = "" if gg_sub_tag == None else " " + gg_sub_tag.get_text()
+            gg_descriptor_txt = gg_main + gg_sub
+            
+            # 1. TOTAL REMOVAL of tags....
+            # 1.1 remove "sensenum" tag (but only the FIRST found, not it make not be present)
+            for x in direct_child_SENSE_TAG.find_all('span', class_="sensenum", limit=1):
+                x.decompose()
+            # 1.2 remove the gramGrp tag
+            for x in direct_child_SENSE_TAG.find_all('span', class_="gramGrp"):
+                x.decompose()
+
+            # 2. UNWRAPPING of tags...
+            # 2.1 all "def" tags...
+            for span_def in direct_child_SENSE_TAG.find_all('span', class_="def"):
+                span_def.unwrap()
+            # 2.2 all "xr" tags
+            for x in direct_child_SENSE_TAG.find_all('span', class_="xr"):
+                x.unwrap()
+            # 2.3 <a> type="def" tags - excessive linkiness...
+            for x in direct_child_SENSE_TAG.find_all('a', attrs={"type": "def"}):
+                x.unwrap()
+            # 2.4 all "form" tags
+            for x in direct_child_SENSE_TAG.find_all('span', class_="form"):
+                x.unwrap()
 
 
-        # 3. MODIFICATION (class changing) of tags
-        # 3.1 all "cit" tags - they are for citations or examples of usage
-        for span_cit in direct_child_SENSE_TAG.find_all('span', class_="cit"):
-            del span_cit['type'] # typically type="example"
-            span_cit['class'] = "def-block"
-            ## Also FULLY RECURSIVE UNWRAPPING = replacing string with get_text
-            span_cit.string = span_cit.get_text()
-        # 3.2 'lbl' tags can mean two things, depending on whether they have a type attribute
-        for span_lbl in direct_child_SENSE_TAG.find_all('span', class_="lbl"):
-            if 'type' in span_lbl.attrs:
-                del span_lbl['type']
-                span_lbl['class'] = "dbox-bold"
-            else:
-                span_lbl['class'] = "dbox-italic"
-            ## Also FULLY RECURSIVE UNWRAPPING = replacing string with get_text
-            span_lbl.string = span_lbl.get_text()
-
-        # 3.3 'hi' rend="i" tags - a slightly different case of ITALIC
-        for x in direct_child_SENSE_TAG.find_all('span', attrs={"class": "hi", "rend": "i"}):
-            del x["rend"]
-            x['class'] = "dbox-italic"
-        # 3.4 'orth' tags - a very deep bold on collins..
-        for x in direct_child_SENSE_TAG.find_all('span', class_="orth"):
-            x['class'] = "dbox-bold"
-
-
-        # 4. MERGING of adjacent tags of same type
-        # 4.1. "dbox-bold" tags...
-        for bold_span in direct_child_SENSE_TAG.find_all('span', class_="dbox-bold"):
-            for sibling in bold_span.next_siblings:
-
-                #3 tests: (1) is it a tag (2) has it a class (3) is that class "dbox-bold"?
-                if type(sibling) == bs4.element.Tag and 'class' in sibling.attrs and sibling.attrs['class'] == "dbox-bold":
-                    bold_span.append(sibling.get_text())
-                    sibling.decompose()
-                    print ("====chain BUILT")
+            # 3. MODIFICATION (class changing) of tags
+            # 3.1 all "cit" tags - they are for citations or examples of usage
+            for span_cit in direct_child_SENSE_TAG.find_all('span', class_="cit"):
+                del span_cit['type'] # typically type="example"
+                span_cit.name = 'div'
+                span_cit['class'] = "def-block"
+                ## Also FULLY RECURSIVE UNWRAPPING = replacing string with get_text
+                span_cit.string = span_cit.get_text()
+            # 3.2 'lbl' tags can mean two things, depending on whether they have a type attribute
+            for span_lbl in direct_child_SENSE_TAG.find_all('span', class_="lbl"):
+                if 'type' in span_lbl.attrs:
+                    del span_lbl['type']
+                    span_lbl['class'] = "dbox-bold"
                 else:
-                    print ("====chain broken by")
-                    print (type(sibling))
-                    print(">"+sibling+"<")
-                    break # chain broken
+                    span_lbl['class'] = "dbox-italic"
+                ## Also FULLY RECURSIVE UNWRAPPING = replacing string with get_text
+                span_lbl.string = span_lbl.get_text()
+
+            # 3.3 'hi' rend="i" tags - a slightly different case of ITALIC
+            for x in direct_child_SENSE_TAG.find_all('span', attrs={"class": "hi", "rend": "i"}):
+                del x["rend"]
+                x['class'] = "dbox-italic"
+            # 3.4 'orth' tags - a very deep bold on collins..
+            for x in direct_child_SENSE_TAG.find_all('span', class_="orth"):
+                x['class'] = "dbox-bold"
+            # 3.5 <a> tags need no custom class, but href needs completing:
+            for x in direct_child_SENSE_TAG.find_all('a'):
+                x["href"] = "http://www.collinsdictionary.com/dictionary/english/" + x["href"]# additionall
+                del x["class"]
+
+            # 4. MERGING of adjacent tags of same type
+            # 4.1. "dbox-bold" tags...
+            for bold_span in direct_child_SENSE_TAG.find_all('span', class_="dbox-bold"):
+                for sibling in bold_span.next_siblings:
+                        
+                    #3 tests: (1) is it a tag (2) has it a class (3) is that class "dbox-bold"?
+                    if type(sibling) == bs4.element.Tag and 'class' in sibling.attrs and sibling.attrs['class'] == "dbox-bold":
+                        bold_span.append(sibling.get_text())
+                        sibling.decompose()
+                    else:
+                        break # chain broken
         
 
-        #just change the main container (span to div)
-        direct_child_SENSE_TAG.name = 'div'
-        direct_child_SENSE_TAG['class'] = 'definition'
-        del direct_child_SENSE_TAG['id']
+            #just change the main container (span to div)
+            direct_child_SENSE_TAG.name = 'div'
+            direct_child_SENSE_TAG['class'] = 'definition'
+            del direct_child_SENSE_TAG['id']
 
-        # inject the gram-grp div actually into the fragment
-        new_tag = soup.new_tag("span")
-        new_tag['class'] = 'gram-grp'
-        new_tag.string = gg_descriptor_txt
-        direct_child_SENSE_TAG.insert(0, new_tag)
-                
-        #standardise the other fonts tags.
+            # inject the gram-grp div actually into the fragment
+            new_tag = soup.new_tag("span")
+            new_tag['class'] = 'gram-grp'
+            new_tag.string = gg_descriptor_txt
+            direct_child_SENSE_TAG.insert(0, new_tag)
+            n_definitions = n_definitions + 1
 
-        #TODO: do this....
+            # build a dictionary of lists, and a list of keys
+            if gg_descriptor_txt not in GG_array:
+                GG_array.append(gg_descriptor_txt)
+                defn_html_frag_dict[gg_descriptor_txt] = []
+            defn_html_frag_dict[gg_descriptor_txt].append(direct_child_SENSE_TAG.prettify())
 
+        # at the level of just within word_H1_tag != None
+        looper = 0
+        LC = 0
+        dry_lists = 0
+        while len(DefinitionHTML_list) < qty_defn:        
+            mylist = defn_html_frag_dict[GG_array[looper]]
+            if LC < len(mylist):
+                DefinitionHTML_list.append( mylist[LC] )
+            else:
+                dry_lists = dry_lists + 1
 
-        temp_count = temp_count + 1
-        if temp_count > 17:
-            break
-
-        # build a dictionary of lists, and a list of keys
-        if gg_descriptor_txt not in GG_array:
-            GG_array.append(gg_descriptor_txt)
-            defn_html_frag_dict[gg_descriptor_txt] = []
-        defn_html_frag_dict[gg_descriptor_txt].append(direct_child_SENSE_TAG.prettify())
-
-
-
-        print ("=========================")
-        print(direct_child_SENSE_TAG.prettify())
-
+            looper = looper + 1
+            if looper >= len(GG_array):
+                if dry_lists >= looper:
+                    break
+                LC = LC+1
+                looper = 0
+                dry_lists = 0
+        
     # .... generate the JSON from the otherwise-ordered extracted data.
+    return json.dumps({
+'word_queried': search_word,
+'word_defined': word_actual,
+'n_definitions': n_definitions,
+'DefnList': DefinitionHTML_list,
+'properties': {
+'popularity': frequency_note,
+'source': "http://www.collinsdictionary.com/dictionary/english/"
+}
+})
 
-
-
-def collinsdictionary_com__digestV2(page_html, search_word):
-    soup = bs4.BeautifulSoup(page_html, "html.parser")
-    main_content_tag = soup.select('div.content.definitions.ced')[0]
-
-    # 'hom' spans are containers for each gramatical group...
-    Hom_Spans = main_content_tag.find_all('span', class_="hom")
-    for hom_span in Hom_Spans:
-        print ("==================")
-        #print(hom_span)
-        gg_descriptor_txt = hom_span.find('span', class_=" gramGrp").get_text()
-        Sense_spans = hom_span.find_all('span', class_="sense")
-
-        for D_tag in hom_span.children:
-            print(possible_sense_span['class'])
-            # each of these is ONE definition...
-            if possible_sense_span['class'] == 'sense':
-                D_tag = possible_sense_span #rename variable 
-
-            print ("==================")
-            defn_txt = defn_span.prettify()
-            print(">>>>" + defn_txt)
 
 
 def dictionary_com__digest(page_html, search_word):
@@ -175,7 +178,7 @@ def dictionary_com__digest(page_html, search_word):
 
             n_definitions = n_definitions +1
 
-            if len(DefinitionHTML_list) < 3:
+            if len(DefinitionHTML_list) < qty_defn:
                 # rename fragment main tag
                 defn_div['class'] = 'definition'
        
@@ -208,7 +211,11 @@ def dictionary_com__digest(page_html, search_word):
 'word_queried': search_word,
 'word_defined': word_actual,
 'n_definitions': n_definitions,
-'DefnList': DefinitionHTML_list
+'DefnList': DefinitionHTML_list,
+'properties': {
+'popularity': "none",
+'source': 'http://www.dictionary.com/browse/'
+}
 })
 
 
@@ -234,12 +241,16 @@ class MyServerProtocol(WebSocketServerProtocol):
         if not isBinary:
             my_query = payload.decode('utf8')
 
-            null_response = json.dumps({
+            null_response = {
 'word_queried': my_query,
 'word_defined': '---',
 'n_definitions': 0,
-'DefnList': []
-})
+'DefnList': [],
+'properties': {
+'popularity': "",
+'source': "http://url/"
+}
+}
 
             #define a callback to (1) parse webpage (2) respond with result
             def dictionary_com__handler(html_string):
@@ -252,18 +263,19 @@ class MyServerProtocol(WebSocketServerProtocol):
                 print("==webpage retrieved (collinsdictionary.com), responding to query "+my_query+"==")
                 print ("Parsing HTML then sending WS response to query: " + my_query)
                 jsn = collinsdictionary_com__digest(html_string, my_query)
-                #not ready for this.
-                #self.sendMessage(jsn, False)
+                self.sendMessage(jsn, False)
 
             def dictionary_com__fail(error_obj):
                 print("==webpage retrieval FAILED (dictionary.com) for query "+my_query+"==")
                 print(error_obj)
-                self.sendMessage(x, False)
+                null_response.properties.source = 'http://www.dictionary.com/browse/'
+                self.sendMessage(json.dumps(null_response), False)
 
             def collinsdictionary_com__fail(error_obj):
                 print("==webpage retrieval FAILED (collinsdictionary.com) for query "+my_query+"==")
                 print(error_obj)
-                self.sendMessage(x, False)
+                null_response['properties']['source'] = 'http://www.collinsdictionary.com/dictionary/english/'
+                self.sendMessage(json.dumps(null_response), False)
 
             # GET webpage, and involke callback upon reciept of data
             #grabber_1 = client.getPage('http://www.dictionary.com/browse/' + payload)
