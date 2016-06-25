@@ -60,7 +60,6 @@ socket.on('full game state transmission', function(gameState){
     tileset = gameState.turned_tiles;
     tilestats = gameState.tile_stats;
     cum_MSG_hash = gameState.state_hash;
-    console.log(cum_MSG_hash);
 
     for(var i = 0; i < players.length; i++){
 	players[i].index = i;
@@ -112,20 +111,27 @@ socket.on('new turned tile', function(newTile_info){
     var tile_index = newTile_info.tile_index;
     var letter = newTile_info.tile_letter;
 
-    snDraw.Game.Event.TileTurn(player_index, tile_index, letter);
+    //hash the incoming in data and check hash validity
+    build_MSG_hash(letter, newTile_info.HH);
 
+    // for response of client-side data model and view
+    snDraw.Game.Event.TileTurn(player_index, tile_index, letter);
 });
 
 
 socket.on('snatch assert', function(SnatchUpdateMsg){
     log_message_ack("snatch");
+
     //Process the incoming data: 
     var player_index = SnatchUpdateMsg.player_index;
-    var tile_indices = SnatchUpdateMsg.tile_id_array
+    var tile_indices = SnatchUpdateMsg.tile_id_array;
     var word_usage = SnatchUpdateMsg.words_consumed;
 
-    snDraw.Game.Event.SnatchEvent(player_index, tile_indices, word_usage);
+    //hash the incoming in data and check hash validity
+    build_MSG_hash(tile_indices, SnatchUpdateMsg.HH);
 
+    // for response of client-side data model and view
+    snDraw.Game.Event.SnatchEvent(player_index, tile_indices, word_usage);
 });
 
 
@@ -252,10 +258,11 @@ function build_MSG_hash(obj, expected_hash){
     cum_MSG_hash = Math.abs(hash_me.hashCode() % 100000); // 5 digit hash
 
     //this is the client-side only bit, which checks...
-    if(obj.expected_hash != cum_MSG_hash){
+    if(expected_hash != cum_MSG_hash){
+	
 	snDraw.Game.Toast.showToast("Game is out-of-sync with the server. Refresh page for up-to-date view.");
     }else{
-	console.log("Hurrah, hashes match...");
+	//console.log("Hurrah, hashes match...("+expected_hash+")");
     }
 }
 

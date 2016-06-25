@@ -12,8 +12,8 @@ module.exports = function (nTiles, WordChecker){
     var tile_ownership = [];
     var next_unturned_tile_i = 0;
 
+    var cum_hash = Math.round(Math.random()*100000);
     console.log("created snatch game instance on server");
-    var cum_hash = 12345;
 
     //this is the collection of externally callable functions
     return{
