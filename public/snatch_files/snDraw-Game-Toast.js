@@ -34,6 +34,10 @@ snDraw.Game.Toast = {
 
 	//Actually the div of the new Toast class...
 	var $NewToast = $( "<div/>", {id: t_key}).addClass("ToastGrey ToastCentral ToastIn").html(my_string);
+	
+	//any <a href> into new windows... 
+	$NewToast.find( "a" ).attr("target","_blank");
+
 	$("#canv-inside").append($NewToast);
 
 	var toast_spacing = snDraw.Game.tileSpacings.ts * 0.18;
