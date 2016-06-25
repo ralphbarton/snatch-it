@@ -178,6 +178,7 @@ socket.on('new word definition', function(W_DEF){
 function PLAYER_SUBMITS_WORD(p)       {log_message_transmit("snatch"); socket.emit('player submits word', p);}
 function TILE_TURN_REQUEST()          {log_message_transmit("turn");   socket.emit('tile turn request', 0);}
 function PLAYER_JOINED_WITH_DETAILS(p){socket.emit('player joined with details', p);}
+function GAME_SETTINGS_CHANGE(p)      {socket.emit('game settings change', p);}
 
 function TURN_MANY_TILES(p)           {socket.emit('many_tile_turn_hack', p);}
 

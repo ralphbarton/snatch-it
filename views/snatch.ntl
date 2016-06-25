@@ -127,18 +127,18 @@
 	    </div>
 
 	    <p> 
-	      <input type="checkbox">
-	      Enable Challenge feature on word meaning
+      <input type="checkbox" name="uOpt_challenge" id="uOpt_challenge" onclick="snDraw.Game.Popup.sendSettingChange()"/>
+	      <label for="uOpt_challenge">Enable Challenge feature on word meaning</label>
 	    </p>
 
 	    <p> 
-	      <input type="checkbox">
-	      Enforce meaning-change rule
+	      <input type="checkbox" name="uOpt_stem" id="uOpt_stem" onclick="snDraw.Game.Popup.sendSettingChange()"/>
+	      <label for="uOpt_stem">Enforce stem-change rule</label>
 	    </p>
 
 	    <p> 
 	      Turns rule
-	      <select>
+	      <select id="uOpt_turns" onchange="snDraw.Game.Popup.sendSettingChange()">
 		<option>Stricly rotating</option>
 		<option>Individual timouts</option>
 		<option>5 second letter spew</option>
@@ -147,14 +147,14 @@
 	      </select>
 	    </p> 
 
-	    <p> 
-	      <input type="checkbox">
-	      Use flip-upon snatch rule
+	    <p>
+	      <input type="checkbox" name="uOpt_flippy" id="uOpt_flippy" onclick="snDraw.Game.Popup.sendSettingChange()"/>
+	      <label for="uOpt_flippy">Double flip-upon snatch rule</label>
 	    </p>
 
 	    <p> 
 	      Dictionary
-	      <select>
+	      <select id="uOpt_dictionary" onclick="snDraw.Game.Popup.sendSettingChange()">
 		<option>None</option>
 		<option>Sowpods</option>
 		<option>Top 60k words</option>
@@ -162,8 +162,8 @@
 	    </p>
 
 	    <p> 
-	      <input type="checkbox">
-	      Apply penalty for words not in dictionary
+	      <input type="checkbox" name="uOpt_penalty" id="uOpt_penalty" onclick="snDraw.Game.Popup.sendSettingChange()"/>
+	      <label for="uOpt_penalty">Apply penalty for words not in dictionary</label>
 	    </p>
 
 	  </div>

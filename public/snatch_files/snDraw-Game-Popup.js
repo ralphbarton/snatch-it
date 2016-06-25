@@ -219,5 +219,51 @@ snDraw.Game.Popup = {
 	var homeURL = window.location.href.split('join')[0];
 	window.location.href = homeURL;
 	
+    },
+
+    sendSettingChange: function(){
+	/* the 6 settings we have currently are...
+
+	   uOpt_challenge
+	   uOpt_stem
+	   uOpt_turns <select>
+	   uOpt_flippy
+	   uOpt_dictionary <select>
+	   uOpt_penalty
+	*/
+
+	var settings_grab = {
+	    //1.
+	    uOpt_challenge: $("#uOpt_challenge").is(":checked"),
+	    //2.
+	    uOpt_stem: $("#uOpt_stem").is(":checked"),
+	    //3. <select>
+	    uOpt_turns: $('#uOpt_turns').val(),
+	    //4.
+	    uOpt_flippy: $("#uOpt_flippy").is(":checked"),
+	    //5. <select>
+	    uOpt_dictionary: $('#uOpt_dictionary').val(),
+	    //6.
+	    uOpt_penalty: $("#uOpt_penalty").is(":checked"),
+	}
+
+	//transmit over websocket...
+	GAME_SETTINGS_CHANGE(settings_grab);
+    },
+
+    recieveSettingChange: function(sOb){
+	//1.
+	$('#uOpt_challenge').prop('checked', sOb.uOpt_challenge);
+	//2.
+	$('#uOpt_stem').prop('checked', sOb.uOpt_stem);
+	//3. <select>
+	$("#uOpt_turns").val(sOb.uOpt_turns);
+	//4.
+	$('#uOpt_flippy').prop('checked', sOb.uOpt_flippy);
+	//5. <select>
+	$("#uOpt_dictionary").val(sOb.uOpt_dictionary);
+	//6.
+	$('#uOpt_penalty').prop('checked', sOb.uOpt_penalty);
     }
+
 };
