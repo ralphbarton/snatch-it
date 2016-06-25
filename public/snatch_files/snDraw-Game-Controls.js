@@ -409,7 +409,7 @@ snDraw.Game.Controls = {
 
 		var t_active = snDraw.Game.Toast.Active_byKey[snDraw.Game.Controls.turn_tk];
 		if (time_remaining == 0){
-		    snDraw.Game.Toast.setToastRemTimeout(snDraw.Game.Controls.turn_tk,true);//the true means clear fast...
+		    snDraw.Game.Toast.setToastRemTimeout(snDraw.Game.Controls.turn_tk, {instant: true});//the true means clear fast...
 		    // to not hold a reference to a now deleted toast.
 		    snDraw.Game.Controls.turn_tk = undefined;
 		}else if(t_active){

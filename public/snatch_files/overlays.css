@@ -144,7 +144,7 @@ td.pl-score{
     cursor:pointer;
     color:#fff045;
     font-family:Arial;
-    padding:9px 23px;
+    padding:7px 15px;
     text-decoration:none;
     text-shadow:1px 1px 1px #000000;
 }
@@ -169,6 +169,26 @@ td.pl-score{
     animation-name: fadeout;
     animation-duration: 0.4s
 }
+
+.ToastClose {/* The Close X */
+    top: -10px;
+    right: -10px;
+    position: relative;
+    color: white;
+    float: right;
+    font-size: 150%;
+    font-weight: bold;
+}
+
+.ToastClose:hover,
+.ToastClose:focus {
+    color: red;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+
 
 /* Add Animation */
 @-webkit-keyframes fadein {

@@ -39,7 +39,8 @@ snDraw.Game.Keyboard = {
 	    this.codeCounter2 = 0;
 	}
 
-
+	//Keystroke is a user-active eveny. Clear Persistent Toasts
+	snDraw.Game.Toast.clear_all_persistent();
 
 	if(snDraw.Game.Popup.popup_in_foreground){
 	    if(snDraw.Game.Popup.popup_in_foreground == "rules"){

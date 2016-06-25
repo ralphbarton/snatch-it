@@ -24,7 +24,7 @@ snDraw.Game.Toast = {
 	return value
     },
 
-    showToast: function(my_string, options){
+    showToast: function(my_string, ToastOptions){
 
 	//how do we reference back to this Toast (important in the placement process...)?
 	var t_key = "toast-n" + this.ToastCounter; 
@@ -88,17 +88,58 @@ snDraw.Game.Toast = {
 	$NewToast.css("-webkit-border-radius", (ts*0.1)+"px");
 	$NewToast.css("border-radius", (ts*0.1)+"px");
 
-	this.setToastRemTimeout(t_key);
+	/*
+	ToastOptions = {
+	    persistent: boolean
+	}
+	*/
+
+	// Apply options to the generated Toast...
+	if (ToastOptions == undefined){
+	    //the default behaviour
+	    this.setToastRemTimeout(t_key);
+	}else{
+	    if(ToastOptions.persistent == true){
+		// add cross in corner to close it
+		var crn_cross = $("<div class=\"ToastClose\"></div>").text("×");
+		$NewToast.prepend(crn_cross);
+		crn_cross.click(function(){
+		    snDraw.Game.Toast.setToastRemTimeout(t_key, {instant: true});});
+		// it'll close by itself in a minute...
+		this.setToastRemTimeout(t_key, {duration: 60000});
+		// it will get
+		this.persistent_toast_list_byKey.push(t_key);
+	    }
+	}
+
+
 	return t_key;
     },
 
+    /*
+    ToastRemovalOptions = {
+	duration: int
+	instant: boolean
+    }
+    */
 
     //these hash tables use t_key as their keys
+    // TODO: can't 3 hash tables be combined into one, given they use the same keys? This is housekeeping work.
     timeoutIDs: {},
     Active_byKey: {},
 
-    setToastRemTimeout: function(t_key, fast){//this will remove any existing timeouts to remove the toast indexed by t_key
+    //this will remove any existing timeouts to remove the toast indexed by t_key
+    setToastRemTimeout: function(t_key, ToastRemovalOptions){
+
+	// default options values
 	var toast_duration = 4000;
+	var fast = false;
+
+	if (ToastRemovalOptions != undefined){
+	    fast = ToastRemovalOptions.instant || fast;
+	    toast_duration = ToastRemovalOptions.duration || toast_duration;
+	}
+
 	var new_timoutID = setTimeout(function(){
 	    
 	    $("#"+t_key).removeClass("ToastIn");
@@ -121,6 +162,13 @@ snDraw.Game.Toast = {
 	this.timeoutIDs[t_key] = new_timoutID;
 	clearTimeout(old_timeoutID);
 	this.Active_byKey[t_key] = true;
+    },
+
+    persistent_toast_list_byKey: [],
+    clear_all_persistent: function(){
+	$.each(this.persistent_toast_list_byKey, function( index, value ) {
+	    snDraw.Game.Toast.setToastRemTimeout(value, {instant: true});
+	});
     },
 
     join_message: function(){
@@ -155,7 +203,7 @@ snDraw.Game.Toast = {
 		var msg = "There " + sss + partipicants[0] + ", " + partipicants[1] + " and you in this game";
 	    }
 
-	    snDraw.Game.Toast.showToast(msg);
+	    snDraw.Game.Toast.showToast(msg, {persistent: true});
 	}, 20);
     }
 

@@ -34,6 +34,10 @@ snDraw.Game.Spell = {
 
 		//'logical validity' of the word in the spell may have changed. Recolour button accordingly
 		this.indicateN_validMoves_onButton();
+
+		//Adding letter to spell is a user-active eveny. Clear Persistent Toasts
+		snDraw.Game.Toast.clear_all_persistent();
+
 		return true;
 	    }
 	}

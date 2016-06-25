@@ -10,6 +10,12 @@ function log_message_transmit(key){// function writes to global data
 
     //in 2.5 seconds time, check if a response was recieved...
     setTimeout(message_arrival_check, 1000 * T_latency_for_popup + 1 );//theshold must be surpassed when checked
+
+    //Aside from the heartbeat (hb) message, client message transmission is a user-active event. Clear Persistent Toasts.
+    if(key != "hb"){
+	snDraw.Game.Toast.clear_all_persistent();
+    }
+
 }
 
 
