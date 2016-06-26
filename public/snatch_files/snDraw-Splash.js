@@ -133,10 +133,6 @@ snDraw.Splash = {
 	this.ringZoneTopPx = this.textObject_main.getHeight()*0.9;
 	//draw the ring of BB's
 	this.drawBBring();
-
-
-	//TODO: set whether background is dark or light
-	snDraw.Game.setDarkBackground(true);
     },
 
     effectiveHeight: undefined,

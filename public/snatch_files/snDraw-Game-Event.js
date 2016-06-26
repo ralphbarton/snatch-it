@@ -3,10 +3,39 @@ snDraw.Game.Event = {
     //this function is called upon entry into the game and anything that requires redraw of all (such as window resize)
     DrawAll: function(){
 
-	// 1. Set Background. Determine various scale constants (based ultimately on screen dimentions)
-	canvas.setBackgroundColor(snDraw.Game.bg_col);
+	// 1. Set Background
+	canvas.setBackgroundColor('black');
+	canvas.clear();	    
 
-	var Spacings = snDraw.Game.calculateRenderingDimentionConstants();
+	// 1.1 Calculate all the dimentions used in rendering, based upon window dimentions...
+	var N_pixels = snDraw.canv_W * snDraw.canv_H;
+	// here we access the number of tiles, which is only set after game state is loaded...
+	var Tile_pixels = N_pixels * this.Ratio_tile / tilestats.n_tiles;
+	var raw_TS = Math.round(Math.sqrt(Tile_pixels)); //excludes the effect of the border, centered on the tile edge
+
+	var tile_stroke_prop = 0.06;
+	var tot_TS = raw_TS * (1+tile_stroke_prop); //overall total Tile size, includes effect of the border
+
+	snDraw.Game.Tile.stdDimention = Math.round(Math.sqrt(N_pixels * 0.0037));
+
+	snDraw.Game.Tile.dims = { //all in pixels
+	    tsi: raw_TS,
+	    ts_thick: raw_TS * tile_stroke_prop,
+	    ts: tot_TS, //tile size, including border
+	    ts_rad: (tot_TS * 0.12), // radius on the corners of tiles
+	    ts_font1: (tot_TS * 0.9), // main font size
+	    ts_font2: (tot_TS * 0.29), // tiny font size
+	    lg: (tot_TS * 0.01), //letter gap (gap only) - "letter gap" refers to the gaps between letters within words. 
+	    tslg: (tot_TS * 1.00), //tile size added to letter gap
+	    tsgg: (tot_TS * 1.09), //tile size added to grid gap
+	    wg: (tot_TS * 0.6), // word gap (gap only)
+	    tsvg: (tot_TS * 1.15), //vertical gap between different rows of words, plus actual tile size
+	    grpad: (tot_TS * 0.20), // minimum horizonal padding of the left and the right of the grid of letters
+	    ingh: (tot_TS * 0.20), // inside a zone box, this is the horizonal padding between the inner wall and a letter
+	    ingt: (tot_TS * 0.20) // inside a zone box, this is the vertical padding between the upper wall and a letter
+	};
+
+	var Spacings = snDraw.Game.Tile.dims;
 	snDraw.Game.Zones.SetZoneStyleScalingsFromTileSize(Spacings.ts);
 	snDraw.Game.Popup.calcModalScale();//if scores were present on resize, this changes some scale params
 
@@ -18,7 +47,7 @@ snDraw.Game.Event = {
 	for (var i = 0; i < tileset.length; i++){
 	    if(tileset[i].status == "turned"){
 		//generate tile & put in grid
-		var TileObject_i = snDraw.Game.generateTileObject(tileset[i], i);
+		var TileObject_i = snDraw.Game.Tile.generateTileObject(tileset[i], i);
 		var gridRC = snDraw.Game.Grid.GetGridSpace();
 		snDraw.Game.Grid.PlaceTileInGrid(i, gridRC, false, null);//todo rename this...
 	    }
@@ -120,7 +149,7 @@ snDraw.Game.Event = {
 	snDraw.Game.Controls.updateTurnLetter_number(n_tiles_remaining);
 
 	// 1.2 maybe modify tile size...
-	var tile_size_change = snDraw.Game.setTileRatSizeFromNTiles(tilestats.n_turned);
+	var tile_size_change = snDraw.Game.Tile.setTileRatSizeFromNTiles(tilestats.n_turned);
 	if (tile_size_change){	
 	    setTimeout(function(){
 		canvas.clear();
@@ -135,7 +164,7 @@ snDraw.Game.Event = {
 	var old_grid_bottom_px = snDraw.Game.Grid.GetGridBottomPx();
 
 	// 2.2 Put new tile and obsurer into location outside the canvas (plot only no animation)
-	var newTile = snDraw.Game.generateTileObject(tileset[tile_index], tile_index);
+	var newTile = snDraw.Game.Tile.generateTileObject(tileset[tile_index], tile_index);
 	newTile.visual = "animating_in";
 	var RandCx = snDraw.Game.Tile.GenRandomCoords_TileEntryOrigin();
 	snDraw.moveSwitchable(newTile, false, null, RandCx);
@@ -222,11 +251,11 @@ snDraw.Game.Event = {
 
 	    //remove tiles from Group, and place in position as individual tiles:
 	    for (var j=0; j<removed_word_tileIDs.length; j++){
-		var StolenTile = snDraw.Game.TileArray[removed_word_tileIDs[j]];
+		var StolenTile = snDraw.Game.Tile.TileArray[removed_word_tileIDs[j]];
 		snDraw.Game.Words.TileGroupsArray[PIi][WIi].remove(StolenTile);		
 		//place individual tiles back on the canvas in location
 		StolenTile.set({
-		    left: Stolen_x_base + snDraw.Game.h_spacer * j,
+		    left: Stolen_x_base + snDraw.Game.Tile.dims.tslg * j,
 		    top: Stolen_y_base
 		});
 		canvas.add(StolenTile);
@@ -514,8 +543,21 @@ snDraw.Game.Event = {
     },
 
 
-    FirstGameRenderOnly: function(){
-	//kb mouse handlers at least to go here...
+    FirstGameRender: function(){
+
+	//mouse event listeners
+	canvas.on('mouse:down', function(e){snDraw.Game.Mouse.mDown(e); });
+	canvas.on('mouse:up',   function(e){snDraw.Game.Mouse.mUp(e);   });
+	canvas.on('mouse:over', function(e){snDraw.Game.Mouse.mOver(e); });
+	canvas.on('mouse:out',  function(e){snDraw.Game.Mouse.mOut(e);  });
+
+	//keyboard event listeners
+	document.addEventListener("keydown",function(e){snDraw.Game.Keyboard.kDown(e); }, false);
+
+	
+	window.onresize = this.WindowResize; /*function(){
+	    snDraw.Game.Event.WindowResize();
+	};*/
     }
 
 };

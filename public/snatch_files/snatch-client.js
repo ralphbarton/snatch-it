@@ -47,15 +47,6 @@ socket.on('full game state transmission', function(gameState){
     // According to the latest Design, this event only occurs once per client session
     // there is no reset etc causing retransmission of the game state.
 
-    //this will clear the message "waiting for the server..."
-    snDraw.Game.TileArray = [];
-    canvas.clear();	    
-
-    //RECIEVE THE MESSAGE FOR THE FIRST time - in this case need to add the listeners...
-    if(tileset.length<1){
-	snDraw.Game.addListeners_kb_mouse();
-    }
-
     players = gameState.playerSet;
     tileset = gameState.turned_tiles;
     tilestats = gameState.tile_stats;
@@ -67,21 +58,16 @@ socket.on('full game state transmission', function(gameState){
     }
 
     //draws the entire game state on the canvas from the data supplied
-    snDraw.Game.setTileRatSizeFromNTiles(tilestats.n_turned);// set starting size for tiles (due to existing game progress)
+    snDraw.Game.Tile.setTileRatSizeFromNTiles(tilestats.n_turned);// set starting size for tiles (due to existing game progress)
+    snDraw.Game.Event.FirstGameRender(); // main effect is to add keyboard & mouse listeners
     snDraw.Game.Event.DrawAll();
 
-    //I hope this can't add the callback twice...
-    window.onresize = function(){
-	snDraw.Game.Event.WindowResize();
-    };
 
-    //show a welcome toast
-    snDraw.Game.Toast.join_message();
-
-    //start the hearbeat process now.
-    emit_heartbeat();
+    snDraw.Game.Toast.join_message(); //show a welcome toast
+    emit_heartbeat(); //start the hearbeat process now.
 
 });//end of function to load game data
+
 
 //player joins game
 socket.on('player has joined game', function(player_join_details){

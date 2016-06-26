@@ -1,5 +1,124 @@
 snDraw.Game.Tile = {
 
+    //member variables
+    Ratio_tile: undefined,
+
+    //member objects (the point with these is that they contain fabric objects and are not native variables):
+    TileArray: [],
+
+    dims: undefined,
+    stdDimention: undefined,
+
+    //this function returns true if value has been changed...
+    setTileRatSizeFromNTiles: function(n_tiles){
+	var old_Ratio_tile = this.Ratio_tile;
+	if(n_tiles < 30){
+	    this.Ratio_tile = 0.65;
+	}else if(n_tiles < 65){
+	    this.Ratio_tile = 0.37;
+	}else{
+	    this.Ratio_tile = 0.28;
+	}
+	return this.Ratio_tile != old_Ratio_tile;
+
+    },
+
+    generateTileObject: function(tile,tile_id){
+
+	var myTileLetterObj = new fabric.Text(tile.letter,{
+	    originX: 'center',
+	    top: -this.dims.ts/2,
+	    fill: 'yellow',
+	    fontWeight: 'bold',
+	    fontSize: this.dims.ts_font1,
+	    selectable: false
+	});
+
+	var myTileNumberObj = new fabric.Text(tile_id.toString(),{
+	    left: this.dims.ts/2 * 0.4,
+	    top: this.dims.ts/2 * 0.4,
+	    fill: 'black',
+	    fontWeight: 'bold',
+	    fontSize: this.dims.ts_font2,
+	    selectable: false
+	});
+
+	var myTileRectObj = new fabric.Rect({
+	    originX: 'center',
+	    originY: 'center',
+	    fill: 'rgb(54,161,235)',
+	    stroke: '#777',
+	    strokeWidth: this.dims.ts_thick,
+	    width: this.dims.ts,
+	    height: this.dims.ts,
+	    rx: this.dims.ts_rad,
+	    ry: this.dims.ts_rad
+	});
+
+	var TileObjCollection = [myTileRectObj, myTileLetterObj];
+	if(dev){TileObjCollection.push(myTileNumberObj);}
+
+	var myNewTileObj = new fabric.Group(TileObjCollection, {
+	    hasControls: false,
+	    hasBorders: false,
+	    selectable: false
+	});
+
+	myNewTileObj.tileID=tile_id;
+	myNewTileObj.letter=tile.letter;
+
+	if(tile.status == "turned"){this.modifyTileObject(myNewTileObj,"flipped");}
+	if(tile.status == "inword"){this.modifyTileObject(myNewTileObj,"flipped");}
+
+	//note that tile.status does not refer to a real member of the 'tileset' array, necessarily
+	if(tile.status == "skeletal"){this.modifyTileObject(myNewTileObj,"skeletal");}
+
+	//add flat-array reference to the object
+	this.TileArray[tile_id] = myNewTileObj;
+
+	return myNewTileObj;
+    },
+
+
+    modifyTileObject: function(myTile,to_state){
+	//record the visual state of the tile as part of the object
+	myTile.visual = to_state;
+
+	if(to_state=="flipped"){//only to be called from within the function
+	    myTile.setOpacity(1.0);
+	}
+	else if(to_state=="skeletal"){
+	    myTile.item(0).setFill('black');
+	    myTile.item(1).setFill( players[client_player_index].color );
+	    myTile.item(0).setStroke( players[client_player_index].color );
+	}
+	else if(to_state=="partial"){
+	    myTile.setOpacity(0.75);
+	}
+	else if(to_state=="shadow"){
+	    myTile.setOpacity(0.40);
+	}
+    },
+
+    TileArray_to_LettersArray: function(TileArray){
+	//get the letter set
+	var letters_array = [];
+	for(var i = 0; i < TileArray.length; i++){
+	    letters_array.push(TileArray[i].letter);
+	}
+	return letters_array;
+    },
+
+    TileIDArray_to_LettersString: function(TileIDArray){
+	//get the letter set
+	var letters_string = "";
+	for(var i = 0; i < TileIDArray.length; i++){
+	    var myTile = this.TileArray[TileIDArray[i]];
+	    letters_string += myTile.letter;
+	}
+	return letters_string;
+    },
+
     GenRandomCoords_TileEntryOrigin: function (){
 
 	var WW = 1.5 * snDraw.canv_W; 
@@ -33,8 +152,8 @@ snDraw.Game.Tile = {
 	y_orig += (Math.random()-0.5) * 2 * Sr * 0.8;
 
 	//and make it a tile plot coordinate (shift by half width and height)
-	x_orig -= snDraw.Game.tileSize/2;
-	y_orig -= snDraw.Game.tileSize/2;
+	x_orig -= snDraw.Game.Tile.dims.ts/2;
+	y_orig -= snDraw.Game.Tile.dims.ts/2;
 
 	return {
 	    left: x_orig,
@@ -46,7 +165,7 @@ snDraw.Game.Tile = {
     r_spark: undefined,
     createObscurer: function (xx, yy, tile_index, pl_col){
 
-	var tsz = snDraw.Game.tileSize;
+	var tsz = snDraw.Game.Tile.dims.ts;
 	this.r_spark = tsz * 0.2;
 	var inset = 0.25;
 	var Q1 = tsz*inset - this.r_spark;
@@ -112,8 +231,8 @@ snDraw.Game.Tile = {
 	var uncovered_tileID = obscurerObj.tileID;
 	var SingleSparks = snDraw.unGroupAndPlaceSingly(obscurerObj);
 	var radSF = Math.PI*2 / 360;
-	var fly_radius_px = snDraw.Game.tileSize * 1.2;
-	var fly_randomise_px = snDraw.Game.tileSize * 0.4;
+	var fly_radius_px = snDraw.Game.Tile.dims.ts * 1.2;
+	var fly_randomise_px = snDraw.Game.Tile.dims.ts * 0.4;
 
 	canvas.remove(SingleSparks[0]);	//actions to remove that black from the canvas
 	var n_sparks = SingleSparks.length-1;
@@ -131,7 +250,7 @@ snDraw.Game.Tile = {
 	    var onComplete_deleteLostZone = function(){
 
 		//tile needs to be removed and re-added to restore touch sensitivity over obscurer
-		var myTile = snDraw.Game.TileArray[uncovered_tileID];
+		var myTile = snDraw.Game.Tile.TileArray[uncovered_tileID];
 		canvas.remove(myTile);
 		canvas.add(myTile);
 		canvas.remove(SingleSparks[i]);

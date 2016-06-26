@@ -36,7 +36,7 @@ snDraw.Game.Zones = {
 	    });
 
 	    var youText = new fabric.Text("You",{
-		fill: snDraw.Game.bg_col,
+		fill: 'black',
 		fontSize: ZoneSty.you_fontsize,
 		fontWeight: 'bold',
 	    });
@@ -239,7 +239,7 @@ snDraw.Game.Zones = {
 	var ZoneSty_U = snDraw.Game.Zones.ZoneSty2;
 	var WordBounds_U = ZoneSty_U.WordBlockBounds;
 	var interzonePad = snDraw.Game.Zones.ZoneVerticalPaddings;
-	var Spacings = snDraw.Game.tileSpacings;
+	var Spacings = snDraw.Game.Tile.dims;
 
 	// 2. retrieve the bottom pixel of the letters grid
 	var upper_drawing_bound = snDraw.Game.Grid.GetGridBottomPx();

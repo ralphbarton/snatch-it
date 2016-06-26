@@ -10,17 +10,17 @@ snDraw.Game.Spell = {
     // methods
     addLetter: function(letter){
 
-	var x_loco_now = this.SpellLeftPx + this.SkeletalLetters.length * snDraw.Game.tileSpacings.tslg;
-	var x_loco_max = snDraw.canv_W - snDraw.Game.tileSpacings.tslg;
+	var x_loco_now = this.SpellLeftPx + this.SkeletalLetters.length * snDraw.Game.Tile.dims.tslg;
+	var x_loco_max = snDraw.canv_W - snDraw.Game.Tile.dims.tslg;
 	//prevents spelling a word that goes off (this user's screen). This does impose a max snatch length.
 	if(x_loco_now < x_loco_max){// I replaced a clearer "wrap threshold" function for this. May be inexact. seems quite good.
 
 	    if(this.allowLetter(letter)){
 
-		var NewSkeletal = snDraw.Game.generateTileObject({letter:letter, status:"skeletal"}, -100 + this.SkeletalLetters.length);
+		var NewSkeletal = snDraw.Game.Tile.generateTileObject({letter:letter, status:"skeletal"}, -100 + this.SkeletalLetters.length);
 		this.SkeletalLetters.push(NewSkeletal);
 		var spell_len = this.SkeletalLetters.length;
-		var x_loco = this.SpellLeftPx + (spell_len-1) * snDraw.Game.tileSpacings.tslg;
+		var x_loco = this.SpellLeftPx + (spell_len-1) * snDraw.Game.Tile.dims.tslg;
 
 
 		var y_loco = this.SpellTopPx;
@@ -49,7 +49,7 @@ snDraw.Game.Spell = {
     //for when tile size is changed.
     redrawResizedSpell: function(){
 
-	var letters_array = snDraw.Game.TileArray_to_LettersArray(this.SkeletalLetters);
+	var letters_array = snDraw.Game.Tile.TileArray_to_LettersArray(this.SkeletalLetters);
 
 	//remove all existing letters
 	for(var i=0; i < letters_array.length; i++){
@@ -96,7 +96,7 @@ snDraw.Game.Spell = {
 	    for (var i=rem_i; i<this.SkeletalLetters.length; i++){
 		var ShiftMeSkeletal = this.SkeletalLetters[i];
 		ShiftMeSkeletal.tileID = i - 100;
-		var x_loco = this.SpellLeftPx + i * snDraw.Game.h_spacer;
+		var x_loco = this.SpellLeftPx + i * snDraw.Game.Tile.dims.tslg;
 		snDraw.moveSwitchable(ShiftMeSkeletal, true, snDraw.ani.sty_Sing,{
 		    left: x_loco
 		});
@@ -144,7 +144,7 @@ snDraw.Game.Spell = {
 	//determine how many instances of 'letter' are in play (i.e. visible, whether in word or free)
 	for (var i=0; i<tileset.length; i++){
 	    if ((tileset[i].status != 'unturned')&&(tileset[i].letter==letter)){
-		Objs_letter.push(snDraw.Game.TileArray[i]);
+		Objs_letter.push(snDraw.Game.Tile.TileArray[i]);
 	    } 
 	}
 	return Objs_letter;
@@ -155,7 +155,7 @@ snDraw.Game.Spell = {
 	var visual = (MyLetters.length > n_letter_in_spell) ? "partial" : "shadow";
 	if((n_letter_in_spell==0)||(n_letter_in_spell==undefined)){visual = "flipped";}
 	for (var i=0; i<MyLetters.length; i++){
-	    snDraw.Game.modifyTileObject(MyLetters[i],visual);    
+	    snDraw.Game.Tile.modifyTileObject(MyLetters[i],visual);    
 	}
     },
 
@@ -167,7 +167,7 @@ snDraw.Game.Spell = {
 	if(this.SkeletalLetters.length<3){
 	    N_valid_moves = 0;//no valid moves involves fewer than 3 letters
 	}else{
-	    var letters_array = snDraw.Game.TileArray_to_LettersArray(this.SkeletalLetters);
+	    var letters_array = snDraw.Game.Tile.TileArray_to_LettersArray(this.SkeletalLetters);
 	    var AssemblyData = Assembler.synthesiseSnatch(letters_array,true);
 	    var best_i_in_ASM = AssemblyData ? AssemblyData.best_i : undefined;
 
@@ -192,7 +192,7 @@ snDraw.Game.Spell = {
 		snDraw.Game.Toast.showToast("Words must be 3 letters or more");
 		return null;
 	    }
-	    var letters_array = snDraw.Game.TileArray_to_LettersArray(this.SkeletalLetters);
+	    var letters_array = snDraw.Game.Tile.TileArray_to_LettersArray(this.SkeletalLetters);
 
 	}else{//construct the letters array from user prompt...
 	    var snatch_string = prompt("Enter Word:");

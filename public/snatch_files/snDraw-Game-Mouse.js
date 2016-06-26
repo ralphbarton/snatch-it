@@ -146,13 +146,13 @@ snDraw.Game.Mouse = {
 	var pointer = canvas.getPointer(mouse_event.e);
 	var wordObj = mouse_event.target;
 	var x_extent = pointer.x - wordObj.getLeft();
-	var index = Math.floor(x_extent/snDraw.Game.tileSpacings.tslg);
+	var index = Math.floor(x_extent/snDraw.Game.Tile.dims.tslg);
 	var index_upper = wordObj._objects.length;
 	index = Math.min(index, index_upper-1);
 	return {
 	    TileObj: wordObj.item(index),
 	    TileCoords: {
-		x: (wordObj.getLeft() + index * snDraw.Game.tileSpacings.tslg),
+		x: (wordObj.getLeft() + index * snDraw.Game.Tile.dims.tslg),
 		y: wordObj.getTop()
 	    }
 	};
@@ -222,7 +222,7 @@ snDraw.Game.Mouse = {
 
 	    var dx = this.x_pickup - my_obj.getLeft();
 	    var dy = this.y_pickup - my_obj.getTop();
-	    movement_in_drag = cartesian_distance(dx,dy) > 0.3 * snDraw.Game.tileSpacings.ts;
+	    movement_in_drag = cartesian_distance(dx,dy) > 0.3 * snDraw.Game.Tile.dims.ts;
 	}
 	return movement_in_drag;
     },

@@ -40,7 +40,7 @@ snDraw.Game.Toast = {
 
 	$("#canv-inside").append($NewToast);
 
-	var toast_spacing = snDraw.Game.tileSpacings.ts * 0.18;
+	var toast_spacing = snDraw.Game.Tile.dims.ts * 0.18;
 	//Determine the vertical position of the toast (start it at its highest potential position)
 	var ClientZone_Title = snDraw.Game.Zones.PlayerZone[0].Zone_FabObjs[1];
 	var ToastTop_current_client_zone_top = ClientZone_Title.top + ClientZone_Title.height;
@@ -50,11 +50,11 @@ snDraw.Game.Toast = {
 	    ToastTop_current_client_words = Math.max(ToastTop_current_client_words, Client_Words_Grps[i].getTop());
         }
 
-	var toast_top = Math.max(this.ToastTop_consumed_words + snDraw.Game.tileSpacings.ts * 1.4,
-				 this.ToastTop_snatched_word + snDraw.Game.tileSpacings.ts * 1.4,
+	var toast_top = Math.max(this.ToastTop_consumed_words + snDraw.Game.Tile.dims.ts * 1.4,
+				 this.ToastTop_snatched_word + snDraw.Game.Tile.dims.ts * 1.4,
 				 this.ToastTop_zone_inner_final,
-				 this.ToastTop_client_words_final + snDraw.Game.tileSpacings.ts * 1.4,
-				 ToastTop_current_client_words +  snDraw.Game.tileSpacings.ts * 1.4,
+				 this.ToastTop_client_words_final + snDraw.Game.Tile.dims.ts * 1.4,
+				 ToastTop_current_client_words +  snDraw.Game.Tile.dims.ts * 1.4,
 				 ToastTop_current_client_zone_top);
 	this.reset_ToastTop_params();
 
@@ -86,7 +86,7 @@ snDraw.Game.Toast = {
 	//toasts scaling (there are some more...)
 	//TODO: this styling code which applies to all toasts should be elsewhere
 	// why can't I use jQuery to change the properties of the CSS class universally whilst no objects of that class exist?
-	var ts = snDraw.Game.tileSpacings.ts;
+	var ts = snDraw.Game.Tile.dims.ts;
 	$NewToast.css("font-size", (ts*0.35)+"px");
 	$NewToast.css("-moz-border-radius", (ts*0.1)+"px");
 	$NewToast.css("-webkit-border-radius", (ts*0.1)+"px");

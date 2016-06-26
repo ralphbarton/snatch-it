@@ -68,7 +68,7 @@ snDraw.Game.Controls = {
 	var buttonRect = new fabric.Rect({
 	    top: 0,
 	    fill: '#AAA',
-	    stroke: snDraw.Game.fg_col,
+	    stroke: 'white',
 	    strokeWidth: this.line_thickness,
 	    width: button_width,
 	    height: this.button_height,
@@ -201,7 +201,7 @@ snDraw.Game.Controls = {
 	    myTextObj.setFill('#75746E');//text colour to a dull grey-brown
 	}else{
 	    myTextObj.setFill('black');//text colour to black
-	    myRectObj.setStroke(snDraw.Game.fg_col);//box border colour to black, in case it was changed...
+	    myRectObj.setStroke('white');//box border colour to black, in case it was changed...
 	}
     },
 
@@ -311,7 +311,7 @@ snDraw.Game.Controls = {
 
 	    //make the outline of the button coloured.
 	    var RoundedRec = this.Button_Objs[1].item(0);
-	    RoundedRec.setStroke(snDraw.Game.client_col);
+	    RoundedRec.setStroke( players[client_player_index].color );
 
 	    //todo: this values ought only be calculated once as they are constant w.r.t. a game instance
 
@@ -358,11 +358,11 @@ snDraw.Game.Controls = {
 	    }
 	    else if (style=="press"){
 		ButtonRect.setStroke('#FF0');
-    		ButtonRect.setFill(snDraw.Game.fg_col);
+    		ButtonRect.setFill('white');
 		if(KeyLabel){KeyLabel.setFill('#999');}
 	    }
 	    else{
-    		ButtonRect.setStroke(snDraw.Game.fg_col);
+    		ButtonRect.setStroke('white');
     		ButtonRect.setFill('#AAA');
 		if(KeyLabel){KeyLabel.setFill('#CCC');}
 	    }

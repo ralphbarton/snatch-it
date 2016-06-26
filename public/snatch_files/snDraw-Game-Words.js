@@ -37,7 +37,7 @@ snDraw.Game.Words = {
     },
 
     AnimateWordCapture: function(player_index, word_index, Coords){
-	var Spacings = snDraw.Game.tileSpacings;
+	var Spacings = snDraw.Game.Tile.dims;
 	var word_length = players[player_index].words[word_index].length;
 	var w_width_px = this.word_width_px(word_length, Spacings);
 	
@@ -60,7 +60,7 @@ snDraw.Game.Words = {
 	var waveAnimateContext_WordTA = function (i){
 	    
 	    var TID = word_by_TIDs[i];
-	    var ThisTile = snDraw.Game.TileArray[TID];
+	    var ThisTile = snDraw.Game.Tile.TileArray[TID];
 	    var my_animate_onComplete = (i == word_length-1) ? onComplete_groupLetters : true;
 	    snDraw.moveSwitchable(ThisTile, my_animate_onComplete, snDraw.ani.sty_Sing, Coords);
 	    Coords.left += Spacings.tslg; 
@@ -84,9 +84,9 @@ snDraw.Game.Words = {
 
 	    var TID = word_by_TIDs[k];
 	    if(B_create_tiles){
-		var TileObject = snDraw.Game.generateTileObject(tileset[TID], TID);
+		var TileObject = snDraw.Game.Tile.generateTileObject(tileset[TID], TID);
 	    }else{
-		var TileObject = snDraw.Game.TileArray[TID];
+		var TileObject = snDraw.Game.Tile.TileArray[TID];
 	    }
 	    canvas.remove(TileObject);
 	    WordTileArray.push(TileObject);

@@ -76,7 +76,7 @@ snDraw.Game.Grid = {
 	    }
 	}
 	var bottomLeft = this.RCgridPx({row:(row_count-1), col:0})
-	return bottomLeft.top + snDraw.Game.tileSpacings.ts;
+	return bottomLeft.top + snDraw.Game.Tile.dims.ts;
     },
 
     DetachLetterSetFromGrid: function(tileIDs, ani_sty){
@@ -85,7 +85,7 @@ snDraw.Game.Grid = {
 	//it is an array of tiles supplied...
 	for (var i=0; i<tileIDs.length; i++){
 	    var TID = tileIDs[i];
-	    var TileObj = snDraw.Game.TileArray[TID];
+	    var TileObj = snDraw.Game.Tile.TileArray[TID];
 	    //if present, remove references (i.e. follow the tile's reference to its grid location)
 	    if((TileObj.Grid_row !== null)&&(TileObj.Grid_row !== undefined)){
 		this.TileGrid[TileObj.Grid_row][TileObj.Grid_col] = null;//now nullify forward ref
@@ -117,7 +117,7 @@ snDraw.Game.Grid = {
 
     PlaceTileInGrid: function(tile_index, gridRC, ani_oC, ani_sty){
 
-	var TileObject = snDraw.Game.TileArray[tile_index];
+	var TileObject = snDraw.Game.Tile.TileArray[tile_index];
 
 	//update the GRID -> TILE references
 	//only happens if tile already on grid.
