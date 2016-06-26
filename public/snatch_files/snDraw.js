@@ -65,30 +65,6 @@ var snDraw = {
 	canvas.setHeight(this.canv_H);
     },
 
-    measureFramePeriod: function(){
-	var completion_flag = false;
-	snDraw.more_animation_frames_at_least(3);// this sets animation going. It is sustained by the non-empty FrameTargetsArray
-	snDraw.FrameTargetsArray.push({
-	    framesCount: 0,
-	    d_start: undefined,
-
-	    frame: function(){
-		if(this.d_start===undefined){
-		    this.d_start = new Date();
-		    setTimeout(function(){completion_flag = true;}, 500); //measure the framerate over a 0.5 second period
-		}else{//think of the fence bars and posts problem. The first post can be excluded in the count
-		    this.framesCount++;
-		}
-		if(completion_flag){
-		    var d_end = new Date();
-		    snDraw.frameperiod_measured = (d_end.getTime() - this.d_start.getTime())/this.framesCount;
-		    return true;
-		}
-		return false;
-	    }
-	});
-    },
-
     animation_frame_requests_exist: false,
     nAnimations: 0,
     literal_frame_countdown: 0,
@@ -168,7 +144,6 @@ animation_style
 	    snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
 	}
     },
-
 
     unGroupAndPlaceSingly: function (markedFabricGrp){
 	// a 'markedFabricGrp' is a Fabric group where all of the _objects have a 'relObjCoords' member

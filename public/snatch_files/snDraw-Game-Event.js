@@ -511,6 +511,11 @@ snDraw.Game.Event = {
 	    snDraw.makeCanvasFitWholeWindow();
 	    snDraw.Game.Event.DrawAll();
 	}, 200); //inject 0.2 second delay ("size stablisation time") before redrawing all...
+    },
+
+
+    FirstGameRenderOnly: function(){
+	//kb mouse handlers at least to go here...
     }
 
 };

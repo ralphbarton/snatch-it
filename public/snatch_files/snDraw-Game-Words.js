@@ -4,167 +4,6 @@ snDraw.Game.Words = {
     TileGroupsArray: [],
 
 
-    //this is my most complex function, it uses recursion to achieve a letter-by-letter animation.
-    drawSingleCapturedWord: function(myplayer, word_index, animate){
-	var x_plotter = myplayer.x_next_word;
-	var y_plotter = myplayer.y_next_word;
-
-	var word_as_tile_index_array = myplayer.words[word_index]; 
-	var word_length = word_as_tile_index_array.length;
-
-	//remove any grid references of any tiles:
-	snDraw.Game.Grid.remove_Tile_references_from_grid(word_as_tile_index_array);
-
-	//word wrap handler
-	//if this word will run over the end of the line, do a carriage return...
-	if( this.xCoordExceedsWrapThreshold(x_plotter + (snDraw.Game.h_spacer * word_as_tile_index_array.length))){
-	    y_plotter += snDraw.Game.v_spacer;
-	    x_plotter = snDraw.Game.x_plotter_R;
-	}
-
-	var LettersOfThisWord = [];//this is an array of Fabric objects (the tiles)
-
-	//generates a new animation properties object which includes a callback to group the relevant set of letter tiles upon completion of the animation
-	var onComplete_groupLetters = function(){
-	    snDraw.Game.Words.makeTilesDraggableGroup(LettersOfThisWord, myplayer, word_index);
-	};
-
-	function Recursive_Letters_Loop(i){
-	    var this_tile_index = word_as_tile_index_array[i];
-	    var ThisTile = snDraw.Game.TileArray[this_tile_index];
-	    LettersOfThisWord[i]=ThisTile;
-
-	    //move the relevant tile (already existing on the canvas) to location...
-	    var my_animate_onComplete = animate ? ((i == word_length-1) ? onComplete_groupLetters : true) : false;
-	    snDraw.moveSwitchable(ThisTile, my_animate_onComplete, snDraw.ani.sty_Sing,{
-		left: x_plotter,
-		top: y_plotter
-	    });
-	    x_plotter += snDraw.Game.h_spacer;
-	
-	    //recursively call this function to achieve looping
-	    i++;
-	    if(i < word_length){
-		if(animate){
-		    setTimeout(function(){Recursive_Letters_Loop(i);}, snDraw.ani.sty_Sing.duration * 0.3);
-		}
-		else{
-		    Recursive_Letters_Loop(i);
-		}
-	    }else{//the letters of the word have finished being run through
-		if(!animate){snDraw.Game.Words.makeTilesDraggableGroup(LettersOfThisWord, myplayer, word_index);}//this only gets called via a later callback in the case of animation (see above)
-
-		//when the letter has been moved, these instructions finish it all off
-		x_plotter += snDraw.Game.h_space_word;
-
-		//finally, always at the end of writing a word, record the coordinates for writing a new word...
-		myplayer.x_next_word = x_plotter;
-		myplayer.y_next_word = y_plotter;
-	    }
-	}
-	Recursive_Letters_Loop(0);
-    },
-
-
-    makeTilesDraggableGroup: function(LettersOfThisWord, myplayer, word_index){
-	var grp_left = LettersOfThisWord[0].getLeft() - 0.5;
-	var grp_top = LettersOfThisWord[0].getTop() - 0.5;
-	
-	for (var i=0; i<LettersOfThisWord.length; i++){//LOOP thru the letters of one specific word...
-	    canvas.remove(LettersOfThisWord[i]);//remove the single tile (after animation) so that it can be readded as a group...
-	}
-
-	var PlayerWordGRP = new fabric.Group( LettersOfThisWord, {
-	    hasControls: false,
-	    hasBorders: false
-	});
-
-	PlayerWordGRP.OwnerPlayer = myplayer;
-	PlayerWordGRP.Player_word_index = word_index;
-	this.TileGroupsArray[myplayer.index].push(PlayerWordGRP);
-
-	PlayerWordGRP.set({
-	    left: grp_left,
-	    top: grp_top
-	});
-
-	canvas.add(PlayerWordGRP);
-	snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
-    },
-
-
-    //given the possibility that snatching a word from a player will leave a gap, this function runs through the words
-    //drawing them one after another to avoid any gap.
-    //in the case where this player has just snatched a word, the final word in their list will be animating into place.
-    //Thus function should not attempt to animate it (which would be duplication), hence the flag...
-    animateRepositionPlayerWords: function(player_index,exclude_final_word_reposition){
-
-	//being used on a real player...
-	if (player_index !== null){
-	    var X_left_offset = snDraw.Game.x_plotter_R;
-	    var X_right_offset = snDraw.Game.marginUnit;
-	    var player = players[player_index];
-	    var y_plotter = player.y_first_word;
-	    var word_GRPs = this.TileGroupsArray[player_index];
-	    var r_offset = snDraw.Game.marginUnit;
-	    //being used to put words into the unclaimed zone
-	}else{
-	    var X_left_offset = snDraw.Game.Zones.uc_Zone_words_L;
-	    var X_right_offset = snDraw.Game.Zones.uc_Zone_words_R;
-	    var y_plotter = snDraw.Game.Zones.uc_Zone_words_T;
-
-	    var word_GRPs = [];
-	    for (var i = 0; i < disconnected_players.length; i++){
-		var dPIi = disconnected_players[i].index;
-		word_GRPs.concat(this.TileGroupsArray[dPIi]);
-	    }
-	}
-	var x_plotter = X_left_offset;
-
-	var n_words = word_GRPs.length;
-	if(exclude_final_word_reposition){n_words--;}
-
-	for (var i = 0; i < n_words; i++){
-
-	    var x_span_word = snDraw.Game.h_spacer * word_GRPs[i].getObjects().length;
-
-	    //if this word will run over the end of the line, do a carriage return...
-	    if( this.xCoordExceedsWrapThreshold(x_plotter + x_span_word, X_right_offset)){
-		y_plotter += snDraw.Game.v_spacer;
-		x_plotter = X_left_offset;
-	    }
-	    
-	    //now its position is determined; animate it into position.
-	    snDraw.moveSwitchable(word_GRPs[i], true, snDraw.ani.sty_Resize,{
-		left: x_plotter,
-		top: y_plotter
-	    });
-
-	    //move the plotter along, given the placing of the word...
-	    x_plotter += snDraw.Game.h_space_word + x_span_word;
-	}
-
-	if (player_index !== null){
-	    //set the saved coordinates back as modified...
-	    player.x_next_word = x_plotter;
-	    player.y_next_word = y_plotter;
-	}
-    },
-
-    xCoordExceedsWrapThreshold: function(x_coord, r_offset){//second parameter optional
-	if(!r_offset){
-	    var r_offset = snDraw.Game.marginUnit;
-	}
-	return (x_coord > snDraw.canv_W - r_offset);
-    },
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// NEW FUNCTIONS HERE...
-
-    //based upon animateRepositionPlayerWords [138]
     MoveWordsIntoRectangleSpace: function(words_list_as_tileIDs, WordArray, Bounds, Spacings, justification, b_animate){
 
 	//get the coordinates for the arrangement
@@ -184,7 +23,6 @@ snDraw.Game.Words = {
 	};//coordinates to use for next word...
     },
 
-
     MoveWordsIntoArrangement: function(Top, WordBounds, WordGroup, WordArrangement_noH, ani_sty){
 	// place the words in the zone
 	var Arrangement = this.WordArrangementSetHeight(WordArrangement_noH, WordBounds, Top);
@@ -197,7 +35,6 @@ snDraw.Game.Words = {
 	    WordGroup[i].bringToFront();
 	}
     },
-
 
     AnimateWordCapture: function(player_index, word_index, Coords){
 	var Spacings = snDraw.Game.tileSpacings;
@@ -276,7 +113,6 @@ snDraw.Game.Words = {
 	return WordGRP;
     },
 
-    // drawSingleCapturedWord & animateRepositionPlayerWords
     GenWordArrangement: function(words_list_as_tileIDs, HorizonalBounds, Spacings, justification){
 
 	// Array 'breaks' holds the indices of the last word of each line
@@ -378,7 +214,6 @@ snDraw.Game.Words = {
 	    return false;
 	}
     },
-
 
     getUnclaimedWordsList: function(TYPE_DIRECTIVE){
 

@@ -10,17 +10,17 @@ snDraw.Game.Spell = {
     // methods
     addLetter: function(letter){
 
-	var x_loco_now = this.SpellLeftPx + this.SkeletalLetters.length * snDraw.Game.h_spacer;
-	//prevents spelling a word that goes off (this user's screen). For a 2:1 H:W aspect, this means 10 letters long
-	//note that "snDraw.Game.h_spacer" is the horizontal pixel separation of adjacent tiles in words 1.04 * tileSize
-	if(!snDraw.Game.Words.xCoordExceedsWrapThreshold(x_loco_now + snDraw.Game.h_spacer)){
+	var x_loco_now = this.SpellLeftPx + this.SkeletalLetters.length * snDraw.Game.tileSpacings.tslg;
+	var x_loco_max = snDraw.canv_W - snDraw.Game.tileSpacings.tslg;
+	//prevents spelling a word that goes off (this user's screen). This does impose a max snatch length.
+	if(x_loco_now < x_loco_max){// I replaced a clearer "wrap threshold" function for this. May be inexact. seems quite good.
 
 	    if(this.allowLetter(letter)){
 
 		var NewSkeletal = snDraw.Game.generateTileObject({letter:letter, status:"skeletal"}, -100 + this.SkeletalLetters.length);
 		this.SkeletalLetters.push(NewSkeletal);
 		var spell_len = this.SkeletalLetters.length;
-		var x_loco = this.SpellLeftPx + (spell_len-1) * snDraw.Game.h_spacer;
+		var x_loco = this.SpellLeftPx + (spell_len-1) * snDraw.Game.tileSpacings.tslg;
 
 
 		var y_loco = this.SpellTopPx;
