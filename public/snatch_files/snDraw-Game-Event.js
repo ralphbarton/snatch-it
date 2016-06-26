@@ -129,15 +129,46 @@ snDraw.Game.Event = {
 	    }, 2000); //2 seconds after turn, apply the resize. This avoids interference with animate in tile...
 	}
 
-	// 2. Determine if zones need to be squeezed because the tile grid has grown vertically...
+	// 2. Create the new tile on the screen, and animate its entry...
+
+	// 2.1 record the old bottom of the grid. Later, we will test if adding the new tile has expanded the 
 	var old_grid_bottom_px = snDraw.Game.Grid.GetGridBottomPx();
-	snDraw.Game.Turn.newTurnedTile_FlyIn_animate(tile_index, player_index, snDraw.ani.sty_Sing);
 
-	var upper_drawing_bound = snDraw.Game.Grid.GetGridBottomPx();
-	var zone_resize_necesary = old_grid_bottom_px != upper_drawing_bound;
+	// 2.2 Put new tile and obsurer into location outside the canvas (plot only no animation)
+	var newTile = snDraw.Game.generateTileObject(tileset[tile_index], tile_index);
+	newTile.visual = "animating_in";
+	var RandCx = snDraw.Game.Tile.GenRandomCoords_TileEntryOrigin();
+	snDraw.moveSwitchable(newTile, false, null, RandCx);
+	var newTileObscurer = snDraw.Game.Tile.createObscurer(RandCx.left, RandCx.top, tile_index, players[player_index].color);
 
-	// 3. If necessary, squeeze everything downwards.
-	if(zone_resize_necesary){
+	// 2.3 Now set up the animation of the tile, and the chain of animations for the obscurer
+	var gridRC = snDraw.Game.Grid.GetGridSpace();
+	var gridPx = snDraw.Game.Grid.RCgridPx(gridRC);
+
+	snDraw.Game.Grid.PlaceTileInGrid(tile_index, gridRC, true, snDraw.ani.sty_Sing);
+
+	var onComplete_disperseThisObscurer = function(){
+	    var hts = snDraw.Game.tileSize / 2;
+
+	    //update object stored coordinates to the final animation position
+	    newTileObscurer.grpCoords = {x:gridPx.left, y:gridPx.top};
+	    newTileObscurer.centerCoords = {x: gridPx.left + hts, y: gridPx.top + hts};
+	    snDraw.Game.Tile.disperseObscurer(newTileObscurer);
+
+	    //the start of dispersing the obscurer is also treated as when the tile really exists (before it is not visible)
+	    newTile.visual = "flipped";
+
+	    //This is a little expensive, but any new tile has the potential to change letter availability
+	    if(snDraw.Game.Spell.SkeletalLetters.length>0){ // irrelivant if the speller is empty
+		snDraw.Game.Spell.recolourAll(snDraw.Game.Spell.ListAllVisibleTilesOf(newTile.letter));
+		snDraw.Game.Spell.indicateN_validMoves_onButton();//also re-indicate how to make
+	    }
+	};
+	snDraw.moveSwitchable(newTileObscurer, onComplete_disperseThisObscurer, snDraw.ani.sty_Sing, gridPx);
+
+
+	// 3. Determine if zones need to be squeezed downwards because the tile grid has grown vertically...
+	if(snDraw.Game.Grid.GetGridBottomPx() != old_grid_bottom_px){
 	    snDraw.Game.Zones.AnimateResizeAllZones(snDraw.ani.sty_Resize, null);
 	}
 

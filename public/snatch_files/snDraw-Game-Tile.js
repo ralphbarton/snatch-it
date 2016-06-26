@@ -1,11 +1,6 @@
-snDraw.Game.Turn = {
+snDraw.Game.Tile = {
 
-    //member
-    r_spark: undefined,
-
-    newTurnedTile_FlyIn_animate: function (tile_index, player_index, ani_sty){
-	var newTile = snDraw.Game.generateTileObject(tileset[tile_index], tile_index);
-	newTile.visual = "animating_in";
+    GenRandomCoords_TileEntryOrigin: function (){
 
 	var WW = 1.5 * snDraw.canv_W; 
 	var HH = 0.25 * (snDraw.canv_H + snDraw.canv_W);
@@ -41,47 +36,14 @@ snDraw.Game.Turn = {
 	x_orig -= snDraw.Game.tileSize/2;
 	y_orig -= snDraw.Game.tileSize/2;
 
-	//move the tile onto the boundary line (this is a plot operation without animation
-	snDraw.moveSwitchable(newTile, false, null,{
+	return {
 	    left: x_orig,
 	    top: y_orig
-	});
-	//also obscure the tile
-	var newTileObscurer = this.createObscurer(x_orig, y_orig, tile_index, players[player_index].color);
-
-	var gridRC = snDraw.Game.Grid.GetGridSpace();
-	var gridPx = snDraw.Game.Grid.RCgridPx(gridRC);
-
-	//ANIMATE the tile
-	snDraw.Game.Grid.PlaceTileInGrid(tile_index, gridRC, true, ani_sty);
-
-	var onComplete_disperseThisObscurer = function(){
-	    var hts = snDraw.Game.tileSize / 2;
-
-	    //update object stored coordinates to the final animation position
-	    newTileObscurer.grpCoords = {x:gridPx.left, y:gridPx.top};
-	    newTileObscurer.centerCoords = {x: gridPx.left + hts, y: gridPx.top + hts};
-	    snDraw.Game.Turn.disperseObscurer(newTileObscurer);
-
-	    //the start of dispersing the obscurer is also treated as when the tile really exists (before it is not visible)
-	    newTile.visual = "flipped";
-
-	    //This is a little expensive, but any new tile has the potential to change letter availability
-	    if(snDraw.Game.Spell.SkeletalLetters.length>0){ // irrelivant if the speller is empty
-		snDraw.Game.Spell.recolourAll(snDraw.Game.Spell.ListAllVisibleTilesOf(newTile.letter));
-		snDraw.Game.Spell.indicateN_validMoves_onButton();//also re-indicate how to make
-	    }
 	};
-
-	//apply the SAME animation to the obscurer:
-	snDraw.moveSwitchable(newTileObscurer, onComplete_disperseThisObscurer, ani_sty,{
-	    left: gridPx.left,
-	    top: gridPx.top
-	});
-
-
     },
 
+    //member
+    r_spark: undefined,
     createObscurer: function (xx, yy, tile_index, pl_col){
 
 	var tsz = snDraw.Game.tileSize;
