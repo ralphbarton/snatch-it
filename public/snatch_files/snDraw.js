@@ -2,6 +2,7 @@
 
 var canvas = undefined;//OK let's at least keep the canvas object as a global...
 
+
 var snDraw = {
 
     //member variables (native types)
@@ -11,6 +12,8 @@ var snDraw = {
 
     frameperiod_measured: undefined,
     
+    //required due to legacy structuring:
+    Game: {},
 
 
     //for animation

@@ -175,7 +175,7 @@ snDraw.Game.Mouse = {
     //returns a function at will, when called, remove this spot.
     showSpotOnTile: function (myTile, WRDtile_coords, spl_add) {
 	//draw a little spot...
-	var rzz = snDraw.Game.tileSize * 0.2;
+	var rzz = snDraw.Game.Tile.dims.ts * 0.2;
 	var rad = rzz * (spl_add ? 1.0 : 0.6);
 	var dot_fill = spl_add ? players[client_player_index].color : '#999';
 

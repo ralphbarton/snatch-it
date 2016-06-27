@@ -30,7 +30,6 @@
     <script src="snatch_files/snatch-message-latency.js"></script>
 
     <script src="snatch_files/snDraw.js"></script>
-    <script src="snatch_files/snDraw-Game.js"></script>
     <script src="snatch_files/snDraw-Game-Controls.js"></script>
     <script src="snatch_files/snDraw-Game-DefineWord.js"></script>
     <script src="snatch_files/snDraw-Game-Event.js"></script>

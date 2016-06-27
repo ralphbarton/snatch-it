@@ -9,8 +9,9 @@ snDraw.Game.Event = {
 
 	// 1.1 Calculate all the dimentions used in rendering, based upon window dimentions...
 	var N_pixels = snDraw.canv_W * snDraw.canv_H;
-	// here we access the number of tiles, which is only set after game state is loaded...
-	var Tile_pixels = N_pixels * this.Ratio_tile / tilestats.n_tiles;
+
+	// here we access the number of tiles & turned tiles, which is only set after game state is loaded...
+	var Tile_pixels = N_pixels * snDraw.Game.Tile.Ratio_tile / tilestats.n_tiles;
 	var raw_TS = Math.round(Math.sqrt(Tile_pixels)); //excludes the effect of the border, centered on the tile edge
 
 	var tile_stroke_prop = 0.06;
@@ -177,7 +178,7 @@ snDraw.Game.Event = {
 	snDraw.Game.Grid.PlaceTileInGrid(tile_index, gridRC, true, snDraw.ani.sty_Sing);
 
 	var onComplete_disperseThisObscurer = function(){
-	    var hts = snDraw.Game.tileSize / 2;
+	    var hts = snDraw.Game.Tile.dims.ts / 2;
 
 	    //update object stored coordinates to the final animation position
 	    newTileObscurer.grpCoords = {x:gridPx.left, y:gridPx.top};

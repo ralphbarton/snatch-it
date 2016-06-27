@@ -77,7 +77,7 @@ snDraw.Game.Zones = {
     DetermineZoneBoxObjectsTops: function(Top, Height, ZoneSty){
 	var box_top = Top + Math.max(ZoneSty.fonthalfheight - ZoneSty.thick/2, 0);
 	var box_bottom = Top + Height - ZoneSty.thick/2;//center of border
-	var hor_centerline_height = box_bottom - (ZoneSty.thick/2 + ZoneSty.spell_vpad + snDraw.Game.tileSize/2);
+	var hor_centerline_height = box_bottom - (ZoneSty.thick/2 + ZoneSty.spell_vpad + snDraw.Game.Tile.dims.ts/2);
 	return [
 	    box_top, // 1. zoneBox_top
 	    Top, // 2. plrName_top
@@ -85,7 +85,7 @@ snDraw.Game.Zones = {
 	    (box_bottom - ZoneSty.you_h + ZoneSty.you_font_Yoff), // 4. youText_top
 	    (hor_centerline_height - ZoneSty.tri_h/2), // 5. spellPointer_top
 	    (hor_centerline_height - ZoneSty.tri_h/2), // 6. spellPointer_Mask_top
-	    (hor_centerline_height - snDraw.Game.tileSize/2) // 7. SPELL_TILES_top
+	    (hor_centerline_height - snDraw.Game.Tile.dims.ts/2) // 7. SPELL_TILES_top
 	];
     },
 

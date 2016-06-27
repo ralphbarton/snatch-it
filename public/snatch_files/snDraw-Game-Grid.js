@@ -52,6 +52,8 @@ snDraw.Game.Grid = {
 		    this.TileGrid.push([]);
 		}
 	    }
+	    //logging only
+	    if(row > 20){console.log("There is a serious problem in the code. Has a NaN crept into tile dimentions calcs?")}
 	}
 	
 	return {row: row, col: col};
