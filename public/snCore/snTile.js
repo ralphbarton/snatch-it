@@ -1,4 +1,4 @@
-snDraw.Game.Tile = {
+snCore.Tile = {
 
     //member variables
     Ratio_tile: undefined,
@@ -121,13 +121,13 @@ snDraw.Game.Tile = {
 
     GenRandomCoords_TileEntryOrigin: function (){
 
-	var WW = 1.5 * snDraw.canv_W; 
-	var HH = 0.25 * (snDraw.canv_H + snDraw.canv_W);
+	var WW = 1.5 * snCore.Basic.canv_W; 
+	var HH = 0.25 * (snCore.Basic.canv_H + snCore.Basic.canv_W);
 	var Br1 = HH;
 	var Br2 = Br1 + WW;
 	var Br3 = Br2 + HH;
 
-	var Sr = 0.25 * snDraw.canv_W;
+	var Sr = 0.25 * snCore.Basic.canv_W;
 
 	var perim_pos = Math.random() * Br3;
 	var x_orig = undefined;
@@ -143,7 +143,7 @@ snDraw.Game.Tile = {
 	    y_orig = -Sr;
 	}else {//right bar
 	    var perim_remain = perim_pos - Br2;
-	    x_orig = snDraw.canv_W + Sr;
+	    x_orig = snCore.Basic.canv_W + Sr;
 	    y_orig = -Sr + perim_remain;
 	}
 
@@ -152,8 +152,8 @@ snDraw.Game.Tile = {
 	y_orig += (Math.random()-0.5) * 2 * Sr * 0.8;
 
 	//and make it a tile plot coordinate (shift by half width and height)
-	x_orig -= snDraw.Game.Tile.dims.ts/2;
-	y_orig -= snDraw.Game.Tile.dims.ts/2;
+	x_orig -= snCore.Tile.dims.ts/2;
+	y_orig -= snCore.Tile.dims.ts/2;
 
 	return {
 	    left: x_orig,
@@ -165,7 +165,7 @@ snDraw.Game.Tile = {
     r_spark: undefined,
     createObscurer: function (xx, yy, tile_index, pl_col){
 
-	var tsz = snDraw.Game.Tile.dims.ts;
+	var tsz = snCore.Tile.dims.ts;
 	this.r_spark = tsz * 0.2;
 	var inset = 0.25;
 	var Q1 = tsz*inset - this.r_spark;
@@ -229,10 +229,10 @@ snDraw.Game.Tile = {
     disperseObscurer: function (obscurerObj){
 
 	var uncovered_tileID = obscurerObj.tileID;
-	var SingleSparks = snDraw.unGroupAndPlaceSingly(obscurerObj);
+	var SingleSparks = snCore.Basic.unGroupAndPlaceSingly(obscurerObj);
 	var radSF = Math.PI*2 / 360;
-	var fly_radius_px = snDraw.Game.Tile.dims.ts * 1.2;
-	var fly_randomise_px = snDraw.Game.Tile.dims.ts * 0.4;
+	var fly_radius_px = snCore.Tile.dims.ts * 1.2;
+	var fly_randomise_px = snCore.Tile.dims.ts * 0.4;
 
 	canvas.remove(SingleSparks[0]);	//actions to remove that black from the canvas
 	var n_sparks = SingleSparks.length-1;
@@ -250,13 +250,13 @@ snDraw.Game.Tile = {
 	    var onComplete_deleteLostZone = function(){
 
 		//tile needs to be removed and re-added to restore touch sensitivity over obscurer
-		var myTile = snDraw.Game.Tile.TileArray[uncovered_tileID];
+		var myTile = snCore.Tile.TileArray[uncovered_tileID];
 		canvas.remove(myTile);
 		canvas.add(myTile);
 		canvas.remove(SingleSparks[i]);
 	    };
 	    
-	    snDraw.moveSwitchable(SingleSparks[i], onComplete_deleteLostZone, snDraw.ani.sty_BBshrink,{
+	    snCore.Basic.moveSwitchable(SingleSparks[i], onComplete_deleteLostZone, snCore.Basic.ani.sty_BBshrink,{
 		left: flyTo_x - (this.r_spark/2),
 		top: flyTo_y -(this.r_spark/2),
 		radius: 0

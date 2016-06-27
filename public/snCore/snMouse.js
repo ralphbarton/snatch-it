@@ -1,4 +1,4 @@
-snDraw.Game.Mouse = {
+snCore.Mouse = {
 
     //these variables are supposedly the class members...
     x_pickup: undefined,
@@ -21,14 +21,14 @@ snDraw.Game.Mouse = {
 		
 		//Clicks that land on Skeletal tiles...
 		if(my_tile_index < 0){
-		    snDraw.Game.Spell.removeLetter(100 + my_tile_index);
+		    snCore.Spell.removeLetter(100 + my_tile_index);
 		}
 	    }
 
 	    //Handle clicks that land on a word...
 	    var word_owner = targetObj.OwnerPlayer;
 	    if(word_owner!==undefined){//mouse down on a word 
-		snDraw.Game.DefineWord.delayedDefinitionToast(targetObj, true);
+		snCore.DefineWord.delayedDefinitionToast(targetObj, true);
 		this.x_pickup = targetObj.getLeft();
 		this.y_pickup = targetObj.getTop();
 	    }
@@ -36,14 +36,14 @@ snDraw.Game.Mouse = {
 	    //Handle clicks that land on a Game Control
 	    var control_index = targetObj.gameButtonID;
 	    if(control_index !== undefined){ //implies the click landed on a button...
-		snDraw.Game.Controls.buttonRecolor(targetObj,"press"); // visual
+		snCore.Controls.buttonRecolor(targetObj,"press"); // visual
 
 		//bulked up with anti double click code...
 		if(this.anti_controls_dblclick[control_index] !== true){
 		    this.callGameControlHandler(control_index);
 		}
 		this.anti_controls_dblclick[control_index] = true;
-		setTimeout(function(){snDraw.Game.Mouse.anti_controls_dblclick[control_index] = false;}, 500);
+		setTimeout(function(){snCore.Mouse.anti_controls_dblclick[control_index] = false;}, 500);
 	    }
 	}
     },
@@ -68,10 +68,10 @@ snDraw.Game.Mouse = {
 	    //Handle click releases over a word...
 	    var word_owner = targetObj.OwnerPlayer;
 	    if(word_owner !== undefined){//mouse up on a word 
-		snDraw.Game.DefineWord.cancelDelayedDefinitionToast(targetObj);
+		snCore.DefineWord.cancelDelayedDefinitionToast(targetObj);
 		//clicks released over a word that had previously been clicked on (i.e. picked up)
 		if(this.x_pickup !== undefined){
-		    snDraw.moveSwitchable(targetObj, true, snDraw.ani.sty_Anag,{
+		    snCore.Basic.moveSwitchable(targetObj, true, snCore.Basic.ani.sty_Anag,{
 			left: this.x_pickup,
 			top: this.y_pickup
 		    });
@@ -96,7 +96,7 @@ snDraw.Game.Mouse = {
 	    //Handle click releases over a Game Control
 	    var control_index = targetObj.gameButtonID;
 	    if(control_index !== undefined){ //implies the click landed on a button...
-		snDraw.Game.Controls.buttonRecolor(targetObj,"normal");		
+		snCore.Controls.buttonRecolor(targetObj,"normal");		
 	    }
 	}
     },
@@ -110,13 +110,13 @@ snDraw.Game.Mouse = {
 	    //Handle mouse pointer passing onto a Game Control
 	    var control_index = targetObj.gameButtonID;
 	    if(control_index !== undefined){ 
-		snDraw.Game.Controls.buttonRecolor(targetObj,"hover");
+		snCore.Controls.buttonRecolor(targetObj,"hover");
 	    }
 
 	    //Handle mouse pointer passing onto a word...
 	    var word_owner = targetObj.OwnerPlayer;
 	    if(word_owner !== undefined){//mouse over a word 
-		snDraw.Game.DefineWord.delayedDefinitionToast(targetObj, false);
+		snCore.DefineWord.delayedDefinitionToast(targetObj, false);
 	    }
 	}
     },
@@ -130,13 +130,13 @@ snDraw.Game.Mouse = {
 	    //Handle mouse pointer moving off a Game Control
 	    var control_index = targetObj.gameButtonID;
 	    if(control_index !== undefined){ 
-		snDraw.Game.Controls.buttonRecolor(targetObj,"normal");
+		snCore.Controls.buttonRecolor(targetObj,"normal");
 	    }
 
 	    //Handle mouse pointer moving off a word...
 	    var word_owner = targetObj.OwnerPlayer;
 	    if(word_owner !== undefined){//mouse moving off a word 
-		snDraw.Game.DefineWord.cancelDelayedDefinitionToast(targetObj);
+		snCore.DefineWord.cancelDelayedDefinitionToast(targetObj);
 	    }
 
 	}
@@ -146,13 +146,13 @@ snDraw.Game.Mouse = {
 	var pointer = canvas.getPointer(mouse_event.e);
 	var wordObj = mouse_event.target;
 	var x_extent = pointer.x - wordObj.getLeft();
-	var index = Math.floor(x_extent/snDraw.Game.Tile.dims.tslg);
+	var index = Math.floor(x_extent/snCore.Tile.dims.tslg);
 	var index_upper = wordObj._objects.length;
 	index = Math.min(index, index_upper-1);
 	return {
 	    TileObj: wordObj.item(index),
 	    TileCoords: {
-		x: (wordObj.getLeft() + index * snDraw.Game.Tile.dims.tslg),
+		x: (wordObj.getLeft() + index * snCore.Tile.dims.tslg),
 		y: wordObj.getTop()
 	    }
 	};
@@ -161,7 +161,7 @@ snDraw.Game.Mouse = {
     spellAddLetter_noDoubleClick: function (myTile, WRDtile_coords) {
 	//only allow the addition of the letter if it wasn't recently clicked...
 	if (myTile.recentClick != true){
-	    var spl_add = snDraw.Game.Spell.addLetter(myTile.letter);
+	    var spl_add = snCore.Spell.addLetter(myTile.letter);
 	    myTile.recentClick = true;
 	    var rem_spot = this.showSpotOnTile(myTile, WRDtile_coords, spl_add);
 
@@ -175,7 +175,7 @@ snDraw.Game.Mouse = {
     //returns a function at will, when called, remove this spot.
     showSpotOnTile: function (myTile, WRDtile_coords, spl_add) {
 	//draw a little spot...
-	var rzz = snDraw.Game.Tile.dims.ts * 0.2;
+	var rzz = snCore.Tile.dims.ts * 0.2;
 	var rad = rzz * (spl_add ? 1.0 : 0.6);
 	var dot_fill = spl_add ? players[client_player_index].color : '#999';
 
@@ -201,12 +201,12 @@ snDraw.Game.Mouse = {
 	    selectable: false
 	});
 	canvas.add(mySpark);
-	snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+	snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
 
 	return function(){
 	    //delete that little spot...
 	    canvas.remove(mySpark);
-	    snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+	    snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
 	};
     },
 
@@ -218,11 +218,11 @@ snDraw.Game.Mouse = {
 	}
 
 	var movement_in_drag = false;
-	if(snDraw.Game.Mouse.x_pickup !== undefined){ // implies drag even it progress.
+	if(snCore.Mouse.x_pickup !== undefined){ // implies drag even it progress.
 
 	    var dx = this.x_pickup - my_obj.getLeft();
 	    var dy = this.y_pickup - my_obj.getTop();
-	    movement_in_drag = cartesian_distance(dx,dy) > 0.3 * snDraw.Game.Tile.dims.ts;
+	    movement_in_drag = cartesian_distance(dx,dy) > 0.3 * snCore.Tile.dims.ts;
 	}
 	return movement_in_drag;
     },
@@ -230,23 +230,23 @@ snDraw.Game.Mouse = {
     callGameControlHandler: function (control_index) {
 	if(control_index == 0){
 	    // Actions for "Cancel Word" Button click
-	    snDraw.Game.Spell.CancelWord();
+	    snCore.Spell.CancelWord();
 	}
 	if(control_index == 1){
 	    // Actions for "Turn Letter" Button click
-	    snDraw.Game.Controls.turnLetterClickHandler();
+	    snCore.Controls.turnLetterClickHandler();
 	}	    
 	if(control_index == 2){
 	    // Actions for "SNATCH IT" Button click
-	    snDraw.Game.Spell.SubmitWord();
+	    snCore.Spell.SubmitWord();
 	}	    
 	if(control_index == 3){
 	    // Actions for "View Scores" Button click
-	    snDraw.Game.Popup.openModal("scores");
+	    snCore.Popup.openModal("scores");
 	}
 	if(control_index == 4){
 	    // Actions for "options" Button click
-	    snDraw.Game.Popup.openModal("options");
+	    snCore.Popup.openModal("options");
 	}
     }
 };

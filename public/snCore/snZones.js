@@ -1,4 +1,4 @@
-snDraw.Game.Zones = {
+snCore.Zones = {
 
     //member data
     PlayerZone: [],//rarranged subset of array players
@@ -7,7 +7,7 @@ snDraw.Game.Zones = {
     CreateZoneBox: function(Height, ZoneProperties){
 	
 	var ZoneSty = ZoneProperties.ZoneSty;
-	var boxWidth  = snDraw.canv_W - 2 * ZoneSty.hpad - ZoneSty.thick;
+	var boxWidth  = snCore.Basic.canv_W - 2 * ZoneSty.hpad - ZoneSty.thick;
 
 	var zoneBox = new fabric.Rect({
 	    width: boxWidth,
@@ -77,7 +77,7 @@ snDraw.Game.Zones = {
     DetermineZoneBoxObjectsTops: function(Top, Height, ZoneSty){
 	var box_top = Top + Math.max(ZoneSty.fonthalfheight - ZoneSty.thick/2, 0);
 	var box_bottom = Top + Height - ZoneSty.thick/2;//center of border
-	var hor_centerline_height = box_bottom - (ZoneSty.thick/2 + ZoneSty.spell_vpad + snDraw.Game.Tile.dims.ts/2);
+	var hor_centerline_height = box_bottom - (ZoneSty.thick/2 + ZoneSty.spell_vpad + snCore.Tile.dims.ts/2);
 	return [
 	    box_top, // 1. zoneBox_top
 	    Top, // 2. plrName_top
@@ -85,7 +85,7 @@ snDraw.Game.Zones = {
 	    (box_bottom - ZoneSty.you_h + ZoneSty.you_font_Yoff), // 4. youText_top
 	    (hor_centerline_height - ZoneSty.tri_h/2), // 5. spellPointer_top
 	    (hor_centerline_height - ZoneSty.tri_h/2), // 6. spellPointer_Mask_top
-	    (hor_centerline_height - snDraw.Game.Tile.dims.ts/2) // 7. SPELL_TILES_top
+	    (hor_centerline_height - snCore.Tile.dims.ts/2) // 7. SPELL_TILES_top
 	];
     },
 
@@ -95,7 +95,7 @@ snDraw.Game.Zones = {
 
     DetermineZoneBoxObjectsLefts: function(Left_Offset, ZoneSty, textWidth){
 	var boxLeft = ZoneSty.hpad;
-	var boxWidth  = snDraw.canv_W - 2 * ZoneSty.hpad - ZoneSty.thick; // this line is duplicated
+	var boxWidth  = snCore.Basic.canv_W - 2 * ZoneSty.hpad - ZoneSty.thick; // this line is duplicated
 	var boxRight = boxLeft + boxWidth + ZoneSty.thick/2; //center of border
 	var textLeft = undefined;
 
@@ -138,7 +138,7 @@ snDraw.Game.Zones = {
 	}
 
 	//2. Share the "spare height" between all active players...
-	var rem_height = snDraw.canv_H - EffectiveZoneTopPx;
+	var rem_height = snCore.Basic.canv_H - EffectiveZoneTopPx;
 	var total_zone_height = rem_height - (n_zones-1) * ZoneVerticalPaddings.between - ZoneVerticalPaddings.bottom;
 	var spare_sharable_height = total_zone_height - words_consume_height_total;
 	var space_height_each = spare_sharable_height / (n_zones+1);
@@ -213,7 +213,7 @@ snDraw.Game.Zones = {
 	function setZoneStyWordBlockBounds (ZoneSty){
 	    ZoneSty.WordBlockBounds = {
 		left: (ZoneSty.hpad + ZoneSty.thick + ZoneSty.w_hpad),
-		right: (snDraw.canv_W - (ZoneSty.hpad + ZoneSty.thick + ZoneSty.w_hpad)),
+		right: (snCore.Basic.canv_W - (ZoneSty.hpad + ZoneSty.thick + ZoneSty.w_hpad)),
 		topPadding: (Math.max(ZoneSty.fonthalfheight + ZoneSty.thick/2, ZoneSty.thick) + ZoneSty.w_vpad)
 	    };
 	}
@@ -234,27 +234,27 @@ snDraw.Game.Zones = {
     calculateAllPositionsArrangements: function(){
 
 	// 1. retrieve style information...
-	var ZoneSty_P = snDraw.Game.Zones.ZoneSty1;
+	var ZoneSty_P = snCore.Zones.ZoneSty1;
 	var WordBounds_P = ZoneSty_P.WordBlockBounds;
-	var ZoneSty_U = snDraw.Game.Zones.ZoneSty2;
+	var ZoneSty_U = snCore.Zones.ZoneSty2;
 	var WordBounds_U = ZoneSty_U.WordBlockBounds;
-	var interzonePad = snDraw.Game.Zones.ZoneVerticalPaddings;
-	var Spacings = snDraw.Game.Tile.dims;
+	var interzonePad = snCore.Zones.ZoneVerticalPaddings;
+	var Spacings = snCore.Tile.dims;
 
 	// 2. retrieve the bottom pixel of the letters grid
-	var upper_drawing_bound = snDraw.Game.Grid.GetGridBottomPx();
+	var upper_drawing_bound = snCore.Grid.GetGridBottomPx();
 
 	// 3. If an unclaimed zone exists, calculate its word arrangement and hence its overall height
 	var Unclaimed_D = {};
-	if(snDraw.Game.Zones.Unclaimed.exists){
-	    var words_list = snDraw.Game.Words.getUnclaimedWordsList("via TID");
-	    Unclaimed_D.Arrangement_noH = snDraw.Game.Words.GenWordArrangement(words_list, WordBounds_U, Spacings, "center");
+	if(snCore.Zones.Unclaimed.exists){
+	    var words_list = snCore.Words.getUnclaimedWordsList("via TID");
+	    Unclaimed_D.Arrangement_noH = snCore.Words.GenWordArrangement(words_list, WordBounds_U, Spacings, "center");
 
-	    upper_drawing_bound += snDraw.Game.Zones.ZoneVerticalPaddings.aboveU;
+	    upper_drawing_bound += snCore.Zones.ZoneVerticalPaddings.aboveU;
 	    Unclaimed_D.Top = upper_drawing_bound;
 
 	    var unclaimed_Height_pads_tot = ZoneSty_U.thick*2 + ZoneSty_U.w_vpad*2;
-	    var unclaimed_Height_words_stack = snDraw.Game.Zones.WordsStackHeightPx(Unclaimed_D.Arrangement_noH, Spacings);
+	    var unclaimed_Height_words_stack = snCore.Zones.WordsStackHeightPx(Unclaimed_D.Arrangement_noH, Spacings);
 	    Unclaimed_D.Height = unclaimed_Height_words_stack + unclaimed_Height_pads_tot;
 
 	    upper_drawing_bound += Unclaimed_D.Height;
@@ -262,9 +262,9 @@ snDraw.Game.Zones = {
 
 	// 4. calculate the word arrangements for zones of all active players
 	var ArrangementsArray_noH = [];
-	for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
-	    var player_i = snDraw.Game.Zones.PlayerZone[i].player;
-	    ArrangementsArray_noH.push(snDraw.Game.Words.GenWordArrangement(player_i.words, WordBounds_P, Spacings, "left"));
+	for (var i = 0; i < snCore.Zones.PlayerZone.length; i++){
+	    var player_i = snCore.Zones.PlayerZone[i].player;
+	    ArrangementsArray_noH.push(snCore.Words.GenWordArrangement(player_i.words, WordBounds_P, Spacings, "left"));
 	}
 
 	// 5. Finally, calculate the sizes of all zones...
@@ -272,14 +272,14 @@ snDraw.Game.Zones = {
 	return {
 	    Unclaimed_D: Unclaimed_D,
 	    ArrangementsArray_noH: ArrangementsArray_noH,
-	    ZoneSizes: (snDraw.Game.Zones.CalcZoneSizes(ArrangementsArray_noH, upper_drawing_bound, interzonePad, Spacings))
+	    ZoneSizes: (snCore.Zones.CalcZoneSizes(ArrangementsArray_noH, upper_drawing_bound, interzonePad, Spacings))
 	};
     },
 
     
     AnimateResizeAllZones: function(ani_sty, exclude_this_zone_by_i){
 	// 1. Get the positions and arrangements of everything...
-	var Positions = snDraw.Game.Zones.calculateAllPositionsArrangements();
+	var Positions = snCore.Zones.calculateAllPositionsArrangements();
 
 	//note, Positions is an object: {Unclaimed_D, ArrangementsArray_noH, ZoneSizes}
 	//note, ZoneSizes is an array: [{Top: , Height: }, {}, ...]
@@ -292,9 +292,9 @@ snDraw.Game.Zones = {
 
 	// by constrast a player zone, if new, always starts has zero words in it at the point this function is called
 	if(exclude_this_zone_by_i !== "unclaimed"){
-	    if(snDraw.Game.Zones.Unclaimed.exists){
+	    if(snCore.Zones.Unclaimed.exists){
 
-		this.repositionZoneAndEnclWordsOnCanvas(snDraw.Game.Zones.Unclaimed,
+		this.repositionZoneAndEnclWordsOnCanvas(snCore.Zones.Unclaimed,
 							Positions.Unclaimed_D.Arrangement_noH,
 							Positions.Unclaimed_D.Top,
 							Positions.Unclaimed_D.Height,
@@ -306,10 +306,10 @@ snDraw.Game.Zones = {
 
 	// 4. Now move all of the player zones, and their contained words
 	var PlayerZoneProps = this.getZoneProperties("player");
-	for (var i = 0; i < snDraw.Game.Zones.PlayerZone.length; i++){
+	for (var i = 0; i < snCore.Zones.PlayerZone.length; i++){
 
 	    var pz_ani_sty = (exclude_this_zone_by_i == i) ? null : ani_sty;
-	    this.repositionZoneAndEnclWordsOnCanvas(snDraw.Game.Zones.PlayerZone[i],
+	    this.repositionZoneAndEnclWordsOnCanvas(snCore.Zones.PlayerZone[i],
 						    Positions.ArrangementsArray_noH[i],
 						    Positions.ZoneSizes[i].Top,
 						    Positions.ZoneSizes[i].Height,
@@ -322,19 +322,19 @@ snDraw.Game.Zones = {
 
 	// 5.1 Set a Toast max-height parameter using the Final Zone position...
 	var Client_Zone_Size = Positions.ZoneSizes[0];
-	snDraw.Game.Toast.ToastTop_zone_inner_final = Client_Zone_Size.Top + PlayerZoneProps.ZoneSty.fontsize;	
+	snCore.Toast.ToastTop_zone_inner_final = Client_Zone_Size.Top + PlayerZoneProps.ZoneSty.fontsize;	
 
 	// 5.2 set another Toast max-height parameter using the final word arrangement.
 	var cli_Arrangement_noH = Positions.ArrangementsArray_noH[0];
 	var pzwb = PlayerZoneProps.WordBounds;
-	var cli_Arrangement = snDraw.Game.Words.WordArrangementSetHeight(cli_Arrangement_noH, pzwb, Client_Zone_Size.Top);
+	var cli_Arrangement = snCore.Words.WordArrangementSetHeight(cli_Arrangement_noH, pzwb, Client_Zone_Size.Top);
 	var cli_coords = cli_Arrangement.coords;
 
 	var ToastTop_client_words = 0;
         for(var i = 0; i < cli_coords.length; i++){
 	    ToastTop_client_words = Math.max(ToastTop_client_words, cli_coords[i].top);
         }
-	snDraw.Game.Toast.ToastTop_client_words_final = ToastTop_client_words;
+	snCore.Toast.ToastTop_client_words_final = ToastTop_client_words;
 
 
 	//return the array: [{Top: , Height: }, {}, ...] for all zones
@@ -346,10 +346,10 @@ snDraw.Game.Zones = {
 
 	//generate the fabric objects that represent the new zone. Note that properties left & top are not set
 	//nor are the objects present onf the canvas.
-	var Zone_FabObjs =  snDraw.Game.Zones.CreateZoneBox(Height, ZoneProperties);
-	var Zone_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneProperties.ZoneSty);
-	var Zone_Lefts = snDraw.Game.Zones.DetermineZoneBoxObjectsLefts(0, ZoneProperties.ZoneSty, Zone_FabObjs[1].width);
-	var flex_box_height = snDraw.Game.Zones.DetermineZoneFlexBoxHeight(Height, ZoneProperties.ZoneSty);
+	var Zone_FabObjs =  snCore.Zones.CreateZoneBox(Height, ZoneProperties);
+	var Zone_Tops = snCore.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneProperties.ZoneSty);
+	var Zone_Lefts = snCore.Zones.DetermineZoneBoxObjectsLefts(0, ZoneProperties.ZoneSty, Zone_FabObjs[1].width);
+	var flex_box_height = snCore.Zones.DetermineZoneFlexBoxHeight(Height, ZoneProperties.ZoneSty);
 
 	//for each object making the ZONE, set coordinates and place on canvas...
 	for (var j = 0; j < Zone_FabObjs.length; j++){
@@ -365,8 +365,8 @@ snDraw.Game.Zones = {
 	if(ZoneProperties.isClient){
 	    var spell_Left = Zone_Lefts[6]; 
 	    var spell_Top = Zone_Tops[6];
-	    snDraw.Game.Spell.setSpellPosition(spell_Left, spell_Top, false, null);
-	    snDraw.Game.Spell.redrawResizedSpell();
+	    snCore.Spell.setSpellPosition(spell_Left, spell_Top, false, null);
+	    snCore.Spell.redrawResizedSpell();
 	}
 
 	return Zone_FabObjs;
@@ -395,28 +395,28 @@ snDraw.Game.Zones = {
 	    var offScreen_location = {};
 
 	    if(direction == "left"){
-		offScreen_location.left = BoxObjs[i].left - snDraw.canv_W;
+		offScreen_location.left = BoxObjs[i].left - snCore.Basic.canv_W;
 
 	    }else if(direction == "right"){
-		offScreen_location.left = BoxObjs[i].left + snDraw.canv_W;
+		offScreen_location.left = BoxObjs[i].left + snCore.Basic.canv_W;
 
 	    }else if(direction == "top"){
 		offScreen_location.top = BoxObjs[i].top - (B_Height + B_Top);
 
 	    }else if(direction == "bottom"){
-		offScreen_location.top = BoxObjs[i].top + (snDraw.canv_H - B_Top);
+		offScreen_location.top = BoxObjs[i].top + (snCore.Basic.canv_H - B_Top);
 	    }
 
 	    if(ani_entryexit == "entry"){
 		//this is to statically place object in starting position
 		BoxObjs[i].set(offScreen_location);
 		//this sets it animating
-		snDraw.moveSwitchable(BoxObjs[i], true, ani_sty, onScreen_location);
+		snCore.Basic.moveSwitchable(BoxObjs[i], true, ani_sty, onScreen_location);
 	    }
 	    if(ani_entryexit == "exit"){
 		// it is already in its onScreen location, so only need to make it move off.
 		//with object deletion upon animation completion built in...
-		snDraw.moveSwitchable(BoxObjs[i], function(){canvas.remove(BoxObjs[i]);}, ani_sty, offScreen_location);
+		snCore.Basic.moveSwitchable(BoxObjs[i], function(){canvas.remove(BoxObjs[i]);}, ani_sty, offScreen_location);
 	    }
 	}
 
@@ -424,44 +424,43 @@ snDraw.Game.Zones = {
     },
 
 
-
     repositionZoneAndEnclWordsOnCanvas: function(Zone, WordArrangement_noH, Top, Height, ZoneProperties, ani_sty){
 	// (A) move the items of Zone box itself into their new positions
 	// copy - pasted...
 	var Zone_FabObjs = Zone.Zone_FabObjs;
-	var Zone_Tops = snDraw.Game.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneProperties.ZoneSty);
-	var flex_box_height = snDraw.Game.Zones.DetermineZoneFlexBoxHeight(Height, ZoneProperties.ZoneSty);
+	var Zone_Tops = snCore.Zones.DetermineZoneBoxObjectsTops(Top, Height, ZoneProperties.ZoneSty);
+	var flex_box_height = snCore.Zones.DetermineZoneFlexBoxHeight(Height, ZoneProperties.ZoneSty);
 
 	var B_animation = (ani_sty !== null);
 	// (i) move items actually making up the zone...
 	for (var j = 0; j < Zone_FabObjs.length; j++){
-	    snDraw.moveSwitchable(Zone_FabObjs[j], B_animation, ani_sty,{
+	    snCore.Basic.moveSwitchable(Zone_FabObjs[j], B_animation, ani_sty,{
 		top: Zone_Tops[j]
 	    });
 	}
 	// (ii) change HEIGHT of box outline (Zone_FabObjs[0] the only array item with variable height)
-	snDraw.moveSwitchable(Zone_FabObjs[0], B_animation, ani_sty,{
+	snCore.Basic.moveSwitchable(Zone_FabObjs[0], B_animation, ani_sty,{
 	    height: flex_box_height
 	});
 	// (iii) if client zone, move spell-pointer...
 	if(Zone.is_client){
 	    var spell_Top = Zone_Tops[6];
-	    snDraw.Game.Spell.setSpellPosition(null, spell_Top, true, ani_sty);
+	    snCore.Spell.setSpellPosition(null, spell_Top, true, ani_sty);
 	}
 
 	// (B) move all words within the box into their new positions
 	if(Zone.exists == undefined){// case 1: a player owned-zone
 	    var PID = Zone.player.index;
-	    var WordGroup = snDraw.Game.Words.TileGroupsArray[PID];
+	    var WordGroup = snCore.Words.TileGroupsArray[PID];
 	}else{// case 2: the unclaimed zone
-	    var WordGroup = snDraw.Game.Words.getUnclaimedWordsList("via Grp");
+	    var WordGroup = snCore.Words.getUnclaimedWordsList("via Grp");
 	}
 
 	// (i) move each word to the new location.
 	// whilst (what can only be called a hack) is in place to allow object placement without animation from a former size,
 	// (so that an entry animation can be used instead) in such cases as these, word movement is not desired at all...
 	if(B_animation){
-	    snDraw.Game.Words.MoveWordsIntoArrangement(Top, ZoneProperties.WordBounds, WordGroup, WordArrangement_noH, ani_sty);
+	    snCore.Words.MoveWordsIntoArrangement(Top, ZoneProperties.WordBounds, WordGroup, WordArrangement_noH, ani_sty);
 	}
     },
 

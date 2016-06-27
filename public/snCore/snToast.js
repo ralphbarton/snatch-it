@@ -1,4 +1,4 @@
-snDraw.Game.Toast = {
+snCore.Toast = {
 
     ToastCounter: 0,//create an integer_key for each toast
     ToastRolling: [],//rolling buffer (length up to 3 - tbc) holding the integer_key's for the dictionary above.
@@ -40,21 +40,21 @@ snDraw.Game.Toast = {
 
 	$("#canv-inside").append($NewToast);
 
-	var toast_spacing = snDraw.Game.Tile.dims.ts * 0.18;
+	var toast_spacing = snCore.Tile.dims.ts * 0.18;
 	//Determine the vertical position of the toast (start it at its highest potential position)
-	var ClientZone_Title = snDraw.Game.Zones.PlayerZone[0].Zone_FabObjs[1];
+	var ClientZone_Title = snCore.Zones.PlayerZone[0].Zone_FabObjs[1];
 	var ToastTop_current_client_zone_top = ClientZone_Title.top + ClientZone_Title.height;
-	var Client_Words_Grps = snDraw.Game.Words.TileGroupsArray[client_player_index];
+	var Client_Words_Grps = snCore.Words.TileGroupsArray[client_player_index];
 	var ToastTop_current_client_words = 0;
         for(var i = 0; i < Client_Words_Grps.length; i++){
 	    ToastTop_current_client_words = Math.max(ToastTop_current_client_words, Client_Words_Grps[i].getTop());
         }
 
-	var toast_top = Math.max(this.ToastTop_consumed_words + snDraw.Game.Tile.dims.ts * 1.4,
-				 this.ToastTop_snatched_word + snDraw.Game.Tile.dims.ts * 1.4,
+	var toast_top = Math.max(this.ToastTop_consumed_words + snCore.Tile.dims.ts * 1.4,
+				 this.ToastTop_snatched_word + snCore.Tile.dims.ts * 1.4,
 				 this.ToastTop_zone_inner_final,
-				 this.ToastTop_client_words_final + snDraw.Game.Tile.dims.ts * 1.4,
-				 ToastTop_current_client_words +  snDraw.Game.Tile.dims.ts * 1.4,
+				 this.ToastTop_client_words_final + snCore.Tile.dims.ts * 1.4,
+				 ToastTop_current_client_words +  snCore.Tile.dims.ts * 1.4,
 				 ToastTop_current_client_zone_top);
 	this.reset_ToastTop_params();
 
@@ -86,7 +86,7 @@ snDraw.Game.Toast = {
 	//toasts scaling (there are some more...)
 	//TODO: this styling code which applies to all toasts should be elsewhere
 	// why can't I use jQuery to change the properties of the CSS class universally whilst no objects of that class exist?
-	var ts = snDraw.Game.Tile.dims.ts;
+	var ts = snCore.Tile.dims.ts;
 	$NewToast.css("font-size", (ts*0.35)+"px");
 	$NewToast.css("-moz-border-radius", (ts*0.1)+"px");
 	$NewToast.css("-webkit-border-radius", (ts*0.1)+"px");
@@ -108,7 +108,7 @@ snDraw.Game.Toast = {
 		var crn_cross = $("<div class=\"ToastClose\"></div>").text("×");
 		$NewToast.prepend(crn_cross);
 		crn_cross.click(function(){
-		    snDraw.Game.Toast.setToastRemTimeout(t_key, {instant: true});});
+		    snCore.Toast.setToastRemTimeout(t_key, {instant: true});});
 		// it'll close by itself in a minute...
 		this.setToastRemTimeout(t_key, {duration: 60000});
 		// it will get
@@ -152,11 +152,11 @@ snDraw.Game.Toast = {
 	    setTimeout(function(){
 
 		//find the array index of the toast concerned (by its key)
-		var roll_index = snDraw.Game.Toast.ToastRolling.indexOf(t_key);
+		var roll_index = snCore.Toast.ToastRolling.indexOf(t_key);
 		//remove this toast key from the array: it is GONE!
-		snDraw.Game.Toast.ToastRolling.splice(roll_index, 1);
+		snCore.Toast.ToastRolling.splice(roll_index, 1);
 		$("#"+t_key).remove();
-		snDraw.Game.Toast.Active_byKey[t_key] = false;
+		snCore.Toast.Active_byKey[t_key] = false;
 
 	    }, 400 + 10);//delete 10ms after fade out is complete.
 
@@ -171,7 +171,7 @@ snDraw.Game.Toast = {
     persistent_toast_list_byKey: [],
     clear_all_persistent: function(){
 	$.each(this.persistent_toast_list_byKey, function( index, value ) {
-	    snDraw.Game.Toast.setToastRemTimeout(value, {instant: true});
+	    snCore.Toast.setToastRemTimeout(value, {instant: true});
 	});
     },
 
@@ -207,7 +207,7 @@ snDraw.Game.Toast = {
 		var msg = "There " + sss + partipicants[0] + ", " + partipicants[1] + " and you in this game";
 	    }
 
-	    snDraw.Game.Toast.showToast(msg, {persistent: true});
+	    snCore.Toast.showToast(msg, {persistent: true});
 	}, 20);
     }
 

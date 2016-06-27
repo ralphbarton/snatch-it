@@ -1,4 +1,4 @@
-var Assembler = {
+snCore.Assembler = {
 
     Assemblies: [],
     ASSEMBLE: function(words_consumed, target_tally, words_for_consumption){
@@ -133,7 +133,7 @@ var Assembler = {
 	//determine how many instances of 'letter' are in play (i.e. visible, whether in word or free)
 	for (var i=0; i<tileset.length; i++){
 	    if (tileset[i].status == 'turned'){
-		if(snDraw.Game.Tile.TileArray[i].visual != "animating_in"){
+		if(snCore.Tile.TileArray[i].visual != "animating_in"){
 		    free_letter_array.push(tileset[i].letter);
 		}	    
 	    }
@@ -194,7 +194,7 @@ var Assembler = {
 		word_tally[LETR]--;
 
 		//now find the tile with the required letter in this word
-		var MyWordsTiles = snDraw.Game.Words.TileGroupsArray[player_index][word_index]._objects;
+		var MyWordsTiles = snCore.Words.TileGroupsArray[player_index][word_index]._objects;
 		var k; //index of tile within word
 		var skip_count=0;
 		get_correct_letter_tile_from_word:
@@ -270,7 +270,7 @@ var Assembler = {
 	find_tile_index:
 	for (var i = tileset.length-1; i>=0; i--){
 	    if ((tileset[i].status == 'turned')&&(tileset[i].letter == myletter)){
-		if(snDraw.Game.Tile.TileArray[i].visual != "animating_in"){
+		if(snCore.Tile.TileArray[i].visual != "animating_in"){
 		    if(n_skips == 0){
 			tile_index_matching_letter = i;
 			break find_tile_index;

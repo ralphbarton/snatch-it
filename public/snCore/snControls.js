@@ -1,4 +1,4 @@
-snDraw.Game.Controls = {
+snCore.Controls = {
 
     //member variables
     playersListWindowVisible: false,
@@ -18,11 +18,11 @@ snDraw.Game.Controls = {
     createControls: function(){
 
 	//set the constants
-	this.button_height = snDraw.Game.Tile.dims.ts * 0.7;
-	this.gap_width = snDraw.Game.Tile.dims.ts*0.2;
-	this.button_font_size = Math.min(snDraw.canv_W, snDraw.canv_H * 1.8) * 0.030;//base font size on width, but with a har limit for extreme aspect ratios...
-	this.line_thickness = snDraw.Game.Tile.dims.ts * 0.06;
-	this.corners_rounding = snDraw.Game.Tile.dims.ts * 0.25;
+	this.button_height = snCore.Tile.dims.ts * 0.7;
+	this.gap_width = snCore.Tile.dims.ts*0.2;
+	this.button_font_size = Math.min(snCore.Basic.canv_W, snCore.Basic.canv_H * 1.8) * 0.030;//base font size on width, but with a har limit for extreme aspect ratios...
+	this.line_thickness = snCore.Tile.dims.ts * 0.06;
+	this.corners_rounding = snCore.Tile.dims.ts * 0.25;
 	this.underneath_buttons_px = this.button_height + this.gap_width * 1.5;// 1.5 is a reasonable gap...
 
 	//set the relative widths of the buttons (these numbers are only relative)
@@ -53,7 +53,7 @@ snDraw.Game.Controls = {
 	var N_but = this.button_widths.length;
 	var button_w_px = [];
 	var button_l_px = [this.gap_width/2];
-	var eff_width = snDraw.canv_W - this.line_thickness;
+	var eff_width = snCore.Basic.canv_W - this.line_thickness;
 	for (var i=0; i<N_but; i++){
 	    button_w_px[i] = (eff_width - N_but * this.gap_width) * (this.button_widths[i] / this.button_widths_cumulated[N_but-1]);
 	    button_l_px[i+1] = button_l_px[i] + this.gap_width + button_w_px[i] ;
@@ -114,10 +114,10 @@ snDraw.Game.Controls = {
 	//Function to add the little box which labels the button with its keyboard shortcut key.	
 	var draw_boxed_label = function(ll, size, myleft){
 
-	    var kl_top = snDraw.Game.Controls.button_height * 0.15;
+	    var kl_top = snCore.Controls.button_height * 0.15;
 	    var key_letter = new fabric.Text(ll, {
 		top: kl_top,
-		left: (myleft + snDraw.Game.Controls.line_thickness),
+		left: (myleft + snCore.Controls.line_thickness),
 		fill: 'black',
 		fontWeight: 'bold',
 		fontSize: size 
@@ -129,7 +129,7 @@ snDraw.Game.Controls = {
 		fill: '#CCC',
 		stroke: 'black',
 		strokeWidth: 1,
-		width: (key_letter.getWidth() + 2*snDraw.Game.Controls.line_thickness),
+		width: (key_letter.getWidth() + 2*snCore.Controls.line_thickness),
 		height: size
 	    });
 	    
@@ -289,7 +289,7 @@ snDraw.Game.Controls = {
 	    }
 
 	}
-	snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+	snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
     },
 
     turnDisabled_dur: undefined,
@@ -315,7 +315,7 @@ snDraw.Game.Controls = {
 
 	    //todo: this values ought only be calculated once as they are constant w.r.t. a game instance
 
-	    var corners_r = snDraw.Game.Tile.dims.ts * 0.12;
+	    var corners_r = snCore.Tile.dims.ts * 0.12;
 
 	    //the exact number of pixels of perimeter of rounded cornered rectangle (test by making the 1.0 slightly smaller!)
 	    var l_tot = ((RoundedRec.getWidth() + RoundedRec.getHeight()) * 2 + 2*corners_r*(Math.PI-4.0))* 1.0;
@@ -325,17 +325,17 @@ snDraw.Game.Controls = {
 	    RoundedRec.setStrokeDashArray([0, l_tot]);
 
 	    this.cancelTurnDisabled=false;
-	    snDraw.FrameTargetsArray.push({
+	    snCore.Basic.FrameTargetsArray.push({
 		frame: function(){
 		    var time_now = (new Date()).getTime();
-		    var time_start = snDraw.Game.Controls.turnDisabled_start;
-		    var progress_fraction = (time_now - time_start) / (1000 * snDraw.Game.Controls.turnDisabled_dur);
+		    var time_start = snCore.Controls.turnDisabled_start;
+		    var progress_fraction = (time_now - time_start) / (1000 * snCore.Controls.turnDisabled_dur);
 		    var solid_len = progress_fraction * l_tot;
 		    RoundedRec.setStrokeDashArray([solid_len, l_tot-solid_len]);
-		    if((progress_fraction>=1)||(snDraw.Game.Controls.cancelTurnDisabled)){//animation completed...
+		    if((progress_fraction>=1)||(snCore.Controls.cancelTurnDisabled)){//animation completed...
 			//restore the visual state of the button to normal
 			RoundedRec.setStrokeDashArray(null);
-			snDraw.Game.Controls.setButtonDisabled(1, false);//un-disable the "Turn Letter" button
+			snCore.Controls.setButtonDisabled(1, false);//un-disable the "Turn Letter" button
 			return true; //this means the function call chain shall terminate
 		    }else{
 			return false; // function call chain to continue
@@ -378,7 +378,7 @@ snDraw.Game.Controls = {
 
 	    if(this.turn_tk != undefined){
 		//the "turn" toast is already on-screen. Extent its timeout
-		snDraw.Game.Toast.setToastRemTimeout(this.turn_tk);
+		snCore.Toast.setToastRemTimeout(this.turn_tk);
 
 		//here is also the opportunity for boldening the message!!
 		if(this.bolden_counter == 1){
@@ -389,15 +389,15 @@ snDraw.Game.Controls = {
 
 	    }else{//create the new Toast
 		var toast_str = "<span id=\"q12\">[x.x]</span> seconds until you can turn another letter";
-		this.turn_tk = snDraw.Game.Toast.showToast(toast_str);
+		this.turn_tk = snCore.Toast.showToast(toast_str);
 		this.bolden_counter = 0;
 	    }
 	    this.bolden_counter++;
 
 	    //in all cases, Toast contents need to update...
 	    function toast_time_updater (){
-		var date_start = snDraw.Game.Controls.turnDisabled_start;
-		var time_dur = snDraw.Game.Controls.turnDisabled_dur;
+		var date_start = snCore.Controls.turnDisabled_start;
+		var time_dur = snCore.Controls.turnDisabled_dur;
 		var date_now = new Date();
 		
 		var time_remaining = Math.max(time_dur - (date_now - date_start)/1000, 0);
@@ -407,17 +407,17 @@ snDraw.Game.Controls = {
 
 		$("#q12").html(time_remaining);
 
-		var t_active = snDraw.Game.Toast.Active_byKey[snDraw.Game.Controls.turn_tk];
+		var t_active = snCore.Toast.Active_byKey[snCore.Controls.turn_tk];
 		if (time_remaining == 0){
-		    snDraw.Game.Toast.setToastRemTimeout(snDraw.Game.Controls.turn_tk, {instant: true});//the true means clear fast...
+		    snCore.Toast.setToastRemTimeout(snCore.Controls.turn_tk, {instant: true});//the true means clear fast...
 		    // to not hold a reference to a now deleted toast.
-		    snDraw.Game.Controls.turn_tk = undefined;
+		    snCore.Controls.turn_tk = undefined;
 		}else if(t_active){
 		    //recursive call...
 		    setTimeout(toast_time_updater, 1000/ndo);
 		}else{
 		    // to not hold a reference to a now deleted toast.
-		    snDraw.Game.Controls.turn_tk = undefined;
+		    snCore.Controls.turn_tk = undefined;
 		}
 	    };
 
@@ -431,13 +431,13 @@ snDraw.Game.Controls = {
 		TILE_TURN_REQUEST(); //request another tile...
 	    }else{
 		this.client_finished_game = true;
-		snDraw.Game.Popup.openModal("scores");
+		snCore.Popup.openModal("scores");
 		//set text
 		var TurnButton = this.Button_Objs[1];
 		TurnButton.item(1).setText("Exit");
 	    }
 	}else{//this is after the client has clicked "finish", and button text is now "Exit"
-	    snDraw.Game.Popup.gotoHomePage();
+	    snCore.Popup.gotoHomePage();
 	}
     }
 };

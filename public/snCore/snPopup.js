@@ -1,4 +1,4 @@
-snDraw.Game.Popup = {
+snCore.Popup = {
 
     //Properties of this class...
     popup_in_foreground: false,
@@ -8,7 +8,7 @@ snDraw.Game.Popup = {
     calcModalScale: function(){
 	
 	//things that scale with the Tile Size
-	var ts = Math.round(snDraw.Game.Tile.stdDimention);
+	var ts = Math.round(snCore.Tile.stdDimention);
 	var cr = ts * 0.30; // corner radius
 	var fsz = ts * 0.50; // master font size
 
@@ -17,7 +17,7 @@ snDraw.Game.Popup = {
 	$("#modal-content").css("border-radius", cr+"px");
 	$("#modal-header").css("border-radius", cr+"px "+cr+"px 0 0");
 	$("#modal-footer").css("border-radius", "0 0 "+cr+"px "+cr+"px");
-	$("#modal-body").css("max-height", snDraw.canv_H * 0.8+"px");
+	$("#modal-body").css("max-height", snCore.Basic.canv_H * 0.8+"px");
 
 	//change the scale associated with those words with a black haze.
 	$('.blacken').css({"text-shadow":"0px 0px "+fsz*0.05+"px black, 0px 0px "+fsz*0.1+"px black"});
@@ -101,7 +101,7 @@ snDraw.Game.Popup = {
 	    
 	    Title = "Players";
 	    Body = "modal-body-scores-table";
-	    Footer = snDraw.Game.Controls.client_finished_game ? "modal-footer-close-replay" : "modal-footer-simple-close"; 
+	    Footer = snCore.Controls.client_finished_game ? "modal-footer-close-replay" : "modal-footer-simple-close"; 
 
 	    // dynamically change content by regenerating the scores table...
 	    $("#modal-body-scores-table").html(this.generate_scores_table_html_element());
@@ -123,7 +123,7 @@ snDraw.Game.Popup = {
 
 	    //dynamic.
 	    function update_latency_html(){
-		var L = get_max_latency();
+		var L = snCore.Latency.GetTimeCurrentlyWaited();
 
 		switch(L.m_key) {
 		case "turn":
@@ -140,7 +140,7 @@ snDraw.Game.Popup = {
 		} 
 
 		$("#connection-latency").html(L.latency.toFixed(0));
-		snDraw.Game.Popup.modal_content_updater_timeout = setTimeout(update_latency_html, 1000);
+		snCore.Popup.modal_content_updater_timeout = setTimeout(update_latency_html, 1000);
 	    }
 	    update_latency_html();//herby start the chain...	    
 
@@ -183,14 +183,14 @@ snDraw.Game.Popup = {
 	setTimeout(function(){
 	    ds.onclick = function(event) {
 		if (event.target == ds) {
-		    snDraw.Game.Popup.hideModal();
+		    snCore.Popup.hideModal();
 		}
 	    };
 	}, 500);
 
 	// 3. the x button closes the window...
 	document.getElementById("close").onclick = function() {
-	    snDraw.Game.Popup.hideModal();
+	    snCore.Popup.hideModal();
 	};
 
 	// 4. set the scale correctly:

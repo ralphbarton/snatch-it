@@ -1,0 +1,8 @@
+/* For the game page... i.e. make the canvas fullscreen */
+#pin, #key{
+    display: none;
+}
+
+#canv-inside{
+    display: block; /* Show, initially*/
+}

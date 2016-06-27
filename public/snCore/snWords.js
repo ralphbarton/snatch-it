@@ -1,4 +1,4 @@
-snDraw.Game.Words = {
+snCore.Words = {
 
     //member objects
     TileGroupsArray: [],
@@ -11,7 +11,7 @@ snDraw.Game.Words = {
 
 	//move all words to those coordinates.
 	for (var i = 0; i < WordArray.length; i++){//this will run through the words to move...
-	    snDraw.moveSwitchable(WordArray[i], b_animate, snDraw.ani.sty_Resize, myArrangement.coords[i]);
+	    snCore.Basic.moveSwitchable(WordArray[i], b_animate, snCore.Basic.ani.sty_Resize, myArrangement.coords[i]);
 	}
 
 	//this last bit is just to provide the drawing-coordinates for next word...
@@ -30,18 +30,18 @@ snDraw.Game.Words = {
 	// The first excludes and animating new word which isn't yet formed into a Group.
 	var B_animation = (ani_sty != null);
 	for (var i = 0; i < WordGroup.length; i++){
-	    snDraw.moveSwitchable(WordGroup[i], B_animation, ani_sty, Arrangement.coords[i]);
+	    snCore.Basic.moveSwitchable(WordGroup[i], B_animation, ani_sty, Arrangement.coords[i]);
 	    // aggressively bring words to front, which ensures all clicks land on them (as well as aesthetic)
 	    WordGroup[i].bringToFront();
 	}
     },
 
     AnimateWordCapture: function(player_index, word_index, Coords){
-	var Spacings = snDraw.Game.Tile.dims;
+	var Spacings = snCore.Tile.dims;
 	var word_length = players[player_index].words[word_index].length;
 	var w_width_px = this.word_width_px(word_length, Spacings);
 	
-	var ZoneProperties = snDraw.Game.Zones.getZoneProperties("player");
+	var ZoneProperties = snCore.Zones.getZoneProperties("player");
 	var wrapCoords = this.wordTilesWrap(Coords, ZoneProperties.WordBounds, Spacings, w_width_px);
 	if(wrapCoords){
 	    Coords = wrapCoords;
@@ -51,23 +51,23 @@ snDraw.Game.Words = {
 
 	var TargetCoords_clone = {left: Coords.left, top: Coords.top};
 	var onComplete_groupLetters = function(){
-	    var WordGrp = snDraw.Game.Words.WordAsTileGroupAtOrigin(player_index, word_index, false, Spacings);
+	    var WordGrp = snCore.Words.WordAsTileGroupAtOrigin(player_index, word_index, false, Spacings);
 	    //move into position...
 	    // remember, one of the benefits of this 'moveSwitchable' function is to remove/re-add for D&D zone behaviour
-	    snDraw.moveSwitchable(WordGrp, false, null, TargetCoords_clone);
+	    snCore.Basic.moveSwitchable(WordGrp, false, null, TargetCoords_clone);
 	};
 
 	var waveAnimateContext_WordTA = function (i){
 	    
 	    var TID = word_by_TIDs[i];
-	    var ThisTile = snDraw.Game.Tile.TileArray[TID];
+	    var ThisTile = snCore.Tile.TileArray[TID];
 	    var my_animate_onComplete = (i == word_length-1) ? onComplete_groupLetters : true;
-	    snDraw.moveSwitchable(ThisTile, my_animate_onComplete, snDraw.ani.sty_Sing, Coords);
+	    snCore.Basic.moveSwitchable(ThisTile, my_animate_onComplete, snCore.Basic.ani.sty_Sing, Coords);
 	    Coords.left += Spacings.tslg; 
 
 	    i++;
 	    if(i < word_length){
-		setTimeout(function(){waveAnimateContext_WordTA(i);}, snDraw.ani.sty_Sing.duration * 0.3);
+		setTimeout(function(){waveAnimateContext_WordTA(i);}, snCore.Basic.ani.sty_Sing.duration * 0.3);
 	    }
 	};
 	waveAnimateContext_WordTA(0);
@@ -84,9 +84,9 @@ snDraw.Game.Words = {
 
 	    var TID = word_by_TIDs[k];
 	    if(B_create_tiles){
-		var TileObject = snDraw.Game.Tile.generateTileObject(tileset[TID], TID);
+		var TileObject = snCore.Tile.generateTileObject(tileset[TID], TID);
 	    }else{
-		var TileObject = snDraw.Game.Tile.TileArray[TID];
+		var TileObject = snCore.Tile.TileArray[TID];
 	    }
 	    canvas.remove(TileObject);
 	    WordTileArray.push(TileObject);
@@ -109,7 +109,7 @@ snDraw.Game.Words = {
 
 	//Global references forwards and backwards
 	WordGRP.OwnerPlayer = players[player_index];
-	snDraw.Game.Words.TileGroupsArray[player_index].push(WordGRP);
+	snCore.Words.TileGroupsArray[player_index].push(WordGRP);
 	return WordGRP;
     },
 
@@ -219,13 +219,13 @@ snDraw.Game.Words = {
 
 	var VARIANT_unclaimed_words_list = [];
 
-	for (var i = 0; i < snDraw.Game.Zones.Unclaimed.playerslist.length; i++){
+	for (var i = 0; i < snCore.Zones.Unclaimed.playerslist.length; i++){
 
-	    var player_i = snDraw.Game.Zones.Unclaimed.playerslist[i];
+	    var player_i = snCore.Zones.Unclaimed.playerslist[i];
 	    var VARIANT_unclaimed_words_chunk = undefined;
 
 	    if (TYPE_DIRECTIVE == "via Grp"){
-		VARIANT_unclaimed_words_chunk = snDraw.Game.Words.TileGroupsArray[player_i.index]; 
+		VARIANT_unclaimed_words_chunk = snCore.Words.TileGroupsArray[player_i.index]; 
 
 	    }else if(TYPE_DIRECTIVE == "via TID"){
 		VARIANT_unclaimed_words_chunk = player_i.words;

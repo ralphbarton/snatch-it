@@ -1,9 +1,4 @@
-//this is all drawing stuff, common to the entire mini App
-
-var canvas = undefined;//OK let's at least keep the canvas object as a global...
-
-
-var snDraw = {
+snCore.Basic = {
 
     //member variables (native types)
     //todo: either delete this non-global data or replace all the global references in the code with this
@@ -12,10 +7,6 @@ var snDraw = {
 
     frameperiod_measured: undefined,
     
-    //required due to legacy structuring:
-    Game: {},
-
-
     //for animation
     FrameTargetsArray: [],
 
@@ -46,18 +37,6 @@ var snDraw = {
 	    duration: 1000
 	}
     },
-    
-    //methods
-    initialiseCanvas: function(){
-	// Obtain a canvas drawing surface from fabric.js
-	canvas = new fabric.Canvas('c');
-	
-	//we don't want to select a group of objects with the mouse
-	canvas.selection = false;
-	//speedup?
-	canvas.renderOnAddRemove = false;
-	canvas.stateful = false;
-    },
 
     makeCanvasFitWholeWindow: function(){
 	//take the window dimentions at time of page load, and use these to draw on
@@ -86,7 +65,7 @@ var snDraw = {
 
 	if((this.FrameTargetsArray.length>0)||(this.nAnimations>0)||(this.literal_frame_countdown>0)){
 	    //this may not guarentee a recursive call, which may cause animation bugs where frames aren't drawn?
-	    window.requestAnimationFrame(function(){snDraw.startScreenFrameDrawing();});
+	    window.requestAnimationFrame(function(){snCore.Basic.startScreenFrameDrawing();});
 	    this.animation_frame_requests_exist = true;
 	}
     },
@@ -127,11 +106,11 @@ animation_style
 	if(typeof(animate_onComplete)=='function'){//a custom on-complete function has been supplied
 	    my_onComplete = function(){
 		animate_onComplete();
-		snDraw.animation_completed();
+		snCore.Basic.animation_completed();
 	    };
 	}else if(animate_onComplete === true){
 	    my_onComplete = function(){
-		snDraw.animation_completed();
+		snCore.Basic.animation_completed();
 	    };
 	}
 
@@ -144,7 +123,7 @@ animation_style
 	    //these two lines are the trick for ensuring click detection zones are moved...
 	    canvas.remove(FabricObject);
 	    canvas.add(FabricObject);
-	    snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+	    snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
 	}
     },
 

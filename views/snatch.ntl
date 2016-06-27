@@ -26,24 +26,24 @@
     <script src="snatch_files/common.js"></script>
 
     <!-- JS files specific to Snatch game -->
-    <script src="snatch_files/snatch-client.js"></script>
-    <script src="snatch_files/snatch-message-latency.js"></script>
+    <script src="snCore/snatch-client.js"></script>
 
-    <script src="snatch_files/snDraw.js"></script>
-    <script src="snatch_files/snDraw-Game-Controls.js"></script>
-    <script src="snatch_files/snDraw-Game-DefineWord.js"></script>
-    <script src="snatch_files/snDraw-Game-Event.js"></script>
-    <script src="snatch_files/snDraw-Game-Grid.js"></script>
-    <script src="snatch_files/snDraw-Game-Keyboard.js"></script>
-    <script src="snatch_files/snDraw-Game-Mouse.js"></script>
-    <script src="snatch_files/snDraw-Game-Popup.js"></script>
-    <script src="snatch_files/snDraw-Game-Spell.js"></script>
-    <script src="snatch_files/snDraw-Game-Toast.js"></script>
-    <script src="snatch_files/snDraw-Game-Tile.js"></script>
-    <script src="snatch_files/snDraw-Game-Words.js"></script>
-    <script src="snatch_files/snDraw-Game-Zones.js"></script>
-    <script src="snatch_files/snDraw-Splash.js"></script>
-    <script src="snatch_files/snatch-assembler.js"></script>
+    <script src="snCore/snAssembler.js"></script>
+    <script src="snCore/snBasic.js"></script>
+    <script src="snCore/snControls.js"></script>
+    <script src="snCore/snDefineWord.js"></script>
+    <script src="snCore/snEvent.js"></script>
+    <script src="snCore/snGrid.js"></script>
+    <script src="snCore/snKeyboard.js"></script>
+    <script src="snCore/snLatency.js"></script>
+    <script src="snCore/snMouse.js"></script>
+    <script src="snCore/snPopup.js"></script>
+    <script src="snCore/snSpell.js"></script>
+    <script src="snCore/snSplash.js"></script>
+    <script src="snCore/snTile.js"></script>
+    <script src="snCore/snToast.js"></script>
+    <script src="snCore/snWords.js"></script>
+    <script src="snCore/snZones.js"></script>
 
   </head>
 
@@ -85,8 +85,8 @@
 	  <div id="modal-body-options-menu">
 
 	    <p class="p-button-center">
-	      <a class="button gray alt" href="#" onclick="snDraw.Game.Popup.openModal('rules')">See Instructions</a>
-	      <a class="button gray alt" href="#" onclick="snDraw.Game.Popup.gotoHomePage()">Leave this Game</a>
+	      <a class="button gray alt" href="#" onclick="snCore.Popup.openModal('rules')">See Instructions</a>
+	      <a class="button gray alt" href="#" onclick="snCore.Popup.gotoHomePage()">Leave this Game</a>
 	    </p> 
 
 	    <div id="copyable-container">
@@ -126,18 +126,18 @@
 	    </div>
 
 	    <p> 
-      <input type="checkbox" name="uOpt_challenge" id="uOpt_challenge" onclick="snDraw.Game.Popup.sendSettingChange()"/>
+      <input type="checkbox" name="uOpt_challenge" id="uOpt_challenge" onclick="snCore.Popup.sendSettingChange()"/>
 	      <label for="uOpt_challenge">Enable Challenge feature on word meaning</label>
 	    </p>
 
 	    <p> 
-	      <input type="checkbox" name="uOpt_stem" id="uOpt_stem" onclick="snDraw.Game.Popup.sendSettingChange()"/>
+	      <input type="checkbox" name="uOpt_stem" id="uOpt_stem" onclick="snCore.Popup.sendSettingChange()"/>
 	      <label for="uOpt_stem">Enforce stem-change rule</label>
 	    </p>
 
 	    <p> 
 	      Turns rule
-	      <select id="uOpt_turns" onchange="snDraw.Game.Popup.sendSettingChange()">
+	      <select id="uOpt_turns" onchange="snCore.Popup.sendSettingChange()">
 		<option>Stricly rotating</option>
 		<option>Individual timouts</option>
 		<option>5 second letter spew</option>
@@ -147,13 +147,13 @@
 	    </p> 
 
 	    <p>
-	      <input type="checkbox" name="uOpt_flippy" id="uOpt_flippy" onclick="snDraw.Game.Popup.sendSettingChange()"/>
+	      <input type="checkbox" name="uOpt_flippy" id="uOpt_flippy" onclick="snCore.Popup.sendSettingChange()"/>
 	      <label for="uOpt_flippy">Double flip-upon snatch rule</label>
 	    </p>
 
 	    <p> 
 	      Dictionary
-	      <select id="uOpt_dictionary" onclick="snDraw.Game.Popup.sendSettingChange()">
+	      <select id="uOpt_dictionary" onclick="snCore.Popup.sendSettingChange()">
 		<option>None</option>
 		<option>Sowpods</option>
 		<option>Top 60k words</option>
@@ -161,7 +161,7 @@
 	    </p>
 
 	    <p> 
-	      <input type="checkbox" name="uOpt_penalty" id="uOpt_penalty" onclick="snDraw.Game.Popup.sendSettingChange()"/>
+	      <input type="checkbox" name="uOpt_penalty" id="uOpt_penalty" onclick="snCore.Popup.sendSettingChange()"/>
 	      <label for="uOpt_penalty">Apply penalty for words not in dictionary</label>
 	    </p>
 
@@ -325,19 +325,19 @@
 
 	  <!-- 6.1. Footer for options menu -->
 	  <div id="modal-footer-simple-close">
-	    <a class="modal" href="#" onclick="snDraw.Game.Popup.hideModal()">Close</a>
+	    <a class="modal" href="#" onclick="snCore.Popup.hideModal()">Close</a>
 	  </div>	  
 
 	  <!-- 6.2. Footer for Connection lost -->
 	  <div id="modal-footer-rejoin">
-	    <a class="modal" href="#" onclick="snDraw.Game.Popup.hideModal()">Wait</a>
+	    <a class="modal" href="#" onclick="snCore.Popup.hideModal()">Wait</a>
 	    | <a class="modal" href="#" onclick="location.reload()">Rejoin</a>
 	  </div>
 
 	  <!-- 6.2. Footer for Game finished -->
 	  <div id="modal-footer-close-replay">
-	    <a class="modal" href="#" onclick="snDraw.Game.Popup.hideModal()">Close</a>
-	    | <a class="modal" href="#" onclick="snDraw.Game.Popup.gotoHomePage()">Another Game</a>
+	    <a class="modal" href="#" onclick="snCore.Popup.hideModal()">Close</a>
+	    | <a class="modal" href="#" onclick="snCore.Popup.gotoHomePage()">Another Game</a>
 	  </div>
 
 	</div>

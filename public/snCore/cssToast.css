@@ -1,0 +1,85 @@
+/* 4. TOASTS styling */
+
+.ToastGrey {
+    -moz-box-shadow:inset 0px -3px 7px 0px #545454;
+    -webkit-box-shadow:inset 0px -3px 7px 0px #545454;
+    box-shadow:inset 0px -3px 7px 0px #545454;
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #38444a), color-stop(1, #1d2329));
+    background:-moz-linear-gradient(top, #38444a 5%, #1d2329 100%);
+    background:-webkit-linear-gradient(top, #38444a 5%, #1d2329 100%);
+    background:-o-linear-gradient(top, #38444a 5%, #1d2329 100%);
+    background:-ms-linear-gradient(top, #38444a 5%, #1d2329 100%);
+    background:linear-gradient(to bottom, #38444a 5%, #1d2329 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#38444a', endColorstr='#1d2329',GradientType=0);
+    background-color:#38444a;
+    border:1px solid #0b0e07;
+    display:inline-block;
+    cursor:pointer;
+    color:#fff045;
+    font-family:Arial;
+    padding:7px 15px;
+    text-decoration:none;
+    text-shadow:1px 1px 1px #000000;
+}
+
+.ToastCentral {
+    position: absolute;
+    width: 62%;
+    left: 15%;
+}
+
+.ToastIn {
+    -webkit-animation-name: fadein;
+    -webkit-animation-duration: 0.4s;
+    animation-name: fadein;
+    animation-duration: 0.4s
+}
+
+.ToastOut {
+    opacity: 0;
+    -webkit-animation-name: fadeout;
+    -webkit-animation-duration: 0.4s;
+    animation-name: fadeout;
+    animation-duration: 0.4s
+}
+
+.ToastClose {/* The Close X */
+    top: -10px;
+    right: -10px;
+    position: relative;
+    color: white;
+    float: right;
+    font-size: 150%;
+    font-weight: bold;
+}
+
+.ToastClose:hover,
+.ToastClose:focus {
+    color: red;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+
+
+/* Add Animation */
+@-webkit-keyframes fadein {
+    from {opacity:0} 
+    to {opacity:1}
+}
+
+@keyframes fadein {
+    from {opacity:0}
+    to {opacity:1}
+}
+
+@-webkit-keyframes fadeout {
+    from {opacity:1} 
+    to {opacity:0}
+}
+
+@keyframes fadeout {
+    from {opacity:1}
+    to {opacity:0}
+}

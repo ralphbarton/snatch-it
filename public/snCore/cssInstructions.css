@@ -1,0 +1,85 @@
+/* 5. Instructions styling */
+.rules-container {
+    width: 600px;
+    height: 495px;
+    margin-bottom:30px;
+}
+
+.rules-cell {
+    font-size: 12pt;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: left;
+    width: 600px;
+    height: 495px;
+    padding: 3px 65px;
+}
+
+.rutxt-tile{
+    border-radius: 5px;
+    background-color: #6EADF5;
+    padding: 1px;
+    color: yellow;
+    display: inline-block;
+    height: 24px;
+    width: 22px;
+    font-weight: bold;
+    border: 2px solid #555;
+    text-align: center;
+}
+
+.rutxt-word{
+    white-space: nowrap; 
+    background-color: black;
+    padding: 3px 2px;
+    box-shadow: 0px 0px 5px 1px #000;
+}
+
+.rutxt-list{
+    font-weight: bold;
+}
+
+.rutxt-h1{
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.rutxt-italic-bold{
+    font-weight: bold;
+    font-style: italic;
+    color: #004359;
+}
+
+li {
+    padding-bottom: 10px;
+}
+
+.rutxt-list-item{
+    font-weight: normal;
+    padding-bottom: 5px;
+}
+
+.rutxt-button{
+    border-radius: 10px;
+    background-color: #AAA;
+    padding: 0px 12px;
+    color: black;
+    display: inline-block;
+    font-weight: bold;
+    font-family: "Times New Roman", Times, serif;
+    border: 2px solid #FFF;
+    text-align: center;
+    box-shadow: 0px 0px 5px 1px #000;
+    white-space: nowrap; 
+}
+
+.rutxt-key{
+    border-radius: 3px;
+    background-color: #EEE;
+    padding: 3px;
+    display: inline-block;
+    font-weight: bold;
+    font-family: "Lucida Sans Unicode","Lucida Grande",sans-serif;
+    text-align: center;
+     font-size: 75%;
+     color: #910000;
+}

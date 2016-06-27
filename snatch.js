@@ -121,7 +121,7 @@ app.get('/sowpods-rsubset/*', function(req, res){
 
 //route 1 - no path...
 app.get('/', function(req, res){
-    res.sendFile(__dirname + '/public/snatch_files/home.html');
+    res.render('home', {identity_html: "<home-page-was-requested>"});
 });
 
 
@@ -154,7 +154,7 @@ app.get('/join=*', function (req, res) {
 	access_room(valid_pin);//extend time out due to link usage.
     }else{
 	console.log(identity_supplied + ' was not detected as a valid game identity. Homepage served instead');
-	res.sendFile(__dirname + '/public/snatch_files/home.html');
+	res.render('home', {identity_html: "<invalid-game-join-identity>"});
     }
 });
 

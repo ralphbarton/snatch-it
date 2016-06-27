@@ -21,6 +21,8 @@
   </head>
 
   <body>
+    <!-- 0. This page does not NEED identifying via this template. But may be useful for presenting an error message -->
+    #identity-html#
 
     <!-- 1. Landing page -->
     <div class="page" id="page1">

@@ -1,4 +1,4 @@
-snDraw.Game.Keyboard = {
+snCore.Keyboard = {
     
     secretCode: "99FROGS99",
     codeCounter: 0,
@@ -31,7 +31,7 @@ snDraw.Game.Keyboard = {
 	    this.codeCounter2++;
 	    if(this.codeCounter2 == this.secretCode2.length){
 		//the whole code was entered!!
-		snDraw.Game.Toast.showToast("Secret code entered shall now flip 25 tiles");
+		snCore.Toast.showToast("Secret code entered shall now flip 25 tiles");
 		TURN_MANY_TILES(25);
 		this.codeCounter2 = 0;
 	    }
@@ -40,53 +40,53 @@ snDraw.Game.Keyboard = {
 	}
 
 	//Keystroke is a user-active eveny. Clear Persistent Toasts
-	snDraw.Game.Toast.clear_all_persistent();
+	snCore.Toast.clear_all_persistent();
 
-	if(snDraw.Game.Popup.popup_in_foreground){
-	    if(snDraw.Game.Popup.popup_in_foreground == "rules"){
+	if(snCore.Popup.popup_in_foreground){
+	    if(snCore.Popup.popup_in_foreground == "rules"){
 		if(myKeycode == 37){//left
 		    flkty.previous();
 		}else if(myKeycode == 39){//right
 		    flkty.next();
 		}else{
-		    snDraw.Game.Popup.hideModal();
+		    snCore.Popup.hideModal();
 		}
 	    }else{
-		snDraw.Game.Popup.hideModal();   
+		snCore.Popup.hideModal();   
 	    }
 
 	}else{
 	    if( (myKeycode >= 65) && (myKeycode <= 90) ){//any letter key
-		snDraw.Game.Spell.addLetter(keyPressed); 
+		snCore.Spell.addLetter(keyPressed); 
 	    }
 
 	    if(myKeycode == 32){//space bar
-		snDraw.Game.Controls.turnLetterClickHandler();
+		snCore.Controls.turnLetterClickHandler();
 	    }
 
 	    if((myKeycode == 8)||(keyPressed == '5')){//delete key
 		// let this be remove the final letter of the spell (if present)
-		snDraw.Game.Spell.removeLetter();
+		snCore.Spell.removeLetter();
 	    }
 
 	    if((myKeycode == 13)||(keyPressed == '3')){//enter key
 		// let this be submit word
-		snDraw.Game.Spell.SubmitWord();
+		snCore.Spell.SubmitWord();
 	    }
 
 	    if((myKeycode == 27)||(keyPressed == '1')){//escape key or number 1
 		// let this be cancel word
-		snDraw.Game.Spell.CancelWord();
+		snCore.Spell.CancelWord();
 		//also removes score window if present...
-		snDraw.Game.Popup.hideModal();
+		snCore.Popup.hideModal();
 	    }
 
 	    if(keyPressed == '2'){
-		snDraw.Game.Controls.turnLetterClickHandler();
+		snCore.Controls.turnLetterClickHandler();
 	    }
 
 	    if(keyPressed == '4'){
-		snDraw.Game.Popup.openModal("scores");
+		snCore.Popup.openModal("scores");
 	    }
 
 	    if(keyPressed == '8'){

@@ -1,4 +1,4 @@
-snDraw.Game.Grid = {
+snCore.Grid = {
 
     //member objects
     TileGrid: undefined,
@@ -11,12 +11,12 @@ snDraw.Game.Grid = {
 
 	// 'Spacings.grpad' refers to minimum padding to left and right of the grid
 	// 'Spacings.tsgg' is tile size plus grid gap
-	this.n_tiles_row = Math.floor( (snDraw.canv_W - 2*Spacings.grpad) / Spacings.tsgg );
+	this.n_tiles_row = Math.floor( (snCore.Basic.canv_W - 2*Spacings.grpad) / Spacings.tsgg );
 	var width_used = (this.n_tiles_row-1) * Spacings.tsgg + Spacings.ts;
-	var left_pad = (snDraw.canv_W-width_used)/2;
+	var left_pad = (snCore.Basic.canv_W-width_used)/2;
 
 	this.xGridOrigin = left_pad;
-	this.yGridOrigin = snDraw.Game.Controls.underneath_buttons_px;
+	this.yGridOrigin = snCore.Controls.underneath_buttons_px;
 	this.xy_incr = Spacings.tsgg;
 	
 	//clear any old version of the grid...
@@ -78,7 +78,7 @@ snDraw.Game.Grid = {
 	    }
 	}
 	var bottomLeft = this.RCgridPx({row:(row_count-1), col:0})
-	return bottomLeft.top + snDraw.Game.Tile.dims.ts;
+	return bottomLeft.top + snCore.Tile.dims.ts;
     },
 
     DetachLetterSetFromGrid: function(tileIDs, ani_sty){
@@ -87,7 +87,7 @@ snDraw.Game.Grid = {
 	//it is an array of tiles supplied...
 	for (var i=0; i<tileIDs.length; i++){
 	    var TID = tileIDs[i];
-	    var TileObj = snDraw.Game.Tile.TileArray[TID];
+	    var TileObj = snCore.Tile.TileArray[TID];
 	    //if present, remove references (i.e. follow the tile's reference to its grid location)
 	    if((TileObj.Grid_row !== null)&&(TileObj.Grid_row !== undefined)){
 		this.TileGrid[TileObj.Grid_row][TileObj.Grid_col] = null;//now nullify forward ref
@@ -119,7 +119,7 @@ snDraw.Game.Grid = {
 
     PlaceTileInGrid: function(tile_index, gridRC, ani_oC, ani_sty){
 
-	var TileObject = snDraw.Game.Tile.TileArray[tile_index];
+	var TileObject = snCore.Tile.TileArray[tile_index];
 
 	//update the GRID -> TILE references
 	//only happens if tile already on grid.
@@ -131,7 +131,7 @@ snDraw.Game.Grid = {
 	TileObject.Grid_col = gridRC.col;
 
 	//move the tile object to the canvas location identified
-	snDraw.moveSwitchable(TileObject, ani_oC, ani_sty, this.RCgridPx(gridRC));
+	snCore.Basic.moveSwitchable(TileObject, ani_oC, ani_sty, this.RCgridPx(gridRC));
     },
 
     RCgridPx: function(gridRC){

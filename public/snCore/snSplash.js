@@ -1,4 +1,4 @@
-snDraw.Splash = {
+snCore.Splash = {
 
     player_name: null,
     myFiveColors: undefined,
@@ -20,8 +20,8 @@ snDraw.Splash = {
 	//the fact that this checks for clicks landing on objects that don't yet exist doesn't matter
 	this.addKBmouseListeners();
 
-	var ts_px = snDraw.canv_W * 0.060;
-	var approx_1px = snDraw.canv_W / 500;
+	var ts_px = snCore.Basic.canv_W * 0.060;
+	var approx_1px = snCore.Basic.canv_W / 500;
 
 	this.textObject_main = new fabric.Text("", {
 	    textAlign: 'left',
@@ -53,7 +53,7 @@ snDraw.Splash = {
 	    });
 
 	    NPbuttonText.set({
-		left: (snDraw.canv_W - NPbuttonText.getWidth())/2
+		left: (snCore.Basic.canv_W - NPbuttonText.getWidth())/2
 	    });
 
 	    var padding = 10;
@@ -101,7 +101,7 @@ snDraw.Splash = {
 			    };
 			    PLAYER_JOINED_WITH_DETAILS(playerDetailsObj);
 			    //this is important, or leave it so that clicking will send a "player joined" even after splash screen...
-			    snDraw.Splash.removeKBmouseListeners();
+			    snCore.Splash.removeKBmouseListeners();
 			}else{
 		    	    this.name_validated = false;
 			}	
@@ -126,7 +126,7 @@ snDraw.Splash = {
 	var mytext = "Welcome, " + this.player_name + "!\nSelect your color:";
 	this.textObject_main.set({
 	    text: mytext,
-	    fontSize: snDraw.canv_W * 0.060
+	    fontSize: snCore.Basic.canv_W * 0.060
 	});
 	canvas.add(this.textObject_main);
 
@@ -145,10 +145,10 @@ snDraw.Splash = {
     drawBBring: function(){
 
 	//set a load of parameters / dimentions that are constants using to draw the BBs
-	this.ringCenterX = snDraw.canv_W/2;
-	this.effectiveHeight = snDraw.canv_H - this.ringZoneTopPx;
+	this.ringCenterX = snCore.Basic.canv_W/2;
+	this.effectiveHeight = snCore.Basic.canv_H - this.ringZoneTopPx;
 	this.ringCenterY = this.ringZoneTopPx + this.effectiveHeight / 2;
-	this.ringRadius = Math.min(snDraw.canv_W, this.effectiveHeight)*0.5*0.6;
+	this.ringRadius = Math.min(snCore.Basic.canv_W, this.effectiveHeight)*0.5*0.6;
 	this.blipBlopRadius = this.ringRadius*0.4;
 	this.radSF = Math.PI*2 / 360;
 
@@ -197,7 +197,7 @@ snDraw.Splash = {
 	    }
 	};
 	
-	snDraw.moveSwitchable(shrinkMeBB, onComplete_deleteBB, snDraw.ani.sty_BBshrink,{
+	snCore.Basic.moveSwitchable(shrinkMeBB, onComplete_deleteBB, snCore.Basic.ani.sty_BBshrink,{
 	    left: newLeft,
 	    top: newTop,
 	    strokeWidth: 0,
@@ -218,11 +218,11 @@ snDraw.Splash = {
 
 	var onComplete_BBchosenReleased_animation = function(){
 
-	    snDraw.Splash.removeKBmouseListeners();
+	    snCore.Splash.removeKBmouseListeners();
 
 	    var wait_str = "Waiting for server\nto send the state of the ongoing\nSNATCH-IT game...";
-	    var my_font_size = snDraw.canv_W * 0.055;
-	    var textObj = snDraw.Splash.textObject_main;
+	    var my_font_size = snCore.Basic.canv_W * 0.055;
+	    var textObj = snCore.Splash.textObject_main;
 
 	    textObj.set({
 		text: wait_str,
@@ -240,16 +240,16 @@ snDraw.Splash = {
 
 	    //send the data to the server
 	    var playerDetailsObj = {
-		name: snDraw.Splash.player_name,
-		color_index: snDraw.Splash.BB_chosen_was,
+		name: snCore.Splash.player_name,
+		color_index: snCore.Splash.BB_chosen_was,
 		reclaiming_player_index: undefined
 	    };
 	    PLAYER_JOINED_WITH_DETAILS(playerDetailsObj);
 	};
 
-	// I have changed two instances of 'this' to 'snDraw.Splash' in the code below. I think it's harmless
+	// I have changed two instances of 'this' to 'snCore.Splash' in the code below. I think it's harmless
 	// and it prevents problems with the keyboad handler. Damn the keyboard handler: rewrite it!!
-	snDraw.Splash.shrinkAndRemoveBBwithIndex(snDraw.Splash.BB_chosen_was, onComplete_BBchosenReleased_animation);
+	snCore.Splash.shrinkAndRemoveBBwithIndex(snCore.Splash.BB_chosen_was, onComplete_BBchosenReleased_animation);
     },
 
     KBListener_ref: undefined,
@@ -259,45 +259,45 @@ snDraw.Splash = {
 	    if(e.target){
 		var BB_hit_i = e.target.BBindex;
 		if(BB_hit_i != undefined){
-		    snDraw.Splash.handleBBchosen(BB_hit_i);
+		    snCore.Splash.handleBBchosen(BB_hit_i);
 		}
 		
 		var isNamePrompt = e.target.isNameEntryPrompt;
 		if(isNamePrompt != undefined){
-		    snDraw.Splash.namePrompt();		    
+		    snCore.Splash.namePrompt();		    
 		}
 	    }
 	}); 
 	//respond to mouse up if a mouse-down has landed on a BB
 	canvas.on('mouse:up',function(e){
-	    if(snDraw.Splash.BB_chosen_was !== undefined){
-		snDraw.Splash.handleBBchosenReleased();
+	    if(snCore.Splash.BB_chosen_was !== undefined){
+		snCore.Splash.handleBBchosenReleased();
 	    }
 	});
 
 	//because the keyboard listener function has to be removed by name, we cannot define and pass it anonymously
 	//there appear to be subtle differnces based upon the context in which the function is defined
-	//(hence not directly defining 'KBlistenerSplash' as a member of snDraw.Splash), but inside another
+	//(hence not directly defining 'KBlistenerSplash' as a member of snCore.Splash), but inside another
 	var KBlistenerSplash = function(e){
 	    var myKeycode = e.keyCode;
 	    var keyPressed = String.fromCharCode(myKeycode);//note that this is non-case sensitive.
 
 	    if(myKeycode == 32){//space bar
 
-		if(snDraw.Splash.BB_chosen_was === undefined){ //action only if mouse stuff hasn't happened
+		if(snCore.Splash.BB_chosen_was === undefined){ //action only if mouse stuff hasn't happened
 		    //apply the "chosen function"
 		    var rand_BB_i = getRandomInt(0,4);
-		    snDraw.Splash.handleBBchosen(rand_BB_i);
+		    snCore.Splash.handleBBchosen(rand_BB_i);
 
 		    //...and halfway through that animation, also apply the released function.
-		    var shrink_dur = snDraw.ani.sty_BBshrink.duration;
-		    setTimeout(snDraw.Splash.handleBBchosenReleased, shrink_dur * 0.5);		
+		    var shrink_dur = snCore.Basic.ani.sty_BBshrink.duration;
+		    setTimeout(snCore.Splash.handleBBchosenReleased, shrink_dur * 0.5);		
 		}
 	    }
 
 	    if(myKeycode == 13){//enter
-		if(!snDraw.Splash.name_validated){
-		    snDraw.Splash.namePrompt();
+		if(!snCore.Splash.name_validated){
+		    snCore.Splash.namePrompt();
 		}
 	    }
 	    

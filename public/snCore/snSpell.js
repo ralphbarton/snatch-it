@@ -1,5 +1,5 @@
 //this is a container for functions and data for Word creation (the generally yellow bit)...
-snDraw.Game.Spell = {
+snCore.Spell = {
 
     // data
     SkeletalLetters: [],
@@ -10,17 +10,17 @@ snDraw.Game.Spell = {
     // methods
     addLetter: function(letter){
 
-	var x_loco_now = this.SpellLeftPx + this.SkeletalLetters.length * snDraw.Game.Tile.dims.tslg;
-	var x_loco_max = snDraw.canv_W - snDraw.Game.Tile.dims.tslg;
+	var x_loco_now = this.SpellLeftPx + this.SkeletalLetters.length * snCore.Tile.dims.tslg;
+	var x_loco_max = snCore.Basic.canv_W - snCore.Tile.dims.tslg;
 	//prevents spelling a word that goes off (this user's screen). This does impose a max snatch length.
 	if(x_loco_now < x_loco_max){// I replaced a clearer "wrap threshold" function for this. May be inexact. seems quite good.
 
 	    if(this.allowLetter(letter)){
 
-		var NewSkeletal = snDraw.Game.Tile.generateTileObject({letter:letter, status:"skeletal"}, -100 + this.SkeletalLetters.length);
+		var NewSkeletal = snCore.Tile.generateTileObject({letter:letter, status:"skeletal"}, -100 + this.SkeletalLetters.length);
 		this.SkeletalLetters.push(NewSkeletal);
 		var spell_len = this.SkeletalLetters.length;
-		var x_loco = this.SpellLeftPx + (spell_len-1) * snDraw.Game.Tile.dims.tslg;
+		var x_loco = this.SpellLeftPx + (spell_len-1) * snCore.Tile.dims.tslg;
 
 
 		var y_loco = this.SpellTopPx;
@@ -30,13 +30,13 @@ snDraw.Game.Spell = {
 		    top: y_loco
 		});
 		canvas.add(NewSkeletal);
-		snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+		snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
 
 		//'logical validity' of the word in the spell may have changed. Recolour button accordingly
 		this.indicateN_validMoves_onButton();
 
 		//Adding letter to spell is a user-active eveny. Clear Persistent Toasts
-		snDraw.Game.Toast.clear_all_persistent();
+		snCore.Toast.clear_all_persistent();
 
 		return true;
 	    }
@@ -49,7 +49,7 @@ snDraw.Game.Spell = {
     //for when tile size is changed.
     redrawResizedSpell: function(){
 
-	var letters_array = snDraw.Game.Tile.TileArray_to_LettersArray(this.SkeletalLetters);
+	var letters_array = snCore.Tile.TileArray_to_LettersArray(this.SkeletalLetters);
 
 	//remove all existing letters
 	for(var i=0; i < letters_array.length; i++){
@@ -69,7 +69,7 @@ snDraw.Game.Spell = {
 	if(newTopPx !== null){this.SpellTopPx = newTopPx;}
 
 	for (var i=0; i<this.SkeletalLetters.length; i++){
-	    snDraw.moveSwitchable(this.SkeletalLetters[i], ani_oC, ani_sty,{
+	    snCore.Basic.moveSwitchable(this.SkeletalLetters[i], ani_oC, ani_sty,{
 		top: (this.SpellTopPx)
 	    });
 	}
@@ -96,8 +96,8 @@ snDraw.Game.Spell = {
 	    for (var i=rem_i; i<this.SkeletalLetters.length; i++){
 		var ShiftMeSkeletal = this.SkeletalLetters[i];
 		ShiftMeSkeletal.tileID = i - 100;
-		var x_loco = this.SpellLeftPx + i * snDraw.Game.Tile.dims.tslg;
-		snDraw.moveSwitchable(ShiftMeSkeletal, true, snDraw.ani.sty_Sing,{
+		var x_loco = this.SpellLeftPx + i * snCore.Tile.dims.tslg;
+		snCore.Basic.moveSwitchable(ShiftMeSkeletal, true, snCore.Basic.ani.sty_Sing,{
 		    left: x_loco
 		});
 	    }
@@ -105,7 +105,7 @@ snDraw.Game.Spell = {
 	    //'logical validity' of the word in the spell may have changed. Recolour button accordingly
 	    this.indicateN_validMoves_onButton();
 
-	    snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+	    snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
 	}
     },
 
@@ -136,7 +136,7 @@ snDraw.Game.Spell = {
 	}
 	this.SkeletalLetters = [];//clear the array (lose the references to the Fabric objects. Hope they get deleted
 	this.indicateN_validMoves_onButton();//cancelling word always has the effect of disabling "SNATCH-IT"
-	snDraw.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+	snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
     },
 
     ListAllVisibleTilesOf: function(letter){
@@ -144,7 +144,7 @@ snDraw.Game.Spell = {
 	//determine how many instances of 'letter' are in play (i.e. visible, whether in word or free)
 	for (var i=0; i<tileset.length; i++){
 	    if ((tileset[i].status != 'unturned')&&(tileset[i].letter==letter)){
-		Objs_letter.push(snDraw.Game.Tile.TileArray[i]);
+		Objs_letter.push(snCore.Tile.TileArray[i]);
 	    } 
 	}
 	return Objs_letter;
@@ -155,7 +155,7 @@ snDraw.Game.Spell = {
 	var visual = (MyLetters.length > n_letter_in_spell) ? "partial" : "shadow";
 	if((n_letter_in_spell==0)||(n_letter_in_spell==undefined)){visual = "flipped";}
 	for (var i=0; i<MyLetters.length; i++){
-	    snDraw.Game.Tile.modifyTileObject(MyLetters[i],visual);    
+	    snCore.Tile.modifyTileObject(MyLetters[i],visual);    
 	}
     },
 
@@ -167,8 +167,8 @@ snDraw.Game.Spell = {
 	if(this.SkeletalLetters.length<3){
 	    N_valid_moves = 0;//no valid moves involves fewer than 3 letters
 	}else{
-	    var letters_array = snDraw.Game.Tile.TileArray_to_LettersArray(this.SkeletalLetters);
-	    var AssemblyData = Assembler.synthesiseSnatch(letters_array,true);
+	    var letters_array = snCore.Tile.TileArray_to_LettersArray(this.SkeletalLetters);
+	    var AssemblyData = snCore.Assembler.synthesiseSnatch(letters_array,true);
 	    var best_i_in_ASM = AssemblyData ? AssemblyData.best_i : undefined;
 
 	    var AssemblySet = AssemblyData.ASM;
@@ -180,8 +180,8 @@ snDraw.Game.Spell = {
 	    }
 	    N_valid_moves = AssemblySet.length;
 	}
-	snDraw.Game.Controls.modifySNATCHbuttonBar(DotSet, best_i_in_ASM);
-	snDraw.Game.Controls.setButtonDisabled(2, N_valid_moves == 0);
+	snCore.Controls.modifySNATCHbuttonBar(DotSet, best_i_in_ASM);
+	snCore.Controls.setButtonDisabled(2, N_valid_moves == 0);
     },
 
     //send a candidate word to the server
@@ -189,10 +189,10 @@ snDraw.Game.Spell = {
 	var letters_array = [];
 	if(this.SkeletalLetters.length>0){//construct the letters array using the skeletal letters.
 	    if(this.SkeletalLetters.length<3){
-		snDraw.Game.Toast.showToast("Words must be 3 letters or more");
+		snCore.Toast.showToast("Words must be 3 letters or more");
 		return null;
 	    }
-	    var letters_array = snDraw.Game.Tile.TileArray_to_LettersArray(this.SkeletalLetters);
+	    var letters_array = snCore.Tile.TileArray_to_LettersArray(this.SkeletalLetters);
 
 	}else{//construct the letters array from user prompt...
 	    var snatch_string = prompt("Enter Word:");
@@ -205,9 +205,9 @@ snDraw.Game.Spell = {
 	    }
 	}
 
-	var word_by_tile_indeces = Assembler.synthesiseSnatch(letters_array);
+	var word_by_tile_indeces = snCore.Assembler.synthesiseSnatch(letters_array);
 	if(word_by_tile_indeces == undefined){
-	    snDraw.Game.Toast.showToast("The letters " + letters_array + " are not a valid move");
+	    snCore.Toast.showToast("The letters " + letters_array + " are not a valid move");
 	}else{
 	    console.log("Sending...",word_by_tile_indeces);
 	    PLAYER_SUBMITS_WORD(word_by_tile_indeces);
