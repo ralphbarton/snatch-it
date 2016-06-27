@@ -5,17 +5,21 @@
     <meta name="viewport" content="user-scalable=no"/>
 
     <!-- styles used in the Snatch game -->
-    <link rel="stylesheet" type="text/css" href="snatch_files/common.css">
-    <link rel="stylesheet" type="text/css" href="snatch_files/overlays.css">
-    <link rel="stylesheet" type="text/css" href="snatch_files/zeroclipboard.css">
-    <link rel="stylesheet" type="text/css" href="snatch_files/loader.css">
-    <link rel="stylesheet" type="text/css" href="snatch_files/css-deck-bright-push-buttons.css">
+    <link rel="stylesheet" type="text/css" href="snCore/cssBasic.css">
+    <link rel="stylesheet" type="text/css" href="snCore/cssButton.css">
+    <link rel="stylesheet" type="text/css" href="snCore/cssInstructions.css">
+    <link rel="stylesheet" type="text/css" href="snCore/cssLoader.css">
+    <link rel="stylesheet" type="text/css" href="snCore/cssPopup.css">
+    <link rel="stylesheet" type="text/css" href="snCore/cssToast.css">
 
-
+    <!-- shared CSS -->
+    <link rel="stylesheet" type="text/css" href="snOuter/common.css">
+    <link rel="stylesheet" type="text/css" href="snOuter/zeroclipboard.css">
 
     <!-- the JS and CSS for the 'flickity' flickable carousel -->
     <link rel="stylesheet" href="include/flickity/flickity.css" media="screen">
     <script src="include/flickity/flickity.pkgd.js"></script>
+
 
     <!-- library / framework JS -->
     <script src="fabric.js-1.5.0/dist/fabric.min.js"></script>

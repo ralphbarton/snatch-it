@@ -4,8 +4,8 @@
     <title>Word Definitions</title>
 
     <!-- styles used in the Snatch game -->
-    <link rel="stylesheet" type="text/css" href="/../snatch_files/common.css">
-    <link rel="stylesheet" type="text/css" href="/../snatch_files/table-style.css">
+    <link rel="stylesheet" type="text/css" href="/../snOuter/common.css">
+    <link rel="stylesheet" type="text/css" href="/../snTools/dictionary-table-style.css">
     <link rel="stylesheet" type="text/css" href="/../include/space-age-searchbox.css">
 
     <!-- library / framework JS -->
@@ -14,8 +14,8 @@
     <script src="/../include/modernizr-1.6.min_.js"></script>
 
     <!-- my JS -->
-    <script src="/../snatch_files/common.js"></script>
-    <script src="/../snatch_files/dictionary-tester.js"></script>
+    <script src="/../snOuter/common.js"></script>
+    <script src="/../snTools/dictionary-tester.js"></script>
 
   </head>
 
