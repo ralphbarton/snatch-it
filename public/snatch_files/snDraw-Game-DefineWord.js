@@ -19,7 +19,7 @@ snDraw.Game.DefineWord = {
     delayedDefinitionToast: function (WordGrp, mouse_is_down) {
 	clearTimeout(this.my_toast_callback);
 	var id = this.get_WI_PI(WordGrp);
-	var word_str = snDraw.Game.TileIDArray_to_LettersString(players[id.PI].words[id.WI]);
+	var word_str = snDraw.Game.Tile.TileIDArray_to_LettersString(players[id.PI].words[id.WI]);
 
 	var confirmation_time = 600;
 	this.my_toast_callback = setTimeout(function(){

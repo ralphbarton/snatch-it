@@ -236,7 +236,7 @@ snDraw.Game.Event = {
 	    var removed_word_tileIDs = players[PIi].words[WIi];
 
 	    // Take this opportunity of running through consumed words to generate them as a list of strings...
-	    words_used_list_as_strings.push(snDraw.Game.TileIDArray_to_LettersString(removed_word_tileIDs));
+	    words_used_list_as_strings.push(snDraw.Game.Tile.TileIDArray_to_LettersString(removed_word_tileIDs));
 	    delete players[PIi].words[WIi];//just delete the array element now, purge the array of empy elements later
 
 	    //determine the group coordinates...
@@ -375,7 +375,7 @@ snDraw.Game.Event = {
 
 	// 4.2 A toast to descibe the snatch in English
 	// (add player's names??)
-	var snatched_word_str = snDraw.Game.TileIDArray_to_LettersString(tile_indices);
+	var snatched_word_str = snDraw.Game.Tile.TileIDArray_to_LettersString(tile_indices);
 	if(words_used_list_as_strings.length == 0){
 	    var ss_ee = ".";
 	}else if(words_used_list_as_strings.length == 1){
