@@ -13,10 +13,30 @@ module.exports = function (nTiles, WordChecker){
     var next_unturned_tile_i = 0;
 
     var cum_hash = Math.round(Math.random()*100000);
+
+    var user_options = {
+	//1.
+	uOpt_challenge: false,
+	//2.
+	uOpt_stem: false,
+	//3. <select>
+	uOpt_turns: "Pseudo Turns",
+	//4.
+	uOpt_flippy: false,
+	//5. <select>
+	uOpt_dictionary: "Sowpods",
+	//6.
+	uOpt_penalty: false
+    };
+
     console.log("created snatch game instance on server");
 
     //this is the collection of externally callable functions
     return{
+	update_uOpt: function(obj){
+	    user_options = obj;
+	},
+
 	build_hash: function(obj){
 	    var hash_me = JSON.stringify(obj) + cum_hash.toString();
 	    cum_hash = Math.abs(hash_me.hashCode() % 100000); // 5 digit hash
@@ -100,7 +120,8 @@ module.exports = function (nTiles, WordChecker){
 		playerSet: playerSet_clone,
 		turned_tiles: turned_tiles,
 		tile_stats: tile_stats,
-		state_hash: cum_hash
+		state_hash: cum_hash,
+		user_options: user_options
 	    }; 
 	},
 

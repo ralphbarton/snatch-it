@@ -63,6 +63,10 @@ socket.on('full game state transmission', function(gameState){
     tilestats = gameState.tile_stats;
     cum_MSG_hash = gameState.state_hash;
 
+    // update to the option-set on server...
+    var u_opt = gameState.user_options;
+    snCore.Popup.recieveSettingChange(u_opt);    
+
     for(var i = 0; i < players.length; i++){
 	players[i].index = i;
 	snCore.Words.TileGroupsArray[i] = [];//correctly create empty container
@@ -172,10 +176,15 @@ socket.on('new word definition', function(W_DEF){
     snCore.DefineWord.word_dictionary[word] = definition;
 });
 
+
+socket.on('game settings download', function(obj){
+    snCore.Popup.recieveSettingChange(obj);
+});
+
 function PLAYER_SUBMITS_WORD(p)       {snCore.Latency.LogTransmit("snatch"); socket.emit('player submits word', p);}
 function TILE_TURN_REQUEST()          {snCore.Latency.LogTransmit("turn");   socket.emit('tile turn request', 0);}
 function PLAYER_JOINED_WITH_DETAILS(p){socket.emit('player joined with details', p);}
-function GAME_SETTINGS_CHANGE(p)      {socket.emit('game settings change', p);}
+function GAME_SETTINGS_CHANGE(p)      {socket.emit('game settings upload', p);}
 
 function TURN_MANY_TILES(p)           {socket.emit('many_tile_turn_hack', p);}
 

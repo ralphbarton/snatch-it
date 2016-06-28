@@ -385,7 +385,7 @@ io.on('connection', function(socket){
 	    // HASHING - keep the next 3 lines of code together
 	    var current_hash = myGame.build_hash(SnatchResponse.SnatchUpdateMsg.tile_id_array);
 	    SnatchResponse.SnatchUpdateMsg.HH = current_hash;
-	    io.to(socket.room_pin).emit('snatch assert', SnatchResponse.SnatchUpdateMsg);	    
+	    io.to(socket.room_pin).emit('snatch assert', SnatchResponse.SnatchUpdateMsg);   
 	    
 	    // also, we now take the chance to look up the accepted work in the real dictionary (web-scrape a website)
 	    // response of the scrape-script with trigger further (anonymous) actions
@@ -403,6 +403,12 @@ io.on('connection', function(socket){
     });
 
 
+    socket.on('game settings upload', function(settings_obj){
+	if(!access_room(socket.room_pin)){return;}; // log that the game was accessed. Terminate if invalid
+	//update server copy of data (this will get sent to new players)
+	rooms_table[socket.room_pin].GameInstance.update_uOpt(settings_obj);
+	socket.broadcast.to(socket.room_pin).emit('game settings download', settings_obj);
+    });
 
 
     //client requests to turn over a tile
@@ -423,6 +429,11 @@ io.on('connection', function(socket){
 	}else{
 	    console.log("All tiles turned - flip message recieved...");
 	}
+    });
+
+    // a client changes their game settings...
+    socket.on('tile turn request', function(obj){
+
     });
 
 

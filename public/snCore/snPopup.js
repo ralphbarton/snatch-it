@@ -245,7 +245,7 @@ snCore.Popup = {
 	    uOpt_dictionary: $('#uOpt_dictionary').val(),
 	    //6.
 	    uOpt_penalty: $("#uOpt_penalty").is(":checked"),
-	}
+	};
 
 	//transmit over websocket...
 	GAME_SETTINGS_CHANGE(settings_grab);

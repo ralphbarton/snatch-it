@@ -27,7 +27,7 @@
     <script src="include/jquery-1.11.1.js"></script>
 
     <!-- my JS -->
-    <script src="snatch_files/common.js"></script>
+    <script src="snOuter/common.js"></script>
 
     <!-- JS files specific to Snatch game -->
     <script src="snCore/snatch-client.js"></script>
@@ -144,6 +144,7 @@
 	      <select id="uOpt_turns" onchange="snCore.Popup.sendSettingChange()">
 		<option>Stricly rotating</option>
 		<option>Individual timouts</option>
+		<option>Pseudo Turns</option>
 		<option>5 second letter spew</option>
 		<option>10 second letter spew</option>
 		<option>free for all</option>
