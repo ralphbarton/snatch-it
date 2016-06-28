@@ -37,7 +37,7 @@ snCore.Event = {
 	};
 
 	var Spacings = snCore.Tile.dims;
-	snCore.Zones.SetZoneStyleScalingsFromTileSize(Spacings.ts);
+	snCore.Zones.CalculateAllZoneStyleScalings();
 	snCore.Popup.calcModalScale();//if scores were present on resize, this changes some scale params
 
 	// 2. Add the controls strip

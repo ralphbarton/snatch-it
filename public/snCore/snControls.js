@@ -18,11 +18,11 @@ snCore.Controls = {
     createControls: function(){
 
 	//set the constants
-	this.button_height = snCore.Tile.dims.ts * 0.7;
-	this.gap_width = snCore.Tile.dims.ts*0.2;
+	this.button_height = snCore.Tile.stdDimention * 0.7;
+	this.gap_width = snCore.Tile.stdDimention*0.2;
 	this.button_font_size = Math.min(snCore.Basic.canv_W, snCore.Basic.canv_H * 1.8) * 0.030;//base font size on width, but with a har limit for extreme aspect ratios...
-	this.line_thickness = snCore.Tile.dims.ts * 0.06;
-	this.corners_rounding = snCore.Tile.dims.ts * 0.25;
+	this.line_thickness = snCore.Tile.stdDimention * 0.06;
+	this.corners_rounding = snCore.Tile.stdDimention * 0.25;
 	this.underneath_buttons_px = this.button_height + this.gap_width * 1.5;// 1.5 is a reasonable gap...
 
 	//set the relative widths of the buttons (these numbers are only relative)
@@ -315,7 +315,7 @@ snCore.Controls = {
 
 	    //todo: this values ought only be calculated once as they are constant w.r.t. a game instance
 
-	    var corners_r = snCore.Tile.dims.ts * 0.12;
+	    var corners_r = snCore.Tile.stdDimention * 0.12;
 
 	    //the exact number of pixels of perimeter of rounded cornered rectangle (test by making the 1.0 slightly smaller!)
 	    var l_tot = ((RoundedRec.getWidth() + RoundedRec.getHeight()) * 2 + 2*corners_r*(Math.PI-4.0))* 1.0;

@@ -166,8 +166,8 @@ snCore.Zones = {
     ZoneSty1: undefined,
     ZoneSty2: undefined,
     ZoneVerticalPaddings: undefined,
-    SetZoneStyleScalingsFromTileSize: function(tile_size_px){
-	var Tx = tile_size_px / 10;
+    CalculateAllZoneStyleScalings: function(){
+	var Tx = snCore.Tile.stdDimention / 10;
 
 	//Zone Style 1 refers to the Player Zones....
 	this.ZoneSty1 = { //all in pixels
