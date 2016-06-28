@@ -31,3 +31,25 @@ function initiate_copy_box(){
     });
 
 }
+
+function fuzzyTime(my_duration) {
+    var msPerMinute = 60 * 1000;
+    var msPerHour = msPerMinute * 60;
+    var msPerDay = msPerHour * 24;
+    var msPerMonth = msPerDay * 30;
+    var msPerYear = msPerDay * 365;
+
+    if (my_duration < msPerMinute) {
+         return Math.round(my_duration/1000) + ' second';
+    } else if (my_duration < msPerHour) {
+         return Math.round(my_duration/msPerMinute) + ' minute';
+    } else if (my_duration < msPerDay ) {
+         return Math.round(my_duration/msPerHour ) + ' hour';
+    } else if (my_duration < msPerMonth) {
+         return 'approximately ' + Math.round(my_duration/msPerDay) + ' day';
+    } else if (my_duration < msPerYear) {
+         return 'approximately ' + Math.round(my_duration/msPerMonth) + ' month';
+    } else {
+         return 'approximately ' + Math.round(my_duration/msPerYear ) + ' year';
+    }
+}

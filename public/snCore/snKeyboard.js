@@ -52,7 +52,10 @@ snCore.Keyboard = {
 		    snCore.Popup.hideModal();
 		}
 	    }else{
-		snCore.Popup.hideModal();   
+		//the two popup checked for are the "unclosable" ones...
+		if((snCore.Popup.popup_in_foreground != "connection")&&(snCore.Popup.popup_in_foreground != "connection_1min")){
+		    snCore.Popup.hideModal();
+		}
 	    }
 
 	}else{

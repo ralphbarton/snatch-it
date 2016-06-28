@@ -87,7 +87,7 @@ function add_listeners(){
 
 		// Col 5
 		var td1 = doc.createElement("td");
-		td1.innerHTML = fuzzyTime(r.duration*1000) + " ago";
+		td1.innerHTML = fuzzyTime(r.duration*1000) + "s ago";
 		td1.className = "b33";
 		tr.appendChild(td1);
 
@@ -118,26 +118,3 @@ function add_listeners(){
 	});
     }
 };
-
-
-function fuzzyTime(my_duration) {
-    var msPerMinute = 60 * 1000;
-    var msPerHour = msPerMinute * 60;
-    var msPerDay = msPerHour * 24;
-    var msPerMonth = msPerDay * 30;
-    var msPerYear = msPerDay * 365;
-
-    if (my_duration < msPerMinute) {
-         return Math.round(my_duration/1000) + ' seconds';   
-    } else if (my_duration < msPerHour) {
-         return Math.round(my_duration/msPerMinute) + ' minutes';   
-    } else if (my_duration < msPerDay ) {
-         return Math.round(my_duration/msPerHour ) + ' hours';   
-    } else if (my_duration < msPerMonth) {
-         return 'approximately ' + Math.round(my_duration/msPerDay) + ' days';   
-    } else if (my_duration < msPerYear) {
-         return 'approximately ' + Math.round(my_duration/msPerMonth) + ' months';   
-    } else {
-         return 'approximately ' + Math.round(my_duration/msPerYear ) + ' years';   
-    }
-}

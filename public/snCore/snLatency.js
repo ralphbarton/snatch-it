@@ -13,7 +13,11 @@ snCore.Latency = {
 			   ack: false};
 
 	//in 2.5 seconds time, check if a response was recieved...
-	setTimeout(this.TestIfAwaitingMSG, 1000 * this.T_latency_for_popup + 1 );//theshold must be surpassed when checked
+	setTimeout(function(){
+	    //the reason it is important to wrap the exact function we're passing in an inline function is that to do
+	    //otherwise would cause the 'this' keyword within the function to operate differently, CAUSING PROBLEMS.
+	    snCore.Latency.TestIfAwaitingMSG();// 'this' keyword could not be used in this context.
+	}, 1000 * this.T_latency_for_popup + 1 );//theshold must be surpassed when checked
 
 	//Aside from the heartbeat (hb) message, client message transmission is a user-active event. Clear Persistent Toasts.
 	if(key != "hb"){
@@ -34,7 +38,7 @@ snCore.Latency = {
 	    this.MessageLog[key].ack = true;
 
 	    // Clear the "connection lost" message if it is present
-	    if(snCore.Popup.popup_in_foreground == "connection"){
+	    if((snCore.Popup.popup_in_foreground == "connection")||(snCore.Popup.popup_in_foreground == "connection_1min")){
 		snCore.Popup.hideModal();
 
 		//comment numerically on the latency...
@@ -76,8 +80,7 @@ snCore.Latency = {
 
     TestIfAwaitingMSG: function(){
 	//if any message has been waiting for more than 2 seconds, complain
-	var LLL = snCore.Latency.GetTimeCurrentlyWaited();// On this line, I just don't understand why 'this' had to be 'snCore.Latency'
-	if(LLL.latency >= this.T_latency_for_popup){//UNITS OF SECONDS...
+	if(this.GetTimeCurrentlyWaited().latency >= this.T_latency_for_popup){//UNITS OF SECONDS...
 	    snCore.Popup.openModal("connection");
 	}
     }

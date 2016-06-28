@@ -114,6 +114,6 @@ td.pl-score{
 
 
 /* 3. the latency message */
-#connection-latency{
+#connection-latency, #connection-latency-2{
     font-weight: bold;
 }

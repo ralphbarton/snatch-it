@@ -172,14 +172,25 @@
 
 	  </div>
 
-	  <!-- modal-body-lost-connection -->
-	  <div id="modal-body-lost-connection">
+	  <!-- modal-body-connection-problem -->
+	  <div id="modal-body-slow-connection">
 	    <p>Your device exchanges messages with a server during play...</p>
 	    <div class="loader">Network Latency...</div>
 	    <p>There has now been a <span id="connection-latency">[too many]</span> second delay receiving a response to a message. Is there a problem with your Internet?</p>
 
-	    <p>If the delay lasts longer than a minute, the page will auto-refresh. You can click rejoin to do this now.</p>
-	    <p>To reclaim you words upon reconnect, you must enter your name exactly as before.</p>
+	    <p>If your Internet is working this message should disappear shortly.</p>
+
+	    <p>Otherwise, click below to re-establish a connection to this game. Enter your name exactly as before to reclaim your words.</p>
+
+	  </div>
+
+	  <!-- modal-body-connection-lost -->
+	  <div id="modal-body-lost-connection">
+	    <p>Your device must exchange messages with a server to allow play.</p>
+	    <p>A message has now failed to arrive after a <span id="connection-latency-2">[too many]</span> wait.</p>
+	    <img src="img/connection_lost.png" alt="icon" height="160" width="160"> 
+	    <p>If your Internet is working, reconnecting should allow you to resume play. Enter your name exactly as before.</p>
+	    <p>Quit, to join/create a different game.</p>
 	  </div>
 
 	  <div id="modal-body-flickity-rules">
@@ -328,15 +339,15 @@
 	    
 	    -->
 
-	  <!-- 6.1. Footer for options menu -->
+	  <!-- 6.1. Just the 'Close' button on the bottom -->
 	  <div id="modal-footer-simple-close">
 	    <a class="modal" href="#" onclick="snCore.Popup.hideModal()">Close</a>
 	  </div>	  
 
 	  <!-- 6.2. Footer for Connection lost -->
 	  <div id="modal-footer-rejoin">
-	    <a class="modal" href="#" onclick="snCore.Popup.hideModal()">Wait</a>
-	    | <a class="modal" href="#" onclick="location.reload()">Rejoin</a>
+	    <a class="modal" href="#" onclick="location.reload()">Reconnect</a>
+	    | <a class="modal" href="#" onclick="snCore.Popup.gotoHomePage()">Quit</a>
 	  </div>
 
 	  <!-- 6.2. Footer for Game finished -->
@@ -344,6 +355,13 @@
 	    <a class="modal" href="#" onclick="snCore.Popup.hideModal()">Close</a>
 	    | <a class="modal" href="#" onclick="snCore.Popup.gotoHomePage()">Another Game</a>
 	  </div>
+
+	  <!-- 6.4. (used for Instructions page) "back" button and "close" button -->
+	  <div id="modal-footer-back-and-close">
+	    <a class="modal" href="#" onclick="snCore.Popup.openModal('options')">Back</a>
+	    | <a class="modal" href="#" onclick="snCore.Popup.hideModal()">Close</a>
+	  </div>	  
+
 
 	</div>
       </div>

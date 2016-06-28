@@ -97,6 +97,8 @@ snCore.Popup = {
 	var Title = "my Title";
 	var Body = "my content id";
 	var Footer = "my footer id";
+	var Closable = true;
+
 	if(type=="scores"){
 	    
 	    Title = "Players";
@@ -118,8 +120,9 @@ snCore.Popup = {
 	}else if(type=="connection"){
 
 	    Title = "Connectivity Problem";
-	    Body = "modal-body-lost-connection";
+	    Body = "modal-body-slow-connection";
 	    Footer = "modal-footer-rejoin";
+	    Closable = false;
 
 	    //dynamic.
 	    function update_latency_html(){
@@ -139,15 +142,36 @@ snCore.Popup = {
 		    $(".loader").css("color", "#693346");
 		} 
 
-		$("#connection-latency").html(L.latency.toFixed(0));
-		snCore.Popup.modal_content_updater_timeout = setTimeout(update_latency_html, 1000);
+		var LAT = L.latency;
+		if(LAT < 60){
+		    $("#connection-latency").html(LAT.toFixed(0));
+		    snCore.Popup.modal_content_updater_timeout = setTimeout(update_latency_html, 1000);
+		}else{
+		    snCore.Popup.openModal("connection_1min");
+		}
 	    }
 	    update_latency_html();//herby start the chain...	    
+
+	}else if(type=="connection_1min"){
+
+	    Title = "Connection Lost";
+	    Body = "modal-body-lost-connection";
+	    Footer = "modal-footer-rejoin";
+	    Closable = false;
+
+	    //dynamic.
+	    function update_latency2_html(){
+		var L = snCore.Latency.GetTimeCurrentlyWaited();
+
+		$("#connection-latency-2").html(fuzzyTime( L.latency*1000) );
+		snCore.Popup.modal_content_updater_timeout = setTimeout(update_latency2_html, 5000);
+	    }
+	    update_latency2_html();//herby start the chain...	    
 
 	}else if(type=="rules"){
 	    Title = "Instructions";
 	    Body = "modal-body-flickity-rules";
-	    Footer = "modal-footer-simple-close";
+	    Footer = "modal-footer-back-and-close";
 
 	    flkty.select( 0 );//revert to page 1
 
@@ -159,10 +183,7 @@ snCore.Popup = {
 	this.setVisibleModalContent("#modal-body", Body);
 	this.setVisibleModalContent("#modal-footer", Footer);
 
-	// only activate if not already present. The other possibility is that modal's content will have been replaced live.
-	if(this.popup_in_foreground == false){
-	    this.activateModal();
-	}
+	this.activateModal(Closable);//it does not matter to run this function if a model is already present.
 
 	//record which popup is currently on display...
 	this.popup_in_foreground = type;
@@ -171,27 +192,34 @@ snCore.Popup = {
     },
 
     // Generic stuff required for presence of the modal
-    activateModal: function(){
+    activateModal: function(Closable){
 
 	// 1. Reveal the DIV which is the dark background with message on it
 	var ds = document.getElementById("modal_dark_sheet");
 	ds.style["display"] = "block";
+	//ds.style["background-color"] = "rgba(0, 0, 0, 0.75)";
 
-	// 2. clicking the background closes the message
-	// the behavior takes half a second to become active (Touchscreen niggle fix)
-	ds.onclick = undefined;
-	setTimeout(function(){
-	    ds.onclick = function(event) {
-		if (event.target == ds) {
-		    snCore.Popup.hideModal();
-		}
+	if(Closable){
+	    // 2. clicking the background closes the message
+	    // the behavior takes half a second to become active (Touchscreen niggle fix)
+	    ds.onclick = undefined;
+	    setTimeout(function(){
+		ds.onclick = function(event) {
+		    if (event.target == ds) {
+			snCore.Popup.hideModal();
+		    }
+		};
+	    }, 500);
+
+	    // 3. the x button closes the window...
+	    $("#close").css("display", "inline");
+	    document.getElementById("close").onclick = function() {
+		snCore.Popup.hideModal();
 	    };
-	}, 500);
-
-	// 3. the x button closes the window...
-	document.getElementById("close").onclick = function() {
-	    snCore.Popup.hideModal();
-	};
+	}else{
+	    ds.onclick = undefined;
+	    $("#close").css("display", "none");
+	}
 
 	// 4. set the scale correctly:
 	this.calcModalScale();
