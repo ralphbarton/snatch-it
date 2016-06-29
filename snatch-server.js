@@ -73,6 +73,7 @@ module.exports = function (nTiles, WordChecker){
 		    color : col,
 		    words : [],
 		    is_disconnected: false,
+		    is_finished: false,
 		    socket_key: socket_key
 		};
 		playerSet.push(newPlayer);
@@ -93,6 +94,20 @@ module.exports = function (nTiles, WordChecker){
 	
 		delete player_index_from_socketKey_lkup[socket_key];
 	    }
+	},
+
+	// this function registers that a particular player has finished
+	// if all active players have finished returns true
+	PlayerFinishedGame: function(socket_key) {
+	    var PI = player_index_from_socketKey_lkup[socket_key];
+	    playerSet[PI].is_finished = true;
+	    for(var i=0; i < playerSet; i++){
+		// ANY active player unfinished => answer false
+		if ((!playerSet[i].is_disconnected) && (!playerSet[i].is_finished)){
+		    return false;
+		}
+	    }
+	    return true;
 	},
 
 	isDisconnectedPlayerOfName: function(name) {

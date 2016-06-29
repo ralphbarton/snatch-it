@@ -371,9 +371,11 @@ snCore.Controls = {
     },
 
     client_finished_game: false,
+    //all_tiles_safely_turned: false,//set true
     turn_tk: undefined,//toast key for the Toast relating to turning letter...
     bolden_counter: 0,
     turnLetterClickHandler: function(){
+	// Case 1: hits space when the countdown is blocking...
 	if(this.turnDisabled){
 
 	    if(this.turn_tk != undefined){
@@ -423,20 +425,25 @@ snCore.Controls = {
 
 	    toast_time_updater();
 
-
+	// Case 2: no blocking due to countdown
 	}else if(this.client_finished_game == false){
-	    var n_tiles_remaining = tilestats.n_tiles-tileset.length;
+	    var n_tiles_remaining = tilestats.n_tiles - tileset.length;
 	    if(n_tiles_remaining>0){
 		this.setButtonDisabled(1, true);//Disable the "turn letter" button...
 		TILE_TURN_REQUEST(); //request another tile...
 	    }else{
+		f
+
+		// TODO: change all this
 		this.client_finished_game = true;
 		snCore.Popup.openModal("scores");
 		//set text
 		var TurnButton = this.Button_Objs[1];
-		TurnButton.item(1).setText("Exit");
+		TurnButton.item(1).setText("Waiting...");
 	    }
-	}else{//this is after the client has clicked "finish", and button text is now "Exit"
+
+	// Case 3: this is after the client has clicked "finish", and button text is now "Exit"
+	}else{
 	    snCore.Popup.gotoHomePage();
 	}
     }

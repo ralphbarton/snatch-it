@@ -427,16 +427,24 @@ io.on('connection', function(socket){
 
 	var myGame = rooms_table[socket.room_pin].GameInstance;
 	var newTile_info = myGame.flipNextTile(socket.id);
+	
+	if(newTile_info){//this means that it was not a request with no tiles left...
 
-	// HASHING - keep the next 3 lines of code together
-	var current_hash = myGame.build_hash(newTile_info.tile_letter);
-	newTile_info.HH = current_hash;
-	io.to(socket.room_pin).emit('new turned tile', newTile_info);
-
-	if(newTile_info){
+	    // HASHING - keep the next 3 lines of code together
+	    var current_hash = myGame.build_hash(newTile_info.tile_letter);
+	    newTile_info.HH = current_hash;
+	    io.to(socket.room_pin).emit('new turned tile', newTile_info);
 	    console.log("["+socket.room_pin+"]: PI=" + newTile_info.flipping_player + " flips tileID=" + newTile_info.tile_index + " (" + newTile_info.tile_letter + ")");
+
 	}else{
 	    console.log("All tiles turned - flip message recieved...");
+	    var all_fin = myGame.PlayerFinishedGame(socket.id);
+	    if(all_fin){
+		io.to(socket.room_pin).emit('all players declared finished', 0);
+	    }else{
+		var PI = myGame.playerIndexFromSocket(socket.id);
+		socket.broadcast.to(socket.room_pin).emit('game settings download', PI);
+	    }
 	}
     });
 
