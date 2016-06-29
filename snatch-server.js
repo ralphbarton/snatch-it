@@ -37,6 +37,10 @@ module.exports = function (nTiles, WordChecker){
 	    user_options = obj;
 	},
 
+	get_uOpt: function(){
+	   return user_options;
+	},
+
 	build_hash: function(obj){
 	    var hash_me = JSON.stringify(obj) + cum_hash.toString();
 	    cum_hash = Math.abs(hash_me.hashCode() % 100000); // 5 digit hash

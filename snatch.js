@@ -241,16 +241,19 @@ io.on('connection', function(socket){
 	}
     });
 
+
     //the server pongs back the heartbeat message to the specific client that sent.
     socket.on('client heartbeat', function(){
 	if(!access_room(socket.room_pin)){return;}; // log that the game was accessed. 
     	socket.emit('heartbeat server ack', 0);
     });
 
+
     //this is not used by the actual snatch game because lookup is tied to snatching
     socket.on('look up definition', function(word){
 	my_SDC.lookup_definition(word);
     });
+
 
     socket.on('request to init room', function (data){
 
@@ -273,8 +276,6 @@ io.on('connection', function(socket){
 	console.log("New game created: ", key_deets);
     	socket.emit('new game pin and key', key_deets);
     });
-
-
 
 
     socket.on('request rooms list', function (no_data){
@@ -300,8 +301,6 @@ io.on('connection', function(socket){
     	socket.emit('rooms list', rooms_data_array);
 	console.log("Rooms list sent to an anonymouse client...");
     });
-
-
 
 
     socket.on('join room and start', function (room_pin){
@@ -383,9 +382,19 @@ io.on('connection', function(socket){
 	if(SnatchResponse.val_check == 'accepted'){
 
 	    // HASHING - keep the next 3 lines of code together
-	    var current_hash = myGame.build_hash(SnatchResponse.SnatchUpdateMsg.tile_id_array);
-	    SnatchResponse.SnatchUpdateMsg.HH = current_hash;
-	    io.to(socket.room_pin).emit('snatch assert', SnatchResponse.SnatchUpdateMsg);   
+	    var SnatchMsg = SnatchResponse.SnatchUpdateMsg;
+	    var current_hash = myGame.build_hash(SnatchMsg.tile_id_array);
+	    SnatchMsg.HH = current_hash;
+
+	    //Here, we append to the message potentially two tiles, depending on rule state...
+	    if(myGame.get_uOpt().uOpt_flippy){
+		SnatchMsg.ExtraTiles = [];
+		// do it twice
+		SnatchMsg.ExtraTiles.push(myGame.flipNextTile(socket.id));
+		SnatchMsg.ExtraTiles.push(myGame.flipNextTile(socket.id));
+	    }
+
+	    io.to(socket.room_pin).emit('snatch assert', SnatchMsg);   
 	    
 	    // also, we now take the chance to look up the accepted work in the real dictionary (web-scrape a website)
 	    // response of the scrape-script with trigger further (anonymous) actions
@@ -431,11 +440,6 @@ io.on('connection', function(socket){
 	}
     });
 
-    // a client changes their game settings...
-    socket.on('tile turn request', function(obj){
-
-    });
-
 
     //client requests to turn over a tile
     socket.on('many_tile_turn_hack', function(n_tiles){
@@ -451,6 +455,12 @@ io.on('connection', function(socket){
 	var R1 = function(i){
 	    var newTile_info = myGame.flipNextTile(socket.id);
 	    if(newTile_info){
+
+		// HASHING - keep the next 3 lines of code together
+		var current_hash = myGame.build_hash(newTile_info.tile_letter);
+		newTile_info.HH = current_hash;
+		//
+
 		io.to(socket.room_pin).emit('new turned tile', newTile_info);
 		letters.push(newTile_info.tile_letter);
 		tileID_final = newTile_info.tile_index

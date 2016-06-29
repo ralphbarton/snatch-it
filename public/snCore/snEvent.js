@@ -169,7 +169,8 @@ snCore.Event = {
 	newTile.visual = "animating_in";
 	var RandCx = snCore.Tile.GenRandomCoords_TileEntryOrigin();
 	snCore.Basic.moveSwitchable(newTile, false, null, RandCx);
-	var newTileObscurer = snCore.Tile.createObscurer(RandCx.left, RandCx.top, tile_index, players[player_index].color);
+	var obs_col = player_index != null ? players[player_index].color : 'black';
+	var newTileObscurer = snCore.Tile.createObscurer(RandCx.left, RandCx.top, tile_index, obs_col);
 
 	// 2.3 Now set up the animation of the tile, and the chain of animations for the obscurer
 	var gridRC = snCore.Grid.GetGridSpace();

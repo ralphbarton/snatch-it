@@ -133,6 +133,15 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
 
     // for response of client-side data model and view
     snCore.Event.SnatchEvent(player_index, tile_indices, word_usage);
+
+    //the snatch message may include some extra tiles...
+    if(SnatchUpdateMsg.ExtraTiles != undefined){
+	for (var i = 0; i < SnatchUpdateMsg.ExtraTiles.length; i++){
+	    var ET = SnatchUpdateMsg.ExtraTiles[i];
+	    snCore.Event.TileTurn(null, ET.tile_index, ET.tile_letter);
+	}
+    }
+
 });
 
 
