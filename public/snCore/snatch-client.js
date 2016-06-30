@@ -198,23 +198,8 @@ socket.on('all players declared finished', function(no_data){
 
 
 socket.on('player declared finished', function(player_index){
-
     players[player_index].is_finished = true;
-
-    // generate list of non-finished players...
-    var n_pl = players.length;
-    var str = "";
-    //todo: perhaps, in future, generate HTML and use player colors here...
-    for(var i = 0; i < n_pl; i++){
-	var Plr = players[i];
-	console.log(Plr.is_disconnected, Plr.is_finished);
-	if((!Plr.is_disconnected) && (!Plr.is_finished)){
-	    str += (i == client_player_index ? "you" : Plr.name) + (i < (n_pl-1) ? ", ":"");
-	}
-    }
-
-    snCore.Toast.showToast(players[player_index].name + " has finished.\nNow waiting for " + str + "\n(after which final scores will show)");
-
+    snCore.Toast.partial_completion_toast(player_index);
 });
 
 

@@ -209,6 +209,33 @@ snCore.Toast = {
 
 	    snCore.Toast.showToast(msg, {persistent: true});
 	}, 20);
+    },
+
+    partial_completion_toast: function(PI_just_finished){
+	// generate list of non-finished players...
+	var n_pl = players.length;
+	var str_nl = "";
+	//todo: perhaps, in future, generate HTML and use player colors here...
+	for(var i = 0; i < n_pl; i++){
+	    var Plr = players[i];
+	    if((!Plr.is_disconnected) && (!Plr.is_finished)){
+		str_nl += (i == PI_just_finished ? "you" : Plr.name) + (i < (n_pl-1) ? ", ":"");
+	    }
+	}
+
+	var str_tot = "";
+	if(PI_just_finished != null){
+	    if(PI_just_finished == client_player_index){
+		str_tot += "You have";
+	    }else{
+		str_tot += players[PI_just_finished].name + " has";
+	    }
+	    str_tot += " finished.<br>Now waiting";
+	}else{
+	    str_tot += "Waiting";
+	}
+	str_tot += " for " + str_nl + " (after which final scores will show)"
+	snCore.Toast.showToast(str_tot);
     }
 
 };

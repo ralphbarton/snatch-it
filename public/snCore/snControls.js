@@ -450,13 +450,11 @@ snCore.Controls = {
 
 	// Case 3: this is after the client has clicked "finish", but not all other players are done
 	}else if(!snCore.Event.game_ended){
-
+	    snCore.Toast.partial_completion_toast(null);//null is because no particular player just finished...
 
 	}else{// Case 4: this is when ALL players are done.
-
-	    //TODO change this...
-
-	    //Toast for "other players"...
+	    // SCORES - here they serve like a 'confirm action' dialogue before quitting...
+	    snCore.Popup.openModal("scores");
 	}
     }
 };

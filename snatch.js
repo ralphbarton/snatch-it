@@ -444,7 +444,7 @@ io.on('connection', function(socket){
 	    }else{
 		console.log("Active players agree: this game is finished");
 		var PI = myGame.playerIndexFromSocket(socket.id);
-		socket.broadcast.to(socket.room_pin).emit('player declared finished', PI);
+		io.to(socket.room_pin).emit('player declared finished', PI);
 	    }
 	}
     });
