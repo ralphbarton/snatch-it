@@ -40,7 +40,7 @@ snCore.Latency = {
 
 	    // only (potentially) clear the message if we're now not waiting for anything:
 	    // I haven't thought about it enough but this is potentially dodgy.
-	    if(L2 == 0.5){
+	    if(L2 < 0.5){
 		// Clear the "connection lost" message if it is present
 		if((snCore.Popup.popup_in_foreground == "connection")||(snCore.Popup.popup_in_foreground == "connection_1min")){
 		    snCore.Popup.hideModal();

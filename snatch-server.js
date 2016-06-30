@@ -13,6 +13,7 @@ module.exports = function (nTiles, WordChecker){
     var next_unturned_tile_i = 0;
 
     var cum_hash = Math.round(Math.random()*100000);
+    var game_finished = false;
 
     var user_options = {
 	//1.
@@ -73,7 +74,7 @@ module.exports = function (nTiles, WordChecker){
 		    color : col,
 		    words : [],
 		    is_disconnected: false,
-		    is_finished: false,
+		    is_finished: game_finished,// typically false!
 		    socket_key: socket_key
 		};
 		playerSet.push(newPlayer);
@@ -107,6 +108,7 @@ module.exports = function (nTiles, WordChecker){
 		    return false;
 		}
 	    }
+	    game_finished = true;
 	    return true;
 	},
 
@@ -140,7 +142,8 @@ module.exports = function (nTiles, WordChecker){
 		turned_tiles: turned_tiles,
 		tile_stats: tile_stats,
 		state_hash: cum_hash,
-		user_options: user_options
+		user_options: user_options,
+		game_finished: game_finished
 	    }; 
 	},
 

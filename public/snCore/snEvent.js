@@ -20,7 +20,7 @@ snCore.Event = {
 	snCore.Tile.stdDimention = Math.round(Math.sqrt(N_pixels * 0.0037));
 
 	snCore.Tile.dims = { //all in pixels
-	    tsi: raw_TS,
+	    tsi: raw_TS, // supposed to refer to 'internal' tile size (before all sides widened by half a thickness unit)
 	    ts_thick: raw_TS * tile_stroke_prop,
 	    ts: tot_TS, //tile size, including border
 	    ts_rad: (tot_TS * 0.12), // radius on the corners of tiles
@@ -564,6 +564,25 @@ snCore.Event = {
     EndGame: function(){
 	this.game_ended = true;
 	snCore.Controls.updateTurnLetter_number("Play Again");
+
+	//change all tiles appearance
+	for(var i = 0; i < snCore.Tile.TileArray.length; i++){
+	    snCore.Tile.modifyTileObject(snCore.Tile.TileArray[i],"invert");
+	}
+
+	//make all words non-draggable (for what this is worth)
+	for(var i = 0; i < snCore.Words.TileGroupsArray.length; i++){
+	    for(var j = 0; j < snCore.Words.TileGroupsArray[i].length; j++){
+		snCore.Words.TileGroupsArray[i][j].set({
+		    hasControls: false,
+		    hasBorders: false,
+		    lockMovementX: true,
+		    lockMovementY: true,
+		    selectable: false
+		});
+	    }
+	}
+
 	snCore.Popup.openModal("scores");
     }
 

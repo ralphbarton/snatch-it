@@ -49,8 +49,8 @@ snCore.Tile = {
 	    fill: 'rgb(54,161,235)',
 	    stroke: '#777',
 	    strokeWidth: this.dims.ts_thick,
-	    width: this.dims.ts,
-	    height: this.dims.ts,
+	    width: this.dims.tsi,
+	    height: this.dims.tsi,
 	    rx: this.dims.ts_rad,
 	    ry: this.dims.ts_rad
 	});
@@ -98,6 +98,11 @@ snCore.Tile = {
 	else if(to_state=="shadow"){
 	    myTile.setOpacity(0.40);
 	}
+	else if(to_state=="invert"){
+	    myTile.item(1).setFill('black');
+	    myTile.item(0).setStroke('white');
+	}
+
     },
 
     TileArray_to_LettersArray: function(TileArray){
