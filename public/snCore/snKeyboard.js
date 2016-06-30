@@ -30,9 +30,10 @@ snCore.Keyboard = {
 	if(keyPressed == this.secretCode2[this.codeCounter2]){
 	    this.codeCounter2++;
 	    if(this.codeCounter2 == this.secretCode2.length){
+		var qty = 96;
 		//the whole code was entered!!
-		snCore.Toast.showToast("Secret code entered shall now flip 25 tiles");
-		TURN_MANY_TILES(25);
+		snCore.Toast.showToast("Secret code entered shall now flip "+qty+" tiles");
+		TURN_MANY_TILES(qty);
 		this.codeCounter2 = 0;
 	    }
 	}else{

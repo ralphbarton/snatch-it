@@ -101,7 +101,7 @@ module.exports = function (nTiles, WordChecker){
 	PlayerFinishedGame: function(socket_key) {
 	    var PI = player_index_from_socketKey_lkup[socket_key];
 	    playerSet[PI].is_finished = true;
-	    for(var i=0; i < playerSet; i++){
+	    for(var i=0; i < playerSet.length; i++){
 		// ANY active player unfinished => answer false
 		if ((!playerSet[i].is_disconnected) && (!playerSet[i].is_finished)){
 		    return false;

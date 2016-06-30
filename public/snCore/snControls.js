@@ -178,33 +178,6 @@ snCore.Controls = {
 	return buttonGrp;
     },
 
-    updateTurnLetter_number: function(n_tiles_remaining){
-	var TurnButton = this.Button_Objs[1];
-	if(n_tiles_remaining>0){
-	    TurnButton.item(1).setText("Turn Letter (" + n_tiles_remaining + ")");
-	}else{
-	    TurnButton.item(1).setText("Finish Game");
-	}
-    },
-
-    turnDisabled: false,
-    cancelTurnDisabled: false,
-    setButtonDisabled: function(buttonID, disable){
-	if(buttonID == 1){//this code is specific to the Turn Letter button
-	    this.turnDisabled = disable;
-	}
-	var myTextObj = this.Button_Objs[buttonID].item(1);
-	var myRectObj = this.Button_Objs[buttonID].item(0);
-    	myRectObj.setFill('#AAA');
-	//change the button text colour
-	if(disable){
-	    myTextObj.setFill('#75746E');//text colour to a dull grey-brown
-	}else{
-	    myTextObj.setFill('black');//text colour to black
-	    myRectObj.setStroke('white');//box border colour to black, in case it was changed...
-	}
-    },
-
     SNATCHbuttonBar_Objs: [],
     modifySNATCHbuttonBar: function(DotSet, i_optimal){
 
@@ -370,7 +343,37 @@ snCore.Controls = {
 	}
     },
 
-    client_finished_game: false,
+
+    //this function gets called upon a 'tile turn' from the server
+    updateTurnLetter_number: function(n_tiles_remaining){
+	var TurnButton = this.Button_Objs[1];
+	if(n_tiles_remaining>0){
+	    TurnButton.item(1).setText("Turn Letter (" + n_tiles_remaining + ")");
+	}else{
+	    TurnButton.item(1).setText("Finish Game");
+	}
+    },
+
+    turnDisabled: false,
+    cancelTurnDisabled: false,
+    setButtonDisabled: function(buttonID, disable){
+	if(buttonID == 1){//this code is specific to the Turn Letter button
+	    this.turnDisabled = disable;
+	}
+	var myTextObj = this.Button_Objs[buttonID].item(1);
+	var myRectObj = this.Button_Objs[buttonID].item(0);
+    	myRectObj.setFill('#AAA');
+	//change the button text colour
+	if(disable){
+	    myTextObj.setFill('#75746E');//text colour to a dull grey-brown
+	}else{
+	    myTextObj.setFill('black');//text colour to black
+	    myRectObj.setStroke('white');//box border colour to black, in case it was changed...
+	}
+    },
+
+
+    client_indicated_finished: false,
     //all_tiles_safely_turned: false,//set true
     turn_tk: undefined,//toast key for the Toast relating to turning letter...
     bolden_counter: 0,
@@ -425,26 +428,35 @@ snCore.Controls = {
 
 	    toast_time_updater();
 
-	// Case 2: no blocking due to countdown
-	}else if(this.client_finished_game == false){
+	// Case 2: no blocking due to countdown (upon a "Turn click")
+	}else if(this.client_indicated_finished == false){
 	    var n_tiles_remaining = tilestats.n_tiles - tileset.length;
 	    if(n_tiles_remaining>0){
 		this.setButtonDisabled(1, true);//Disable the "turn letter" button...
 		TILE_TURN_REQUEST(); //request another tile...
 	    }else{
-		f
+		
+		//request another tile...
+		TILE_TURN_REQUEST(); 
 
 		// TODO: change all this
-		this.client_finished_game = true;
-		snCore.Popup.openModal("scores");
+		this.client_indicated_finished = true;
+		//snCore.Popup.openModal("scores");
 		//set text
 		var TurnButton = this.Button_Objs[1];
 		TurnButton.item(1).setText("Waiting...");
+		snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
 	    }
 
-	// Case 3: this is after the client has clicked "finish", and button text is now "Exit"
-	}else{
-	    snCore.Popup.gotoHomePage();
+	// Case 3: this is after the client has clicked "finish", but not all other players are done
+	}else if(!snCore.Event.game_ended){
+
+
+	}else{// Case 4: this is when ALL players are done.
+
+	    //TODO change this...
+
+	    //Toast for "other players"...
 	}
     }
 };

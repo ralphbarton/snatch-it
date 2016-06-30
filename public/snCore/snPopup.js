@@ -101,9 +101,9 @@ snCore.Popup = {
 
 	if(type=="scores"){
 	    
-	    Title = "Players";
+	    Title = snCore.Event.game_ended ? "Game Finished" : "Players";
 	    Body = "modal-body-scores-table";
-	    Footer = snCore.Controls.client_finished_game ? "modal-footer-close-replay" : "modal-footer-simple-close"; 
+	    Footer = snCore.Controls.client_indicated_finished ? "modal-footer-close-replay" : "modal-footer-simple-close"; 
 
 	    // dynamically change content by regenerating the scores table...
 	    $("#modal-body-scores-table").html(this.generate_scores_table_html_element());

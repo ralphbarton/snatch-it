@@ -36,21 +36,25 @@ snCore.Latency = {
 	    var L = this.GetTimeCurrentlyWaited();
 	    //This resets the flag which indicates that a message has not been recieved. Must grab latency beforehand...
 	    this.MessageLog[key].ack = true;
+	    var L2 = this.GetTimeCurrentlyWaited();
 
-	    // Clear the "connection lost" message if it is present
-	    if((snCore.Popup.popup_in_foreground == "connection")||(snCore.Popup.popup_in_foreground == "connection_1min")){
-		snCore.Popup.hideModal();
+	    // only (potentially) clear the message if we're now not waiting for anything:
+	    if(L2 == 0){
+		// Clear the "connection lost" message if it is present
+		if((snCore.Popup.popup_in_foreground == "connection")||(snCore.Popup.popup_in_foreground == "connection_1min")){
+		    snCore.Popup.hideModal();
 
-		//comment numerically on the latency...
-		var lat = L.latency;
-		var q_te = "slightly ";
-		if (lat > this.T_latency_thres2){
-		    var q_te = "extremely ";
-		}else if(lat > this.T_latency_thres1){
-		    var q_te = "";
+		    //comment numerically on the latency...
+		    var lat = L.latency;
+		    var q_te = "slightly ";
+		    if (lat > this.T_latency_thres2){
+			var q_te = "extremely ";
+		    }else if(lat > this.T_latency_thres1){
+			var q_te = "";
+		    }
+
+		    snCore.Toast.showToast("Internet connection is functional but "+q_te+"slow... ("+lat.toFixed(1)+" seconds)");
 		}
-
-		snCore.Toast.showToast("Internet connection is functional but "+q_te+"slow... ("+lat.toFixed(1)+" seconds)");
 	    }
 	}
     },

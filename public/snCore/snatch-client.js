@@ -190,8 +190,40 @@ socket.on('game settings download', function(obj){
     snCore.Popup.recieveSettingChange(obj);
 });
 
+
+socket.on('all players declared finished', function(no_data){
+    console.log('all players declared finished');
+    snCore.Event.EndGame();
+});
+
+
+socket.on('player declared finished', function(player_index){
+
+    players[player_index].is_finished = true;
+
+    // generate list of non-finished players...
+    var n_pl = players.length;
+    var str = "";
+    //todo: perhaps, in future, generate HTML and use player colors here...
+    for(var i = 0; i < n_pl; i++){
+	var Plr = players[i];
+	console.log(Plr.is_disconnected, Plr.is_finished);
+	if((!Plr.is_disconnected) && (!Plr.is_finished)){
+	    str += (i == client_player_index ? "you" : Plr.name) + (i < (n_pl-1) ? ", ":"");
+	}
+    }
+
+    snCore.Toast.showToast(players[player_index].name + " has finished.\nNow waiting for " + str + "\n(after which final scores will show)");
+
+});
+
+
+
 function PLAYER_SUBMITS_WORD(p)       {snCore.Latency.LogTransmit("snatch"); socket.emit('player submits word', p);}
-function TILE_TURN_REQUEST()          {snCore.Latency.LogTransmit("turn");   socket.emit('tile turn request', 0);}
+function TILE_TURN_REQUEST()          {
+    if(tilestats.n_tiles>tileset.length){snCore.Latency.LogTransmit("turn");}
+    socket.emit('tile turn request', 0);}//only expect a like response if NOT all tiles are already turned
+
 function PLAYER_JOINED_WITH_DETAILS(p){socket.emit('player joined with details', p);}
 function GAME_SETTINGS_CHANGE(p)      {socket.emit('game settings upload', p);}
 

@@ -560,6 +560,12 @@ snCore.Event = {
 	window.onresize = this.WindowResize; /*function(){
 	    snCore.Event.WindowResize();
 	};*/
+    },
+
+    game_ended: false,
+    EndGame: function(){
+	this.game_ended = true;
+	snCore.Popup.openModal("scores");
     }
 
 };

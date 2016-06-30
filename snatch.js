@@ -437,13 +437,14 @@ io.on('connection', function(socket){
 	    console.log("["+socket.room_pin+"]: PI=" + newTile_info.flipping_player + " flips tileID=" + newTile_info.tile_index + " (" + newTile_info.tile_letter + ")");
 
 	}else{
-	    console.log("All tiles turned - flip message recieved...");
+	    console.log("A 'flip' message was recieved when all tiles were already turned");
 	    var all_fin = myGame.PlayerFinishedGame(socket.id);
 	    if(all_fin){
 		io.to(socket.room_pin).emit('all players declared finished', 0);
 	    }else{
+		console.log("Active players agree: this game is finished");
 		var PI = myGame.playerIndexFromSocket(socket.id);
-		socket.broadcast.to(socket.room_pin).emit('game settings download', PI);
+		socket.broadcast.to(socket.room_pin).emit('player declared finished', PI);
 	    }
 	}
     });
