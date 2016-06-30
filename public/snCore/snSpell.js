@@ -10,35 +10,39 @@ snCore.Spell = {
     // methods
     addLetter: function(letter){
 
-	var x_loco_now = this.SpellLeftPx + this.SkeletalLetters.length * snCore.Tile.dims.tslg;
-	var x_loco_max = snCore.Basic.canv_W - snCore.Tile.dims.tslg;
-	//prevents spelling a word that goes off (this user's screen). This does impose a max snatch length.
-	if(x_loco_now < x_loco_max){// I replaced a clearer "wrap threshold" function for this. May be inexact. seems quite good.
+	if(snCore.Event.game_ended){
+	    snCore.Toast.game_fin();
+	}else{
+	    var x_loco_now = this.SpellLeftPx + this.SkeletalLetters.length * snCore.Tile.dims.tslg;
+	    var x_loco_max = snCore.Basic.canv_W - snCore.Tile.dims.tslg;
+	    //prevents spelling a word that goes off (this user's screen). This does impose a max snatch length.
+	    if(x_loco_now < x_loco_max){// replaces "wrap threshold" func. May be inexact. seems quite good.
 
-	    if(this.allowLetter(letter)){
+		if(this.allowLetter(letter)){
 
-		var NewSkeletal = snCore.Tile.generateTileObject({letter:letter, status:"skeletal"}, -100 + this.SkeletalLetters.length);
-		this.SkeletalLetters.push(NewSkeletal);
-		var spell_len = this.SkeletalLetters.length;
-		var x_loco = this.SpellLeftPx + (spell_len-1) * snCore.Tile.dims.tslg;
+		    var NewSkeletal = snCore.Tile.generateTileObject({letter:letter, status:"skeletal"}, -100 + this.SkeletalLetters.length);
+		    this.SkeletalLetters.push(NewSkeletal);
+		    var spell_len = this.SkeletalLetters.length;
+		    var x_loco = this.SpellLeftPx + (spell_len-1) * snCore.Tile.dims.tslg;
 
 
-		var y_loco = this.SpellTopPx;
+		    var y_loco = this.SpellTopPx;
 
-		NewSkeletal.set({
-		    left: x_loco,
-		    top: y_loco
-		});
-		canvas.add(NewSkeletal);
-		snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+		    NewSkeletal.set({
+			left: x_loco,
+			top: y_loco
+		    });
+		    canvas.add(NewSkeletal);
+		    snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
 
-		//'logical validity' of the word in the spell may have changed. Recolour button accordingly
-		this.indicateN_validMoves_onButton();
+		    //'logical validity' of the word in the spell may have changed. Recolour button accordingly
+		    this.indicateN_validMoves_onButton();
 
-		//Adding letter to spell is a user-active eveny. Clear Persistent Toasts
-		snCore.Toast.clear_all_persistent();
+		    //Adding letter to spell is a user-active eveny. Clear Persistent Toasts
+		    snCore.Toast.clear_all_persistent();
 
-		return true;
+		    return true;
+		}
 	    }
 	}
 
@@ -187,6 +191,10 @@ snCore.Spell = {
     //send a candidate word to the server
     SubmitWord: function(){
 	var letters_array = [];
+	if(snCore.Event.game_ended){
+	    snCore.Toast.game_fin();
+	    return null;
+	}
 	if(this.SkeletalLetters.length>0){//construct the letters array using the skeletal letters.
 	    if(this.SkeletalLetters.length<3){
 		snCore.Toast.showToast("Words must be 3 letters or more");
@@ -196,6 +204,10 @@ snCore.Spell = {
 
 	}else{//construct the letters array from user prompt...
 	    var snatch_string = prompt("Enter Word:");
+	    if((snatch_string == null)||(snatch_string.length < 3)){
+		snCore.Toast.showToast("Words must be 3 letters or more");
+		return null;
+	    }
 	    snatch_string = snatch_string.toUpperCase();
 	    for(var i=0; i < snatch_string.length; i++){
 		var some_char = snatch_string.charCodeAt(i);

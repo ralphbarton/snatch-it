@@ -231,11 +231,26 @@ io.on('connection', function(socket){
 	// only if (1) the socket is assigned a .room_pin property (2) a game exist there (should always be true...)
 	// (3) the client at the socket actually entered the game and became a player.
 	if(dis_pl_i !== undefined){
+	    // record the disconnection in the backend, and also broadcast to the room...
 	    var dis_pl_i = myGame.playerIndexFromSocket(socket.id);
-	    socket.broadcast.to(socket.room_pin).emit('player disconnected',dis_pl_i);
+	    socket.broadcast.to(socket.room_pin).emit('player disconnected', dis_pl_i);
+
+	    // 'disconnecting' when all tiles are turned is equivalent to clicking finish
+	    // this preserves the possibility that the 'fin' message will show even with an unclean departure.
+	    if(myGame.areAllTilesTurned()){
+		var all_fin = myGame.PlayerFinishedGame(socket.id);
+		if(all_fin){
+		    io.to(socket.room_pin).emit('all players declared finished', 0);
+		}
+	    }
+  
+	    // make the log message
 	    var dis_pl_name = myGame.getPlayerObject(socket.id).name;
-	    myGame.removePlayer(socket.id);
 	    console.log('Player ' + dis_pl_i + ' (' + dis_pl_name + ') disconnected (socket.id = ' + socket.id + ')');
+
+	    //this function call must be last, and not be before other member functions of 'myGame'...
+	    myGame.removePlayer(socket.id);
+
 	}else{
 	    console.log('Connection closed (socket.id = ' + socket.id + ') - no player associated...');
 	}
@@ -440,9 +455,9 @@ io.on('connection', function(socket){
 	    console.log("A 'flip' message was recieved when all tiles were already turned");
 	    var all_fin = myGame.PlayerFinishedGame(socket.id);
 	    if(all_fin){
+		console.log("Active players agree: this game is finished");
 		io.to(socket.room_pin).emit('all players declared finished', 0);
 	    }else{
-		console.log("Active players agree: this game is finished");
 		var PI = myGame.playerIndexFromSocket(socket.id);
 		io.to(socket.room_pin).emit('player declared finished', PI);
 	    }

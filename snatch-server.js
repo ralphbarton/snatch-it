@@ -173,6 +173,10 @@ module.exports = function (nTiles, WordChecker){
 		return null;
 	    }
 	},
+
+	areAllTilesTurned: function(){
+	    return !(next_unturned_tile_i < tileSet.length);
+	},
 	
 	//I don't believe this function is used, by design...
 	resetGame: function(nTiles) {

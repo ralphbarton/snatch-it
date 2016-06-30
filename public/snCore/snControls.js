@@ -345,14 +345,22 @@ snCore.Controls = {
 
 
     //this function gets called upon a 'tile turn' from the server
-    updateTurnLetter_number: function(n_tiles_remaining){
+    updateTurnLetter_number: function(variant_str_tiles_rem){
 	var TurnButton = this.Button_Objs[1];
-	if(n_tiles_remaining>0){
-	    TurnButton.item(1).setText("Turn Letter (" + n_tiles_remaining + ")");
+	if(typeof(variant_str_tiles_rem) == "number"){
+
+	    if(variant_str_tiles_rem>0){
+		TurnButton.item(1).setText("Turn Letter (" + variant_str_tiles_rem + ")");
+	    }else{
+		TurnButton.item(1).setText("Finish Game");
+	    }
 	}else{
-	    TurnButton.item(1).setText("Finish Game");
+	    // this assumes the non-numeric value passed is a string.
+	    TurnButton.item(1).setText(variant_str_tiles_rem);
 	}
+	snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
     },
+
 
     turnDisabled: false,
     cancelTurnDisabled: false,
@@ -434,18 +442,11 @@ snCore.Controls = {
 	    if(n_tiles_remaining>0){
 		this.setButtonDisabled(1, true);//Disable the "turn letter" button...
 		TILE_TURN_REQUEST(); //request another tile...
-	    }else{
-		
-		//request another tile...
-		TILE_TURN_REQUEST(); 
-
-		// TODO: change all this
+	
+	    }else{// this is the case where all tiles are turned.
+		TILE_TURN_REQUEST(); //this call will indicate the intention to finish game (i.e. used to serve dual purpose)
 		this.client_indicated_finished = true;
-		//snCore.Popup.openModal("scores");
-		//set text
-		var TurnButton = this.Button_Objs[1];
-		TurnButton.item(1).setText("Waiting...");
-		snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+		this.updateTurnLetter_number("Waiting...");
 	    }
 
 	// Case 3: this is after the client has clicked "finish", but not all other players are done

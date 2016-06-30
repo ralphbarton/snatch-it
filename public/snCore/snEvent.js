@@ -398,8 +398,6 @@ snCore.Event = {
 
 
     Disconnection: function(player_index){
-
-	console.log("Player disconnetion message recieved, with player_index="+player_index);
 	var dis_plr = players[player_index];
 	dis_plr.is_disconnected = true;
 
@@ -565,10 +563,7 @@ snCore.Event = {
     game_ended: false,
     EndGame: function(){
 	this.game_ended = true;
-	//3 lines of code to achieve this is a little verbose. TODO: integrate with "updateTurnLetter_number"
-	var TurnButton = snCore.Controls.Button_Objs[1];
-	TurnButton.item(1).setText("Play Again");
-	snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+	snCore.Controls.updateTurnLetter_number("Play Again");
 	snCore.Popup.openModal("scores");
     }
 

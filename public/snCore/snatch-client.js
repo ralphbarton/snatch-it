@@ -192,7 +192,6 @@ socket.on('game settings download', function(obj){
 
 
 socket.on('all players declared finished', function(no_data){
-    console.log('all players declared finished');
     snCore.Event.EndGame();
 });
 

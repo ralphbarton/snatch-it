@@ -219,7 +219,7 @@ snCore.Toast = {
 	for(var i = 0; i < n_pl; i++){
 	    var Plr = players[i];
 	    if((!Plr.is_disconnected) && (!Plr.is_finished)){
-		str_nl += (i == PI_just_finished ? "you" : Plr.name) + (i < (n_pl-1) ? ", ":"");
+		str_nl += (i == client_player_index ? "you" : Plr.name) + (i < (n_pl-1) ? ", ":"");
 	    }
 	}
 
@@ -234,8 +234,12 @@ snCore.Toast = {
 	}else{
 	    str_tot += "Waiting";
 	}
-	str_tot += " for " + str_nl + " (after which final scores will show)"
+	str_tot += " for " + str_nl + " (after which final scores will show)";
 	snCore.Toast.showToast(str_tot);
+    },
+
+    game_fin: function(){
+	snCore.Toast.showToast("The game is now finished");
     }
 
 };
