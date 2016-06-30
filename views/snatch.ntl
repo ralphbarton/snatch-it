@@ -352,7 +352,7 @@
 
 	  <!-- 6.2. Footer for Game finished -->
 	  <div id="modal-footer-close-replay">
-	    <a class="modal" href="#" onclick="snCore.Popup.hideModal()">Close</a>
+	    <a class="modal" href="#" onclick="snCore.Popup.hideModal()">Hide</a>
 	    | <a class="modal" href="#" onclick="snCore.Popup.gotoHomePage()">Play Again</a>
 	  </div>
 
