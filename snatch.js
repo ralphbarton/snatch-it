@@ -431,7 +431,13 @@ io.on('connection', function(socket){
 	if(!access_room(socket.room_pin)){return;}; // log that the game was accessed. Terminate if invalid
 	//update server copy of data (this will get sent to new players)
 	rooms_table[socket.room_pin].GameInstance.update_uOpt(settings_obj);
-	socket.broadcast.to(socket.room_pin).emit('game settings download', settings_obj);
+	var myGame = rooms_table[socket.room_pin].GameInstance;
+	var details_obj = {
+	    settings_obj: settings_obj,
+	    changer_player_index: myGame.playerIndexFromSocket(socket.id)
+	};
+
+	socket.broadcast.to(socket.room_pin).emit('game settings download', details_obj);
     });
 
 

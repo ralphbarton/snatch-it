@@ -177,7 +177,11 @@ socket.on('new word definition', function(W_DEF){
 
 
 socket.on('game settings download', function(obj){
-    snCore.Popup.recieveSettingChange(obj);
+    var changed_settings = snCore.Popup.recieveSettingChange(obj.settings_obj);
+    if(snCore.Popup.popup_in_foreground == false){
+	var nam = players[obj.changer_player_index].name;
+	snCore.Toast.showToast(nam + " changed some game settings.");
+    }
 });
 
 

@@ -306,9 +306,15 @@ snCore.Controls = {
 		    var solid_len = progress_fraction * l_tot;
 		    RoundedRec.setStrokeDashArray([solid_len, l_tot-solid_len]);
 		    if((progress_fraction>=1)||(snCore.Controls.cancelTurnDisabled)){//animation completed...
+
 			//restore the visual state of the button to normal
 			RoundedRec.setStrokeDashArray(null);
 			snCore.Controls.setButtonDisabled(1, false);//un-disable the "Turn Letter" button
+
+			//also, remove any toast that relates to the Turn being disabled...
+			snCore.Toast.setToastRemTimeout(snCore.Controls.turn_tk, {instant: true});//the true means clear fast...
+			snCore.Controls.turn_tk = undefined;// to not hold a reference to a now deleted toast.
+			
 			return true; //this means the function call chain shall terminate
 		    }else{
 			return false; // function call chain to continue
@@ -422,9 +428,7 @@ snCore.Controls = {
 
 		var t_active = snCore.Toast.Active_byKey[snCore.Controls.turn_tk];
 		if (time_remaining == 0){
-		    snCore.Toast.setToastRemTimeout(snCore.Controls.turn_tk, {instant: true});//the true means clear fast...
-		    // to not hold a reference to a now deleted toast.
-		    snCore.Controls.turn_tk = undefined;
+		    //the point is that in this case we DON'T make any recursive call...
 		}else if(t_active){
 		    //recursive call...
 		    setTimeout(toast_time_updater, 1000/ndo);

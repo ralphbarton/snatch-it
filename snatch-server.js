@@ -74,7 +74,7 @@ module.exports = function (nTiles, WordChecker){
 		    color : col,
 		    words : [],
 		    is_disconnected: false,
-		    is_finished: game_finished,// typically false!
+		    is_finished: this.areAllTilesTurned(),// typically false!
 		    socket_key: socket_key
 		};
 		playerSet.push(newPlayer);
