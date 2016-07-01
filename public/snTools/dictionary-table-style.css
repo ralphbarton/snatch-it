@@ -218,7 +218,8 @@ td.text-right {
 }
 
 .gram-grp{
-    color: #793FA1;
+    font-style: italic;
+    color: #793FA1; /* purple */
     font-weight: 400;
 }
 

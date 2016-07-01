@@ -95,6 +95,7 @@ snCore.Toast = {
 	/*
 	ToastOptions = {
 	    persistent: boolean
+	    HTML_frag: <object, jQuery>
 	}
 	*/
 
@@ -113,6 +114,10 @@ snCore.Toast = {
 		this.setToastRemTimeout(t_key, {duration: 60000});
 		// it will get
 		this.persistent_toast_list_byKey.push(t_key);
+	    }
+
+	    if(ToastOptions.HTML_frag !== undefined){
+		$NewToast.html("").append(ToastOptions.HTML_frag);
 	    }
 	}
 

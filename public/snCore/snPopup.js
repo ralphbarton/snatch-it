@@ -182,12 +182,10 @@ snCore.Popup = {
 	//Setting Modal BODY
 	this.setVisibleModalContent("#modal-body", Body);
 	this.setVisibleModalContent("#modal-footer", Footer);
-
 	this.activateModal(Closable);//it does not matter to run this function if a model is already present.
 
 	//record which popup is currently on display...
 	this.popup_in_foreground = type;
-
 
     },
 

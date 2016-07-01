@@ -60,7 +60,7 @@ my_SDC.rEvent.on('searchComplete', function(result){
     // Work needed for this whole aspect of linking reponse to original asynchronous request
     console.log("BS search completed for word : " + prev_word);
     io.emit('new word definition', BSres);	    
-    word_dictionary[prev_word] = prev_result;
+    word_dictionary[prev_word] = BSres;
 });
 
 

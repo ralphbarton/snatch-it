@@ -39,8 +39,10 @@ snCore.Latency = {
 	    var L2 = this.GetTimeCurrentlyWaited();
 
 	    // only (potentially) clear the message if we're now not waiting for anything:
-	    // I haven't thought about it enough but this is potentially dodgy.
-	    if(L2 < 0.5){
+	    // What this means is that if two messages are awaited, one of them arriving will not cause a clear
+	    // however, the "waiting" circle of dots won't change colour, being based upon the most delayed message at time of
+	    // raising the Popup.
+	    if(L2.latency < 0.25){
 		// Clear the "connection lost" message if it is present
 		if((snCore.Popup.popup_in_foreground == "connection")||(snCore.Popup.popup_in_foreground == "connection_1min")){
 		    snCore.Popup.hideModal();
