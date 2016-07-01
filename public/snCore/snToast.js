@@ -35,9 +35,6 @@ snCore.Toast = {
 	//Actually the div of the new Toast class...
 	var $NewToast = $( "<div/>", {id: t_key}).addClass("ToastGrey ToastCentral ToastIn").html(my_string);
 	
-	//any <a href> into new windows... 
-	$NewToast.find( "a" ).attr("target","_blank");
-
 	$("#canv-inside").append($NewToast);
 
 	var toast_spacing = snCore.Tile.stdDimention * 0.18;
@@ -120,6 +117,9 @@ snCore.Toast = {
 		$NewToast.html("").append(ToastOptions.HTML_frag);
 	    }
 	}
+
+	//any <a href> into new windows... (this will apply to links in str or frags...)
+	$NewToast.find( "a" ).attr("target","_blank");
 
 
 	return t_key;

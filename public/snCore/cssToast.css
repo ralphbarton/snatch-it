@@ -60,6 +60,64 @@
     cursor: pointer;
 }
 
+/* Format the dictionary-text within... */
+.defn-main-word{
+    color: white;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.defn-queried{
+    color: #AAA;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.defn-showing{
+    font-size: 85%;
+    font-style: italic;
+    color: white;
+}
+
+.defn-showing-word{
+    font-style: normal;
+    color: white;
+    font-size: 118%;
+    font-weight: bold;
+}
+
+.defn-text {
+    font-size: 85%;
+    color: #AAA;
+}
+
+.gram-grp{
+    font-style: italic;
+    color: #DE8FFF; /* purple */
+    font-weight: 400;
+}
+
+.dbox-italic{
+    font-style: italic;
+}
+
+.dbox-bold{
+    color: #CCC;
+    font-weight: bold;
+}
+
+.definition a{
+    color: #6B92BF;
+}
+
+.def-block{/* for citations... */
+    color: #D1C373;
+    font-size: 75%;
+    font-weight: bold;
+}
+
+
+
 
 
 

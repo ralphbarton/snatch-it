@@ -33,60 +33,55 @@ snCore.DefineWord = {
 		    DefnList: <Array>
 		    }*/
 		var DefnObj = snCore.DefineWord.word_dictionary[word_str];
+		var invalid_defn = DefnObj == undefined;
 		var w_change = DefnObj.word_defined.toLowerCase() != DefnObj.word_queried.toLowerCase();
 		var no_defns_found = DefnObj.DefnList.length == 0;
 
 		var Def_Frag = $('<div/>');
 
-		if (no_defns_found){
-		    Def_Frag.text("No definitions found for ").append(
+		//generate the innerHTML
+		if (invalid_defn){
+		    Def_Frag.text("Undefined: ").append(
+			$('<span/>').addClass("defn-main-word").html(DefnObj.word_queried)
+		    );
+		}else if (no_defns_found){
+		    Def_Frag.text("No definitions were retrieved for ").append(
 			$('<span/>').addClass("defn-main-word").html(DefnObj.word_queried)
 		    );
 		}else{
-
 		    // 1. Generate the "Top Line"
 		    var TopLine_Frag = $('<div/>');
+		    var HR = DefnObj.properties.source + DefnObj.word_defined.toLowerCase();
 		    if(w_change){ // 1.1 word was transformed
 			TopLine_Frag.append(
-			    $('<span/>').addClass("defn-queried").html(DefnObj.word_queried)
+			    $('<a/>').attr("href", HR).addClass("defn-queried").text(DefnObj.word_queried.toUpperCase())
 			).append(
-			    $('<span/>').addClass("defn-showing").html(
-				'(results for <span class="defn-showing-word">'+DefnObj.word_defined+'</span>)'
+			    $('<span/>').addClass("defn-showing").append(
+				"  (results for "
+			    ).append(
+				$('<span/>').addClass("defn-showing-word").text(DefnObj.word_defined.toUpperCase())
+			    ).append(
+				")"
 			    )
 			);
 		    }else{ // 1.1 word verbatim
 			TopLine_Frag.append(
-			    $('<span/>').addClass("defn-main-word").html(DefnObj.word_queried)
+			    $('<a/>').attr("href", HR).addClass("defn-main-word").text(DefnObj.word_queried.toUpperCase())
 			);
 		    }
+		    Def_Frag.append(TopLine_Frag);
 
-
-		    Def_Frag.append(
-			$('<div/>').append(//to achieve line break
-
-			)
-		    );
-
-		    );
-
-text("No definitions found for ").append(
-			$('<span/>').addClass("defn-main-word").html(DefnObj.word_queried)
-		    );
-		}
-		
-
-// definition = W_DEF.DefnList[0];
-
-		if(w_change){
-		    var Toast_HTML =  '<div><span class="defn-queried">'+DefnObj.word_queried+'</span>';
-		    var Toast_HTML += '<span class="defn-showing">(results shown for '+DefnObj.word_defined+')</span></div>';
-		}else{
-
+		    // 2. Inject further content...
+		    var Max_Ds = 2;
+		    for (var i = 0; (i < DefnObj.DefnList.length) && (i < Max_Ds); i++){//cap qty defns @ 2
+			Def_Frag.append(
+			    $('<div/>').addClass("defn-text").html(DefnObj.DefnList[i]) // this this the definition
+			);
+		    }
 		}
 
-		snCore.Toast.showToast(word_str + ": " + );
 
-
+		snCore.Toast.showToast("(text str)",{HTML_frag: Def_Frag});
 
 		if(mouse_is_down){
 		    snCore.Mouse.defn_toast_shown_since_mouse_down = true;

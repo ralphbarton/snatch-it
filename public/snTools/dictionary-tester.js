@@ -6,6 +6,7 @@ socket.on('new word definition', function(W_DEF){
 	word_defined: <string>
 	n_definitions: <int>
 	DefnList: <Array>
+	properties: {}
     }*/
 
     var tag_id = '#defn-' + W_DEF.word_queried.toUpperCase();
