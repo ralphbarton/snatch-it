@@ -117,7 +117,22 @@
 }
 
 
+.ToastStop {
+    top: -8px;
+    right: -11px;
+    position: relative;
+    float: right;
+    font-size: 75%;
+    font-weight: bold;
+}
 
+.ToastStop.S1{
+    color: #629E73;
+}
+
+.ToastStop.S2{
+    color: #9E7362;
+}
 
 
 

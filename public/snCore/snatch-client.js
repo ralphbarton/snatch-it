@@ -77,10 +77,6 @@ socket.on('full game state transmission', function(gameState){
     snCore.Event.FirstGameRender(); // main effect is to add keyboard & mouse listeners
     snCore.Event.DrawAll();
 
-    if(gameState.game_finished){
-	snCore.Event.EndGame();
-    }
-
     snCore.Toast.join_message(); //show a welcome toast
     emit_heartbeat(); //start the hearbeat process now.
 

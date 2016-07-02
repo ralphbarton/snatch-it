@@ -176,9 +176,9 @@
 	  <div id="modal-body-slow-connection">
 	    <p>Your device exchanges messages with a server during play...</p>
 	    <div class="loader">Network Latency...</div>
-	    <p>There has now been a <span id="connection-latency">[too many]</span> second delay receiving a response to a message. Is there a problem with your Internet?</p>
+	    <p>There has now been a <span id="connection-latency">[too many]</span> second delay receiving a response to a message. Is there something wrong with your internet connection?</p>
 
-	    <p>If your Internet is working this message may disappear shortly.</p>
+	    <p>If your internet is working this message may disappear shortly.</p>
 
 	    <p>Otherwise, click below to re-establish a connection to this game. Enter your name exactly as before to reclaim your words.</p>
 

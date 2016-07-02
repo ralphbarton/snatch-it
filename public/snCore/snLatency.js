@@ -23,7 +23,6 @@ snCore.Latency = {
 	if(key != "hb"){
 	    snCore.Toast.clear_all_persistent();
 	}
-
     },
 
 

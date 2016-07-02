@@ -47,11 +47,12 @@ snCore.Toast = {
 	    ToastTop_current_client_words = Math.max(ToastTop_current_client_words, Client_Words_Grps[i].getTop());
         }
 
-	var toast_top = Math.max(this.ToastTop_consumed_words + snCore.Tile.stdDimention * 1.4,
-				 this.ToastTop_snatched_word + snCore.Tile.stdDimention * 1.4,
+	var H_spacer = snCore.Tile.dims.ts + snCore.Tile.stdDimention * 0.35;
+	var toast_top = Math.max(this.ToastTop_consumed_words + H_spacer,
+				 this.ToastTop_snatched_word + H_spacer,
 				 this.ToastTop_zone_inner_final,
-				 this.ToastTop_client_words_final + snCore.Tile.stdDimention * 1.4,
-				 ToastTop_current_client_words +  snCore.Tile.stdDimention * 1.4,
+				 this.ToastTop_client_words_final + H_spacer,
+				 ToastTop_current_client_words +  H_spacer,
 				 ToastTop_current_client_zone_top);
 	this.reset_ToastTop_params();
 
@@ -83,16 +84,17 @@ snCore.Toast = {
 	//toasts scaling (there are some more...)
 	//TODO: this styling code which applies to all toasts should be elsewhere
 	// why can't I use jQuery to change the properties of the CSS class universally whilst no objects of that class exist?
-	var ts = snCore.Tile.stdDimention;
-	$NewToast.css("font-size", (ts*0.35)+"px");
-	$NewToast.css("-moz-border-radius", (ts*0.1)+"px");
-	$NewToast.css("-webkit-border-radius", (ts*0.1)+"px");
-	$NewToast.css("border-radius", (ts*0.1)+"px");
+	var sd = snCore.Tile.stdDimention;
+	$NewToast.css("font-size", (sd*0.35)+"px");
+	$NewToast.css("-moz-border-radius", (sd*0.1)+"px");
+	$NewToast.css("-webkit-border-radius", (sd*0.1)+"px");
+	$NewToast.css("border-radius", (sd*0.1)+"px");
 
 	/*
 	ToastOptions = {
 	    persistent: boolean
 	    HTML_frag: <object, jQuery>
+	    stoppable: boolean
 	}
 	*/
 
@@ -103,7 +105,7 @@ snCore.Toast = {
 	}else{
 	    if(ToastOptions.persistent == true){
 		// add cross in corner to close it
-		var crn_cross = $("<div class=\"ToastClose\"></div>").text("×");
+		var crn_cross = $('<div/>').addClass("ToastClose").text("×");
 		$NewToast.prepend(crn_cross);
 		crn_cross.click(function(){
 		    snCore.Toast.setToastRemTimeout(t_key, {instant: true});});
@@ -118,6 +120,17 @@ snCore.Toast = {
 
 	    if(ToastOptions.HTML_frag !== undefined){
 		$NewToast.html("").append(ToastOptions.HTML_frag);
+	    }
+
+	    if(ToastOptions.stoppable == true){
+		var stop_msg = $('<div/>', {id: "m1"+t_key}).addClass("ToastStop S1").text("click to hold in view");
+		$NewToast.prepend(stop_msg).click(function(){
+		    snCore.Toast.setToastRemTimeout(t_key, {duration: 120000});//2 minutes
+		    $("#m1"+t_key).removeClass("S1").addClass("S2").text("click to clear");
+		    $NewToast.click(function(){//get rid of
+			snCore.Toast.setToastRemTimeout(t_key, {instant: true});
+		    });
+		});
 	    }
 	}
 

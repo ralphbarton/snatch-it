@@ -34,15 +34,17 @@ snCore.DefineWord = {
 		    }*/
 		var DefnObj = snCore.DefineWord.word_dictionary[word_str];
 		var invalid_defn = DefnObj == undefined;
-		var w_change = DefnObj.word_defined.toLowerCase() != DefnObj.word_queried.toLowerCase();
-		var no_defns_found = DefnObj.DefnList.length == 0;
+		if(!invalid_defn){
+		    var w_change = DefnObj.word_defined.toLowerCase() != DefnObj.word_queried.toLowerCase();
+		    var no_defns_found = DefnObj.DefnList.length == 0;
+		}
 
 		var Def_Frag = $('<div/>');
 
 		//generate the innerHTML
 		if (invalid_defn){
 		    Def_Frag.text("Undefined: ").append(
-			$('<span/>').addClass("defn-main-word").html(DefnObj.word_queried)
+			$('<span/>').addClass("defn-main-word").html(word_str)
 		    );
 		}else if (no_defns_found){
 		    Def_Frag.text("No definitions were retrieved for ").append(
@@ -81,7 +83,7 @@ snCore.DefineWord = {
 		}
 
 
-		snCore.Toast.showToast("(text str)",{HTML_frag: Def_Frag});
+		snCore.Toast.showToast("(text str)",{HTML_frag: Def_Frag, stoppable: true});
 
 		if(mouse_is_down){
 		    snCore.Mouse.defn_toast_shown_since_mouse_down = true;

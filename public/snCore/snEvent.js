@@ -132,7 +132,12 @@ snCore.Event = {
 	    snCore.Words.MoveWordsIntoArrangement(Top, ZoneProperties.WordBounds, WordGroup, Arrangement_noH, null);
 	}
 
-	//After draw operation, actually draw the frame on-screen...
+	//  apply 'ended' style if necessary.
+	if(this.game_ended == true){
+	    snCore.Event.EndGame();
+	}
+
+	// draw some such frames
 	snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
     },
     
