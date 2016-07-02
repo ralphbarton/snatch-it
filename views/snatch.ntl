@@ -30,11 +30,11 @@
     <script src="snOuter/common.js"></script>
 
     <!-- JS files specific to Snatch game -->
-    <script src="snCore/snatch-client.js"></script>
+    <script src="snCore/snatch-client#FF#.js"></script>
 
     <script src="snCore/snAssembler.js"></script>
     <script src="snCore/snBasic.js"></script>
-    <script src="snCore/snControls.js"></script>
+    <script src="snCore/snControls#FF#.js"></script>
     <script src="snCore/snDefineWord.js"></script>
     <script src="snCore/snEvent.js"></script>
     <script src="snCore/snGrid.js"></script>
@@ -43,7 +43,7 @@
     <script src="snCore/snMouse.js"></script>
     <script src="snCore/snPopup.js"></script>
     <script src="snCore/snSpell.js"></script>
-    <script src="snCore/snSplash.js"></script>
+    <script src="snCore/snSplash#FF#.js"></script>
     <script src="snCore/snTile.js"></script>
     <script src="snCore/snToast.js"></script>
     <script src="snCore/snWords.js"></script>

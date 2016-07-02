@@ -10,7 +10,7 @@ app.engine('ntl', function (filePath, options, callback) { // define the templat
   fs.readFile(filePath, function (err, content) {
     if (err) return callback(new Error(err));
     // this is an extremely simple template engine
-    var rendered = content.toString().replace('#identity-html#', options.identity_html).replace('#html-1#', options.html1);
+    var rendered = content.toString().replace('#identity-html#', options.identity_html).replace('#html-1#', options.html1).replace(/#FF#/g, options.fileset);
     return callback(null, rendered);
   });
 });
@@ -130,6 +130,10 @@ app.get('/join=*', function (req, res) {
     var frags = req.url.split('=');
     var identity_supplied = frags[frags.length-1];
 
+    var id_frags = identity_supplied.split('&');
+    var identity_supplied = id_frags[0];
+    var fileset_tag = id_frags[1] || '';
+
     var valid_pin = undefined;
     var dash_key = undefined;//i.e. pink-elephant
     var space_key = undefined;//i.e. pink elephant
@@ -150,7 +154,7 @@ app.get('/join=*', function (req, res) {
 
     if(valid_pin != undefined){
 	var my_html = '<div id="pin">' + valid_pin + '</div>\n<div id="key">'+ dash_key +'</div>\n';
-	res.render('snatch', {identity_html: my_html});
+	res.render('snatch', {identity_html: my_html, fileset: fileset_tag});
 	access_room(valid_pin);//extend time out due to link usage.
     }else{
 	console.log(identity_supplied + ' was not detected as a valid game identity. Homepage served instead');
