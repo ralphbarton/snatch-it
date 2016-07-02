@@ -61,6 +61,9 @@
       <canvas id="c"></canvas>
     </div>
 
+    <div class="page" id="game-container">
+    </div>
+
 
     <!-- 5. The Modal -->
     <div id="modal_dark_sheet">
