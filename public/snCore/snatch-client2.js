@@ -199,6 +199,13 @@ function GAME_SETTINGS_CHANGE(p)      {socket.emit('game settings upload', p);}
 function TURN_MANY_TILES(p)           {socket.emit('many_tile_turn_hack', p);}
 
 
+//to help with in-situ css-properties
+function px(a, b, c){
+    var ret = a.toFixed(1)+'px';
+    if(b!==undefined){ret += " " + b.toFixed(1)+'px';}
+    if(c!==undefined){ret += " " + c.toFixed(1)+'px';}
+    return ret;
+}
 
 
 ///Todo what uses this function? Can it be placed elsewhere in the code?

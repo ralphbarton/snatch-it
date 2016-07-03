@@ -14,7 +14,7 @@ snCore.Splash2 = {
 	this.players_t = players_t;
 
 	//the fact that this checks for clicks landing on objects that don't yet exist doesn't matter
-	this.addKBmouseListeners();
+	this.addKbListeners();
 
 	//unhide the relevant DIV...
 	$("#game-container").show().css({"background-color": "#CCC"});
@@ -69,7 +69,8 @@ snCore.Splash2 = {
 			    };
 			    PLAYER_JOINED_WITH_DETAILS(playerDetailsObj);
 			    //this is important, or leave it so that clicking will send a "player joined" even after splash screen...
-			    snCore.Splash.removeKBmouseListeners();
+			    document.removeEventListener("keydown", this.KBListener_ref, false);
+
 			}else{
 		    	    this.name_validated = false;
 			}	
@@ -87,109 +88,118 @@ snCore.Splash2 = {
 	return this.name_validated;
     },
 
+    BB_radius: undefined,
     renderPromptScreen: function(){
 
 	var frW = port_W * 0.020;// this is some fraction of page Width, in this case 2%
 
 	$("#game-container").empty().css({"background-color": "white"}).append(//the text...
-	    $('<div/>').css({
-		"font-size": (frW+"pt"),
-		"padding": "20px"
+	    $('<div/>', {id: "BB-msg"}).css({
+		"font-size": (1.7*frW+"pt"),
+		"font-weight": "800",
+		"padding": "2px 20px"
 	    }).append(
-		$('<p/>').text("Welcome, " + this.player_name + "!")
+		$('<div/>').text("Welcome, " + this.player_name + "!")
 	    ).append(
-		$('<p/>').text("Select your color:")
+		$('<div/>').text("Select your color:")
 	    )
-	).append(
-	    $('<div/>', {id: "BB-cont"}).css({
-		border: "1px solid red",
-		width: (port_W-1)+"px",
-		height: (port_W-1)+"px"
-	    })
 	);
 
-	//just create the BB's in-situ
-	
-	var dd;
+	var rem_height = port_H - parseFloat($("#BB-msg").css('height'));
+	var sqr_dim = Math.min(port_W, rem_height)
 
+	$("#game-container").append(
+	    $('<div/>', {id: "BB-area"}).css({
+		background: "#BDAEB3",
+		width: (port_W)+"px",
+		height: (rem_height)+"px"
+	    }).append(
+		$('<div/>', {id: "BB-box"}).css({
+		    position: "relative",
+		    background: "#90FC9D",
+		    width: (sqr_dim)+"px",
+		    height: (sqr_dim)+"px",
+		    margin: "0 auto"
+		})
+	    )
+	);
 
-    },
-
-    effectiveHeight: undefined,
-    ringCenterX: undefined,
-    ringCenterY: undefined,
-    ringRadius: undefined,
-    blipBlopRadius: undefined,
-    radSF: undefined,
-
-    drawBBring: function(){
-
-	//set a load of parameters / dimentions that are constants using to draw the BBs
-	this.ringCenterX = snCore.Basic.canv_W/2;
-	this.effectiveHeight = snCore.Basic.canv_H - this.ringZoneTopPx;
-	this.ringCenterY = this.ringZoneTopPx + this.effectiveHeight / 2;
-	this.ringRadius = Math.min(snCore.Basic.canv_W, this.effectiveHeight)*0.5*0.6;
-	this.blipBlopRadius = this.ringRadius*0.4;
-	this.radSF = Math.PI*2 / 360;
+	var ring_center_coord = sqr_dim/2;
+	var ring_radius = (sqr_dim/2) * 0.6;
+	this.BB_radius = ring_radius * 0.4;
+	var radSF = Math.PI*2 / 360;
 
 	//now draw the BBs
-	for (var i=0; i<5; i++){
-	    this.drawBBwithIndex(i);
+	for (var index = 0; index<5; index++){
+
+	    var placement_angle = 18 + 36 + 72 * index;
+	    var mcLeft_c = (sqr_dim/2) + ring_radius * Math.cos(radSF * placement_angle);
+	    var mcTop_c = (sqr_dim/2) - ring_radius * Math.sin(radSF * placement_angle);
+	    var mcLeft = mcLeft_c - this.BB_radius;
+	    var mcTop = mcTop_c - this.BB_radius;
+
+	    var bb_id = "BB-"+index;
+	    //just create the BB's in-situ
+	    $("#BB-box").append(
+		$('<div/>', {id: bb_id}).css({
+		    background: this.myFiveColors[index],
+		    position: "absolute",
+		    top: px(mcTop),
+		    left: px(mcLeft),
+		    width: px(this.BB_radius*2),
+		    height: px(this.BB_radius*2),
+		    border: px(this.BB_radius*0.15) + " solid black",
+		    "border-radius": px(this.BB_radius)
+		}).mousedown(function(){
+		    console.log("A");
+		    var freeze_i = index;
+		    snCore.Splash2.handleBBchosen(freeze_i);
+		}).mouseup(function(){
+		    console.log("B");
+		    snCore.Splash2.handleBBchosenReleased();
+		})
+	    );
+
+
+	    /*
+	    //set forwards and backwards linking
+	    myBB.BBindex = index;
+	    this.myFiveBBs[index] = myBB;
+	    */
+
 	}
-	canvas.renderAll();
-    },
-
-    drawBBwithIndex: function(index){
-	
-	var placement_angle = 18 + 36 + 72 * index;
-	var mcLeft_c = this.ringCenterX + this.ringRadius * Math.cos(this.radSF*placement_angle);
-	var mcTop_c = this.ringCenterY - this.ringRadius * Math.sin(this.radSF*placement_angle);
-	var mcLeft = mcLeft_c - this.blipBlopRadius;
-	var mcTop = mcTop_c - this.blipBlopRadius;
-
-	var myBB = new fabric.Circle({
-	    radius: this.blipBlopRadius,
-	    stroke: 'black',
-	    strokeWidth: this.blipBlopRadius*0.2,
-	    fill: this.myFiveColors[index],
-	    left: mcLeft,
-	    top: mcTop,
-	    hasControls: false,
-	    hasBorders: false
-	});
-
-	//set forwards and backwards linking
-	myBB.BBindex = index;
-	this.myFiveBBs[index] = myBB;
-	canvas.add(myBB);
-
     },
 
     shrinkAndRemoveBBwithIndex: function(index,extra_onComplete_function){
-	var shrinkMeBB = this.myFiveBBs[index];
-	var newLeft = shrinkMeBB.getLeft() + this.blipBlopRadius; 
-	var newTop = shrinkMeBB.getTop() + this.blipBlopRadius;
+	var shrinkMeBB = $("#BB-" + index);
+	var newLeft = parseFloat(shrinkMeBB.css('left')) + this.blipBlopRadius; 
+	var newTop = parseFloat(shrinkMeBB.css('left')) + this.blipBlopRadius;
+
+	var props_final = {
+	    width: px(0),
+	    height: px(0),
+	    left: newLeft,
+	    top: newTop,
+	    "border-width": px(0)
+	};
 
 	var onComplete_deleteBB = function(){
-	    canvas.remove(shrinkMeBB);
+	    shrinkMeBB.remove();
 	    if(extra_onComplete_function!==undefined){
 		extra_onComplete_function();
 	    }
 	};
-	
-	snCore.Basic.moveSwitchable(shrinkMeBB, onComplete_deleteBB, snCore.Basic.ani.sty_BBshrink,{
-	    left: newLeft,
-	    top: newTop,
-	    strokeWidth: 0,
-	    radius: 0
-	});
+
+	shrinkMeBB.animate(props_final, 400, onComplete_deleteBB);
     },
 
     BB_chosen_was: undefined,
     handleBBchosen: function(i_chosen){
+	console.log("C = ", i_chosen);
 	this.BB_chosen_was = i_chosen;
 	for (var i=0; i < 5; i++){
 	    if(i == i_chosen){continue;}//don't vanish the BB we just hit!
+	    console.log("D = ", i);
 	    this.shrinkAndRemoveBBwithIndex(i);
 	}
     },
@@ -198,8 +208,9 @@ snCore.Splash2 = {
 
 	var onComplete_BBchosenReleased_animation = function(){
 
-	    snCore.Splash.removeKBmouseListeners();
+	    document.removeEventListener("keydown", this.KBListener_ref, false);
 
+	    /*
 	    var wait_str = "Waiting for server\nto send the state of the ongoing\nSNATCH-IT game...";
 	    var my_font_size = snCore.Basic.canv_W * 0.055;
 	    var textObj = snCore.Splash.textObject_main;
@@ -216,7 +227,7 @@ snCore.Splash2 = {
 	    textObj.set({
 		left: (canvas.getWidth() - textObj.getWidth()) / 2,
 		top: (canvas.getHeight() - textObj.getHeight()) / 2,
-	    });
+	    });*/
 
 	    //send the data to the server
 	    var playerDetailsObj = {
@@ -233,27 +244,7 @@ snCore.Splash2 = {
     },
 
     KBListener_ref: undefined,
-    addKBmouseListeners: function(){
-	//respond to mouse down on a BB
-
-	// CANVAS IS NO MORE !!
-/*
-	canvas.on('mouse:down',function(e){
-	    if(e.target){
-		var BB_hit_i = e.target.BBindex;
-		if(BB_hit_i != undefined){
-		    snCore.Splash.handleBBchosen(BB_hit_i);
-		}
-	    }
-	}); 
-	//respond to mouse up if a mouse-down has landed on a BB
-	canvas.on('mouse:up',function(e){
-	    if(snCore.Splash.BB_chosen_was !== undefined){
-		snCore.Splash.handleBBchosenReleased();
-	    }
-	});
-*/
-
+    addKbListeners: function(){
 	//because the keyboard listener function has to be removed by name, we cannot define and pass it anonymously
 	//there appear to be subtle differnces based upon the context in which the function is defined
 	//(hence not directly defining 'KBlistenerSplash' as a member of snCore.Splash), but inside another
@@ -279,19 +270,11 @@ snCore.Splash2 = {
 		    snCore.Splash.namePrompt();
 		}
 	    }
-	    
-
 	};
 	this.KBListener_ref = KBlistenerSplash;
 
 	//respond to keydown events
 	document.addEventListener("keydown", this.KBListener_ref, false);
-
-    },
-
-    removeKBmouseListeners: function(){
-	    canvas.off('mouse:down');
-	    canvas.off('mouse:up');
-	    document.removeEventListener("keydown", this.KBListener_ref, false);
     }
+
 };
