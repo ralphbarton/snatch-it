@@ -2,8 +2,6 @@ snCore.Splash2 = {
 
     player_name: null,
     myFiveColors: undefined,
-    myFiveBBs: [],
-    ringZoneTopPx: undefined,
     name_validated: false,
     players_t: undefined,
 
@@ -110,13 +108,11 @@ snCore.Splash2 = {
 
 	$("#game-container").append(
 	    $('<div/>', {id: "BB-area"}).css({
-		background: "#BDAEB3",
 		width: (port_W)+"px",
 		height: (rem_height)+"px"
 	    }).append(
 		$('<div/>', {id: "BB-box"}).css({
 		    position: "relative",
-		    background: "#90FC9D",
 		    width: (sqr_dim)+"px",
 		    height: (sqr_dim)+"px",
 		    margin: "0 auto"
@@ -124,7 +120,6 @@ snCore.Splash2 = {
 	    )
 	);
 
-	var ring_center_coord = sqr_dim/2;
 	var ring_radius = (sqr_dim/2) * 0.6;
 	this.BB_radius = ring_radius * 0.4;
 	var radSF = Math.PI*2 / 360;
@@ -151,29 +146,20 @@ snCore.Splash2 = {
 		    border: px(this.BB_radius*0.15) + " solid black",
 		    "border-radius": px(this.BB_radius)
 		}).mousedown(function(){
-		    console.log("A");
-		    var freeze_i = index;
-		    snCore.Splash2.handleBBchosen(freeze_i);
+		    var my_tag = $(this).attr('id');
+		    var bb_i = parseInt(my_tag.replace("BB-",""))
+		    snCore.Splash2.handleBBchosen(bb_i);
 		}).mouseup(function(){
-		    console.log("B");
 		    snCore.Splash2.handleBBchosenReleased();
 		})
 	    );
-
-
-	    /*
-	    //set forwards and backwards linking
-	    myBB.BBindex = index;
-	    this.myFiveBBs[index] = myBB;
-	    */
-
 	}
     },
 
     shrinkAndRemoveBBwithIndex: function(index,extra_onComplete_function){
 	var shrinkMeBB = $("#BB-" + index);
-	var newLeft = parseFloat(shrinkMeBB.css('left')) + this.blipBlopRadius; 
-	var newTop = parseFloat(shrinkMeBB.css('left')) + this.blipBlopRadius;
+	var newLeft = parseFloat(shrinkMeBB.css('left')) + this.BB_radius;
+	var newTop = parseFloat(shrinkMeBB.css('top')) + this.BB_radius;
 
 	var props_final = {
 	    width: px(0),
@@ -195,11 +181,9 @@ snCore.Splash2 = {
 
     BB_chosen_was: undefined,
     handleBBchosen: function(i_chosen){
-	console.log("C = ", i_chosen);
 	this.BB_chosen_was = i_chosen;
 	for (var i=0; i < 5; i++){
 	    if(i == i_chosen){continue;}//don't vanish the BB we just hit!
-	    console.log("D = ", i);
 	    this.shrinkAndRemoveBBwithIndex(i);
 	}
     },
@@ -210,37 +194,36 @@ snCore.Splash2 = {
 
 	    document.removeEventListener("keydown", this.KBListener_ref, false);
 
-	    /*
-	    var wait_str = "Waiting for server\nto send the state of the ongoing\nSNATCH-IT game...";
-	    var my_font_size = snCore.Basic.canv_W * 0.055;
-	    var textObj = snCore.Splash.textObject_main;
+	    var frW = port_W * 0.020;// this is some fraction of page Width, in this case 2%
 
-	    textObj.set({
-		text: wait_str,
-		textAlign: 'center',
-		fontWeight: 'bold',
-		fontSize: my_font_size,
-		fill: 'rgb(230,0,40)'
-	    });
-
-	    //this needs to be a separate, later function call, since the first one alters the size...
-	    textObj.set({
-		left: (canvas.getWidth() - textObj.getWidth()) / 2,
-		top: (canvas.getHeight() - textObj.getHeight()) / 2,
-	    });*/
+	    $("#game-container").empty().append(//the text...
+		$('<div/>', {id: "BB-msg"}).css({
+		    "font-size": (1.7*frW+"pt"),
+		    "font-weight": "800",
+		    "color": 'rgb(230,0,40)',
+		    "text-align": "center",
+		    "margin-top": px(frW*10)
+		}).append(
+		    $('<div/>').text("Waiting for server")
+		).append(
+		    $('<div/>').text("to send the state of the ongoing")
+		).append(
+		    $('<div/>').text("SNATCH-IT game...")
+		)
+	    );
 
 	    //send the data to the server
 	    var playerDetailsObj = {
-		name: snCore.Splash.player_name,
-		color_index: snCore.Splash.BB_chosen_was,
+		name: snCore.Splash2.player_name,
+		color_index: snCore.Splash2.BB_chosen_was,
 		reclaiming_player_index: undefined
 	    };
 	    PLAYER_JOINED_WITH_DETAILS(playerDetailsObj);
 	};
 
-	// I have changed two instances of 'this' to 'snCore.Splash' in the code below. I think it's harmless
-	// and it prevents problems with the keyboad handler. Damn the keyboard handler: rewrite it!!
-	snCore.Splash.shrinkAndRemoveBBwithIndex(snCore.Splash.BB_chosen_was, onComplete_BBchosenReleased_animation);
+	// I tried changing this then changed it back.
+	// because of the call context using 'this' in place of snCore.Splash2 doesn't work...
+	snCore.Splash2.shrinkAndRemoveBBwithIndex(snCore.Splash2.BB_chosen_was, onComplete_BBchosenReleased_animation);
     },
 
     KBListener_ref: undefined,
@@ -254,20 +237,20 @@ snCore.Splash2 = {
 
 	    if(myKeycode == 32){//space bar
 
-		if(snCore.Splash.BB_chosen_was === undefined){ //action only if mouse stuff hasn't happened
+		if(snCore.Splash2.BB_chosen_was === undefined){ //action only if mouse stuff hasn't happened
 		    //apply the "chosen function"
 		    var rand_BB_i = getRandomInt(0,4);
-		    snCore.Splash.handleBBchosen(rand_BB_i);
+		    snCore.Splash2.handleBBchosen(rand_BB_i);
 
 		    //...and halfway through that animation, also apply the released function.
 		    var shrink_dur = snCore.Basic.ani.sty_BBshrink.duration;
-		    setTimeout(snCore.Splash.handleBBchosenReleased, shrink_dur * 0.5);		
+		    setTimeout(snCore.Splash2.handleBBchosenReleased, shrink_dur * 0.5);		
 		}
 	    }
 
 	    if(myKeycode == 13){//enter
-		if(!snCore.Splash.name_validated){
-		    snCore.Splash.namePrompt();
+		if(!snCore.Splash2.name_validated){
+		    snCore.Splash2.namePrompt();
 		}
 	    }
 	};
@@ -276,5 +259,4 @@ snCore.Splash2 = {
 	//respond to keydown events
 	document.addEventListener("keydown", this.KBListener_ref, false);
     }
-
 };
