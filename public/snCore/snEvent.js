@@ -4,10 +4,11 @@ snCore.Event = {
     DrawAll: function(){
 
 	// 1. Set Background
-	$("#game-container").empty().css({"background-color": "black"});
+	canvas.setBackgroundColor('black');
+	canvas.clear();	    
 
 	// 1.1 Calculate all the dimentions used in rendering, based upon window dimentions...
-	var N_pixels = port_W * port_H;
+	var N_pixels = snCore.Basic.canv_W * snCore.Basic.canv_H;
 
 	// here we access the number of tiles & turned tiles, which is only set after game state is loaded...
 	var Tile_pixels = N_pixels * snCore.Tile.Ratio_tile / tilestats.n_tiles;
@@ -549,13 +550,15 @@ snCore.Event = {
 
     FirstGameRender: function(){
 
-	document.onmousedown = function(e){snCore.Mouse.mDown(e); };
-	document.onmouseup =   function(e){snCore.Mouse.mUp(e);   };
-	document.onmouseover = function(e){snCore.Mouse.mOver(e); };
-	document.onmouseout =  function(e){snCore.Mouse.mOut(e);  };
+	//mouse event listeners
+	canvas.on('mouse:down', function(e){snCore.Mouse.mDown(e); });
+	canvas.on('mouse:up',   function(e){snCore.Mouse.mUp(e);   });
+	canvas.on('mouse:over', function(e){snCore.Mouse.mOver(e); });
+	canvas.on('mouse:out',  function(e){snCore.Mouse.mOut(e);  });
 
 	//keyboard event listeners
 	document.addEventListener("keydown",function(e){snCore.Keyboard.kDown(e); }, false);
+
 	
 	window.onresize = this.WindowResize; /*function(){
 	    snCore.Event.WindowResize();
