@@ -177,6 +177,8 @@ app.get('/join=*', function (req, res) {
 // note that the keys of this associative array are values taken by room_pin e.g. "1234"
 var rooms_table = {};
 
+// the keys for this array are IP addresses
+var ip_table = {};
 
 function close_room(room_pin){
     console.log("Closing room [" + rooms_table[room_pin].room_key + "] / [" + room_pin + "] due to inactivity");
@@ -366,9 +368,23 @@ io.on('connection', function(socket){
 	var myGame = rooms_table[socket.room_pin].GameInstance;
 	myGame.addPlayer(details_obj, socket.id);
 
+	//count the join by the IP
+	var REC = ip_table[client_ip];
+	if(REC == undefined){
+	    REC = {
+		n_joins: 0,
+		rooms_accessed_list: [socket.room_pin]
+	    };
+	}else{
+	    if(REC.rooms_accessed_list.indexOf(socket.room_pin) == -1){
+		REC.rooms_accessed_list.push(socket.room_pin);
+	    }
+	    n_joins++;
+	}
+
 	//index to the new joiner
 	var pl_i = myGame.playerIndexFromSocket(socket.id);
-	socket.emit('give client their player index', pl_i);
+	socket.emit('give client their player index', {player_index: pl_i, ip_details: REC});
 
 	//gamestate to the new joiner
 	var gameObj = myGame.getGameObject();

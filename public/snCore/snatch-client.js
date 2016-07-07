@@ -149,8 +149,9 @@ socket.on('player disconnected', function(player_index){
 });
 
 
-socket.on('give client their player index', function(myIndex){
-    client_player_index = myIndex;
+socket.on('give client their player index', function(obj){
+    client_player_index = obj.player_index;
+    snCore.Toast.showToast("IP details: " + JSON.stringify(obj.ip_details));
 });
 
 
