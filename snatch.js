@@ -213,10 +213,6 @@ function access_room(room_pin){
     }
 }
 
-
-// todo introduce IP based logging.
-var ip_history = {};
-
 io.on('connection', function(socket){
 
     //basic logging
@@ -372,6 +368,7 @@ io.on('connection', function(socket){
 	var REC = ip_table[client_ip];
 	if(REC == undefined){
 	    REC = {
+		ip: client_ip,
 		n_joins: 0,
 		rooms_accessed_list: [socket.room_pin]
 	    };
