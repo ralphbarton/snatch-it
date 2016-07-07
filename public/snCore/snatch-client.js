@@ -3,6 +3,7 @@ var socket = io();
 
 var snCore = {};
 
+var ip_comments = undefined;//global reference - for server data...
 var tileset = [];//global reference - for server data...
 var players = [];//global reference - for server data...
 var tilestats = {};//global reference - for server data...
@@ -151,9 +152,7 @@ socket.on('player disconnected', function(player_index){
 
 socket.on('give client their player index', function(obj){
     client_player_index = obj.player_index;
-    setTimeout(function(){
-	snCore.Toast.showToast("IP details: " + JSON.stringify(obj.ip_details));
-    }, 600);
+    ip_comments = obj.ip_details;
 });
 
 

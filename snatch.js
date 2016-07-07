@@ -217,6 +217,7 @@ io.on('connection', function(socket){
 
     //basic logging
     var client_ip = socket.handshake.headers['x-real-ip'];
+    if (client_ip == undefined){client_ip = "no-real-ip";}
     var client_ua = parse_user_agent(socket.handshake.headers['user-agent']);
 
     console.log('A user at ip = ' + client_ip + ' connected with socket.id: ' + socket.id);
@@ -365,23 +366,22 @@ io.on('connection', function(socket){
 	myGame.addPlayer(details_obj, socket.id);
 
 	//count the join by the IP
-	var REC = ip_table[client_ip];
-	if(REC == undefined){
-	    REC = {
+	if(ip_table[client_ip] == undefined){
+	    ip_table[client_ip] = {
 		ip: client_ip,
-		n_joins: 0,
+		n_joins: 1,
 		rooms_accessed_list: [socket.room_pin]
 	    };
 	}else{
-	    if(REC.rooms_accessed_list.indexOf(socket.room_pin) == -1){
-		REC.rooms_accessed_list.push(socket.room_pin);
+	    if(ip_table[client_ip].rooms_accessed_list.indexOf(socket.room_pin) == -1){
+		ip_table[client_ip].rooms_accessed_list.push(socket.room_pin);
 	    }
-	    n_joins++;
+	    ip_table[client_ip].n_joins++;
 	}
 
 	//index to the new joiner
 	var pl_i = myGame.playerIndexFromSocket(socket.id);
-	socket.emit('give client their player index', {player_index: pl_i, ip_details: REC});
+	socket.emit('give client their player index', {player_index: pl_i, ip_details: ip_table[client_ip]});
 
 	//gamestate to the new joiner
 	var gameObj = myGame.getGameObject();

@@ -136,7 +136,7 @@ snCore.Toast = {
 
 	//any <a href> into new windows... (this will apply to links in str or frags...)
 	$NewToast.find( "a" ).attr("target","_blank");
-
+	$NewToast.find( ".samewin" ).attr("target","_self");
 
 	return t_key;
     },
@@ -226,6 +226,12 @@ snCore.Toast = {
 		var msg = "There " + sss + partipicants[0] + " and you in this game";
 	    }else if(partipicants.length==2){
 		var msg = "There " + sss + partipicants[0] + ", " + partipicants[1] + " and you in this game";
+	    }
+
+	    //potentially add some more content to this Toast...
+	    if(ip_comments.n_joins < 2){
+		var msg2 = "<br>First ever game? View <a class=\"samewin\"href=\"#\" onclick=\"snCore.Popup.openModal('rules')\">Instructions</a>...";
+		msg += msg2;
 	    }
 
 	    snCore.Toast.showToast(msg, {persistent: true});
