@@ -567,6 +567,7 @@ snCore.Event = {
 
     game_ended: false,
     EndGame: function(){
+	var completion_moment = (this.game_ended == false);
 	this.game_ended = true;
 	snCore.Controls.updateTurnLetter_number("Play Again");
 
@@ -587,8 +588,9 @@ snCore.Event = {
 		});
 	    }
 	}
-
-	snCore.Popup.openModal("scores");
+	if(completion_moment){
+	    snCore.Popup.openModal("scores");
+	}
     }
 
 };

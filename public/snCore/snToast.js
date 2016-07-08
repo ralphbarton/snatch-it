@@ -220,12 +220,14 @@ snCore.Toast = {
 		if(pss_oth>1){singular=false;}
 	    }
 
-	    var msg = "You are the only player in this game";
+	    var mGam = " in this "+(snCore.Event.game_ended?"(finished) ":"")+"game";
+
+	    var msg = "You are the only player" + mGam;
 	    var sss = singular?"is ":"are ";
 	    if(partipicants.length==1){
-		var msg = "There " + sss + partipicants[0] + " and you in this game";
+		var msg = "There " + sss + partipicants[0] + " and you" + mGam;
 	    }else if(partipicants.length==2){
-		var msg = "There " + sss + partipicants[0] + ", " + partipicants[1] + " and you in this game";
+		var msg = "There " + sss + partipicants[0] + ", " + partipicants[1] + " and you" + mGam;
 	    }
 
 	    //potentially add some more content to this Toast...

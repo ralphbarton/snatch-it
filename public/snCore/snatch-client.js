@@ -64,6 +64,7 @@ socket.on('full game state transmission', function(gameState){
     tilestats = gameState.tile_stats;
     cum_MSG_hash = gameState.state_hash;
 
+
     // update to the option-set on server...
     var u_opt = gameState.user_options;
     snCore.Popup.recieveSettingChange(u_opt);    
@@ -77,6 +78,9 @@ socket.on('full game state transmission', function(gameState){
     snCore.Tile.setTileRatSizeFromNTiles(tilestats.n_turned);// set starting size for tiles (due to existing game progress)
     snCore.Event.FirstGameRender(); // main effect is to add keyboard & mouse listeners
     snCore.Event.DrawAll();
+    if(gameState.game_finished){
+	snCore.Event.EndGame();
+    }
 
     snCore.Toast.join_message(); //show a welcome toast
     emit_heartbeat(); //start the hearbeat process now.
