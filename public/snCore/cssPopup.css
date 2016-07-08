@@ -89,6 +89,7 @@ a.modal:hover{
 table {
     border-collapse: collapse;
     width: auto;
+    display: inline-block;
 }
 
 th.scores, td.scores {
