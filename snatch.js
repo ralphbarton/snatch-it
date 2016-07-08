@@ -446,16 +446,75 @@ io.on('connection', function(socket){
 
     socket.on('game settings upload', function(settings_obj){
 	if(!access_room(socket.room_pin)){return;}; // log that the game was accessed. Terminate if invalid
-	//update server copy of data (this will get sent to new players)
-	rooms_table[socket.room_pin].GameInstance.update_uOpt(settings_obj);
+
+
 	var myGame = rooms_table[socket.room_pin].GameInstance;
+	var old_settings = myGame.get_uOpt();
+	myGame.update_uOpt(settings_obj);//update server copy of data (for sending to players yet to join...)
+
 	var details_obj = {
 	    settings_obj: settings_obj,
 	    changer_player_index: myGame.playerIndexFromSocket(socket.id)
 	};
 
+	//TODO: please change this! Embodying a setting like this by testing for string equality is terrible!!!
+	var op5 = "5 second letter spew";
+	var op10 = "10 second letter spew";
+
+	var rm_pin = socket.room_pin;
+	var myGame = rooms_table[rm_pin].GameInstance;
+
+	//TODO: code growth management: is this the right place for all this stuff. This file is pretty bloated now!
+
+	//detect "op5" switched OFF
+	if((old_settings.uOpt_turns == op5)&&(settings_obj.uOpt_turns != op5)){
+	    console.log("["+rm_pin+"]: Deactivated: " + op5);
+	    clearTimeout(letter_spew_timout_ID);
+	    letter_spew_timout_ID = undefined;
+	}
+
+	//detect "op10" switched OFF
+	if((old_settings.uOpt_turns == op10)&&(settings_obj.uOpt_turns != op10)){
+	    console.log("["+rm_pin+"]: Deactivated: " + op10);
+	    clearTimeout(letter_spew_timout_ID);
+	    letter_spew_timout_ID = undefined;
+	}
+
+	//detect "op5" switched ON
+	if((old_settings.uOpt_turns != op5)&&(settings_obj.uOpt_turns == op5)){
+	    console.log("["+rm_pin+"]: Activated: " + op5);
+	    letter_spew_timout_ID = setTimeout(function(){Letter_Spew(myGame, rm_pin, 5000)}, 3000);
+	}
+
+	//detect "op10" switched ON
+	if((old_settings.uOpt_turns != op10)&&(settings_obj.uOpt_turns == op10)){
+	    console.log("["+rm_pin+"]: Activated: " + op10);
+	    letter_spew_timout_ID = setTimeout(function(){Letter_Spew(myGame, rm_pin, 10000)}, 3000);
+	}
+
 	socket.broadcast.to(socket.room_pin).emit('game settings download', details_obj);
     });
+
+
+    var letter_spew_timout_ID = undefined;
+    function Letter_Spew (Game, rm_pin, t_period){
+	var nt_info = TRANSMIT_new_turned_tile(Game, rm_pin, null);
+	if(nt_info){//continue the chain if tiles are left...
+	    letter_spew_timout_ID = setTimeout(function(){Letter_Spew(Game, rm_pin, t_period)}, t_period);
+	}
+    };
+
+    
+    function TRANSMIT_new_turned_tile(Game, rm_pin, sID){
+	var newTile_info = Game.flipNextTile(sID);
+	if(newTile_info){//this means that it was not a request with no tiles left...
+	    // HASHING - keep the next 3 lines of code together
+	    var current_hash = Game.build_hash(newTile_info.tile_letter);
+	    newTile_info.HH = current_hash;
+	    io.to(rm_pin).emit('new turned tile', newTile_info);
+	}
+	return newTile_info;
+    };
 
 
     //client requests to turn over a tile
@@ -463,18 +522,17 @@ io.on('connection', function(socket){
 	// This will terminate function if the room no longer exists
 	if(!access_room(socket.room_pin)){return;}; // log that the game was accessed. 
 
+	if(letter_spew_timout_ID != undefined){
+	    console.log("There is a problem. User turn should be disabled during timed auto-turn...");
+	}
+
 	var myGame = rooms_table[socket.room_pin].GameInstance;
-	var newTile_info = myGame.flipNextTile(socket.id);
-	
-	if(newTile_info){//this means that it was not a request with no tiles left...
+	var nt_info = TRANSMIT_new_turned_tile(myGame, socket.room_pin, socket.id);
 
-	    // HASHING - keep the next 3 lines of code together
-	    var current_hash = myGame.build_hash(newTile_info.tile_letter);
-	    newTile_info.HH = current_hash;
-	    io.to(socket.room_pin).emit('new turned tile', newTile_info);
-	    console.log("["+socket.room_pin+"]: PI=" + newTile_info.flipping_player + " flips tileID=" + newTile_info.tile_index + " (" + newTile_info.tile_letter + ")");
-
-	}else{
+	if(nt_info){
+	    var txt_m = " flips tileID=" + nt_info.tile_index + " (" + nt_info.tile_letter + ")";
+	    console.log("["+socket.room_pin+"]: PI=" + nt_info.flipping_player + txt_m);
+	}else{//this means no tiles left....
 	    console.log("A 'flip' message was recieved when all tiles were already turned");
 	    var all_fin = myGame.PlayerFinishedGame(socket.id);
 	    if(all_fin){
@@ -500,29 +558,23 @@ io.on('connection', function(socket){
 	var period = 100;
 
 	var R1 = function(i){
-	    var newTile_info = myGame.flipNextTile(socket.id);
-	    if(newTile_info){
 
-		// HASHING - keep the next 3 lines of code together
-		var current_hash = myGame.build_hash(newTile_info.tile_letter);
-		newTile_info.HH = current_hash;
-		//
+	    var nt_info = TRANSMIT_new_turned_tile(myGame, socket.room_pin, socket.id);
 
-		io.to(socket.room_pin).emit('new turned tile', newTile_info);
-		letters.push(newTile_info.tile_letter);
-		tileID_final = newTile_info.tile_index
-		fl_player = newTile_info.flipping_player;
-		if(i==0){tileID_first = newTile_info.tile_index;}
+	    if(nt_info){
+		letters.push(nt_info.tile_letter);
+		tileID_final = nt_info.tile_index
+		fl_player = nt_info.flipping_player;
+		if(i == 0){tileID_first = nt_info.tile_index;}
 		if(i < n_tiles){setTimeout(function(){R1(i+1);},period);}//here is the recursive call achieving simple looping...
 	    }
 	    if(i >= n_tiles){
 		if(tileID_final !== undefined){
-		    console.log("PI=" + fl_player + " has turned multiple tiles at once, from\
-tileID=" + tileID_first + " to tileID=" + tileID_final + ". The letters are: " + letters);
+		    var pt_2 = tileID_first + " to tileID=" + tileID_final + ". The letters are: " + letters;
+		    console.log("PI=" + fl_player + " has turned multiple tiles at once, from tileID=" + pt_2);
 		}else{
 		    console.log("All tiles turned");
 		}
-
 	    }
 	};
 	R1(0);
