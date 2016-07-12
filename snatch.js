@@ -35,7 +35,7 @@ var keygen  = require('./vivid_keygen.js')();
 
 // Load the SOWPODS dictionary...
 var WDT_factory = require('./word_check.js');
-var WordDictionaryTools = WDT_factory('./dictionaries/sowpods.txt');
+var WordDictionaryTools = WDT_factory('./dictionaries/sowpods.txt', './dictionaries/COCA_top5000_word_frequencies.txt');
 
  
 //START OF experimental code secion
@@ -74,17 +74,26 @@ app.get('/definition/*', function(req, res){
 });
 
 //route 4 - to get random words...
-app.get('/sowpods-rsubset/*', function(req, res){
+app.get('/random-defns/*', function(req, res){
     var frags = req.url.split('/');
-    var final_arg = frags[frags.length-1];
-    var n_words_req = parseInt(final_arg);
+    var final_path = frags[frags.length-1];
+
+    var req_frags = final_path.split('&');
+
+    var n_words_req = parseInt(req_frags[0]);
+    var chosen_wl_tag = req_frags[1] || 'top5000';
+
 
     var N_WORDS_MAX = 350
     n_words_req = Math.min(n_words_req, N_WORDS_MAX);
 
-    var sowpods_array = WordDictionaryTools.get_word_list();
+    var chosen_word_list = WordDictionaryTools.get_word_list();
+    if(chosen_wl_tag == 'top5000'){
+	chosen_word_list = WordDictionaryTools.get_top5000_list();
+    }
+
     var HTM = '<div class="table-title">\
-<h3>List of '+n_words_req+' words from the SOWPODS dictionary:</h3>\
+<h3>List of '+n_words_req+' words from the ' + chosen_wl_tag + ' dictionary:</h3>\
 </div>\n';
 
     HTM += '<table class="table-fill">\
@@ -99,8 +108,8 @@ app.get('/sowpods-rsubset/*', function(req, res){
     var RandWordList = []
 
     for(var i=0; i < n_words_req; i++){
-	var rand_index = Math.floor(Math.random() * sowpods_array.length);
-	var rand_word = sowpods_array[rand_index];
+	var rand_index = Math.floor(Math.random() * chosen_word_list.length);
+	var rand_word = chosen_word_list[rand_index];
 
 	RandWordList.push(rand_word);
 
