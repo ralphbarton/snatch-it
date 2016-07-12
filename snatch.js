@@ -96,17 +96,27 @@ app.get('/sowpods-rsubset/*', function(req, res){
 </thead>\
 <tbody class="table-hover">';
 
+    var RandWordList = []
+
     for(var i=0; i < n_words_req; i++){
 	var rand_index = Math.floor(Math.random() * sowpods_array.length);
 	var rand_word = sowpods_array[rand_index];
 
-	my_SDC.lookup_definition(rand_word);
+	RandWordList.push(rand_word);
 
 	HTM += '\n<tr>\
 \n\t<td class="text-left">'+rand_word+'</td>\
 \n\t<td class="text-left"><span id="defn-'+rand_word.toUpperCase()+'">no definition recieved</span></td>\
 \n</tr>\n';
     }
+
+    // only perform lookup later...
+    // I think this might prevent failures of words being recieved because it's too fast for socket.io
+    setTimout(function(){
+	for(var i=0; i < RandWordList.length; i++){
+	    my_SDC.lookup_definition(RandWordList[i]);
+	}
+    },1000);
 
     HTM += '</tbody>\
 </table>';
