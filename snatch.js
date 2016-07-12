@@ -112,7 +112,7 @@ app.get('/sowpods-rsubset/*', function(req, res){
 
     // only perform lookup later...
     // I think this might prevent failures of words being recieved because it's too fast for socket.io
-    setTimout(function(){
+    setTimeout(function(){
 	for(var i=0; i < RandWordList.length; i++){
 	    my_SDC.lookup_definition(RandWordList[i]);
 	}
