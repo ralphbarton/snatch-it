@@ -73,6 +73,16 @@ app.get('/definition/*', function(req, res){
  looked up ' + prev_word + ' and a search result was:<br>' + prev_result);
 });
 
+
+
+// Import Mongo Database link...
+var mongo_link = require('./mongo-link.js')();
+
+// route 3.5 !!
+app.get('/mongo', function(req, res){
+    mongo_link.serve_word_list_page2(res);
+});
+
 //route 4 - to get random words...
 app.get('/random-defns/*', function(req, res){
     var frags = req.url.split('/');
@@ -453,6 +463,9 @@ io.on('connection', function(socket){
 	    my_SDC.lookup_definition(word_str);
 	    console.log("Web-scraping defintion of word " + word_str);
 	    prev_word = word_str;
+
+	    // also also, log it:
+	    mongo_link.log_word(word_str);
 
 	}else{
 	    // where client snatch request is rejected because it is duplicate & invalid, don't even respond
