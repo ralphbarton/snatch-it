@@ -78,6 +78,10 @@ app.get('/definition/*', function(req, res){
 // Import Mongo Database link...
 var mongo_link = require('./mongo-link.js')();
 
+//todo (count increment...)
+var x=0; 
+mongo_link.get_snatch_PID();
+
 // route 3.5 !!
 app.get('/mongo', function(req, res){
     mongo_link.serve_word_list_page2(res);
@@ -193,7 +197,7 @@ app.get('/join=*', function (req, res) {
 
 ///oh Jesus this file is getting messy....
 // this is now a section for MongoDB schema defintion:
-
+/*
 var active_game_schema = new mongoose.Schema({
     status: String,
     room_key: String,
@@ -203,9 +207,10 @@ var active_game_schema = new mongoose.Schema({
     GameInstance: Schema.Types.Mixed
 });
 
+
 //Compile Schema into Model
 var ActiveGame = mongoose.model('ActiveGame', active_game_schema);
-
+*/
 // a hash table, note how it is global for all connection. It contains details for a particular room, they are:
 /*
   {
@@ -219,7 +224,7 @@ var ActiveGame = mongoose.model('ActiveGame', active_game_schema);
 */
 
 // note that the keys of this associative array are values taken by room_pin e.g. "1234"
-var dict_activeGames dict_activeGames = {};
+var dict_activeGames = {};
 
 // the keys for this array are IP addresses
 var ip_table = {};

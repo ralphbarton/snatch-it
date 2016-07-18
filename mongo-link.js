@@ -12,7 +12,7 @@ module.exports = function (){
 	    } else {
 		console.log('Mongo: Connection made to DB');
 		db_func(db);//this is my function
-		db.close();
+		//db.close();
 	    }
 	});
     };
@@ -81,6 +81,46 @@ module.exports = function (){
 		    db.close();
 		});//find complete
 	    });//event (connect) complete
+
+	},
+
+	get_snatch_PID: function(){
+
+	    console.log("X1");
+	    db_event(function(db){
+
+		var collection = db.collection('counters');
+		//step 1: find the existing value, if present...
+		collection.find({counter_type: 'n_restarts'}).toArray(function (err, result) {
+		    console.log("X2");
+		    if (err) {
+			console.log(err);
+		    } else {
+			
+			// step 2: if not present, add and initialise to zero
+			if(result.length == 0){
+			    
+			    collection.insert({counter_type: 'n_restarts', count: 0}, function (err, result) {
+				if (err) {
+				    console.log(err);
+				}
+				// needed??   
+				db.close();
+			    });
+
+			}else{
+
+			}
+			
+
+			console.log('data retrieved from DB : ', result);
+		    }
+
+		});//find complete
+	    });//event (connect) complete
+	},
+
+	serve_snatch_PID: function(res){
 
 	}
 
