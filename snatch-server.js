@@ -1,36 +1,56 @@
-module.exports = function (nTiles, WordChecker){
+module.exports = function (nTiles, WordChecker, SaveGameData){
 
-    //generate un unshuffled array using letter frequencies
-    var tileSet = generateNewRandomTileSet(nTiles);
-    var playerSet = [];//this would be an empty player set for game start
+    // By excluding these data from the save-game data, I am making the assumption that there is no point in a saved
+    // game including socket level state because by the time it is reloaded all connected players will have left
+    // because it is a different run-instance on the VM
+    var cum_hash = Math.round(Math.random()*100000);
     var player_previous_snatch_tileIDs = [];
     var player_index_from_socketKey_lkup = [];
-    var my_color_palette = shuffle(generateDistributedRandomColorSet(12));
-    var emergency_colors = shuffle(my_color_palette.slice(0));//duplicated data
     var fiveColorsSent_socketKey = {};
 
-    var tile_ownership = [];
-    var next_unturned_tile_i = 0;
+    if(SaveGameData){
 
-    var cum_hash = Math.round(Math.random()*100000);
-    var game_finished = false;
+	var tileSet              = SaveGameData.tileSet;
+	var playerSet            = SaveGameData.playerSet;
+	var my_color_palette     = SaveGameData.my_color_palette;
+	var emergency_colors     = SaveGameData.emergency_colors;
+	var tile_ownership       = SaveGameData.tile_ownership;
+	var next_unturned_tile_i = SaveGameData.next_unturned_tile_i;
+	var game_finished        = SaveGameData.game_finished;
+	var user_options         = SaveGameData.user_options;
 
-    var user_options = {
-	//1.
-	uOpt_challenge: false,
-	//2.
-	uOpt_stem: false,
-	//3. <select>
-	uOpt_turns: "Pseudo Turns",
-	//4.
-	uOpt_flippy: false,
-	//5. <select>
-	uOpt_dictionary: "Sowpods",
-	//6.
-	uOpt_penalty: false
-    };
+	console.log("Reloaded a snatch game instance on server");
+    }else{
+	//generate un unshuffled array using letter frequencies
+	var tileSet = generateNewRandomTileSet(nTiles);
+	var playerSet = [];//this would be an empty player set for game start
+	var my_color_palette = shuffle(generateDistributedRandomColorSet(12));
+	var emergency_colors = shuffle(my_color_palette.slice(0));//duplicated data
 
-    console.log("created snatch game instance on server");
+
+	var tile_ownership = [];
+	var next_unturned_tile_i = 0;
+
+
+	var game_finished = false;
+
+	var user_options = {
+	    //1.
+	    uOpt_challenge: false,
+	    //2.
+	    uOpt_stem: false,
+	    //3. <select>
+	    uOpt_turns: "Pseudo Turns",
+	    //4.
+	    uOpt_flippy: false,
+	    //5. <select>
+	    uOpt_dictionary: "Sowpods",
+	    //6.
+	    uOpt_penalty: false
+	};
+
+	console.log("New snatch game instance created on server");
+    }
 
     //this is the collection of externally callable functions
     return{

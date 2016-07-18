@@ -147,7 +147,6 @@ app.get('/random-defns/*', function(req, res){
 //END OF experimental code secion
 
 
-
 //route 1 - no path...
 app.get('/', function(req, res){
     res.render('home', {identity_html: "<home-page-was-requested>"});
@@ -169,15 +168,15 @@ app.get('/join=*', function (req, res) {
 
     // this code leads to setting of 'valid_pin' and 'dash_key'
     if((!isNaN(identity_supplied)) && (identity_supplied.length==4)){// first test: is it a 4 digit numeric string?
-	if(rooms_table[identity_supplied] !== undefined){// is it a PIN of an existant game?
+	if(dict_activeGames[identity_supplied] !== undefined){// is it a PIN of an existant game?
 	    var valid_pin = identity_supplied;
-	    var dash_key = rooms_table[valid_pin].room_key.replace(" ","-");
+	    var dash_key = dict_activeGames[valid_pin].room_key.replace(" ","-");
 	}
     }else if(/^[a-zA-Z-]+$/.test(identity_supplied)){//second test: is it a string composed only of letters and '-'?
 	space_key = identity_supplied.replace("-"," ");
 	valid_pin = keygen.getPINfromWORDKEY(space_key);
 	if (valid_pin != undefined){
-	    dash_key = rooms_table[valid_pin].room_key.replace(" ","-");//conversion back-forth may fix capitalisation
+	    dash_key = dict_activeGames[valid_pin].room_key.replace(" ","-");//conversion back-forth may fix capitalisation
 	}
     }
 
@@ -190,6 +189,22 @@ app.get('/join=*', function (req, res) {
 	res.render('home', {identity_html: "<invalid-game-join-identity>"});
     }
 });
+
+
+///oh Jesus this file is getting messy....
+// this is now a section for MongoDB schema defintion:
+
+var active_game_schema = new mongoose.Schema({
+    status: String,
+    room_key: String,
+    closeTimeoutID: Number,
+    timeStarted: { type: Date, default: Date.now },
+    timeAccessed: { type: Date, default: Date.now },
+    GameInstance: Schema.Types.Mixed
+});
+
+//Compile Schema into Model
+var ActiveGame = mongoose.model('ActiveGame', active_game_schema);
 
 // a hash table, note how it is global for all connection. It contains details for a particular room, they are:
 /*
@@ -204,20 +219,20 @@ app.get('/join=*', function (req, res) {
 */
 
 // note that the keys of this associative array are values taken by room_pin e.g. "1234"
-var rooms_table = {};
+var dict_activeGames dict_activeGames = {};
 
 // the keys for this array are IP addresses
 var ip_table = {};
 
 function close_room(room_pin){
-    console.log("Closing room [" + rooms_table[room_pin].room_key + "] / [" + room_pin + "] due to inactivity");
+    console.log("Closing room [" + dict_activeGames[room_pin].room_key + "] / [" + room_pin + "] due to inactivity");
     keygen.freePIN(room_pin);
-    delete rooms_table[room_pin];
+    delete dict_activeGames[room_pin];
     io.to(room_pin).emit('room closed', 0);//probably no one gets this message anyhow.
 }
 
 function access_room(room_pin){
-    var R = rooms_table[room_pin];
+    var R = dict_activeGames[room_pin];
 
     if(R !== undefined){
 	//clear the old timeout by reference...
@@ -254,7 +269,7 @@ io.on('connection', function(socket){
     socket.on('disconnect', function(){
 
 	if(socket.room_pin){
-	    var myGame = rooms_table[socket.room_pin].GameInstance;
+	    var myGame = dict_activeGames[socket.room_pin].GameInstance;
 	}
 	if(myGame){
 	    var dis_pl_i = myGame.playerIndexFromSocket(socket.id);
@@ -310,7 +325,7 @@ io.on('connection', function(socket){
 	var room_pin = key_deets.pin;
 
 	// 2. Now create a new room instance, referenced by the room_pin
-	rooms_table[room_pin] = {
+	dict_activeGames[room_pin] = {
 	    status: "new",
 	    room_key: key_deets.key,
 	    closeTimeoutID: undefined,
@@ -329,10 +344,10 @@ io.on('connection', function(socket){
 
 	//convert the hash table into a list for the client to display...
 	var rooms_data_array = [];
-	for (var room_pin in rooms_table) {
-	    if (rooms_table.hasOwnProperty(room_pin)) {
+	for (var room_pin in dict_activeGames) {
+	    if (dict_activeGames.hasOwnProperty(room_pin)) {
 
-		var R = rooms_table[room_pin];
+		var R = dict_activeGames[room_pin];
 		var gameObj = R.GameInstance.getGameObject();
 
 		rooms_data_array.push({
@@ -354,7 +369,7 @@ io.on('connection', function(socket){
 
 	//respond by providing a set of colours to choose between
 	console.log("'join room and start' message recieved. Room = " + room_pin);
-	var myRoom = rooms_table[room_pin];
+	var myRoom = dict_activeGames[room_pin];
 
 	if(myRoom !== undefined){
 
@@ -391,7 +406,7 @@ io.on('connection', function(socket){
 
 	//this newly joined player can be added to the game...
 	console.log('player joined with details : ' + JSON.stringify(details_obj));
-	var myGame = rooms_table[socket.room_pin].GameInstance;
+	var myGame = dict_activeGames[socket.room_pin].GameInstance;
 	myGame.addPlayer(details_obj, socket.id);
 
 	//count the join by the IP
@@ -437,7 +452,7 @@ io.on('connection', function(socket){
 	if(!access_room(socket.room_pin)){return;}; // log that the game was accessed. Terminate if invalid
 
 	console.log("["+socket.room_pin+"]: Snatch submission with letters: ",tile_id_array);
-	var myGame = rooms_table[socket.room_pin].GameInstance;
+	var myGame = dict_activeGames[socket.room_pin].GameInstance;
 	var SnatchResponse = myGame.playerSnatches(tile_id_array, socket.id)
 
 	if(SnatchResponse.val_check == 'accepted'){
@@ -480,7 +495,7 @@ io.on('connection', function(socket){
 	if(!access_room(socket.room_pin)){return;}; // log that the game was accessed. Terminate if invalid
 
 
-	var myGame = rooms_table[socket.room_pin].GameInstance;
+	var myGame = dict_activeGames[socket.room_pin].GameInstance;
 	var old_settings = myGame.get_uOpt();
 	myGame.update_uOpt(settings_obj);//update server copy of data (for sending to players yet to join...)
 
@@ -494,7 +509,7 @@ io.on('connection', function(socket){
 	var op10 = "10 second letter spew";
 
 	var rm_pin = socket.room_pin;
-	var myGame = rooms_table[rm_pin].GameInstance;
+	var myGame = dict_activeGames[rm_pin].GameInstance;
 
 	//TODO: code growth management: is this the right place for all this stuff. This file is pretty bloated now!
 
@@ -558,7 +573,7 @@ io.on('connection', function(socket){
 	    console.log("There is a problem. User turn should be disabled during timed auto-turn...");
 	}
 
-	var myGame = rooms_table[socket.room_pin].GameInstance;
+	var myGame = dict_activeGames[socket.room_pin].GameInstance;
 	var nt_info = TRANSMIT_new_turned_tile(myGame, socket.room_pin, socket.id);
 
 	if(nt_info){
@@ -581,7 +596,7 @@ io.on('connection', function(socket){
     //client requests to turn over a tile
     socket.on('many_tile_turn_hack', function(n_tiles){
 
-	var myGame = rooms_table[socket.room_pin].GameInstance;
+	var myGame = dict_activeGames[socket.room_pin].GameInstance;
 
 	var letters = [];
 	var tileID_first = undefined;
