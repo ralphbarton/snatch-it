@@ -78,9 +78,9 @@ app.get('/definition/*', function(req, res){
 // Import Mongo Database link...
 var mongo_link = require('./mongo-link.js')();
 
-//todo (count increment...)
-var x=0; 
-mongo_link.get_snatch_PID();
+// todo (count increment...)
+var Snatch_pid = undefined; 
+mongo_link.next_snatch_PID(function(x){Snatch_pid=x;});
 
 // route 3.5 !!
 app.get('/mongo', function(req, res){

@@ -84,45 +84,45 @@ module.exports = function (){
 
 	},
 
-	get_snatch_PID: function(){
+	next_snatch_PID: function(SET_ME){
 
-	    console.log("X1");
 	    db_event(function(db){
 
 		var collection = db.collection('counters');
 		//step 1: find the existing value, if present...
 		collection.find({counter_type: 'n_restarts'}).toArray(function (err, result) {
-		    console.log("X2");
 		    if (err) {
 			console.log(err);
 		    } else {
 			
 			// step 2: if not present, add and initialise to zero
 			if(result.length == 0){
-			    
+			    console.log("Snatch_pid initialised to : Zero");
+			    SET_ME(0);
 			    collection.insert({counter_type: 'n_restarts', count: 0}, function (err, result) {
 				if (err) {
 				    console.log(err);
 				}
-				// needed??   
 				db.close();
 			    });
 
+			    // step 3: if present, increment...
 			}else{
-
+			    var pid = (result[0].count + 1);
+			    collection.update({counter_type: 'n_restarts'}, {$set: {count: pid}}, function (err, data) {
+				if (err) {
+				    console.log(err);
+				}else{
+				    SET_ME(pid);
+				    console.log("Snatch_pid initialised to : " + pid);
+				}
+				db.close();
+			    });
 			}
-			
-
-			console.log('data retrieved from DB : ', result);
 		    }
-
 		});//find complete
 	    });//event (connect) complete
 	},
-
-	serve_snatch_PID: function(res){
-
-	}
 
     };//return a collection of functions
 
