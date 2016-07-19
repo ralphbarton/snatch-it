@@ -17,6 +17,35 @@ module.exports = function (){
 	});
     };
 
+
+    // MONGOOSE stuff all BELOW here...
+    var mongoose = require('mongoose');
+
+    var db = mongoose.connection;
+
+    db.on('error', console.error);
+    db.once('open', function() {
+
+	// this is now a section for MongoDB schema defintion:
+
+	var save_game_schema = new mongoose.Schema({
+	    timeStarted: { type: Date, default: Date.now },
+	    timeAccessed: { type: Date, default: Date.now },
+	    original_key: String,
+	    original_pin: Number,
+	    original_SnPID: Number,
+	    n_reloads: Number,
+	    GameData: mongoose.Schema.Types.Mixed
+	});
+
+	//Compile Schema into Model
+	var SaveGame = mongoose.model('SaveGame', save_game_schema);
+
+    });
+
+    mongoose.connect(url);
+
+
     console.log("Prepared to connected to", url);
 
     return{
@@ -123,6 +152,10 @@ module.exports = function (){
 		});//find complete
 	    });//event (connect) complete
 	},
+
+	Save_Game: function(game_obj){
+
+	}
 
     };//return a collection of functions
 

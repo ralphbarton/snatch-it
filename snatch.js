@@ -195,22 +195,6 @@ app.get('/join=*', function (req, res) {
 });
 
 
-///oh Jesus this file is getting messy....
-// this is now a section for MongoDB schema defintion:
-/*
-var active_game_schema = new mongoose.Schema({
-    status: String,
-    room_key: String,
-    closeTimeoutID: Number,
-    timeStarted: { type: Date, default: Date.now },
-    timeAccessed: { type: Date, default: Date.now },
-    GameInstance: Schema.Types.Mixed
-});
-
-
-//Compile Schema into Model
-var ActiveGame = mongoose.model('ActiveGame', active_game_schema);
-*/
 // a hash table, note how it is global for all connection. It contains details for a particular room, they are:
 /*
   {
@@ -222,7 +206,6 @@ var ActiveGame = mongoose.model('ActiveGame', active_game_schema);
   GameInstance: Obj
   }
 */
-
 // note that the keys of this associative array are values taken by room_pin e.g. "1234"
 var dict_activeGames = {};
 
