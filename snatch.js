@@ -209,6 +209,7 @@ app.get('/join=*', function (req, res) {
 // a hash table, note how it is global for all connection. It contains details for a particular room, they are:
 /*
   {
+  db_uID: int,
   room_key: str,
   closeTimeoutID: int,
   timeStarted: Date,
@@ -247,8 +248,20 @@ function access_room(room_pin){
 	//    }, 1000 * 60 * 10);// 10 minues persistence
 	console.log("["+room_pin+"] - timout extended...");
 
-	//Add
-	R.timeLastAccessed = new Date;
+	R.timeAccessed = new Date;
+
+	// Here is how we save the game into the database. Not sure about code elegance here!
+	// (Hacky use of MongooseJS - effectively I am using it as though it were MondoDB).
+	// this is put in a timeout because access_room is called at the top, I prefer to save state a few moments later... 
+	setTimeout(function(){
+	    /*
+	      first ARG = obj_AG
+	      original_pin: arg1,
+	      original_SnPID: arg2,
+	    */
+	    mongo_link.Save_Game(R, room_pin, Snatch_pid);
+	}, 500);
+
 	return true;
     }else{
 	console.log("message recieved for non-existant room ["+room_pin+"]... no action taken");

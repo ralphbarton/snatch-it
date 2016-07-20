@@ -24,24 +24,24 @@ module.exports = function (){
     var db = mongoose.connection;
 
     db.on('error', console.error);
-    db.once('open', function() {
+    //db.once('open', function() {
 
-	// this is now a section for MongoDB schema defintion:
+    // this is now a section for MongoDB schema defintion:
 
-	var save_game_schema = new mongoose.Schema({
-	    timeStarted: { type: Date, default: Date.now },
-	    timeAccessed: { type: Date, default: Date.now },
-	    original_key: String,
-	    original_pin: Number,
-	    original_SnPID: Number,
-	    n_reloads: Number,
-	    GameData: mongoose.Schema.Types.Mixed
-	});
-
-	//Compile Schema into Model
-	var SaveGame = mongoose.model('SaveGame', save_game_schema);
-
+    var save_game_schema = new mongoose.Schema({
+	game_db_uID: Number,
+	timeStarted: { type: Date, default: Date.now },
+	timeAccessed: { type: Date, default: Date.now },
+	original_key: String,
+	original_pin: Number,
+	original_SnPID: Number,
+	GameData: mongoose.Schema.Types.Mixed
     });
+
+    //Compile Schema into Model
+    var SaveGame = mongoose.model('SaveGame', save_game_schema);
+
+    //});
 
     mongoose.connect(url);
 
@@ -115,13 +115,14 @@ module.exports = function (){
 			    }
 
 			    for(var i=3; i < word_lengths.length; i++){//start with 3 letter words...
-				str += "Count of " + i + " letter words: <b>" + word_lengths[i] + "</b><br><br>";
+				if(word_lengths[i]==undefined){word_lengths[i]=0;}
+				str += "Count of " + i + " letter words: <b>" + word_lengths[i] + "</b><br>";
 			    }
 
 			    res.send(str);
 
 			}else{
-			    var str = "<b> Cumulation of all words snatched since 17th July 2016 </b> <br>";
+			    var str = "<b> Cumulation of all words snatched since 17th July 2016 </b> <br><br>";
 			    for(var i=0; i < result.length; i++){
 				str += result[i]._id + ": <b>" + result[i].count + "</b><br>";
 			    }
@@ -185,9 +186,50 @@ module.exports = function (){
 	    });//event (connect) complete
 	},
 
-	Save_Game: function(game_obj){
+/*
+	dict_activeGames[room_pin] = {
+	    db_uID: next_game_db_uID,
+	    room_key: key_deets.key,
+	    closeTimeoutID: undefined,
+	    timeStarted: (new Date),
+	    timeAccessed: undefined,
+	    GameInstance: snatchSvr_factory(qty_tiles, WordDictionaryTools.in_dictionary)
+	};
+*/
 
+	Save_Game: function(obj_AG, arg1, arg2){
+
+	    var query = { game_db_uID: obj_AG.db_uID };
+	    var props_obj = {
+		timeStarted: obj_AG.timeStarted,
+		timeAccessed: obj_AG.timeAccessed,
+		original_key: obj_AG.room_key,
+		original_pin: arg1,
+		original_SnPID: arg2,
+		GameData: (obj_AG.GameInstance.get_FullGameData())
+	    };
+
+	    SaveGame.findOneAndUpdate(query, props_obj, {upsert: true}, function (err, result) {
+		if (err) {
+		    console.log(err);
+		} else {
+		    console.log('game upserted in DB...');
+		}
+	    });
+	},
+
+
+	retrive_by_game_db_uID: function(uID){
+
+	},
+
+	serve_SaveGame_list: function(res, my_op){
+
+	    db_event(function(db){
+
+	    });
 	}
+
 
     };//return a collection of functions
 
