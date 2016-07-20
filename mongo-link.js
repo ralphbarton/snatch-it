@@ -101,7 +101,7 @@ module.exports = function (){
 
 			//this is to show count of how many words of each length...
 			if(my_op==1){
-			    var str = "<b> Length distribution of words snatched since 17th July 2016 </b> <br>";
+			    var str = "<b> Length distribution of all words snatched since 17th July 2016 </b> <br><br>";
 			    var word_lengths = [];
 
 			    for(var i=0; i < result.length; i++){
@@ -115,7 +115,7 @@ module.exports = function (){
 			    }
 
 			    for(var i=3; i < word_lengths.length; i++){//start with 3 letter words...
-				str += "Count of " + i + " letter words: <b>" + word_lengths[i] + "</b><br>";
+				str += "Count of " + i + " letter words: <b>" + word_lengths[i] + "</b><br><br>";
 			    }
 
 			    res.send(str);
@@ -136,22 +136,31 @@ module.exports = function (){
 
 	},
 
-	next_snatch_PID: function(SET_ME){
+	IncrDBcount: function(SET_ME,counter_name){
+
+	    //this code is just to add a layer of protection to what gets added in the database...
+	    var counter_type_str = 'unknown count';
+	    if(counter_name == 'Snatch_pid'){
+		counter_type_str = 'n_restarts';
+
+	    }else if(counter_name == 'game_db_uID'){
+		counter_type_str = 'n_game_instances';
+	    }
 
 	    db_event(function(db){
 
 		var collection = db.collection('counters');
 		//step 1: find the existing value, if present...
-		collection.find({counter_type: 'n_restarts'}).toArray(function (err, result) {
+		collection.find({counter_type: counter_type_str}).toArray(function (err, result) {
 		    if (err) {
 			console.log(err);
 		    } else {
 			
 			// step 2: if not present, add and initialise to zero
 			if(result.length == 0){
-			    console.log("Snatch_pid initialised to : Zero");
+			    console.log(counter_type_str + " initialised to : Zero");
 			    SET_ME(0);
-			    collection.insert({counter_type: 'n_restarts', count: 0}, function (err, result) {
+			    collection.insert({counter_type: counter_type_str, count: 0}, function (err, result) {
 				if (err) {
 				    console.log(err);
 				}
@@ -161,12 +170,12 @@ module.exports = function (){
 			    // step 3: if present, increment...
 			}else{
 			    var pid = (result[0].count + 1);
-			    collection.update({counter_type: 'n_restarts'}, {$set: {count: pid}}, function (err, data) {
+			    collection.update({counter_type: counter_type_str}, {$set: {count: pid}}, function (err, data) {
 				if (err) {
 				    console.log(err);
 				}else{
 				    SET_ME(pid);
-				    console.log("Snatch_pid initialised to : " + pid);
+				    console.log(counter_type_str + " now at : " + pid);
 				}
 				db.close();
 			    });

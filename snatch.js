@@ -80,7 +80,13 @@ var mongo_link = require('./mongo-link.js')();
 
 // todo (count increment...)
 var Snatch_pid = undefined; 
-mongo_link.next_snatch_PID(function(x){Snatch_pid=x;});
+mongo_link.IncrDBcount(function(x){Snatch_pid=x;},'Snatch_pid');
+
+// this concept I'm using here is slightly dangerous, just because if games are started sufficiently frequently,
+// there is no guarentee that asynchronously called uID incrementor will increment quickly enough.
+var next_game_db_uID = undefined; 
+mongo_link.IncrDBcount(function(x){next_game_db_uID=x;},'game_db_uID');
+
 
 // route 3.5 !!
 app.get('/db_words', function(req, res){
@@ -203,12 +209,12 @@ app.get('/join=*', function (req, res) {
 // a hash table, note how it is global for all connection. It contains details for a particular room, they are:
 /*
   {
-  status: str,
   room_key: str,
   closeTimeoutID: int,
   timeStarted: Date,
   timeAccessed: Date,
   GameInstance: Obj
+  
   }
 */
 // note that the keys of this associative array are values taken by room_pin e.g. "1234"
@@ -319,7 +325,7 @@ io.on('connection', function(socket){
 
 	// 2. Now create a new room instance, referenced by the room_pin
 	dict_activeGames[room_pin] = {
-	    status: "new",
+	    db_uID: next_game_db_uID,
 	    room_key: key_deets.key,
 	    closeTimeoutID: undefined,
 	    timeStarted: (new Date),
@@ -327,6 +333,10 @@ io.on('connection', function(socket){
 	    GameInstance: snatchSvr_factory(qty_tiles, WordDictionaryTools.in_dictionary)
 	};
 	access_room(room_pin);//this perhaps ought to be part of constructor. Needed to put timeout in place.
+
+	//as mentioned earlier, we really to block upon completion of this callback for full robustness...
+	//TODO: make it work properly (for guarenteed uID uniqueness).
+	mongo_link.IncrDBcount(function(x){next_game_db_uID=x;},'game_db_uID');
 
 	console.log("New game created: ", key_deets);
     	socket.emit('new game pin and key', key_deets);
@@ -373,7 +383,6 @@ io.on('connection', function(socket){
 	    socket.room_pin = room_pin;
 	    //this causes the socket to be subscribed to room-specific broadcasts...
 	    socket.join(room_pin);
-	    myRoom.status = "joined";
 
 	    var myGame = myRoom.GameInstance;
 	    var gameObj = myGame.getGameObject();

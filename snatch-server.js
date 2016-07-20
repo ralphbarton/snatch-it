@@ -7,47 +7,44 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
     var player_previous_snatch_tileIDs = [];
     var player_index_from_socketKey_lkup = [];
     var fiveColorsSent_socketKey = {};
+    
+    //container for "Game Data"
+    var GD = {};
 
+    //reload data of saved game
     if(SaveGameData){
-
-	var tileSet              = SaveGameData.tileSet;
-	var playerSet            = SaveGameData.playerSet;
-	var my_color_palette     = SaveGameData.my_color_palette;
-	var emergency_colors     = SaveGameData.emergency_colors;
-	var tile_ownership       = SaveGameData.tile_ownership;
-	var next_unturned_tile_i = SaveGameData.next_unturned_tile_i;
-	var game_finished        = SaveGameData.game_finished;
-	var user_options         = SaveGameData.user_options;
-
+	GD = SaveGameData;
 	console.log("Reloaded a snatch game instance on server");
+
+    // populate initial state of a new game
     }else{
-	//generate un unshuffled array using letter frequencies
-	var tileSet = generateNewRandomTileSet(nTiles);
-	var playerSet = [];//this would be an empty player set for game start
-	var my_color_palette = shuffle(generateDistributedRandomColorSet(12));
-	var emergency_colors = shuffle(my_color_palette.slice(0));//duplicated data
+	
+	var GD = {
+	    tileSet: generateNewRandomTileSet(nTiles),	//shuffled array with official distribution
+	    playerSet: [], // this would be an empty player set for game start
+	    my_color_palette: shuffle(generateDistributedRandomColorSet(12)),
 
+	    tile_ownership: [],
+	    next_unturned_tile_i: 0,
 
-	var tile_ownership = [];
-	var next_unturned_tile_i = 0;
+	    game_finished: false,
 
-
-	var game_finished = false;
-
-	var user_options = {
-	    //1.
-	    uOpt_challenge: false,
-	    //2.
-	    uOpt_stem: false,
-	    //3. <select>
-	    uOpt_turns: "Pseudo Turns",
-	    //4.
-	    uOpt_flippy: false,
-	    //5. <select>
-	    uOpt_dictionary: "Sowpods",
-	    //6.
-	    uOpt_penalty: false
-	};
+	    user_options: {
+		//1.
+		uOpt_challenge: false,
+		//2.
+		uOpt_stem: false,
+		//3. <select>
+		uOpt_turns: "Pseudo Turns",
+		//4.
+		uOpt_flippy: false,
+		//5. <select>
+		uOpt_dictionary: "Sowpods",
+		//6.
+		uOpt_penalty: false
+	    }
+	}
+	GD.emergency_colors = shuffle(GD.my_color_palette.slice(0));//duplicated data
 
 	console.log("New snatch game instance created on server");
     }
@@ -55,11 +52,15 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
     //this is the collection of externally callable functions
     return{
 	update_uOpt: function(obj){
-	    user_options = obj;
+	    GD.user_options = obj;
 	},
 
 	get_uOpt: function(){
-	   return user_options;
+	   return GD.user_options;
+	},
+
+	get_FullGameData: function(){
+	   return GD;
 	},
 
 	build_hash: function(obj){
@@ -82,7 +83,7 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 		    if(fiveColorsSent_socketKey[socket_key].restore){
 			for(var i=0; i<5; i++){
 			    if(i == ci){continue;}
-			    my_color_palette.push(fiveColorsSent_socketKey[socket_key].cols[i]);
+			    GD.my_color_palette.push(fiveColorsSent_socketKey[socket_key].cols[i]);
 			}
 		    }
 		    delete fiveColorsSent_socketKey[socket_key];
@@ -97,11 +98,11 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 		    is_finished: this.areAllTilesTurned(),// typically false!
 		    socket_key: socket_key
 		};
-		playerSet.push(newPlayer);
-		player_index_from_socketKey_lkup[socket_key] = playerSet.length-1;
+		GD.playerSet.push(newPlayer);
+		player_index_from_socketKey_lkup[socket_key] = GD.playerSet.length-1;
 	    }else{
-		playerSet[rPID].is_disconnected = false;
-		playerSet[rPID].socket_key = socket_key;
+		GD.playerSet[rPID].is_disconnected = false;
+		GD.playerSet[rPID].socket_key = socket_key;
 		player_index_from_socketKey_lkup[socket_key] = rPID;
 	    }
 	},
@@ -110,8 +111,8 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 	    var PI = player_index_from_socketKey_lkup[socket_key];
 	    //there is the possibility that the player was never attached to this socket...
 	    if(PI != undefined){
-		playerSet[PI].is_disconnected = true;
-		playerSet[PI].socket_key = true;
+		GD.playerSet[PI].is_disconnected = true;
+		GD.playerSet[PI].socket_key = true;
 	
 		delete player_index_from_socketKey_lkup[socket_key];
 	    }
@@ -121,20 +122,20 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 	// if all active players have finished returns true
 	PlayerFinishedGame: function(socket_key) {
 	    var PI = player_index_from_socketKey_lkup[socket_key];
-	    playerSet[PI].is_finished = true;
-	    for(var i=0; i < playerSet.length; i++){
+	    GD.playerSet[PI].is_finished = true;
+	    for(var i=0; i < GD.playerSet.length; i++){
 		// ANY active player unfinished => answer false
-		if ((!playerSet[i].is_disconnected) && (!playerSet[i].is_finished)){
+		if ((!GD.playerSet[i].is_disconnected) && (!GD.playerSet[i].is_finished)){
 		    return false;
 		}
 	    }
-	    game_finished = true;
+	    GD.game_finished = true;
 	    return true;
 	},
 
 	isDisconnectedPlayerOfName: function(name) {
-	    for(var i = 0; i < playerSet.length; i++){
-		var PLR = playerSet[i]; 
+	    for(var i = 0; i < GD.playerSet.length; i++){
+		var PLR = GD.playerSet[i]; 
 		if((PLR.is_disconnected==true) && (PLR.name.toUpperCase == name.toUpperCase)){
 		    return i;
 		}
@@ -143,8 +144,8 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 	},
 
 	rejoinPlayer: function(socket_key, player_index) {
-	    playerSet[player_index].is_disconnected = false;
-	    playerSet[player_index].socket_key = socket_key;
+	    GD.playerSet[player_index].is_disconnected = false;
+	    GD.playerSet[player_index].socket_key = socket_key;
 
 	    player_index_from_socketKey_lkup[socket_key] = player_index;
 	},
@@ -152,18 +153,18 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 	getGameObject: function() {
 
 	    var playerSet_clone = [];
-	    for (var i=0; i < playerSet.length; i++){
+	    for (var i=0; i < GD.playerSet.length; i++){
 		playerSet_clone.push(this.getPlayerObject(i));
 	    }
-	    var turned_tiles = tileSet.slice(0,next_unturned_tile_i);
-	    var tile_stats = {n_tiles: tileSet.length, n_turned: next_unturned_tile_i};
+	    var turned_tiles = GD.tileSet.slice(0,GD.next_unturned_tile_i);
+	    var tile_stats = {n_tiles: GD.tileSet.length, n_turned: GD.next_unturned_tile_i};
 	    return {
 		playerSet: playerSet_clone,
 		turned_tiles: turned_tiles,
 		tile_stats: tile_stats,
 		state_hash: cum_hash,
-		user_options: user_options,
-		game_finished: game_finished
+		user_options: GD.user_options,
+		game_finished: GD.game_finished
 	    }; 
 	},
 
@@ -171,25 +172,25 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 	    // if socket key is actually a number (i.e. an array index), use it to index the player directly
 	    var PI = typeof(socket_key) == "number" ? socket_key : player_index_from_socketKey_lkup[socket_key];
 	    //in this case we are performing a deep copy of data, hence the use of the JSON function
-	    var player_clone = JSON.parse(JSON.stringify(playerSet[PI]));
+	    var player_clone = JSON.parse(JSON.stringify(GD.playerSet[PI]));
 	    delete player_clone.socket_key;
 	    return player_clone;
 	},
 
 	getPlayerNameBySocket: function(socket_key) {
 	    var PI = player_index_from_socketKey_lkup[socket_key];
-	    return playerSet[PI].name;
+	    return GD.playerSet[PI].name;
 	},
 
 	flipNextTile: function(socket_key) {
-	    var TI = next_unturned_tile_i;
-	    if(TI < tileSet.length){
+	    var TI = GD.next_unturned_tile_i;
+	    if(TI < GD.tileSet.length){
 		var PI = socket_key ? player_index_from_socketKey_lkup[socket_key] : null;
-		next_unturned_tile_i++;
-		tileSet[TI].status="turned";
+		GD.next_unturned_tile_i++;
+		GD.tileSet[TI].status="turned";
 		return {
 		    tile_index: TI,
-		    tile_letter: tileSet[TI].letter,
+		    tile_letter: GD.tileSet[TI].letter,
 		    flipping_player: PI
 		};
 	    }else{
@@ -198,22 +199,7 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 	},
 
 	areAllTilesTurned: function(){
-	    return !(next_unturned_tile_i < tileSet.length);
-	},
-	
-	//I don't believe this function is used, by design...
-	resetGame: function(nTiles) {
-	    tileSet = generateNewRandomTileSet(nTiles);
-	    my_color_palette = shuffle(color_palette);
-
-	    //reset some game variables...
-	    tile_ownership = [];
-	    next_unturned_tile_i = 0;
-
-	    //remove all words from all players
-	    for (i=0; i<playerSet.length; i++){
-		playerSet[i].words = [];//empty...
-	    }
+	    return !(GD.next_unturned_tile_i < GD.tileSet.length);
 	},
 
 	playerIndexFromSocket: function(socket_key) {
@@ -244,7 +230,7 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 	    //Dictionary check... (reconstruct word as string)
 	    var STR = "";
 	    for(var i=0; i<tile_id_array.length; i++){
-		var myTile = tileSet[tile_id_array[i]];
+		var myTile = GD.tileSet[tile_id_array[i]];
 		if(myTile == undefined){
 		    return {validity: 'invalid: references to undefined tiles in recieved data'};
 		}
@@ -278,9 +264,9 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 		var TID = tile_id_array[i];
 
 		//letter usage counting within all the words which get used
-		if(tileSet[TID].status=='inword'){
-		    var old_PI = tile_ownership[TID].player_index;
-		    var old_WI = tile_ownership[TID].word_index;
+		if(GD.tileSet[TID].status=='inword'){
+		    var old_PI = GD.tile_ownership[TID].player_index;
+		    var old_WI = GD.tile_ownership[TID].word_index;
 		    var key = 'p' + old_PI + 'w' + old_WI;
 		    
 		    //count the letter usage within that word
@@ -311,8 +297,8 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 		var PI_i = WordsInvolved[key_i].OldUsage.PI;
 		var WI_i = WordsInvolved[key_i].OldUsage.WI;
 		console.log("At key " + key_i + ", we consider player " + PI_i + " word " + WI_i);
-		console.log("the word is: " + playerSet[PI_i].words[WI_i]);
-		var wordlength_i = playerSet[PI_i].words[WI_i].length;
+		console.log("the word is: " + GD.playerSet[PI_i].words[WI_i]);
+		var wordlength_i = GD.playerSet[PI_i].words[WI_i].length;
 		if(wordlength_i != WordsInvolved[key_i].letter_usage_count){
 		    return {validity: 'invalid letters: partial usage of word ' + key_i};
 		}
@@ -347,11 +333,11 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 
 		//BUSINESS LOGIC: UPDATE SERVER-SIDE GAME REPRESENTATION
 
-		//[step 1] remove any consumed words. This also includes updating the tile_ownership[] array, as indexes shift...
+		//[step 1] remove any consumed words. This also includes updating the GD.tile_ownership[] array, as indexes shift...
 		for(var i=0; i<words_consumed.length; i++){
 		    var old_PI = words_consumed[i].PI;
 		    var old_WI = words_consumed[i].WI;
-		    var lost_word = playerSet[old_PI].words.splice(old_WI,1)[0];
+		    var lost_word = GD.playerSet[old_PI].words.splice(old_WI,1)[0];
 
 		    //maintain validity of words_consumed[i] given word index shift due to splice operation...
 		    for(var j=i+1; j<words_consumed.length; j++){
@@ -362,12 +348,12 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 			}
 		    }
 
-		    //maintain validity of tile_ownership[TID] given word index shift due to splice operation...
-		    var PI_wordset = playerSet[old_PI].words;
+		    //maintain validity of GD.tile_ownership[TID] given word index shift due to splice operation...
+		    var PI_wordset = GD.playerSet[old_PI].words;
 		    for(var j=old_WI; j<PI_wordset.length; j++){
 			for(var k=0; k<PI_wordset[j].length; k++){
 			    var TID = PI_wordset[j][k];
-			    tile_ownership[TID] = {
+			    GD.tile_ownership[TID] = {
 				player_index: old_PI,
 				word_index: j
 			    };
@@ -380,17 +366,17 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 		for(var i=0; i<tile_id_array.length; i++){
 		    var TID = tile_id_array[i];
 		    //update status
-		    tileSet[TID].status = 'inword';
+		    GD.tileSet[TID].status = 'inword';
 		    //hold a back-reference (Tile objects back-references from player/word index)
 		    //the length attribute will increment when the new word is added, which happens subsequently, and so it (now) represents its index
-		    tile_ownership[TID] = {
+		    GD.tile_ownership[TID] = {
 			player_index: PI,
-			word_index: playerSet[PI].words.length
+			word_index: GD.playerSet[PI].words.length
 		    };
 		}
 	
 		//[step 3] - puts the snatched word into the server's data structure
-		playerSet[PI].words.push(tile_id_array);
+		GD.playerSet[PI].words.push(tile_id_array);
 		
 		//COMMUNICATION LOGIC: SENDING THE CHANGE TO ALL CLIENTS...
 
@@ -405,8 +391,8 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 
 	    //log status at this point...
 	    console.log("Words in player are now:");
-	    for(var i=0; i<playerSet.length; i++){
-		console.log("Player " + i + "  has: " + JSON.stringify(playerSet[i].words));
+	    for(var i=0; i<GD.playerSet.length; i++){
+		console.log("Player " + i + "  has: " + JSON.stringify(GD.playerSet[i].words));
 	    }
 	    console.log("--------\n");
 
@@ -419,13 +405,13 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 	    var mySet = undefined;
 	    fiveColorsSent_socketKey[socket_key] = {};
 
-	    if(my_color_palette.length >= 5){
-		mySet = my_color_palette.splice(0,5);
+	    if(GD.my_color_palette.length >= 5){
+		mySet = GD.my_color_palette.splice(0,5);
 		fiveColorsSent_socketKey[socket_key].restore = true;
 		}
 	    else{
-		mySet = emergency_colors.slice(0,5);
-		emergency_colors = emergency_colors.concat(emergency_colors.splice(0,5));
+		mySet = GD.emergency_colors.slice(0,5);
+		GD.emergency_colors = GD.emergency_colors.concat(GD.emergency_colors.splice(0,5));
 		fiveColorsSent_socketKey[socket_key].restore = false;
 	    }
 
@@ -439,7 +425,7 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 	    var letters_string = "";
 	    for(var i = 0; i < TileIDArray.length; i++){
 		var TI = TileIDArray[i];
-		var myletter = tileSet[TI].letter;
+		var myletter = GD.tileSet[TI].letter;
 		letters_string += myletter;
 	    }
 	    return letters_string;
