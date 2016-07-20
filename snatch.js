@@ -83,8 +83,13 @@ var Snatch_pid = undefined;
 mongo_link.next_snatch_PID(function(x){Snatch_pid=x;});
 
 // route 3.5 !!
-app.get('/mongo', function(req, res){
+app.get('/db_words', function(req, res){
     mongo_link.serve_word_list_page2(res);
+});
+
+// route 3.6 !!
+app.get('/db_lengths', function(req, res){
+    mongo_link.serve_word_list_page2(res,1);
 });
 
 //route 4 - to get random words...

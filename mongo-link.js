@@ -88,7 +88,7 @@ module.exports = function (){
 	},
 */
 
-	serve_word_list_page2: function(res){
+	serve_word_list_page2: function(res, my_op){
 
 	    db_event(function(db){
 
@@ -99,12 +99,35 @@ module.exports = function (){
 		    } else {
 			console.log('data retrieved from DB');
 
-			var str = "<b> Cumulation of all words snatched </b> <br>";
-			for(var i=0; i < result.length; i++){
-			    str += result[i]._id + ": <b>" + result[i].count + "</b><br>";
-			}
+			//this is to show count of how many words of each length...
+			if(my_op==1){
+			    var str = "<b> Length distribution of words snatched since 17th July 2016 </b> <br>";
+			    var word_lengths = [];
 
-			res.send(str);
+			    for(var i=0; i < result.length; i++){
+
+				var length = result[i]._id.length;
+				if(word_lengths[length]==undefined){
+				    word_lengths[length] = 0;
+				}
+				word_lengths[length] += result[i].count;//there may be multiple of a particular word
+
+			    }
+
+			    for(var i=3; i < word_lengths.length; i++){//start with 3 letter words...
+				str += "Count of " + i + " letter words: <b>" + word_lengths[i] + "</b><br>";
+			    }
+
+			    res.send(str);
+
+			}else{
+			    var str = "<b> Cumulation of all words snatched since 17th July 2016 </b> <br>";
+			    for(var i=0; i < result.length; i++){
+				str += result[i]._id + ": <b>" + result[i].count + "</b><br>";
+			    }
+
+			    res.send(str);
+			}
 		    }
 		    //Close connection
 		    db.close();
