@@ -313,6 +313,16 @@ io.on('connection', function(socket){
 	    var dis_pl_name = myGame.getPlayerObject(socket.id).name;
 	    console.log('Player ' + dis_pl_i + ' (' + dis_pl_name + ') disconnected (socket.id = ' + socket.id + ')');
 
+	    // log as a Game Event
+	    mongo_link.log_GameEvent({
+		game_db_uID: dict_activeGames[socket.room_pin].db_uID,
+		event_type: "player leave",
+		player_name: myGame.playerNameFromSocket(socket.id),
+		player_number: myGame.playerIndexFromSocket(socket.id),
+		orderedLetters: null,
+		orderedTileIDs: null
+	    });
+
 	    //this function call must be last, and not be before other member functions of 'myGame'...
 	    myGame.removePlayer(socket.id);
 
@@ -356,6 +366,16 @@ io.on('connection', function(socket){
 	//as mentioned earlier, we really to block upon completion of this callback for full robustness...
 	//TODO: make it work properly (for guarenteed uID uniqueness).
 	mongo_link.IncrDBcount(function(x){next_game_db_uID=x;},'game_db_uID');
+
+	// log as a Game Event
+	mongo_link.log_GameEvent({
+	    game_db_uID: dict_activeGames[room_pin].db_uID,
+	    event_type: "game created",
+	    player_name: null,
+	    player_number: null,
+	    orderedLetters: null,
+	    orderedTileIDs: null
+	});
 
 	console.log("New game created: ", key_deets);
     	socket.emit('new game pin and key', key_deets);
@@ -465,6 +485,17 @@ io.on('connection', function(socket){
 	}
 
 	socket.broadcast.to(socket.room_pin).emit('player has joined game', player_join_details);
+
+	// log as a Game Event
+	mongo_link.log_GameEvent({
+	    game_db_uID: dict_activeGames[socket.room_pin].db_uID,
+	    event_type: "player join",
+	    player_name: myGame.playerNameFromSocket(socket.id),
+	    player_number: myGame.playerIndexFromSocket(socket.id),
+	    orderedLetters: null,
+	    orderedTileIDs: null
+	});
+
     });
 
 
@@ -503,7 +534,7 @@ io.on('connection', function(socket){
 	    // also also, log it:
 	    mongo_link.log_word(word_str);
 
-	    // and log it again...
+	    // and log it again... - log as a Game Event
 	    mongo_link.log_GameEvent({
 		game_db_uID: dict_activeGames[socket.room_pin].db_uID,
 		event_type: "snatch",
@@ -590,6 +621,18 @@ io.on('connection', function(socket){
 	    var current_hash = Game.build_hash(newTile_info.tile_letter);
 	    newTile_info.HH = current_hash;
 	    io.to(rm_pin).emit('new turned tile', newTile_info);
+
+	    // log as a Game Event - TURN
+	    mongo_link.log_GameEvent({
+		game_db_uID: dict_activeGames[rm_pin].db_uID,
+		event_type: "turn",
+		player_name: (sID != null ? Game.playerNameFromSocket(sID) : null),
+		player_number: (sID != null ? Game.playerIndexFromSocket(sID) : null),
+		orderedLetters: newTile_info.tile_letter,
+		orderedTileIDs: [newTile_info.tile_index]
+	    });
+
+
 	}
 	return newTile_info;
     };
@@ -616,6 +659,16 @@ io.on('connection', function(socket){
 	    if(all_fin){
 		console.log("Active players agree: this game is finished");
 		io.to(socket.room_pin).emit('all players declared finished', 0);
+
+		mongo_link.log_GameEvent({
+		    game_db_uID: dict_activeGames[socket.room_pin].db_uID,
+		    event_type: "all finished",
+		    player_name: null,
+		    player_number: null,
+		    orderedLetters: null,
+		    orderedTileIDs: null
+		});
+
 	    }else{
 		var PI = myGame.playerIndexFromSocket(socket.id);
 		io.to(socket.room_pin).emit('player declared finished', PI);
