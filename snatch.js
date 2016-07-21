@@ -98,6 +98,12 @@ app.get('/db_lengths', function(req, res){
     mongo_link.serve_word_list_page2(res,1);
 });
 
+// route 3.7 !!
+app.get('/db_events', function(req, res){
+    mongo_link.serve_GameEvent_list(res);
+});
+
+
 //route 4 - to get random words...
 app.get('/random-defns/*', function(req, res){
     var frags = req.url.split('/');
@@ -466,7 +472,7 @@ io.on('connection', function(socket){
     socket.on('player submits word', function(tile_id_array){
 	if(!access_room(socket.room_pin)){return;}; // log that the game was accessed. Terminate if invalid
 
-	console.log("["+socket.room_pin+"]: Snatch submission with letters: ",tile_id_array);
+	console.log("["+socket.room_pin+"]: Snatch submission with letters: ", tile_id_array);
 	var myGame = dict_activeGames[socket.room_pin].GameInstance;
 	var SnatchResponse = myGame.playerSnatches(tile_id_array, socket.id)
 
@@ -496,6 +502,16 @@ io.on('connection', function(socket){
 
 	    // also also, log it:
 	    mongo_link.log_word(word_str);
+
+	    // and log it again...
+	    mongo_link.log_GameEvent({
+		game_db_uID: dict_activeGames[socket.room_pin].db_uID,
+		event_type: "snatch",
+		player_name: myGame.playerNameFromSocket(socket.id),
+		player_number: myGame.playerIndexFromSocket(socket.id),
+		orderedLetters: word_str,
+		orderedTileIDs: tile_id_array
+	    });
 
 	}else{
 	    // where client snatch request is rejected because it is duplicate & invalid, don't even respond

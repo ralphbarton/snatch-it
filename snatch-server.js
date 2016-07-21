@@ -177,11 +177,6 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 	    return player_clone;
 	},
 
-	getPlayerNameBySocket: function(socket_key) {
-	    var PI = player_index_from_socketKey_lkup[socket_key];
-	    return GD.playerSet[PI].name;
-	},
-
 	flipNextTile: function(socket_key) {
 	    var TI = GD.next_unturned_tile_i;
 	    if(TI < GD.tileSet.length){
@@ -204,6 +199,11 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 
 	playerIndexFromSocket: function(socket_key) {
 	    return player_index_from_socketKey_lkup[socket_key];
+	},
+
+	playerNameFromSocket: function(socket_key) {
+	    var PI = player_index_from_socketKey_lkup[socket_key];
+	    return GD.playerSet[PI].name;
 	},
 
 	snatchWordValidation: function(player_index, tile_id_array){

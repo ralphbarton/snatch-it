@@ -24,7 +24,6 @@ module.exports = function (){
     var db = mongoose.connection;
 
     db.on('error', console.error);
-    //db.once('open', function() {
 
     // this is now a section for MongoDB schema defintion:
 
@@ -41,10 +40,23 @@ module.exports = function (){
     //Compile Schema into Model
     var SaveGame = mongoose.model('SaveGame', save_game_schema);
 
-    //});
+    var game_event_schema = new mongoose.Schema({
+	timeStamp: { type: Date, default: Date.now },
+	game_db_uID: Number,
+	event_type: String,
+	player_name: String,
+	player_number: Number,
+	orderedLetters: String,
+	orderedTileIDs: [Number]
+    });
+
+    //Compile Schema into Model
+    var GameEvent = mongoose.model('GameEvent', game_event_schema);
+
+
+
 
     mongoose.connect(url);
-
 
     console.log("Prepared to connected to", url);
 
@@ -186,6 +198,9 @@ module.exports = function (){
 	    });//event (connect) complete
 	},
 
+
+// This is just a reminder of the structure of the obj_AG object mentioned below, actually used in snatch.js
+
 /*
 	dict_activeGames[room_pin] = {
 	    db_uID: next_game_db_uID,
@@ -199,13 +214,13 @@ module.exports = function (){
 
 	Save_Game: function(obj_AG, arg1, arg2){
 
-	    var query = { game_db_uID: obj_AG.db_uID };
+	    var query = { game_db_uID: obj_AG.db_uID };// this is where game UID object comes in...
 	    var props_obj = {
 		timeStarted: obj_AG.timeStarted,
 		timeAccessed: obj_AG.timeAccessed,
 		original_key: obj_AG.room_key,
 		original_pin: arg1,
-		original_SnPID: arg2,
+		original_SnPID: arg2,//Snatch 'Process ID' (process counter). 'Original' in the sense of which process init-ed
 		GameData: (obj_AG.GameInstance.get_FullGameData())
 	    };
 
@@ -219,7 +234,7 @@ module.exports = function (){
 	},
 
 
-	retrive_by_game_db_uID: function(uID){
+	reload_by_game_db_uID: function(uID){
 
 	},
 
@@ -228,9 +243,64 @@ module.exports = function (){
 	    db_event(function(db){
 
 	    });
-	}
+	},
 
+
+	log_GameEvent: function(game_event_props){
+
+	    game_event_props.timeStamp = new Date();
+
+	    var game_event = new GameEvent(game_event_props);
+
+	    game_event.save(function (err, fluffy) {
+		if (err) return console.error(err);
+		console.log("Game Event Logged");
+	    });
+
+	},
+
+
+	serve_GameEvent_list: function(res){
+
+	    db_event(function(db){
+
+		GameEvent.find(function (err, kittens) {
+		    if (err) return console.error(err);
+//		    res.send(syntaxHighlight(kittens));
+		    var my_str = JSON.stringify(kittens, null, 2);
+		    my_str = "<pre><code>" + my_str + "</pre></code>";
+
+		    res.send(my_str);
+		});
+
+	    });
+	}
 
     };//return a collection of functions
 
+}
+
+
+// this is for sending all the JSON in an HTML serve...
+
+function syntaxHighlight(json) {
+    if (typeof json != 'string') {
+         json = JSON.stringify(json, undefined, 2);
+    }
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        var cls = 'number';
+        if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+                cls = 'key';
+            } else {
+                cls = 'string';
+            }
+        } else if (/true|false/.test(match)) {
+            cls = 'boolean';
+        } else if (/null/.test(match)) {
+            cls = 'null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+    });
 }
