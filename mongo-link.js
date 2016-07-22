@@ -4,6 +4,8 @@ module.exports = function (){
     var MongoClient = mongodb.MongoClient;// Work with "MongoClient" interface to connect to a mongodb server.
     var url = 'mongodb://localhost:27017/snatch_db'; // where mongodb server is running.
 
+    XLSX = require('xlsx');
+
     function db_event(db_func){
 	// Use connect method to connect to the Server
 	MongoClient.connect(url, function (err, db) {
@@ -260,17 +262,23 @@ module.exports = function (){
 	},
 
 
-	serve_GameEvent_list: function(res){
+	serve_GameEvent_list: function(res, db_uID){
+
+	    var query = db_uID ? {game_db_uID: db_uID} : {};
 
 	    db_event(function(db){
 
-		GameEvent.find(function (err, kittens) {
+		GameEvent.find(query, function (err, kittens) {
 		    if (err) return console.error(err);
 //		    res.send(syntaxHighlight(kittens));
 		    var my_str = JSON.stringify(kittens, null, 2);
 		    my_str = "<pre><code>" + my_str + "</pre></code>";
 
-		    res.send(my_str);
+		    db_uID ="Go";
+		    var str2 = "<b>Database dump for " + (db_uID ? ("game with uID = "+db_uID) : "all games logged") + "</b><br>";
+		    str2 += "<a href=\"/get_xlxs\">Download Excel file...</a><br><br>";
+		    res.send(str2 + my_str);
+		    write_GameEvent_xlsx(kittens);
 		});
 
 	    });
@@ -303,4 +311,49 @@ function syntaxHighlight(json) {
         }
         return '<span class="' + cls + '">' + match + '</span>';
     });
+}
+
+
+
+function write_GameEvent_xlsx(data){
+
+    var workbook = XLSX.readFile('files_creation/blank.xlsx');
+
+    var first_sheet_name = workbook.SheetNames[0];
+    var address_of_cell = 'A1';
+    
+    // Get worksheet
+    var worksheet = workbook.Sheets[first_sheet_name];
+
+    //we only write to the workbook...
+    for(var i = 0; i < data.length; i++){
+	var row = i+2;
+
+	worksheet['A'+row] = {v: data[i].game_db_uID};
+	worksheet['B'+row] = {v: data[i].timeStamp};
+	worksheet['C'+row] = {v: data[i].player_name};
+	worksheet['D'+row] = {v: data[i].event_type};
+	worksheet['E'+row] = {v: data[i].orderedLetters};
+	worksheet['F'+row] = {v: data[i].orderedTileIDs};
+    }
+
+
+    XLSX.writeFile(workbook, 'files_creation/latest.xlsx');
+
+
+    // even if this library may offer benefits, I don't seem to be able to make it open files...
+    /*
+      var EditXlsx = require('edit-xlsx');
+
+      var path = "/home/ralph/Documents/Projects/20-ralph-administrated-websites/digitalocean-mirror/snatch-it.rocks/abc.xlsx";
+
+      var xlsx = new EditXlsx("/home/ralph/Documents/Projects/20-ralph-administrated-websites/digitalocean-mirror/snatch-it.rocks/abc.xlsx");
+      var sheet = xlsx.sheet(0);
+      
+      sheet.update('A1', 'Title');
+      sheet.update([2, 1], 'Creator');
+
+      xlsx.save('files_creation/out2.xlsx');
+    */
+
 }

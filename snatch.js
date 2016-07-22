@@ -103,6 +103,12 @@ app.get('/db_events', function(req, res){
     mongo_link.serve_GameEvent_list(res);
 });
 
+// route 3.8 !!
+app.get('/get_xlxs', function(req, res){
+    res.download('files_creation/latest.xlsx', 'game_log.xlsx');
+//    mongo_link.serve_GameEvent_xlsx(null);
+});
+
 
 //route 4 - to get random words...
 app.get('/random-defns/*', function(req, res){
