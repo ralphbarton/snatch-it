@@ -226,7 +226,7 @@ module.exports = function (){
 		GameData: (obj_AG.GameInstance.get_FullGameData())
 	    };
 
-	    SaveGame.findOneAndUpdate(query, props_obj, {upsert: true}, function (err, result) {
+	    SaveGame.update(query, {$set: props_obj}, {upsert: true}, function (err, result) {
 		if (err) {
 		    console.log(err);
 		} else {
