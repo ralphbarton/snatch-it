@@ -6,6 +6,9 @@ snCore.Keyboard = {
     secretCode2: "99FROGS88",
     codeCounter2: 0,
 
+    secretCode3: "99FROGS77",
+    codeCounter3: 0,
+
     kDown: function (e) {
 	var myKeycode = e.keyCode;
 	var keyPressed = String.fromCharCode(myKeycode);//note that this is non-case sensitive.
@@ -39,6 +42,25 @@ snCore.Keyboard = {
 	}else{
 	    this.codeCounter2 = 0;
 	}
+
+	//this design only handles one code but could easily be modified for more.
+	//note how the easy modification used here has been the copying and pasting of code.
+	//TODO. if any more codes are to be used, do it a bit better than this, please...
+	// note that plee above has herby been disregarded.
+	if(keyPressed == this.secretCode3[this.codeCounter3]){
+	    this.codeCounter3++;
+	    if(this.codeCounter3 == this.secretCode3.length){
+		snCore.Toast.showToast("This game has uID = " + db_uID);
+
+		this.codeCounter3 = 0;
+	    }
+	}else{
+	    this.codeCounter3 = 0;
+	}
+
+
+
+
 
 	//Keystroke is a user-active eveny. Clear Persistent Toasts
 	snCore.Toast.clear_all_persistent();

@@ -17,6 +17,8 @@ var dev = false; // select whether development more is active or not
 // the server...
 var room_pin = undefined;
 var room_key = undefined;
+var db_uID = undefined
+
 // global references
 var flkty = undefined;
 var canvas = undefined;
@@ -64,6 +66,7 @@ socket.on('full game state transmission', function(gameState){
     tilestats = gameState.tile_stats;
     cum_MSG_hash = gameState.state_hash;
 
+    db_uID = gameState.db_uID;
 
     // update to the option-set on server...
     var u_opt = gameState.user_options;

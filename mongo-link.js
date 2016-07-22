@@ -274,7 +274,6 @@ module.exports = function (){
 		    var my_str = JSON.stringify(kittens, null, 2);
 		    my_str = "<pre><code>" + my_str + "</pre></code>";
 
-		    db_uID ="Go";
 		    var str2 = "<b>Database dump for " + (db_uID ? ("game with uID = "+db_uID) : "all games logged") + "</b><br>";
 		    str2 += "<a href=\"/get_xlxs\">Download Excel file...</a><br><br>";
 		    res.send(str2 + my_str);

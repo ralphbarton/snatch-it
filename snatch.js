@@ -99,8 +99,15 @@ app.get('/db_lengths', function(req, res){
 });
 
 // route 3.7 !!
-app.get('/db_events', function(req, res){
-    mongo_link.serve_GameEvent_list(res);
+app.get('/db_events*', function(req, res){
+
+    var frags = req.url.split('=');
+    var final_path = frags[frags.length-1];
+
+    var req_uid = parseInt(final_path);
+    var req_uid_2 = isNaN(req_uid) ? null : req_uid;
+
+    mongo_link.serve_GameEvent_list(res, req_uid_2);
 });
 
 // route 3.8 !!
@@ -476,6 +483,8 @@ io.on('connection', function(socket){
 
 	//gamestate to the new joiner
 	var gameObj = myGame.getGameObject();
+	gameObj.db_uID = dict_activeGames[socket.room_pin].db_uID;
+
 	socket.emit('full game state transmission', gameObj);//now just transmit to the new player
 	socket.emit('word definitions dictionary', word_dictionary);
 	
