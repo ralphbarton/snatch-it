@@ -116,6 +116,8 @@ snCore.Popup = {
 	    
 	    //dynamic.
 	    initiate_copy_box();
+	    var homeURL = window.location.href.split('join')[0];
+	    $("#download-log-link-a").attr("href", homeURL + "db_events=" + db_uID);
 
 	}else if(type=="connection"){
 

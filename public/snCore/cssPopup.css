@@ -80,6 +80,11 @@ a.modal:hover{
     font-size: 12pt;
 }
 
+#download-log-link-p{
+    margin: 0px;
+    text-align: right;
+    font-size: 10pt;
+}
 
 
 
