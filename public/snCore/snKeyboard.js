@@ -65,6 +65,7 @@ snCore.Keyboard = {
 	//Keystroke is a user-active eveny. Clear Persistent Toasts
 	snCore.Toast.clear_all_persistent();
 
+
 	if(snCore.Popup.popup_in_foreground){
 	    if(snCore.Popup.popup_in_foreground == "rules"){
 		if(myKeycode == 37){//left
@@ -105,6 +106,8 @@ snCore.Keyboard = {
 		snCore.Spell.CancelWord();
 		//also removes score window if present...
 		snCore.Popup.hideModal();
+		//also removes all Toasts with immediate effect
+		snCore.Toast.clear_all();
 	    }
 
 	    if(keyPressed == '2'){

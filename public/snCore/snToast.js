@@ -196,6 +196,14 @@ snCore.Toast = {
 	});
     },
 
+    clear_all: function(){
+	for (var my_tk in this.Active_byKey) {
+	    if (this.Active_byKey.hasOwnProperty(my_tk)) {
+		snCore.Toast.setToastRemTimeout(my_tk, {instant: true});//the true means clear fast...
+	    }
+	}
+    },
+
     join_message: function(){
 	// (I've put a moment of delay here. Probably UNNECESSARY TO USE TIMEOUT
 	setTimeout(function(){

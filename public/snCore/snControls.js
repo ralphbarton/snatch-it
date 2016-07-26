@@ -391,6 +391,8 @@ snCore.Controls = {
     //all_tiles_safely_turned: false,//set true
     turn_tk: undefined,//toast key for the Toast relating to turning letter...
     bolden_counter: 0,
+    //what happens when we click "Turn Letter".
+    // this is largely concerned with a Toast to warn how recently letter has been turned..
     turnLetterClickHandler: function(){
 	// Case 1: hits space when the countdown is blocking...
 	if(this.turnDisabled){
@@ -420,7 +422,7 @@ snCore.Controls = {
 		var date_now = new Date();
 		
 		var time_remaining = Math.max(time_dur - (date_now - date_start)/1000, 0);
-		var ndo = 5;
+		var ndo = 5; // this is the number of divisions of a second (e.g. 5 means 0.2 seconds)
 		//create the string for time remaining
 		time_remaining = (Math.round(time_remaining * ndo) / ndo).toFixed(1);
 
