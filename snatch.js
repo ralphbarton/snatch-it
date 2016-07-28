@@ -537,8 +537,14 @@ io.on('connection', function(socket){
 		SnatchMsg.ExtraTiles.push(myGame.flipNextTile(socket.id));
 	    }
 
+	    // use this to inject a delay...
+	    /*
+	      setTimeout(function(){
+	      }, 2000);*/	    
+
 	    io.to(socket.room_pin).emit('snatch assert', SnatchMsg);   
-	    
+
+
 	    // also, we now take the chance to look up the accepted work in the real dictionary (web-scrape a website)
 	    // response of the scrape-script with trigger further (anonymous) actions
 	    var word_str = myGame.TileIDArray_to_LettersString(tile_id_array);
@@ -559,6 +565,19 @@ io.on('connection', function(socket){
 		orderedTileIDs: tile_id_array
 	    });
 
+	    // in the case of "double auto flip", log this as a separate event...
+	    var T_pair = SnatchMsg.ExtraTiles;
+	    if(myGame.get_uOpt().uOpt_flippy){
+		mongo_link.log_GameEvent({
+		    game_db_uID: dict_activeGames[socket.room_pin].db_uID,
+		    event_type: "turn (auto)",
+		    player_name: myGame.playerNameFromSocket(socket.id),
+		    player_number: myGame.playerIndexFromSocket(socket.id),
+		    orderedLetters: T_pair[0].tile_letter + ", "+ T_pair[1].tile_letter,
+		    orderedTileIDs: [T_pair[0].tile_index, T_pair[1].tile_index]
+		});
+	    }
+
 	}else{
 	    // where client snatch request is rejected because it is duplicate & invalid, don't even respond
 	    if(SnatchResponse.val_check != 'duplicate'){
@@ -570,7 +589,6 @@ io.on('connection', function(socket){
 
     socket.on('game settings upload', function(settings_obj){
 	if(!access_room(socket.room_pin)){return;}; // log that the game was accessed. Terminate if invalid
-
 
 	var myGame = dict_activeGames[socket.room_pin].GameInstance;
 	var old_settings = myGame.get_uOpt();
@@ -617,6 +635,30 @@ io.on('connection', function(socket){
 	}
 
 	socket.broadcast.to(socket.room_pin).emit('game settings download', details_obj);
+
+	// Log only the settings that changed (n.b. this means shoehorning a settings object into "Tiles" field...
+	var changed_setting = "";
+
+	for (var prop in old_settings) {
+	    if( old_settings.hasOwnProperty( prop ) ) {
+		if (old_settings[prop] != settings_obj[prop]){
+		    //changed_setting[prop] = settings_obj[prop];
+		    changed_setting += prop + ": " + settings_obj[prop];
+		}
+	    } 
+	}
+
+	mongo_link.log_GameEvent({
+	    game_db_uID: dict_activeGames[socket.room_pin].db_uID,
+	    event_type: "settings change",
+	    player_name: myGame.playerNameFromSocket(socket.id),
+	    player_number: myGame.playerIndexFromSocket(socket.id),
+	    orderedLetters: changed_setting,
+	    orderedTileIDs: null
+	});
+
+
+
     });
 
 
@@ -671,10 +713,23 @@ io.on('connection', function(socket){
 	}else{//this means no tiles left....
 	    console.log("A 'flip' message was recieved when all tiles were already turned");
 	    var all_fin = myGame.PlayerFinishedGame(socket.id);
+
+	    // Log the "Individual finished" event
+	    // and log it again... - log as a Game Event
+	    mongo_link.log_GameEvent({
+		game_db_uID: dict_activeGames[socket.room_pin].db_uID,
+		event_type: "player finished",
+		player_name: myGame.playerNameFromSocket(socket.id),
+		player_number: myGame.playerIndexFromSocket(socket.id),
+		orderedLetters: null,
+		orderedTileIDs: null
+	    });
+
 	    if(all_fin){
 		console.log("Active players agree: this game is finished");
 		io.to(socket.room_pin).emit('all players declared finished', 0);
 
+		// Log the "ALL finished" event
 		mongo_link.log_GameEvent({
 		    game_db_uID: dict_activeGames[socket.room_pin].db_uID,
 		    event_type: "all finished",
