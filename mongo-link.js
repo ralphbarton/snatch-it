@@ -236,14 +236,63 @@ module.exports = function (){
 	},
 
 
-	reload_by_game_db_uID: function(uID){
+	reload_by_game_db_uID: function(res, uid, dict_activeGames, snatchSvr_factory, keygen, get_active_uids_list, WordDictionaryTools, access_room, mongo_link){
 
+	    db_event(function(db){
+		SaveGame.find({game_db_uID:uid}, function (err, kittens) {
+
+		    var Saved_Game = kittens[0];
+		    if (Saved_Game == undefined){
+			console.log("A requested saved game was not found in the database");
+			res.send("A requested saved game was not found in the database");
+		    }else if(get_active_uids_list().indexOf(uid) != -1){
+			//condition to check if game already loaded
+			console.log("Cannot reload an already loaded Game");
+			res.send("Cannot reload an already loaded Game");
+		    }else{
+			// NOTE TO SELF: this is pretty similar code to handler for socket.on('request to init room'...
+			var key_deets = keygen.getPIN();
+			var room_pin = key_deets.pin;
+			// Create a new room instance, referenced by the room_pin
+			dict_activeGames[room_pin] = {
+			    db_uID: uid,
+			    room_key: key_deets.key,
+			    closeTimeoutID: undefined,
+			    timeStarted: (new Date(Saved_Game.timeStarted)),
+			    timeAccessed: undefined,
+			    GameInstance: snatchSvr_factory(null, WordDictionaryTools.in_dictionary, Saved_Game.GameData)
+			};
+			access_room(room_pin);//this perhaps ought to be part of constructor. Needed to put timeout in place.
+
+			// log as a Game Event
+			
+			mongo_link.log_GameEvent({
+			    game_db_uID: uid,
+			    event_type: "game reloaded",
+			    player_name: null,
+			    player_number: null,
+			    orderedLetters: null,
+			    orderedTileIDs: null
+			});
+
+			console.log("Game reloaded with new key/pin: ", key_deets);
+			var str1 ="Reloaded game of uid "+uid+".<br>Original key: "+Saved_Game.original_key+"<br>New key: "+key_deets.key; 
+			var str2 = "<br><a href='/'>Homepage</a><br>";
+			var str3 = "<a href='/join="+key_deets.pin+"'>Enter...</a><br>";
+			res.send(str1 + str2 + str3);
+		    }
+		});
+	    });
 	},
 
 
-	serve_SaveGame_list: function(res, dict_activeGames){
+	serve_SaveGame_list: function(res, dict_activeGames, uid_list_fun){
 
 	    var Mnths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+	    //generate the list of uIDs of the active games
+	    var uid_active = uid_list_fun();
+
 	    var projection_query = {
 		_id: false,
 		game_db_uID: true,
@@ -266,18 +315,30 @@ module.exports = function (){
 
 		    for(var i = 0; i < kittens.length; i++){
 			var thisDate = new Date(kittens[i].timeStarted);
-			var active = dict_activeGames[kittens[i].original_pin] != undefined;
-			if (active){active = dict_activeGames[kittens[i].original_pin].db_uID == kittens[i].game_db_uID;}
-			    
+			var pin = kittens[i].original_pin;
+			var uid = kittens[i].game_db_uID
+			var newly_active = dict_activeGames[pin] != undefined;
+			var reactivated = false;
+			if (newly_active){
+			    active = dict_activeGames[pin].db_uID == uid;
+			}else{
+			    // so we already know it is not the case that
+			    // (1) the original pin is an active pin, AND
+			    // (2) the game's (original) uid matches between RAM copy and DB copy
+			    reactivated = (uid_active.indexOf(uid) != -1);
+			}
 			
-			console.log(dict_activeGames[kittens[i].original_pin]);
-
+			//Generates the HTML for the table of Saved Games
+			var key_cell_cont = kittens[i].original_key;
+			if((!reactivated)&&(!newly_active)){
+			    key_cell_cont += " <a href='/db_retrieve="+uid+"'>(reload...)</a>"
+			}
 
 			my_tbl +=  "<tr>\
 <td>" + thisDate.getDate() + "-" + Mnths[thisDate.getMonth()] + "</td>\
 <td>" + thisDate.toLocaleTimeString() + "</td>\
-<td>" + kittens[i].game_db_uID + "</td>\
-<td style=\"color: "+(active?"red":"blue")+"\">" + kittens[i].original_key + "</td>\
+<td>" + uid + "</td>\
+<td style=\"color: "+(newly_active?"red":(reactivated?"orange":"blue"))+"\">" + key_cell_cont + "</td>\
 </tr>";
 		    }
 

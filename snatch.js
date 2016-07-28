@@ -118,16 +118,17 @@ app.get('/get_xlxs', function(req, res){
 
 // route 3.81 
 app.get('/db_saved', function(req, res){
-    mongo_link.serve_SaveGame_list(res, dict_activeGames);
+    mongo_link.serve_SaveGame_list(res, dict_activeGames, get_active_uids_list);
 });
 
 // route 3.82 !!
 app.get('/db_retrieve*', function(req, res){
 
     var frags = req.url.split('=');
-    var final_path = frags[frags.length-1];
+    var uid = frags[frags.length-1];
 
-   // mongo_link.serve_word_list_page2(res,1);
+    mongo_link.reload_by_game_db_uID(res, uid, dict_activeGames, snatchSvr_factory, keygen, get_active_uids_list, WordDictionaryTools, access_room, mongo_link);
+
 });
 
 //route 4 - to get random words...
@@ -301,6 +302,16 @@ function access_room(room_pin){
     }
 }
 
+function get_active_uids_list(){
+    var uid_active = [];
+    for (var game_pin in dict_activeGames) {
+	if(dict_activeGames.hasOwnProperty(game_pin)){
+	    uid_active.push(dict_activeGames[game_pin].db_uID);
+	} 
+    }
+    return uid_active;
+}
+
 io.on('connection', function(socket){
 
     //basic logging
@@ -371,7 +382,7 @@ io.on('connection', function(socket){
     });
 
 
-    socket.on('request to init room', function (data){
+    socket.on('request to init room', function (no_data){
 
 	// create a new unique tag... the form will be {key: "word word", pin: 1234}
 	var key_deets = keygen.getPIN();
