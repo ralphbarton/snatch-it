@@ -116,6 +116,19 @@ app.get('/get_xlxs', function(req, res){
 //    mongo_link.serve_GameEvent_xlsx(null);
 });
 
+// route 3.81 
+app.get('/db_saved', function(req, res){
+    mongo_link.serve_SaveGame_list(res, dict_activeGames);
+});
+
+// route 3.82 !!
+app.get('/db_retrieve*', function(req, res){
+
+    var frags = req.url.split('=');
+    var final_path = frags[frags.length-1];
+
+   // mongo_link.serve_word_list_page2(res,1);
+});
 
 //route 4 - to get random words...
 app.get('/random-defns/*', function(req, res){
@@ -362,7 +375,6 @@ io.on('connection', function(socket){
 
 	// create a new unique tag... the form will be {key: "word word", pin: 1234}
 	var key_deets = keygen.getPIN();
-	//todo use 
 	var room_pin = key_deets.pin;
 
 	// 2. Now create a new room instance, referenced by the room_pin

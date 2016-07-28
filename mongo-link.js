@@ -240,10 +240,54 @@ module.exports = function (){
 
 	},
 
-	serve_SaveGame_list: function(res, my_op){
+
+	serve_SaveGame_list: function(res, dict_activeGames){
+
+	    var Mnths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+	    var projection_query = {
+		_id: false,
+		game_db_uID: true,
+		timeStarted: true,
+		original_pin: true,
+		original_key: true
+	    };
 
 	    db_event(function(db){
+		SaveGame.find({}, projection_query, function (err, kittens) {
 
+		    var my_tbl = "<table style=\"border: 1px solid black\">\
+<tr>\
+<th>Date Started</th>\
+<th>Time Started</th>\
+<th>Save Game ID</th>\
+<th>Key (original)</th>\
+</tr>";
+
+
+		    for(var i = 0; i < kittens.length; i++){
+			var thisDate = new Date(kittens[i].timeStarted);
+			var active = dict_activeGames[kittens[i].original_pin] != undefined;
+			if (active){active = dict_activeGames[kittens[i].original_pin].db_uID == kittens[i].game_db_uID;}
+			    
+			
+			console.log(dict_activeGames[kittens[i].original_pin]);
+
+
+			my_tbl +=  "<tr>\
+<td>" + thisDate.getDate() + "-" + Mnths[thisDate.getMonth()] + "</td>\
+<td>" + thisDate.toLocaleTimeString() + "</td>\
+<td>" + kittens[i].game_db_uID + "</td>\
+<td style=\"color: "+(active?"red":"blue")+"\">" + kittens[i].original_key + "</td>\
+</tr>";
+		    }
+
+		    my_tbl += "</table>";
+
+		    var str2 = "<b>Saved Games Listing from Database (count="+kittens.length+")</b><br><br>";
+		    res.send(str2 + my_tbl);
+
+		    
+		});
 	    });
 	},
 
