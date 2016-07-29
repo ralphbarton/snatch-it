@@ -20,7 +20,7 @@ var room_key = undefined;
 var db_uID = undefined
 
 // global references
-var flkty = undefined;
+var flkty_rules = undefined;
 var canvas = undefined;
 window.onload = function() {
 
@@ -36,7 +36,7 @@ window.onload = function() {
     if((!isNaN(room_pin)) && (room_pin.length==4)){//test it is a 4 digit numeric string...
 	socket.emit('join room and start', room_pin);
     }
-    flkty = new Flickity('.carousel', {
+    flkty_rules = new Flickity('.rules-container', {
 	// options
 	accessibility: false // this is to disable inbuilt kb arrow handling, because I'm doing arrow handling.
     });

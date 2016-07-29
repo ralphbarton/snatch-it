@@ -80,7 +80,7 @@ a.modal:hover{
     font-size: 12pt;
 }
 
-#download-log-link-p{
+.p-for-small-RHS-link{
     margin: 0px;
     text-align: right;
     font-size: 10pt;

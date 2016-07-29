@@ -106,7 +106,7 @@ snCore.Popup = {
 	    Footer = snCore.Controls.client_indicated_finished ? "modal-footer-close-replay" : "modal-footer-simple-close"; 
 
 	    // dynamically change content by regenerating the scores table...
-	    $("#modal-body-scores-table").html(this.generate_scores_table_html_element());
+	    $("#scores-table-container").html(this.generate_scores_table_html_element());
 
 	}else if(type=="options"){
 
@@ -175,8 +175,18 @@ snCore.Popup = {
 	    Body = "modal-body-flickity-rules";
 	    Footer = "modal-footer-back-and-close";
 
-	    flkty.select( 0 );//revert to page 1
+	    flkty_rules.select(0);//revert to page 1
 
+	}else if(type=="stats"){
+	    Title = "Game Stats";
+	    Body = "modal-body-flickity-stats";
+	    Footer = snCore.Controls.client_indicated_finished ? "modal-footer-close-replay" : "modal-footer-simple-close"; 
+
+	    var div_w = snCore.Basic.canv_W * 0.95;
+	    var div_h = Math.min(div_w, snCore.Basic.canv_H * 0.95);
+	    $("#modal-body-flickity-stats").css("border", "1px solid red")
+		.css("width", div_w)
+		.css("height", div_h);
 	}
 
 	//Inject the Title

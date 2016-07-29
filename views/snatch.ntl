@@ -83,10 +83,16 @@
 	       modal-body-lost-connection
 	       modal-body-options-menu
 	       modal-body-flickity-rules
+	       modal-body-flickity-stats
 	    -->
 
 	  <!-- modal-body-scores-table (note that this always has to be generated dynamically) -->
-	  <div id="modal-body-scores-table"></div>
+	  <div id="modal-body-scores-table">
+	    <div id="scores-table-container"></div>
+	    <p class="p-for-small-RHS-link"> 
+	      <a href="#" onclick="snCore.Popup.openModal('stats')">More game stats...</a> 
+	    </p>
+	  </div>
 
 	  <!-- modal-body-options-menu -->
 	  <div id="modal-body-options-menu">
@@ -173,7 +179,7 @@
 	      <label for="uOpt_penalty">Apply penalty for words not in dictionary</label>
 	    </p>
 
-	    <p id="download-log-link-p"> 
+	    <p class="p-for-small-RHS-link"> 
 	      <a id="download-log-link-a" target="_blank">Game Log Download</a> 
 	    </p>
 
@@ -189,6 +195,10 @@
 
 	    <p>Otherwise, click below to re-establish a connection to this game. Enter your name exactly as before to reclaim your words.</p>
 
+	  </div>
+
+	  <!-- modal-body-connection-problem -->
+	  <div id="modal-body-slow-connection">
 	  </div>
 
 	  <!-- modal-body-connection-lost -->
@@ -329,8 +339,25 @@
 	      </div>
 	    </div>
 
-
 	  </div>
+
+	  <div id="modal-body-flickity-stats">
+
+	    <div class="carousel stats-container">
+
+	      <!-- Graph here -->
+	      <div class="carousel-cell stats-cell">
+		Hello World 1
+	      </div>
+
+	      <!-- Graph here -->
+	      <div class="carousel-cell stats-cell">
+		Hello World 2
+	      </div>
+
+	    </div>
+	  </div>
+
 	</div>
 
 

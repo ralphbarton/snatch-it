@@ -69,9 +69,9 @@ snCore.Keyboard = {
 	if(snCore.Popup.popup_in_foreground){
 	    if(snCore.Popup.popup_in_foreground == "rules"){
 		if(myKeycode == 37){//left
-		    flkty.previous();
+		    flkty_rules.previous();
 		}else if(myKeycode == 39){//right
-		    flkty.next();
+		    flkty_rules.next();
 		}else{
 		    snCore.Popup.hideModal();
 		}
