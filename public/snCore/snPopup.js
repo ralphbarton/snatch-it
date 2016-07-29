@@ -193,48 +193,74 @@ snCore.Popup = {
 	    $(".stats-container").css("width", px(div_w)).css("height", px(div_h_inr));
 	    $(".stats-cell").css("width", px(div_w)).css("height", px(div_h_inr));
 
+	    var data = {
+		datasets: [{
+		    label: 'Sam',
+		    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+		    borderColor: 'rgba(255,99,132,1)',
+		    data: [{
+			x: (new Date("2016-07-29T22:38:44.120Z")-new Date("2016-07-29T22:38:44.120Z")),
+			y: 0
+		    }, {
+			x: (new Date("2016-07-29T22:38:46.680Z")-new Date("2016-07-29T22:38:44.120Z")),
+			y: 10
+		    }, {
+			x: (new Date("2016-07-29T22:38:49.336Z")-new Date("2016-07-29T22:38:44.120Z")),
+			y: 5
+		    }]
+		},{
+		    label: 'Dave',
+		    steppedLine: true,
+		    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+		    borderColor: 'rgba(54, 162, 235, 1)',
+		    data: [{
+			x: (new Date("2016-07-29T22:38:44.120Z")-new Date("2016-07-29T22:38:44.120Z")),
+			y: 2
+		    }, {
+			x: (new Date("2016-07-29T22:38:46.680Z")-new Date("2016-07-29T22:38:44.120Z")),
+			y: 4
+		    }, {
+			x: (new Date("2016-07-29T22:38:49.336Z")-new Date("2016-07-29T22:38:44.120Z")),
+			y: 9
+		    }]
+		}]
+	    };
 
 	    //The idea here is we dynamically reinitialise the flickity so that it takes the correct size...
 	    if(flkty_stats != undefined){flkty_stats.destroy();}
 	    flkty_stats = new Flickity('.stats-container', {accessibility: false});
 
-	    $("#myChart-container").css("width", px(div_w-140)).css("height", px(div_h_inr-30));
+	    $("#myChart-container").css("width", px(div_w-140)).css("height", px(div_h_inr-30)).css("margin", "15px");
 	    //NOW create chart contents...
 	    if(this.myChart == undefined){
 		var ctx = document.getElementById("myChart");
 		this.myChart = new Chart(ctx, {
-		    type: 'bar',
-		    data: {
-			labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-			datasets: [{
-			    label: '# of Votes',
-			    data: [12, 19, 3, 5, 2, 3],
-			    backgroundColor: [
-				'rgba(255, 99, 132, 0.2)',
-				'rgba(54, 162, 235, 0.2)',
-				'rgba(255, 206, 86, 0.2)',
-				'rgba(75, 192, 192, 0.2)',
-				'rgba(153, 102, 255, 0.2)',
-				'rgba(255, 159, 64, 0.2)'
-			    ],
-			    borderColor: [
-				'rgba(255,99,132,1)',
-				'rgba(54, 162, 235, 1)',
-				'rgba(255, 206, 86, 1)',
-				'rgba(75, 192, 192, 1)',
-				'rgba(153, 102, 255, 1)',
-				'rgba(255, 159, 64, 1)'
-			    ],
-			    borderWidth: 1
-			}]
-		    },
+		    type: 'line',
+		    data: data,
 		    options: {
 			scales: {
-			    yAxes: [{
-				ticks: {
-				    beginAtZero:true
+			    xAxes: [{
+				type: 'time',
+				time: {
+				    unit: 'second',
+				    displayFormats: {
+					second: 'm:ss'
+				    }
+				},
+				scaleLabel: {
+				    display: true,
+				    labelString: 'minutes of play'
 				}
 			    }]
+			},
+			legend: {
+			    position: 'bottom',
+			    display: true
+			},
+			title: {
+			    display: true,
+			    text: "Scores Plot",
+			    fontSize: 28
 			},
 			maintainAspectRatio: false,
 			responsive: true

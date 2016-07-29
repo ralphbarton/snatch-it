@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="include/flickity/flickity.css" media="screen">
     <script src="include/flickity/flickity.pkgd.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.0/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.0/Chart.bundle.min.js"></script>
 
     <!-- library / framework JS -->
     <script src="fabric.js-1.5.0/dist/fabric.min.js"></script>
