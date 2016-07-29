@@ -93,6 +93,7 @@ snCore.Popup = {
     },
 
     modal_content_updater_timeout: undefined,
+    myChart: undefined,
     openModal: function(type){
 	var Title = "my Title";
 	var Body = "my content id";
@@ -182,11 +183,63 @@ snCore.Popup = {
 	    Body = "modal-body-flickity-stats";
 	    Footer = snCore.Controls.client_indicated_finished ? "modal-footer-close-replay" : "modal-footer-simple-close"; 
 
+	    // I want the 'stats' window (to be used for showing graphs) to be more-or-less as big as it can be within the screen
+
 	    var div_w = snCore.Basic.canv_W * 0.95;
-	    var div_h = Math.min(div_w, snCore.Basic.canv_H * 0.95);
-	    $("#modal-body-flickity-stats").css("border", "1px solid red")
-		.css("width", div_w)
-		.css("height", div_h);
+	    var div_h = Math.min(div_w, snCore.Basic.canv_H * 0.78);
+	    var div_h_inr = div_h - 34;
+	    function px(x){return x+ "px";}
+	    $("#modal-body-flickity-stats").css("width", px(div_w)).css("height", px(div_h));
+	    $(".stats-container").css("width", px(div_w)).css("height", px(div_h_inr));
+	    $(".stats-cell").css("width", px(div_w)).css("height", px(div_h_inr));
+
+
+	    //The idea here is we dynamically reinitialise the flickity so that it takes the correct size...
+	    if(flkty_stats != undefined){flkty_stats.destroy();}
+	    flkty_stats = new Flickity('.stats-container', {accessibility: false});
+
+	    $("#myChart-container").css("width", px(div_w-100)).css("height", px(div_h_inr-100));
+	    //NOW create chart contents...
+	    if(this.myChart == undefined){
+		var ctx = document.getElementById("myChart");
+		this.myChart = new Chart(ctx, {
+		    type: 'bar',
+		    data: {
+			labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+			datasets: [{
+			    label: '# of Votes',
+			    data: [12, 19, 3, 5, 2, 3],
+			    backgroundColor: [
+				'rgba(255, 99, 132, 0.2)',
+				'rgba(54, 162, 235, 0.2)',
+				'rgba(255, 206, 86, 0.2)',
+				'rgba(75, 192, 192, 0.2)',
+				'rgba(153, 102, 255, 0.2)',
+				'rgba(255, 159, 64, 0.2)'
+			    ],
+			    borderColor: [
+				'rgba(255,99,132,1)',
+				'rgba(54, 162, 235, 1)',
+				'rgba(255, 206, 86, 1)',
+				'rgba(75, 192, 192, 1)',
+				'rgba(153, 102, 255, 1)',
+				'rgba(255, 159, 64, 1)'
+			    ],
+			    borderWidth: 1
+			}]
+		    },
+		    options: {
+			scales: {
+			    yAxes: [{
+				ticks: {
+				    beginAtZero:true
+				}
+			    }]
+			},
+			maintainAspectRatio: false
+		    }
+		});
+	    }
 	}
 
 	//Inject the Title

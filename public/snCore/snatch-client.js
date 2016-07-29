@@ -21,6 +21,7 @@ var db_uID = undefined
 
 // global references
 var flkty_rules = undefined;
+var flkty_stats = undefined;
 var canvas = undefined;
 window.onload = function() {
 
@@ -39,7 +40,10 @@ window.onload = function() {
     flkty_rules = new Flickity('.rules-container', {
 	// options
 	accessibility: false // this is to disable inbuilt kb arrow handling, because I'm doing arrow handling.
+	//Reason: because the inbuild arrow-key handlers only apply when the flicity object is the "focus", which
+	// users will generally experience as a bug.
     });
+
 };
 
 //Provides data to allow player to reclaim name, make new name AND choose their color 

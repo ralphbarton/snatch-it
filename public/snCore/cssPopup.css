@@ -23,7 +23,7 @@
 
 #modal-header 
 {
-    padding: 2%;
+    padding: 5px;
 /*    border: 2px solid #FFF;*/
     color: black;
 }
@@ -35,8 +35,8 @@
 
 
 #close {/* The Close X */
-    margin-top: -2.5%;
-    margin-right: 2%;
+    margin-top: -10px;
+    margin-right: 2px;
     color: black;
     float: right;
     font-size: 120%;
@@ -123,3 +123,7 @@ td.pl-score{
 #connection-latency, #connection-latency-2{
     font-weight: bold;
 }
+
+
+
+/* X. Stats styling - for consistency, these should be a new CSS file... */
