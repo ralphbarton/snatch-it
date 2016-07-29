@@ -198,7 +198,7 @@ snCore.Popup = {
 	    if(flkty_stats != undefined){flkty_stats.destroy();}
 	    flkty_stats = new Flickity('.stats-container', {accessibility: false});
 
-	    $("#myChart-container").css("width", px(div_w-100)).css("height", px(div_h_inr-100));
+	    $("#myChart-container").css("width", px(div_w-140)).css("height", px(div_h_inr-30));
 	    //NOW create chart contents...
 	    if(this.myChart == undefined){
 		var ctx = document.getElementById("myChart");
@@ -236,11 +236,17 @@ snCore.Popup = {
 				}
 			    }]
 			},
-			maintainAspectRatio: false
+			maintainAspectRatio: false,
+			responsive: true
 		    }
 		});
+	    }else{
+		// use of a timeout here seems slightly hacky, but resolves an issue related to
+		// canvas size needing to be adjusted after render...
+		setTimeout(function(){snCore.Popup.myChart.resize();}, 50);
 	    }
 	}
+
 
 	//Inject the Title
 	$("#box-title").html(Title);

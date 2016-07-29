@@ -355,9 +355,8 @@
 
 	      <!-- Graph here -->
 	      <div class="carousel-cell stats-cell">
-		Hello World 2
 		<div id="myChart-container" style="display:inline-block;">
-		  <canvas id="myChart" style="border: 1px solid black; background:white;"></canvas>
+		  <canvas id="myChart"></canvas>
 		</div>
 	      </div>
 

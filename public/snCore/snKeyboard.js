@@ -67,11 +67,12 @@ snCore.Keyboard = {
 
 
 	if(snCore.Popup.popup_in_foreground){
-	    if(snCore.Popup.popup_in_foreground == "rules"){
+	    if((snCore.Popup.popup_in_foreground == "rules")||(snCore.Popup.popup_in_foreground == "stats")){
+		var flkty_foreground = (snCore.Popup.popup_in_foreground == "rules")?flkty_rules:flkty_stats;
 		if(myKeycode == 37){//left
-		    flkty_rules.previous();
+		    flkty_foreground.previous();
 		}else if(myKeycode == 39){//right
-		    flkty_rules.next();
+		    flkty_foreground.next();
 		}else{
 		    snCore.Popup.hideModal();
 		}
