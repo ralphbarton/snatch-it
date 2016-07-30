@@ -205,6 +205,9 @@ socket.on('player declared finished', function(player_index){
 });
 
 
+socket.on('game graphing stats data', function(data){
+    console.log('MESSAGE RECIEVED: game graphing stats data');
+});
 
 function PLAYER_SUBMITS_WORD(p)       {snCore.Latency.LogTransmit("snatch"); socket.emit('player submits word', p);}
 function TILE_TURN_REQUEST()          {
@@ -213,6 +216,7 @@ function TILE_TURN_REQUEST()          {
 
 function PLAYER_JOINED_WITH_DETAILS(p){socket.emit('player joined with details', p);}
 function GAME_SETTINGS_CHANGE(p)      {socket.emit('game settings upload', p);}
+function GAME_GRAPHING_STATS_REQUEST(){socket.emit('game graphing stats request', 0);}
 
 function TURN_MANY_TILES(p)           {socket.emit('many_tile_turn_hack', p);}
 

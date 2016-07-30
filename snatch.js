@@ -770,6 +770,13 @@ io.on('connection', function(socket){
     });
 
 
+    //client requests for game graphing stats...
+    socket.on('game graphing stats request', function(blank_msg){
+
+	socket.emit('game graphing stats data', {lots: "of data to follow!!"});
+    });
+
+
     //client requests to turn over a tile
     socket.on('many_tile_turn_hack', function(n_tiles){
 

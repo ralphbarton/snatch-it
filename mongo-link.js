@@ -386,6 +386,34 @@ module.exports = function (){
 		});
 
 	    });
+	},
+
+	GameStats_for_client: function(db_uID, cb){
+
+	    var query = {
+		game_db_uID: db_uID,
+		event_type: "snatch"
+	    };
+
+	    var projection_query = {
+		_id: false,
+		timeStamp: true,
+		player_number: true
+		//also need the SNATCH'ed tiles themselves...
+	    };
+
+
+	    db_event(function(db){
+
+		GameEvent.find(query, function (err, kittens) {
+		    if (err) return console.error(err);
+
+		    //at this point, we have retrieved the data...
+		    
+		});
+
+	    });
+
 	}
 
     };//return a collection of functions
