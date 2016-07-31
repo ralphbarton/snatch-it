@@ -177,6 +177,29 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 	    return player_clone;
 	},
 
+	/*
+	getGameStateHistoryPoint: function() {
+
+	    var free_tile_ids = [];
+	    for (var i=0; i < GD.tileSet.length; i++){
+		if(GD.tileSet[i].status == "turned"){
+		    turned_tile_ids.push(i);
+		}
+	    }
+
+	    var players_words = [];
+	    for (var i=0; i < GD.playerSet.length; i++){
+		players_words.push(GD.playerSet[i].words);
+	    }
+
+	    return {
+		free_tile_ids: free_tile_ids,
+		players_words: players_words
+	    };
+
+	},
+	*/
+
 	flipNextTile: function(socket_key) {
 	    var TI = GD.next_unturned_tile_i;
 	    if(TI < GD.tileSet.length){

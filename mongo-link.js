@@ -388,20 +388,11 @@ module.exports = function (){
 	    });
 	},
 
-	GameStats_for_client: function(db_uID, cb){
+	GameStats_for_client: function(db_uID, StatsProcessor, cb){
 
 	    var query = {
 		game_db_uID: db_uID,
-		event_type: "snatch"
 	    };
-
-	    var projection_query = {
-		_id: false,
-		timeStamp: true,
-		player_number: true
-		//also need the SNATCH'ed tiles themselves...
-	    };
-
 
 	    db_event(function(db){
 
@@ -409,7 +400,9 @@ module.exports = function (){
 		    if (err) return console.error(err);
 
 		    //at this point, we have retrieved the data...
-		    
+		    var big_array = StatsProcessor.StateHistoryFromData(kittens);
+		    console.log(JSON.stringify(big_array, null, 2));
+
 		});
 
 	    });

@@ -37,6 +37,10 @@ var keygen  = require('./vivid_keygen.js')();
 var WDT_factory = require('./word_check.js');
 var WordDictionaryTools = WDT_factory('./dictionaries/sowpods.txt', './dictionaries/COCA_top5000_word_frequencies.txt');
 
+// Load the SOWPODS dictionary...
+var Stats = require('./stats-calc.js')();
+
+
  
 //START OF experimental code secion
 // code to enable web-facing testing of the word Definition tool
@@ -773,7 +777,14 @@ io.on('connection', function(socket){
     //client requests for game graphing stats...
     socket.on('game graphing stats request', function(blank_msg){
 
-	socket.emit('game graphing stats data', {lots: "of data to follow!!"});
+	var cb = function (x){
+	    socket.emit('game graphing stats data', x);
+	};
+
+	var uid = dict_activeGames[socket.room_pin].db_uID;
+
+	mongo_link.GameStats_for_client(uid, Stats, cb);
+
     });
 
 
