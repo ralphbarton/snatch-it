@@ -152,6 +152,7 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
 	    snCore.Event.TileTurn(null, ET.tile_index, ET.tile_letter);
 	}
     }
+    snCore.Controls.updateSnatchButtonStatus("reactivate button");
 
 });
 
@@ -170,6 +171,7 @@ socket.on('give client their player index', function(obj){
 socket.on('snatch rejected', function(rejection_reason){
     snCore.Latency.LogAck("snatch");
     snCore.Toast.showToast("Move invalid: " + rejection_reason);
+    snCore.Controls.updateSnatchButtonStatus("reactivate button");
 });
 
 
@@ -209,7 +211,11 @@ socket.on('game graphing stats data', function(data){
     console.log('MESSAGE RECIEVED: game graphing stats data');
 });
 
-function PLAYER_SUBMITS_WORD(p)       {snCore.Latency.LogTransmit("snatch"); socket.emit('player submits word', p);}
+function PLAYER_SUBMITS_WORD(p)       {
+    snCore.Latency.LogTransmit("snatch");
+    snCore.Controls.updateSnatchButtonStatus("checking");
+    socket.emit('player submits word', p);
+}
 function TILE_TURN_REQUEST()          {
     if(tilestats.n_tiles>tileset.length){snCore.Latency.LogTransmit("turn");}
     socket.emit('tile turn request', 0);}//only expect a like response if NOT all tiles are already turned

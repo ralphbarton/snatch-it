@@ -367,6 +367,22 @@ snCore.Controls = {
 	snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
     },
 
+    block_Snatch_button_visual_changes: false,
+    updateSnatchButtonStatus: function(status_str){
+	var SnatchTextObj = this.Button_Objs[2].item(1);
+	if(status_str=="checking"){
+	    SnatchTextObj.setText("Checking...");
+	    this.setButtonDisabled(2, true);
+	    this.block_Snatch_button_visual_changes = true;
+	}else{
+	    SnatchTextObj.setText("SNATCH IT");
+	    this.setButtonDisabled(2, false);
+	    this.block_Snatch_button_visual_changes = false;
+	}
+	snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+
+    },
+
 
     turnDisabled: false,
     cancelTurnDisabled: false,
@@ -374,6 +390,7 @@ snCore.Controls = {
 	if(buttonID == 1){//this code is specific to the Turn Letter button
 	    this.turnDisabled = disable;
 	}
+	if((buttonID == 2)&&(this.block_Snatch_button_visual_changes)){return;}
 	var myTextObj = this.Button_Objs[buttonID].item(1);
 	var myRectObj = this.Button_Objs[buttonID].item(0);
     	myRectObj.setFill('#AAA');

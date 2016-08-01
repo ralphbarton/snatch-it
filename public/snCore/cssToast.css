@@ -150,20 +150,20 @@
 /* Add Animation */
 @-webkit-keyframes fadein {
     from {opacity:0} 
-    to {opacity:1}
+    to {opacity:0.75}
 }
 
 @keyframes fadein {
     from {opacity:0}
-    to {opacity:1}
+    to {opacity:0.75}
 }
 
 @-webkit-keyframes fadeout {
-    from {opacity:1} 
+    from {opacity:0.75} 
     to {opacity:0}
 }
 
 @keyframes fadeout {
-    from {opacity:1}
+    from {opacity:0.75}
     to {opacity:0}
 }
