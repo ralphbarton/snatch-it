@@ -1,5 +1,6 @@
 /* 4. TOASTS styling */
 
+/* don't like the over-styled grey-glob inner shadow effect toast...
 .ToastGrey {
     -moz-box-shadow:inset 0px -3px 7px 0px #545454;
     -webkit-box-shadow:inset 0px -3px 7px 0px #545454;
@@ -20,6 +21,16 @@
     padding:7px 15px;
     text-decoration:none;
     text-shadow:1px 1px 1px #000000;
+}*/
+
+.ToastGrey {
+    opacity: 0.75;
+    background-color:#38444a;
+    display:inline-block;
+    color:#fff045;
+    font-family:Arial;
+    padding:7px 15px;
+    text-decoration:none;
 }
 
 .ToastCentral {
