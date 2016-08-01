@@ -23,7 +23,13 @@ def collinsdictionary_com__digest(page_html, search_word):
 
     wrd_header = soup.find('div', class_="entry_header")
     if wrd_header != None:
-        word_actual = wrd_header.find('h1').get_text()
+        
+        #remove unwanted number 1's from the heading (class='homnum')
+        wrd_header_H1 = wrd_header.find('h1')
+        for x in wrd_header_H1.find_all('span', class_='homnum'):
+            x.decompose()
+
+        word_actual = wrd_header_H1.get_text()
         frequency_note = wrd_header.find('div', class_="word-frequency-img")["title"]
 
         # Word's defintions content
