@@ -401,7 +401,9 @@ module.exports = function (){
 
 		    //at this point, we have retrieved the data...
 		    var big_array = StatsProcessor.StateHistoryFromData(kittens);
+
 		    console.log(JSON.stringify(big_array, null, 2));
+		    //cb(big_array);
 
 		});
 
