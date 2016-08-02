@@ -183,8 +183,7 @@ snCore.Popup = {
 	    Body = "modal-body-flickity-stats";
 	    Footer = snCore.Controls.client_indicated_finished ? "modal-footer-close-replay" : "modal-footer-simple-close"; 
 
-	    // I want the 'stats' window (to be used for showing graphs) to be more-or-less as big as it can be within the screen
-
+	    // I want the 'stats' window to be more-or-less as big as it can be within the screen
 	    var div_w = snCore.Basic.canv_W * 0.95;
 	    var div_h = Math.min(div_w, snCore.Basic.canv_H * 0.78);
 	    var div_h_inr = div_h - 34;
@@ -193,84 +192,13 @@ snCore.Popup = {
 	    $(".stats-container").css("width", px(div_w)).css("height", px(div_h_inr));
 	    $(".stats-cell").css("width", px(div_w)).css("height", px(div_h_inr));
 
-	    var data = {
-		datasets: [{
-		    label: 'Sam',
-		    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-		    borderColor: 'rgba(255,99,132,1)',
-		    data: [{
-			x: (new Date("2016-07-29T22:38:44.120Z")-new Date("2016-07-29T22:38:44.120Z")),
-			y: 0
-		    }, {
-			x: (new Date("2016-07-29T22:38:46.680Z")-new Date("2016-07-29T22:38:44.120Z")),
-			y: 10
-		    }, {
-			x: (new Date("2016-07-29T22:38:49.336Z")-new Date("2016-07-29T22:38:44.120Z")),
-			y: 5
-		    }]
-		},{
-		    label: 'Dave',
-		    steppedLine: true,
-		    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-		    borderColor: 'rgba(54, 162, 235, 1)',
-		    data: [{
-			x: (new Date("2016-07-29T22:38:44.120Z")-new Date("2016-07-29T22:38:44.120Z")),
-			y: 2
-		    }, {
-			x: (new Date("2016-07-29T22:38:46.680Z")-new Date("2016-07-29T22:38:44.120Z")),
-			y: 4
-		    }, {
-			x: (new Date("2016-07-29T22:38:49.336Z")-new Date("2016-07-29T22:38:44.120Z")),
-			y: 9
-		    }]
-		}]
-	    };
-
 	    //The idea here is we dynamically reinitialise the flickity so that it takes the correct size...
 	    if(flkty_stats != undefined){flkty_stats.destroy();}
 	    flkty_stats = new Flickity('.stats-container', {accessibility: false});
 
 	    $("#myChart-container").css("width", px(div_w-140)).css("height", px(div_h_inr-30)).css("margin", "15px");
-	    //NOW create chart contents...
-	    if(this.myChart == undefined){
-		var ctx = document.getElementById("myChart");
-		this.myChart = new Chart(ctx, {
-		    type: 'line',
-		    data: data,
-		    options: {
-			scales: {
-			    xAxes: [{
-				type: 'time',
-				time: {
-				    unit: 'second',
-				    displayFormats: {
-					second: 'm:ss'
-				    }
-				},
-				scaleLabel: {
-				    display: true,
-				    labelString: 'minutes of play'
-				}
-			    }]
-			},
-			legend: {
-			    position: 'bottom',
-			    display: true
-			},
-			title: {
-			    display: true,
-			    text: "Scores Plot",
-			    fontSize: 28
-			},
-			maintainAspectRatio: false,
-			responsive: true
-		    }
-		});
-	    }else{
-		// use of a timeout here seems slightly hacky, but resolves an issue related to
-		// canvas size needing to be adjusted after render...
-		setTimeout(function(){snCore.Popup.myChart.resize();}, 50);
-	    }
+
+	    GAME_GRAPHING_STATS_REQUEST();
 	}
 
 
@@ -283,6 +211,85 @@ snCore.Popup = {
 
 	//record which popup is currently on display...
 	this.popup_in_foreground = type;
+
+    },
+
+    setChart: function(data){
+	
+	console.log(JSON.stringify(data, null, 2));
+/*
+	var data = {
+	    datasets: [{
+		label: 'Sam',
+		borderColor: 'rgba(255,99,132,1)',
+		data: [{
+		    x: (new Date("2016-07-29T22:38:44.120Z")-new Date("2016-07-29T22:38:44.120Z")),
+		    y: 0
+		}, {
+		    x: (new Date("2016-07-29T22:38:46.680Z")-new Date("2016-07-29T22:38:44.120Z")),
+		    y: 10
+		}, {
+		    x: (new Date("2016-07-29T22:38:49.336Z")-new Date("2016-07-29T22:38:44.120Z")),
+		    y: 5
+		}]
+	    },{
+		label: 'Dave',
+		steppedLine: true,
+		borderColor: 'rgba(54, 162, 235, 1)',
+		data: [{
+		    x: (new Date("2016-07-29T22:38:44.120Z")-new Date("2016-07-29T22:38:44.120Z")),
+		    y: 2
+		}, {
+		    x: (new Date("2016-07-29T22:38:46.680Z")-new Date("2016-07-29T22:38:44.120Z")),
+		    y: 4
+		}, {
+		    x: (new Date("2016-07-29T22:38:49.336Z")-new Date("2016-07-29T22:38:44.120Z")),
+		    y: 9
+		}]
+	    }]
+	};
+*/
+
+	//NOW create chart contents...
+	if(this.myChart == undefined){
+	    var ctx = document.getElementById("myChart");
+	    this.myChart = new Chart(ctx, {
+		type: 'line',
+		data: data,
+		options: {
+		    scales: {
+			xAxes: [{
+			    type: 'time',
+			    time: {
+				unit: 'second',
+				displayFormats: {
+				    second: 'm:ss'
+				}
+			    },
+			    scaleLabel: {
+				display: true,
+				labelString: 'minutes of play'
+			    }
+			}]
+		    },
+		    legend: {
+			position: 'bottom',
+			display: true
+		    },
+		    title: {
+			display: true,
+			text: "Scores Plot",
+			fontSize: 28
+		    },
+		    maintainAspectRatio: false,
+		    responsive: true
+		}
+	    });
+	}else{
+	    // use of a timeout here seems slightly hacky, but resolves an issue related to
+	    // canvas size needing to be adjusted after render...
+	    setTimeout(function(){snCore.Popup.myChart.resize();}, 50);
+	}
 
     },
 

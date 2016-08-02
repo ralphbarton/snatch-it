@@ -12,6 +12,8 @@ var client_player_index = undefined;
 
 var dev = false; // select whether development more is active or not
 
+var graphing_stats = undefined;
+
 /// TO DO: REORGANISE THIS...
 // in the case where the pin is populated in the page that has just downloaded, this means the client must send a message to
 // the server...
@@ -208,7 +210,27 @@ socket.on('player declared finished', function(player_index){
 
 
 socket.on('game graphing stats data', function(data){
-    console.log('MESSAGE RECIEVED: game graphing stats data');
+    graphing_stats = data;
+    
+    var scores_data = {
+	datasets: []
+    };
+
+    for(var i = 0; i < players.length; i++){
+	var g_dat = graphing_stats.Scores_Timeseries[i];
+	if(g_dat != undefined){
+	    scores_data.datasets.push({
+		label: players[i].name,
+		borderColor: players[i].color,
+		fill: false,
+		steppedLine: true,
+		data: g_dat
+	    });
+	}
+    }    
+
+    snCore.Popup.setChart(scores_data);
+    console.log("set chart data");
 });
 
 function PLAYER_SUBMITS_WORD(p)       {

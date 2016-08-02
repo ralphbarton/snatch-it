@@ -403,7 +403,7 @@ module.exports = function (){
 		    var big_array = StatsProcessor.StateHistoryFromData(kittens);
 
 		    console.log(JSON.stringify(big_array, null, 2));
-		    //cb(big_array);
+		    cb(big_array);
 
 		});
 
