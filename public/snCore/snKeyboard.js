@@ -116,14 +116,23 @@ snCore.Keyboard = {
 	    }
 
 	    if(keyPressed == '4'){
-		snCore.Popup.openModal("scores");
+		if(snCore.DefineWord.KPicker_isPresent){
+		    snCore.DefineWord.KPicker_cycler('select');
+		}else{
+		    snCore.Popup.openModal("scores");
+		}
 	    }
 
-	    if(keyPressed == '8'){
-		// no action, but keep in reserve for testing...
+	    if(keyPressed == '6'){
+		// let this cycle through words
+		snCore.DefineWord.KPicker_cycler('cycle');
 	    }
 
 	    if(keyPressed == '7'){
+		// no action, but keep in reserve for testing...
+	    }
+
+	    if(keyPressed == '8'){
 		// no action, but keep in reserve for testing...
 	    }
 

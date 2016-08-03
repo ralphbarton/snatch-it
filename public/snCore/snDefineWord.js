@@ -95,5 +95,98 @@ snCore.DefineWord = {
 
     cancelDelayedDefinitionToast: function (WordGrp) {
 	clearTimeout(this.my_toast_callback);
+    },
+
+    kb_WI_selected: undefined, 
+    kb_ZI_selected: undefined, 
+    four_square_Fabs: [[],[]], 
+    KPicker_isPresent: function (action) {return this.kb_ZI_selected != undefined},
+
+    KPicker_cycler: function (action) {
+
+	//shopping list...
+	var x1 = snCore.Tile.dims.ts;
+	var x2 = snCore.Tile.dims.tslg;
+	var x3 = x1/6;// little square size
+	var x4 = x3/2.5;// border thickness
+
+	function lil_square(){
+	    return new fabric.Rect({
+		fill: 'black',
+		stroke: 'white',
+		strokeWidth: x4,
+		width: x3,
+		height: x3,
+	    });
+	};
+
+	function create_highlight(){
+	    for (var i = 0; i < 2; i++){	    
+		for (var j = 0; j < 2; j++){	    
+		    snCore.DefineWord.four_square_Fabs[i][j] = lil_square();
+		    canvas.add(snCore.DefineWord.four_square_Fabs[i][j]);
+		}
+	    }
+	};
+
+	function destroy_highlight(){
+	    for (var i = 0; i < 2; i++){	    
+		for (var j = 0; j < 2; j++){	    
+		    canvas.remove(snCore.DefineWord.four_square_Fabs[i][j]);
+		}
+	    }
+	    snCore.DefineWord.four_square_Fabs[i][j] = [[],[]];
+	    snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+	};
+
+	function highlight_word(pi, wi){
+	    var W_left = snCore.Words.TileGroupsArray[pi][wi].getLeft();
+	    var W_top = snCore.Words.TileGroupsArray[pi][wi].getTop();
+	    var W_len = snCore.Words.TileGroupsArray[pi][wi]._objects.length;
+
+	    var LL = [W_left, (W_left + (W_len-1)*x2 + x1 - x3 )];
+	    var TT = [W_top, (W_top + x1 - x3)];
+		
+	    for (var i = 0; i < 2; i++){	    
+		for (var j = 0; j < 2; j++){	    
+		    snCore.DefineWord.four_square_Fabs[i][j].left = LL[j];
+		    snCore.DefineWord.four_square_Fabs[i][j].top = TT[i];
+		}
+	    }
+	    snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+	};
+
+	if(action == 'select'){
+
+	}else if(action == 'cycle'){
+	    if(!this.KPicker_isPresent()){
+		create_highlight();
+		//if the client player has zero words, cycle to next zone...
+		this.kb_ZI_selected = snCore.Zones.PlayerZone[0].player.words.length > 0 ? 0 : 1;
+	    }
+
+	    // implies we're still in the phase of cycling zones...
+	    if(this.kb_WI_selected == undefined){
+		this.kb_ZI_selected++;
+		if(this.kb_ZI_selected >= snCore.Zones.PlayerZone.length){
+		    //if the client player has zero words, cycle to next zone...
+		    this.kb_ZI_selected = snCore.Zones.PlayerZone[0].player.words.length > 0 ? 0 : 1;
+		}
+	    }else{// implies we're cycling words within some chosen zone...
+
+	    }
+	    
+	    console.log(this.kb_ZI_selected);
+	    var on_plr = snCore.Zones.PlayerZone[this.kb_ZI_selected].player.index;
+	    var final_p_wi = players[on_plr].words.length-1;
+	    highlight_word(on_plr, this.kb_WI_selected||final_p_wi);
+
+
+
+	}else if(action == 'clear'){
+
+	}
+
+
     }
 };
