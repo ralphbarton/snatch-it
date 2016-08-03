@@ -221,6 +221,7 @@ snCore.Event = {
     SnatchEvent: function(player_index, tile_indices, words_used_list){
 
 	// 1. Clear the Spell if it is the Client Snatching. Set some variables used in this script.
+	snCore.DefineWord.KPicker_cycler('clear');
 	var snatching_player = players[player_index];
 	var client_is_snatcher = client_player_index == player_index;
 	if(client_is_snatcher){snCore.Spell.CancelWord();}
@@ -541,6 +542,7 @@ snCore.Event = {
 	}
 	
 	this.resizeTimeoutID = setTimeout(function(){
+	    snCore.DefineWord.KPicker_cycler('clear');
 	    canvas.clear();
 	    snCore.Basic.makeCanvasFitWholeWindow();
 	    snCore.Event.DrawAll();

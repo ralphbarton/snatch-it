@@ -85,6 +85,7 @@ snCore.Keyboard = {
 
 	}else{
 	    if( (myKeycode >= 65) && (myKeycode <= 90) ){//any letter key
+		snCore.DefineWord.KPicker_cycler('clear');
 		snCore.Spell.addLetter(keyPressed); 
 	    }
 
@@ -109,6 +110,8 @@ snCore.Keyboard = {
 		snCore.Popup.hideModal();
 		//also removes all Toasts with immediate effect
 		snCore.Toast.clear_all();
+		//also remove the keyboard-based picker to define a word
+		snCore.DefineWord.KPicker_cycler('clear');
 	    }
 
 	    if(keyPressed == '2'){
@@ -116,7 +119,7 @@ snCore.Keyboard = {
 	    }
 
 	    if(keyPressed == '4'){
-		if(snCore.DefineWord.KPicker_isPresent){
+		if(snCore.DefineWord.KPicker_isPresent()){
 		    snCore.DefineWord.KPicker_cycler('select');
 		}else{
 		    snCore.Popup.openModal("scores");
