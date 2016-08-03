@@ -107,6 +107,7 @@ snCore.DefineWord = {
     kb_WI_selected: undefined, 
     kb_ZI_selected: undefined, 
     four_square_Fabs: [[],[]], 
+    destroy_highlight_callback: undefined,
     KPicker_isPresent: function (action) {return this.kb_ZI_selected != undefined},
 
     KPicker_cycler: function (action) {
@@ -125,6 +126,11 @@ snCore.DefineWord = {
 		width: x3,
 		height: x3,
 	    });
+	};
+
+	function extend_timout(){
+	    clearTimeout(snCore.DefineWord.destroy_highlight_callback);
+	    snCore.DefineWord.destroy_highlight_callback = setTimeout(function(){destroy_highlight()},2000);
 	};
 
 	function create_highlight(){
@@ -152,6 +158,7 @@ snCore.DefineWord = {
 		    canvas.remove(snCore.DefineWord.four_square_Fabs[i][j]);
 		}
 	    }
+	    clearTimeout(snCore.DefineWord.destroy_highlight_callback);
 	    snCore.DefineWord.four_square_Fabs = [[],[]];
 	    snCore.DefineWord.kb_ZI_selected = undefined;
 	    snCore.DefineWord.kb_WI_selected = undefined;
@@ -176,7 +183,7 @@ snCore.DefineWord = {
 	};
 
 	if(action == 'select'){
-
+	    extend_timout();
 	    var on_plr = snCore.Zones.PlayerZone[this.kb_ZI_selected].player.index;
 
 
@@ -193,6 +200,7 @@ snCore.DefineWord = {
 	    }
 
 	}else if(action == 'cycle'){
+	    extend_timout();
 	    if(!this.KPicker_isPresent()){
 		create_highlight();
 		//if the client player has zero words, cycle to next zone...
@@ -213,10 +221,8 @@ snCore.DefineWord = {
 			//set back to highest index word...
 			this.kb_WI_selected = snCore.Zones.PlayerZone[this.kb_ZI_selected].player.words.length-1;
 		    }
-		    console.log(this.kb_WI_selected);
 		}
 	    }
-
 
 	    var on_plr = snCore.Zones.PlayerZone[this.kb_ZI_selected].player.index;
 	    var final_p_wi = players[on_plr].words.length-1;
