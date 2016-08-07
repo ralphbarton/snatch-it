@@ -40,6 +40,8 @@ var WordDictionaryTools = WDT_factory('./dictionaries/sowpods.txt', './dictionar
 // Load the SOWPODS dictionary...
 var Stats = require('./stats-calc.js')();
 
+// this is a stub of a new module for the purpose of introducing a non-socket IO websockets interface to the game...
+var WS_interface  = require('./ws_interface.js')();
 
  
 //START OF experimental code secion
