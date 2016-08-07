@@ -14,6 +14,13 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
     //reload data of saved game
     if(SaveGameData){
 	GD = SaveGameData;
+
+	// reset all players starting states to "disconnected" because this is a new program session.
+	for (var i=0; i < GD.playerSet.length; i++){
+	    GD.playerSet[i].is_disconnected = true;
+	    GD.playerSet[i].socket_key = null;
+	}
+
 	console.log("Reloaded a snatch game instance on server");
 
     // populate initial state of a new game

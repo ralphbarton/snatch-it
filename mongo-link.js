@@ -253,6 +253,8 @@ module.exports = function (){
 			// NOTE TO SELF: this is pretty similar code to handler for socket.on('request to init room'...
 			var key_deets = keygen.getPIN();
 			var room_pin = key_deets.pin;
+			var myRetrivedGame = snatchSvr_factory(null, WordDictionaryTools.in_dictionary, Saved_Game.GameData);
+
 			// Create a new room instance, referenced by the room_pin
 			dict_activeGames[room_pin] = {
 			    db_uID: uid,
@@ -260,12 +262,17 @@ module.exports = function (){
 			    closeTimeoutID: undefined,
 			    timeStarted: (new Date(Saved_Game.timeStarted)),
 			    timeAccessed: undefined,
-			    GameInstance: snatchSvr_factory(null, WordDictionaryTools.in_dictionary, Saved_Game.GameData)
+			    GameInstance: myRetrivedGame
 			};
 			access_room(room_pin);//this perhaps ought to be part of constructor. Needed to put timeout in place.
 
-			// log as a Game Event
-			
+			/*
+	    var word_str = myGame.TileIDArray_to_LettersString(tile_id_array);
+	    my_SDC.lookup_definition(word_str);
+*/
+
+
+			// log as a Game Event			
 			mongo_link.log_GameEvent({
 			    game_db_uID: uid,
 			    event_type: "game reloaded",
