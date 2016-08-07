@@ -151,7 +151,9 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
     if(SnatchUpdateMsg.ExtraTiles != undefined){
 	for (var i = 0; i < SnatchUpdateMsg.ExtraTiles.length; i++){
 	    var ET = SnatchUpdateMsg.ExtraTiles[i];
-	    snCore.Event.TileTurn(null, ET.tile_index, ET.tile_letter);
+	    if(ET != null){
+		snCore.Event.TileTurn(null, ET.tile_index, ET.tile_letter);
+	    }
 	}
     }
     snCore.Controls.updateSnatchButtonStatus("reactivate button");

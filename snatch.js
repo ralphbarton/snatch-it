@@ -560,6 +560,7 @@ io.on('connection', function(socket){
 	    if(myGame.get_uOpt().uOpt_flippy){
 		SnatchMsg.ExtraTiles = [];
 		// do it twice
+		// array entries will be like [null, null] if there are no tiles left...
 		SnatchMsg.ExtraTiles.push(myGame.flipNextTile(socket.id));
 		SnatchMsg.ExtraTiles.push(myGame.flipNextTile(socket.id));
 	    }
@@ -592,17 +593,34 @@ io.on('connection', function(socket){
 		orderedTileIDs: tile_id_array
 	    });
 
+
 	    // in the case of "double auto flip", log this as a separate event...
-	    var T_pair = SnatchMsg.ExtraTiles;
 	    if(myGame.get_uOpt().uOpt_flippy){
-		mongo_link.log_GameEvent({
-		    game_db_uID: dict_activeGames[socket.room_pin].db_uID,
-		    event_type: "turn (auto)",
-		    player_name: myGame.playerNameFromSocket(socket.id),
-		    player_number: myGame.playerIndexFromSocket(socket.id),
-		    orderedLetters: T_pair[0].tile_letter + ", "+ T_pair[1].tile_letter,
-		    orderedTileIDs: [T_pair[0].tile_index, T_pair[1].tile_index]
-		});
+		var T_pair = SnatchMsg.ExtraTiles;
+		var tiles_str = undefined;
+		var tiles_IDs = [];
+
+		if(T_pair[0] != null){// at least one Tile
+		    if(T_pair[1] == null){// just one Tile in the attempted double flip
+			tiles_str = T_pair[0].tile_letter;
+			tiles_IDs = [T_pair[0].tile_index];
+		    }else{// two Tile in the double flip
+			tiles_str = T_pair[0].tile_letter + ", "+ T_pair[1].tile_letter;
+			tiles_IDs = [T_pair[0].tile_index, T_pair[1].tile_index];
+		    }
+		}
+
+		// only log if some tiles were actually turned.
+		if(tiles_IDs.length > 0){
+		    mongo_link.log_GameEvent({
+			game_db_uID: dict_activeGames[socket.room_pin].db_uID,
+			event_type: "turn (auto)",
+			player_name: myGame.playerNameFromSocket(socket.id),
+			player_number: myGame.playerIndexFromSocket(socket.id),
+			orderedLetters: tiles_str,
+			orderedTileIDs: tiles_IDs
+		    });
+		}
 	    }
 
 	}else{
