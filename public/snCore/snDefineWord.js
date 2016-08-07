@@ -74,7 +74,7 @@ snCore.DefineWord = {
 	    }
 	}
 
-	snCore.Toast.showToast("(text str)",{HTML_frag: Def_Frag, stoppable: true});
+	snCore.Toast.showToast("(text str)",{HTML_frag: Def_Frag, holdable: true});
 
     },
 

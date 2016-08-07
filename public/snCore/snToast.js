@@ -94,7 +94,7 @@ snCore.Toast = {
 	ToastOptions = {
 	    persistent: boolean
 	    HTML_frag: <object, jQuery>
-	    stoppable: boolean
+	    holdable: boolean
 	}
 	*/
 
@@ -122,7 +122,7 @@ snCore.Toast = {
 		$NewToast.html("").append(ToastOptions.HTML_frag);
 	    }
 
-	    if(ToastOptions.stoppable == true){
+	    if(ToastOptions.holdable == true){
 		var stop_msg = $('<div/>', {id: "m1"+t_key}).addClass("ToastStop S1").text("click to hold in view");
 		$NewToast.prepend(stop_msg).click(function(){
 		    snCore.Toast.setToastRemTimeout(t_key, {duration: 120000});//2 minutes
