@@ -136,8 +136,7 @@ snCore.Controls = {
 	    //Add the objects to the group
 	    //sequence of layer ordering: push the box before the letter...
 	    buttonObsArray.push(key_box, key_letter);
-	    buttonObsArray.push();
-	}
+	};
 
 	if(centerising_offset != undefined){//this applies for all buttons except the rightmost -/-/- options button
 
@@ -146,20 +145,9 @@ snCore.Controls = {
 
 	    draw_boxed_label(key_label, key_font_size, kl_left);
 
-	    if(n_ind == 0){//it's the CANCEL button
-		var extra_width = buttonObsArray[2].getWidth();
-		draw_boxed_label("5", key_font_size, kl_left + extra_width);
-
-		var CancelTextwith15boxRightPx = kl_left + extra_width*2;
-		if(buttonObsArray[1].getLeft() < CancelTextwith15boxRightPx){
-		    buttonObsArray[1].setLeft(CancelTextwith15boxRightPx);
-		} 
-	    }
-
 	    //this is a bit of a scrappy, iterative approach to nicely centering (ish) 2 objects evenly accross a space...
 	    //Having used the main text to position the 'key label boxes', I now use the 'key label boxes to reposition the main text
-	    var item_i = n_ind == 0 ? 4 : 2;
-	    var littleBoxRightEdge = buttonObsArray[item_i].getLeft() + buttonObsArray[item_i].getWidth();
+	    var littleBoxRightEdge = buttonObsArray[2].getLeft() + buttonObsArray[2].getWidth();
 	    var buttonText = buttonObsArray[1];
 	    var twoThirds_centerise_offset = littleBoxRightEdge + (button_width - littleBoxRightEdge - buttonText.getWidth())/2; 
 	    buttonText.setLeft(twoThirds_centerise_offset);
