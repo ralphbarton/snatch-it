@@ -131,7 +131,7 @@ app.get('/db_retrieve*', function(req, res){
     var frags = req.url.split('=');
     var uid = frags[frags.length-1];
 
-    mongo_link.reload_by_game_db_uID(res, uid, dict_activeGames, snatchSvr_factory, keygen, get_active_uids_list, WordDictionaryTools, access_room, mongo_link);
+    mongo_link.reload_by_game_db_uID(res, uid, dict_activeGames, snatchSvr_factory, keygen, get_active_uids_list, WordDictionaryTools, access_room, mongo_link, my_SDC);
 
 });
 

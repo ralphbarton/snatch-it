@@ -236,7 +236,7 @@ module.exports = function (){
 	},
 
 
-	reload_by_game_db_uID: function(res, uid, dict_activeGames, snatchSvr_factory, keygen, get_active_uids_list, WordDictionaryTools, access_room, mongo_link){
+	reload_by_game_db_uID: function(res, uid, dict_activeGames, snatchSvr_factory, keygen, get_active_uids_list, WordDictionaryTools, access_room, mongo_link, my_SDC){
 
 	    db_event(function(db){
 		SaveGame.find({game_db_uID:uid}, function (err, kittens) {
@@ -266,11 +266,16 @@ module.exports = function (){
 			};
 			access_room(room_pin);//this perhaps ought to be part of constructor. Needed to put timeout in place.
 
-			/*
-	    var word_str = myGame.TileIDArray_to_LettersString(tile_id_array);
-	    my_SDC.lookup_definition(word_str);
-*/
-
+			// Lookup all definitions of all words, in one hit...
+			var players_data = myRetrivedGame.getGameObject().playerSet;
+			for(var i=0; i < players_data.length; i++){
+			    var word_list_i = players_data[i].words;
+			    for(var j=0; j < word_list_i.length; j++){
+				var word_str = myRetrivedGame.TileIDArray_to_LettersString(word_list_i[j]);
+				my_SDC.lookup_definition(word_str);
+				console.log("Looking up a word for a retrieved game:" + word_str);
+			    }
+			}
 
 			// log as a Game Event			
 			mongo_link.log_GameEvent({
