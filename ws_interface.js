@@ -1,4 +1,4 @@
-module.exports = function (){
+module.exports = function (dict_activeGames, most_recent_pin){
 
     var events = require('events');
     var eventEmitter = new events.EventEmitter();
@@ -36,7 +36,12 @@ module.exports = function (){
             if (message.type === 'utf8') {
 		// process WebSocket message
 		console.log(message);
-		connection.send("crazy dog");
+
+		console.log(most_recent_pin.p);
+		var R = dict_activeGames[most_recent_pin.p];
+		var gameObj = R.GameInstance.getGameObject();
+
+		connection.send(JSON.stringify(gameObj));
 		eventEmitter.emit('message', message);
             }
 	});

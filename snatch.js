@@ -40,9 +40,6 @@ var WordDictionaryTools = WDT_factory('./dictionaries/sowpods.txt', './dictionar
 // Load the SOWPODS dictionary...
 var Stats = require('./stats-calc.js')();
 
-// this is a stub of a new module for the purpose of introducing a non-socket IO websockets interface to the game...
-var WS_interface  = require('./ws_interface.js')();
-
  
 //START OF experimental code secion
 // code to enable web-facing testing of the word Definition tool
@@ -259,6 +256,12 @@ app.get('/join=*', function (req, res) {
 */
 // note that the keys of this associative array are values taken by room_pin e.g. "1234"
 var dict_activeGames = {};
+var most_recent_pin = {};
+
+// this is a stub of a new module for the purpose of introducing a non-socket IO websockets interface to the game...
+var WS_interface  = require('./ws_interface.js')(dict_activeGames, most_recent_pin);
+
+
 
 // the keys for this array are IP addresses
 var ip_table = {};
@@ -271,6 +274,7 @@ function close_room(room_pin){
 }
 
 function access_room(room_pin){
+    most_recent_pin.p = room_pin;
     var R = dict_activeGames[room_pin];
 
     if(R !== undefined){
