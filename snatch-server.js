@@ -136,6 +136,12 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 		    return false;
 		}
 	    }
+	    // Detect the moment of game completion, and store new property for every player at this point
+	    if(GD.game_finished == false){
+		for(var i=0; i < GD.playerSet.length; i++){
+		    GD.playerSet[i].was_connected_at_completion = !GD.playerSet[i].is_disconnected;
+		}
+	    }
 	    GD.game_finished = true;
 	    return true;
 	},

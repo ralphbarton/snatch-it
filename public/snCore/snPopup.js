@@ -25,71 +25,67 @@ snCore.Popup = {
 
     generate_scores_table_html_element: function(){
 
-	// 3. Extract the data
+	// 1. Generate an Array representing Ranked players' scores
 	var player_scores_list = [];
-	//extact scores from players stat structure:
 	for(var i = 0; i < players.length; i++){
+	    // 1.1 Calculate the score
 	    var player_i_score = 0;
 	    for(var j = 0; j < players[i].words.length; j++){
 		player_i_score += Math.max(1,players[i].words[j].length-2);
 	    }
+	    // 1.2 push into array
 	    player_scores_list.push({
 		p_index: i,
 		score: player_i_score
 	    });
 	}
 
+	// 1.3 put into descending order..
 	function comparePlayers(a, b) {
 	    return a.score - b.score;
 	}
 	player_scores_list.sort(comparePlayers);
 	player_scores_list.reverse();
 
-	var doc = document;
-	var fragment = doc.createDocumentFragment();
-
-	//Just create the table headings...
-	var tr = doc.createElement("tr");
-	var th1 = doc.createElement("th");
-	th1.innerHTML = "Name";
-	th1.className = "scores scores-underline";
-	tr.appendChild(th1);
-
-	var th2 = doc.createElement("th");
-	th2.innerHTML = "Score";
-	th2.className = "scores scores-underline";
-	tr.appendChild(th2);
-
-	//does not trigger reflow
-	fragment.appendChild(tr);
+	// 2. Generate an HTML element for the scores data
 	
-	var n_psl = player_scores_list.length;
-	for(var i = 0; i < n_psl; i++){
+	// 2.1 Generate the shell
+	var table_shell = $("<table />").append(
+	    $("<tr />").append(
+		$("<th />").addClass("scores scores-underline").html("Name"),
+		$("<th />").addClass("scores scores-underline").html("Score")
+	    )
+	);
 
-	    var Plr = players[player_scores_list[i].p_index];
+	// 2.2 Generate the content
+	var psl_length = player_scores_list.length;
+	// these variables need to be outside the map operation... (is this hacky from a functional programming point of view?)
+	var rank_counter = 0;
+	var n_highlight = 0;
 
-	    var tr = doc.createElement("tr");
-	    var td1 = doc.createElement("td");
-	    td1.innerHTML = (i+1)+ ". " + Plr.name;
-	    td1.className = "scores pl-name" + (i != n_psl-1?" scores-underline":"");
-	    tr.appendChild(td1);
+	// Apply a 'map' function to the ordered list of players, for a list of HTML 'row' objects...
+	var rows_of_players = player_scores_list.map(function(PSL_i){// objects are {p_index: 0, score: 0}
+	    rank_counter++;
+	    var lastR = rank_counter >= psl_length;
+	    var Plr = players[PSL_i.p_index];
+	    var incl_me = snCore.Event.game_ended ? Plr.was_connected_at_completion : (!Plr.is_disconnected);
+	    var highlight = (n_highlight < 3) && incl_me;
+	    if(highlight){n_highlight++;}
 
-	    var td2 = doc.createElement("td");
-	    td2.innerHTML = player_scores_list[i].score.toString();
-	    tr.appendChild(td2);
-	    td2.className = "scores pl-score" + (i<3?" blacken":"")+ (i != n_psl-1?" scores-underline":"");
-	    td2.style["font-weight"] = (i<3?800:100);
-	    td2.style["color"] = (i<3? Plr.color : 'black');
+	    return $("<tr />").append(
+		$("<td />").addClass("scores pl-name" + (lastR ? "" : " scores-underline"))
+		    .html(rank_counter + ". " + Plr.name),
 
-	    //does not trigger reflow
-	    fragment.appendChild(tr);
+		$("<td />").addClass("scores pl-score" + (highlight ? " blacken":"")+ (lastR ? "" : " scores-underline"))
+		    .html(PSL_i.score.toString())
+		    .css({
+			"font-weight": (highlight ? 800:100),
+			"color": (highlight ? Plr.color : 'black')
+		    })
+	    );
+	});
 
-	}
-
-	var table = doc.createElement("table");
-	table.appendChild(fragment);
-
-	return table;
+	return table_shell.append(rows_of_players);
     },
 
     modal_content_updater_timeout: undefined,
