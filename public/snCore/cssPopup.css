@@ -130,6 +130,18 @@ a.modal:hover{
     color: #777;
 }
 
+#disconnect-hint {
+    border: 1px solid rgba(0,0,0,0.4);
+    border-radius: 8px;
+    background: rgba(156, 211, 230, 0.4);
+    padding: 0px 10px;
+    font-size: 85%;
+}
+
+#disconnect-hint div{
+    margin: 10px 0px;
+}
+
 /* 3. the latency message */
 #connection-latency, #connection-latency-2{
     font-weight: bold;

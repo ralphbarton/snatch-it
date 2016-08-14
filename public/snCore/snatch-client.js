@@ -83,6 +83,9 @@ socket.on('full game state transmission', function(gameState){
 	snCore.Words.TileGroupsArray[i] = [];//correctly create empty container
     }
 
+    //this is ABSOLUTELY temporary
+    console.log(players[1]);
+
     //draws the entire game state on the canvas from the data supplied
     snCore.Tile.setTileRatSizeFromNTiles(tilestats.n_turned);// set starting size for tiles (due to existing game progress)
     snCore.Event.FirstGameRender(); // main effect is to add keyboard & mouse listeners

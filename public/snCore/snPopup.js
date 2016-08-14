@@ -77,7 +77,18 @@ snCore.Popup = {
 			$("<a />").addClass("ln-disconnected")
 			    .html(incl_me?"":"(disconnected)")
 			    .attr({"href":"#"})
-			    .click(function(){alert('hey there')})
+			    .click(function(){
+				//show the main box
+				$("#disconnect-hint").show();
+				//adjust the text variant
+				if(snCore.Event.game_ended){
+				    $("#disconnect-hint-v1").hide();
+				    $("#disconnect-hint-v2").show();
+				}else{
+				    $("#disconnect-hint-v1").show();
+				    $("#disconnect-hint-v2").hide();
+				}
+			    })
 		    ),
 
 		$("<td />").addClass("pl-score" + greyme + (highlight ? " blacken":""))
@@ -108,6 +119,7 @@ snCore.Popup = {
 
 	    // dynamically change content by regenerating the scores table...
 	    $("#scores-table-container").html(this.generate_scores_table_html_element());
+	    $("#disconnect-hint").hide();
 
 	}else if(type=="options"){
 

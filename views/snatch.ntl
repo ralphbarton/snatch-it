@@ -90,6 +90,17 @@
 	  <!-- modal-body-scores-table (note that this always has to be generated dynamically) -->
 	  <div id="modal-body-scores-table">
 	    <div id="scores-table-container"></div>
+	    <div id="disconnect-hint">
+	      <div>
+		When players lose their internet connection or closed their brower mid game, their word groups remain.
+	      </div>
+	      <div id="disconnect-hint-v1">
+		To reclaim the words, rejoin the same game (identified by word key or PIN). Enter the same Player Name as before.
+	      </div>
+	      <div id="disconnect-hint-v2">
+		This game is now completed, and players are shown as "disconnected" based on their status at the moment of game completion.
+	      </div>
+	    </div>
 	    <p class="p-for-small-RHS-link"> 
 	      <a href="#" onclick="snCore.Popup.openModal('stats')">More game stats...</a> 
 	    </p>

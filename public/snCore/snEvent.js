@@ -594,7 +594,9 @@ snCore.Event = {
 	    // 1. Add new propery to all players, recording whether they were in the game at completion moment.
 	    // this is bascially a copy of serverside code in function "PlayerFinishedGame"
 	    for(var i=0; i < players.length; i++){
-		players[i].was_connected_at_completion = !players[i].is_disconnected;
+		if(players[i].was_connected_at_completion == undefined){
+		    players[i].was_connected_at_completion = !players[i].is_disconnected;
+		}
 	    }
 
 	    // 2. Automatically open the scores window
