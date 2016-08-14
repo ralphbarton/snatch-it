@@ -107,7 +107,7 @@ snCore.DefineWord = {
     kb_WI_selected: undefined, 
     kb_ZI_selected: undefined, 
     four_square_Fabs: [[],[]], 
-    destroy_highlight_callback: undefined,
+    do_select_callback: undefined,
     KPicker_isPresent: function (action) {return this.kb_ZI_selected != undefined},
 
     KPicker_cycler: function (action) {
@@ -129,8 +129,8 @@ snCore.DefineWord = {
 	};
 
 	function extend_timout(){
-	    clearTimeout(snCore.DefineWord.destroy_highlight_callback);
-	    snCore.DefineWord.destroy_highlight_callback = setTimeout(function(){destroy_highlight()},2000);
+	    clearTimeout(snCore.DefineWord.do_select_callback);
+	    snCore.DefineWord.do_select_callback = setTimeout(function(){snCore.DefineWord.KPicker_cycler('select');},1000);
 	};
 
 	function create_highlight(){
@@ -158,7 +158,7 @@ snCore.DefineWord = {
 		    canvas.remove(snCore.DefineWord.four_square_Fabs[i][j]);
 		}
 	    }
-	    clearTimeout(snCore.DefineWord.destroy_highlight_callback);
+	    clearTimeout(snCore.DefineWord.do_select_callback);
 	    snCore.DefineWord.four_square_Fabs = [[],[]];
 	    snCore.DefineWord.kb_ZI_selected = undefined;
 	    snCore.DefineWord.kb_WI_selected = undefined;

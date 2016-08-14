@@ -119,11 +119,7 @@ snCore.Keyboard = {
 	    }
 
 	    if(keyPressed == '4'){
-		if(snCore.DefineWord.KPicker_isPresent()){
-		    snCore.DefineWord.KPicker_cycler('select');
-		}else{
-		    snCore.Popup.openModal("scores");
-		}
+		snCore.Popup.openModal("scores");
 	    }
 
 	    if(keyPressed == '6'){
