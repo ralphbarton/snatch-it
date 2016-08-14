@@ -91,33 +91,44 @@ a.modal:hover{
 
 
 /* 2. the scores window */
-table {
+.scores-table {
     border-collapse: collapse;
     width: auto;
     display: inline-block;
 }
 
-th.scores, td.scores {
-    padding: 8px;
-    white-space: nowrap;
-}
-
-th.scores-underline, td.scores-underline {
-    border-bottom: 1px solid #666;
-}
-
-th{
+.scores-table th{
     color: rgba(0,0,0, 0.7); /* Black w/ opacity */
 }
 
-td.pl-name{
+.scores-table td,th {
+    padding: 8px;
+    white-space: nowrap;
+    border-bottom: 1px solid #666;
+}
+
+.scores-table tr:last-child td {
+    border-bottom: none;
+}
+
+
+.scores-table td.pl-name{
     text-align: left;
 }
 
-td.pl-score{
+.scores-table td.pl-score{
     font-size: 120%;
 }
 
+.scores-table td.grey-out {
+    color: #666;
+}
+
+.scores-table a.ln-disconnected {
+    font-size: 70%;
+    font-style: italic;
+    color: #777;
+}
 
 /* 3. the latency message */
 #connection-latency, #connection-latency-2{

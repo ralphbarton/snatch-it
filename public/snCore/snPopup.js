@@ -50,15 +50,14 @@ snCore.Popup = {
 	// 2. Generate an HTML element for the scores data
 	
 	// 2.1 Generate the shell
-	var table_shell = $("<table />").append(
+	var table_shell = $("<table />").addClass("scores-table").append(
 	    $("<tr />").append(
-		$("<th />").addClass("scores scores-underline").html("Name"),
-		$("<th />").addClass("scores scores-underline").html("Score")
+		$("<th />").html("Name"),
+		$("<th />").html("Score")
 	    )
 	);
 
 	// 2.2 Generate the content
-	var psl_length = player_scores_list.length;
 	// these variables need to be outside the map operation... (is this hacky from a functional programming point of view?)
 	var rank_counter = 0;
 	var n_highlight = 0;
@@ -66,22 +65,27 @@ snCore.Popup = {
 	// Apply a 'map' function to the ordered list of players, for a list of HTML 'row' objects...
 	var rows_of_players = player_scores_list.map(function(PSL_i){// objects are {p_index: 0, score: 0}
 	    rank_counter++;
-	    var lastR = rank_counter >= psl_length;
 	    var Plr = players[PSL_i.p_index];
 	    var incl_me = snCore.Event.game_ended ? Plr.was_connected_at_completion : (!Plr.is_disconnected);
 	    var highlight = (n_highlight < 3) && incl_me;
 	    if(highlight){n_highlight++;}
 
+	    var greyme = incl_me ? "" : " grey-out";
 	    return $("<tr />").append(
-		$("<td />").addClass("scores pl-name" + (lastR ? "" : " scores-underline"))
-		    .html(rank_counter + ". " + Plr.name),
+		$("<td />").addClass("pl-name" + greyme)
+		    .html(rank_counter + ". " + Plr.name + (incl_me?"":" ")).append(
+			$("<a />").addClass("ln-disconnected")
+			    .html(incl_me?"":"(disconnected)")
+			    .attr({"href":"#"})
+			    .click(function(){alert('hey there')})
+		    ),
 
-		$("<td />").addClass("scores pl-score" + (highlight ? " blacken":"")+ (lastR ? "" : " scores-underline"))
+		$("<td />").addClass("pl-score" + greyme + (highlight ? " blacken":""))
 		    .html(PSL_i.score.toString())
-		    .css({
-			"font-weight": (highlight ? 800:100),
-			"color": (highlight ? Plr.color : 'black')
-		    })
+		    .css(highlight?{
+			"font-weight": 800,
+			"color": Plr.color
+		    }:{})
 	    );
 	});
 
