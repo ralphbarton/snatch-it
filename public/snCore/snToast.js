@@ -95,6 +95,7 @@ snCore.Toast = {
 	    persistent: boolean
 	    HTML_frag: <object, jQuery>
 	    holdable: boolean
+	    via_KB: boolean (for the case where Toast was triggered via the keyboard, alter its disappearance behaviour)
 	}
 	*/
 
@@ -123,13 +124,22 @@ snCore.Toast = {
 	    }
 
 	    if(ToastOptions.holdable == true){
-		var stop_msg = $('<div/>', {id: "m1"+t_key}).addClass("ToastStop S1").text("click to hold in view");
+		var via_kb = ToastOptions.via_KB == true;
+
+		var stop_msg_str = (via_kb?"Hit 6 again":"click") + " to hold in view";
+		var stop_msg = $('<div/>', {id: "m1"+t_key}).addClass("ToastStop S1").text(stop_msg_str);
+
+		//clear the 'hold' message
+		if(via_kb){
+		    setTimeout(function(){
+			if($("#m1"+t_key).text().includes("Hit 6")){
+			    $("#m1"+t_key).text("");
+			}
+		    }, 1200);
+		}
+
 		$NewToast.prepend(stop_msg).click(function(){
-		    snCore.Toast.setToastRemTimeout(t_key, {duration: 120000});//2 minutes
-		    $("#m1"+t_key).removeClass("S1").addClass("S2").text("click to clear");
-		    $NewToast.click(function(){//get rid of
-			snCore.Toast.setToastRemTimeout(t_key, {instant: true});
-		    });
+		    snCore.Toast.holdToast(t_key, via_kb);
 		});
 	    }
 	}
@@ -139,6 +149,15 @@ snCore.Toast = {
 	$NewToast.find( ".samewin" ).attr("target","_self");
 
 	return t_key;
+    },
+
+    holdToast: function(t_key, via_kb){
+	var this_toast = $("#"+t_key);
+	snCore.Toast.setToastRemTimeout(t_key, {duration: 120000});//2 minutes
+	$("#m1"+t_key).removeClass("S1").addClass("S2").text((via_kb?"ESC":"click")+" to clear");
+	this_toast.click(function(){//get rid of
+	    snCore.Toast.setToastRemTimeout(t_key, {instant: true});
+	});
     },
 
     /*

@@ -17,7 +17,7 @@ snCore.DefineWord = {
     },
 
 
-    showDefinitionToast: function (word_str) {
+    showDefinitionToast: function (word_str, via_kb) {
 	/*  {
 	    word_queried: <string>
 	    word_defined: <string>
@@ -74,8 +74,7 @@ snCore.DefineWord = {
 	    }
 	}
 
-	snCore.Toast.showToast("(text str)",{HTML_frag: Def_Frag, holdable: true});
-
+	return snCore.Toast.showToast("(text str)",{HTML_frag: Def_Frag, holdable: true, via_KB: via_kb});
     },
 
 
@@ -90,7 +89,7 @@ snCore.DefineWord = {
 	    if( !snCore.Mouse.is_movedSincePickup(WordGrp) ){
 
 		//This is the code that actually calls the Toast...
-		snCore.DefineWord.showDefinitionToast(word_str);
+		snCore.DefineWord.showDefinitionToast(word_str, false);
 
 		if(mouse_is_down){
 		    snCore.Mouse.defn_toast_shown_since_mouse_down = true;
@@ -108,6 +107,7 @@ snCore.DefineWord = {
     kb_ZI_selected: undefined, 
     four_square_Fabs: [[],[]], 
     do_select_callback: undefined,
+    recent_defn_toast_key: false,
     KPicker_isPresent: function (action) {return this.kb_ZI_selected != undefined},
 
     KPicker_cycler: function (action) {
@@ -130,7 +130,7 @@ snCore.DefineWord = {
 
 	function extend_timout(){
 	    clearTimeout(snCore.DefineWord.do_select_callback);
-	    snCore.DefineWord.do_select_callback = setTimeout(function(){snCore.DefineWord.KPicker_cycler('select');},1000);
+	    snCore.DefineWord.do_select_callback = setTimeout(function(){snCore.DefineWord.KPicker_cycler('select');},600);
 	};
 
 	function create_highlight(){
@@ -183,8 +183,10 @@ snCore.DefineWord = {
 	};
 
 
+	if(this.recent_defn_toast_key){
+	    snCore.Toast.holdToast(this.recent_defn_toast_key, true);	    
 
-	if(action == 'select'){
+	}else if(action == 'select'){
 	    extend_timout();
 	    var on_plr = snCore.Zones.PlayerZone[this.kb_ZI_selected].player.index;
 
@@ -198,7 +200,12 @@ snCore.DefineWord = {
 		// we were already in a zone. So now, define a word.
 		var word_str = snCore.Tile.TileIDArray_to_LettersString(players[on_plr].words[this.kb_WI_selected]);
 		destroy_highlight();
-		this.showDefinitionToast(word_str);
+
+		setTimeout(function(){
+		    snCore.DefineWord.recent_defn_toast_key = false;
+		}, 1200);
+
+		this.recent_defn_toast_key = this.showDefinitionToast(word_str, true);
 	    }
 
 	}else if(action == 'cycle'){
@@ -223,7 +230,10 @@ snCore.DefineWord = {
 		    var ZIs_max_word_i = snCore.Zones.PlayerZone[this.kb_ZI_selected].player.words.length-1;
 
 		    if(ZIs_max_word_i==0){//shortcut to 'select' effect if 6 pressed for 1 word only in zone
-			this.KPicker_cycler('select');
+
+			//use a deferred (5ms) call to prevent issues with reference (i.e. 'this' vs. 'snCore.DefineWord')
+			setTimeout(function(){snCore.DefineWord.KPicker_cycler('select');},5);
+
 		    }else{//otherwise, cycle as normal.
 			this.kb_WI_selected--;
 			// underflow management
@@ -231,7 +241,6 @@ snCore.DefineWord = {
 			    this.kb_WI_selected = ZIs_max_word_i;
 			}
 		    }
-
 		}
 	    }
 

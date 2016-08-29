@@ -129,10 +129,9 @@
 
 
 .ToastStop {
-    top: -8px;
-    right: -11px;
-    position: relative;
-    float: right;
+    top: 1px;
+    right: 4px;
+    position: absolute;
     font-size: 75%;
     font-weight: bold;
 }
