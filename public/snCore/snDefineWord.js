@@ -182,6 +182,8 @@ snCore.DefineWord = {
 	    snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
 	};
 
+
+
 	if(action == 'select'){
 	    extend_timout();
 	    var on_plr = snCore.Zones.PlayerZone[this.kb_ZI_selected].player.index;
@@ -216,11 +218,20 @@ snCore.DefineWord = {
 			this.kb_ZI_selected = snCore.Zones.PlayerZone[0].player.words.length > 0 ? 0 : 1;
 		    }
 		}else{// implies we're cycling words within some chosen zone...
-		    this.kb_WI_selected--;
-		    if(this.kb_WI_selected < 0){
-			//set back to highest index word...
-			this.kb_WI_selected = snCore.Zones.PlayerZone[this.kb_ZI_selected].player.words.length-1;
+
+		    //get the highest word index for the zone we're cycling within...		    
+		    var ZIs_max_word_i = snCore.Zones.PlayerZone[this.kb_ZI_selected].player.words.length-1;
+
+		    if(ZIs_max_word_i==0){//shortcut to 'select' effect if 6 pressed for 1 word only in zone
+			this.KPicker_cycler('select');
+		    }else{//otherwise, cycle as normal.
+			this.kb_WI_selected--;
+			// underflow management
+			if(this.kb_WI_selected < 0){
+			    this.kb_WI_selected = ZIs_max_word_i;
+			}
 		    }
+
 		}
 	    }
 
