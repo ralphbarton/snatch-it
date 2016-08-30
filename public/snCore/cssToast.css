@@ -33,6 +33,10 @@
     text-decoration:none;
 }
 
+.ToastGrey a {
+    color: #C4E0FF;
+}
+
 .ToastCentral {
     position: absolute;
     width: 62%;
