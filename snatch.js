@@ -256,11 +256,13 @@ app.get('/join=*', function (req, res) {
 */
 // note that the keys of this associative array are values taken by room_pin e.g. "1234"
 var dict_activeGames = {};
-var most_recent_pin = {};
+var most_recent_pin = {}; //this object only has the .p property
+var dict_socket_disconnect_callbacks = {};
+var heart_stop_interval = (10 + 25) * 1000; // if a heartbeat message does not occur for this length of time, player is booted.
+
 
 // this is a stub of a new module for the purpose of introducing a non-socket IO websockets interface to the game...
 var WS_interface  = require('./ws_interface.js')(dict_activeGames, most_recent_pin);
-
 
 
 // the keys for this array are IP addresses
@@ -322,6 +324,56 @@ function get_active_uids_list(){
     return uid_active;
 }
 
+
+
+function socket_disconnection(socket){
+
+    if(socket.room_pin){
+	var myGame = dict_activeGames[socket.room_pin].GameInstance;
+    }
+    if(myGame){
+	var dis_pl_i = myGame.playerIndexFromSocket(socket.id);
+    }
+
+    // only if (1) the socket is assigned a .room_pin property (2) a game exists there (should always be true...)
+    // (3) the client at the socket actually entered the game and became a player.
+    if(dis_pl_i !== undefined){
+	// record the disconnection in the backend, and also broadcast to the room...
+	var dis_pl_i = myGame.playerIndexFromSocket(socket.id);
+	socket.broadcast.to(socket.room_pin).emit('player disconnected', dis_pl_i);
+
+	// 'disconnecting' when all tiles are turned is equivalent to clicking finish
+	// this preserves the possibility that the 'fin' message will show even with an unclean departure.
+	if(myGame.areAllTilesTurned()){
+	    var all_fin = myGame.PlayerFinishedGame(socket.id);
+	    if(all_fin){
+		io.to(socket.room_pin).emit('all players declared finished', 0);
+	    }
+	}
+	
+	// make the log message
+	var dis_pl_name = myGame.getPlayerObject(socket.id).name;
+	console.log('Player ' + dis_pl_i + ' (' + dis_pl_name + ') disconnected (socket.id = ' + socket.id + ')');
+
+	// log as a Game Event
+	mongo_link.log_GameEvent({
+	    game_db_uID: dict_activeGames[socket.room_pin].db_uID,
+	    event_type: "player leave",
+	    player_name: myGame.playerNameFromSocket(socket.id),
+	    player_number: myGame.playerIndexFromSocket(socket.id),
+	    orderedLetters: null,
+	    orderedTileIDs: null
+	});
+
+	//this function call must be last, and not be before other member functions of 'myGame'...
+	myGame.removePlayer(socket.id);
+
+    }else{
+	console.log('Connection closed (socket.id = ' + socket.id + ') - no player associated...');
+    }
+}
+
+
 io.on('connection', function(socket){
 
     //basic logging
@@ -331,57 +383,27 @@ io.on('connection', function(socket){
 
     console.log('A user at ip = ' + client_ip + ' connected with socket.id: ' + socket.id);
 
-    socket.on('disconnect', function(){
 
-	if(socket.room_pin){
-	    var myGame = dict_activeGames[socket.room_pin].GameInstance;
-	}
-	if(myGame){
-	    var dis_pl_i = myGame.playerIndexFromSocket(socket.id);
-	}
+    dict_socket_disconnect_callbacks[socket.id] = setTimeout(function(){
+	socket.disconnect();
+    }, heart_stop_interval);
 
-	// only if (1) the socket is assigned a .room_pin property (2) a game exist there (should always be true...)
-	// (3) the client at the socket actually entered the game and became a player.
-	if(dis_pl_i !== undefined){
-	    // record the disconnection in the backend, and also broadcast to the room...
-	    var dis_pl_i = myGame.playerIndexFromSocket(socket.id);
-	    socket.broadcast.to(socket.room_pin).emit('player disconnected', dis_pl_i);
-
-	    // 'disconnecting' when all tiles are turned is equivalent to clicking finish
-	    // this preserves the possibility that the 'fin' message will show even with an unclean departure.
-	    if(myGame.areAllTilesTurned()){
-		var all_fin = myGame.PlayerFinishedGame(socket.id);
-		if(all_fin){
-		    io.to(socket.room_pin).emit('all players declared finished', 0);
-		}
-	    }
-  
-	    // make the log message
-	    var dis_pl_name = myGame.getPlayerObject(socket.id).name;
-	    console.log('Player ' + dis_pl_i + ' (' + dis_pl_name + ') disconnected (socket.id = ' + socket.id + ')');
-
-	    // log as a Game Event
-	    mongo_link.log_GameEvent({
-		game_db_uID: dict_activeGames[socket.room_pin].db_uID,
-		event_type: "player leave",
-		player_name: myGame.playerNameFromSocket(socket.id),
-		player_number: myGame.playerIndexFromSocket(socket.id),
-		orderedLetters: null,
-		orderedTileIDs: null
-	    });
-
-	    //this function call must be last, and not be before other member functions of 'myGame'...
-	    myGame.removePlayer(socket.id);
-
-	}else{
-	    console.log('Connection closed (socket.id = ' + socket.id + ') - no player associated...');
-	}
-    });
+    socket.on('disconnect', function(){socket_disconnection(socket); });
 
 
     //the server pongs back the heartbeat message to the specific client that sent.
     socket.on('client heartbeat', function(){
 	if(!access_room(socket.room_pin)){return;}; // log that the game was accessed. 
+
+
+	//clear the old time-out
+	clearTimeout(dict_socket_disconnect_callbacks[socket.id]);
+	//and capture the reference to the new one
+	dict_socket_disconnect_callbacks[socket.id] = setTimeout(function(){
+	    socket.disconnect();
+	}, heart_stop_interval);
+
+
     	socket.emit('heartbeat server ack', 0);
     });
 
