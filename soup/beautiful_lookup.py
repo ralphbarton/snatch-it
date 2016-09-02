@@ -26,10 +26,20 @@ def collinsdictionary_com__digest(page_html, search_word):
         
         #remove unwanted number 1's from the heading (class='homnum')
         wrd_header_H1 = wrd_header.find('h1')
-        for x in wrd_header_H1.find_all('span', class_='homnum'):
-            x.decompose()
+        if wrd_header_H1 != None:
+            for x in wrd_header_H1.find_all('span', class_='homnum'):
+                x.decompose()
+            word_actual = wrd_header_H1.get_text()
+        # This copy-pasted block of code from above is because the H1 has been changed to a H2. Retain backward compat...
+        wrd_header_H2 = wrd_header.find('h2')
+        if wrd_header_H2 != None:
+            for x in wrd_header_H2.find_all('span', class_='homnum'):
+                x.decompose()
+            word_actual = wrd_header_H2.get_text()
 
-        word_actual = wrd_header_H1.get_text()
+
+
+
         frequency_note = wrd_header.find('div', class_="word-frequency-img")["title"]
 
         # Word's defintions content
