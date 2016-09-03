@@ -232,7 +232,6 @@ socket.on('game graphing stats data', function(data){
     }    
 
     snCore.Popup.setChart(scores_data);
-    console.log("set chart data");
 });
 
 function PLAYER_SUBMITS_WORD(p)       {

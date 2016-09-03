@@ -37,8 +37,6 @@ var keygen  = require('./vivid_keygen.js')();
 var WDT_factory = require('./word_check.js');
 var WordDictionaryTools = WDT_factory('./dictionaries/sowpods.txt', './dictionaries/COCA_top5000_word_frequencies.txt');
 
-// Load the SOWPODS dictionary...
-var Stats = require('./stats-calc.js')();
 
  
 //START OF experimental code secion
@@ -829,7 +827,7 @@ io.on('connection', function(socket){
 
 	var uid = dict_activeGames[socket.room_pin].db_uID;
 
-	mongo_link.GameStats_for_client(uid, Stats, cb);
+	mongo_link.GameStats_for_client(uid, cb);
 
     });
 

@@ -100,8 +100,15 @@ module.exports = function (){
 
 		    // 2. Push it into the History Array
 		    push_history(Ei);
-		    
-		}//specifically, a snatch event...
+		 
+		    //specifically, a snatch event...   
+		}else if(i == Game_Events.length-1){//the final event in the log...
+
+		    //regardless of event type, the final event in the log will go in...
+		    push_history(Ei);
+
+		}
+
 
 	    }//cycling thought the game events
 	    
@@ -123,8 +130,12 @@ module.exports = function (){
 	    var Scores_Timeseries = [];
 
 	    var XOX = FullStateHistory.StatePoints;
+
+	    //Loop though all State-points
 	    for (var i=0; i < XOX.length; i++){
 		var SNi = XOX[i];
+
+		//If a particular state point is a SNATCH
 		if(SNi.event_type == "snatch"){
 
 		    //loop through all players
@@ -142,9 +153,9 @@ module.exports = function (){
 
 			    // only log the score upon a score change...
 			    var b_add_point = false;
-			    if (series_pi.length == 0){
+			    if (series_pi.length == 0){//test if this player has had score before
 				b_add_point = true;
-			    } else if (series_pi[series_pi.length-1].y != pi_sco){
+			    } else if (series_pi[series_pi.length-1].y != pi_sco){//test if score changed
 				b_add_point = true;
 			    }
 
@@ -156,6 +167,20 @@ module.exports = function (){
 			    }
 			}
 		    }
+		}
+	    }
+
+	    //add a final data point to each series for the final logged event...
+	    //this is almost duplicating the code above...
+	    //note that this still doesn't guarentee a 'final' point.
+	    for (var pi=0; pi < Scores_Timeseries.length; pi++){
+		var series_pi = Scores_Timeseries[pi];
+		if (series_pi.length > 0){//test if this player has had score so far at all
+		    var pi_sco = individual_score(SNi.player_words[pi]);
+		    series_pi.push({
+			x: SNi.time_elapsed,
+			y: pi_sco
+		    });
 		}
 	    }
 

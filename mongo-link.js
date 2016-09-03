@@ -4,6 +4,9 @@ module.exports = function (){
     var MongoClient = mongodb.MongoClient;// Work with "MongoClient" interface to connect to a mongodb server.
     var url = 'mongodb://localhost:27017/snatch_db'; // where mongodb server is running.
 
+    // This function will regenerate game history from database data
+    var StatsProcessor = require('./stats-calc.js')();
+
     XLSX = require('xlsx');
 
     function db_event(db_func){
@@ -400,7 +403,7 @@ module.exports = function (){
 	    });
 	},
 
-	GameStats_for_client: function(db_uID, StatsProcessor, cb){
+	GameStats_for_client: function(db_uID, cb){
 
 	    var query = {
 		game_db_uID: db_uID,

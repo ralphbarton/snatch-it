@@ -238,10 +238,12 @@ snCore.Popup = {
 
 	//get t_max
 	var t_max = 0;
+	var score_max = 0
 	for(var i = 0; i < data.datasets.length; i++){
 	    var series_i = data.datasets[i].data;
 	    for(var j = 0; j < series_i.length; j++){
 		t_max = Math.max(t_max, series_i[j].x);
+		score_max = Math.max(score_max, series_i[j].y);
 
 		// convert all the times into moment durations
 		series_i[j].x = moment(series_i[j].x).utc();//the .utc() removes local 1h offset (e.g. on browser with BST)
@@ -255,8 +257,6 @@ snCore.Popup = {
 	var in_hours = (t_max/60000) > 40; //use a 40 minute threshold...
 	var time_format = in_hours ? "H:mm" : "m:ss";
 	var time_axis_label = in_hours ? "hours of play" : "minutes of play";
-
-	console.log(JSON.stringify(data, null, 2));	    
 
 	//NOW create chart contents...
 	if(this.myChart == undefined){
@@ -281,6 +281,16 @@ snCore.Popup = {
 			    scaleLabel: {
 				display: true,
 				labelString: time_axis_label
+			    }
+			}],
+			yAxes: [{
+			    ticks: {
+				// Create scientific notation labels
+				callback: function(value, index, values) {
+				    return Math.round(value);
+				},
+				stepSize: ( score_max>5 ? undefined : 1 ),//undefined will mean auto.
+				min: 0
 			    }
 			}]
 		    },
