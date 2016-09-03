@@ -20,7 +20,17 @@
     <link rel="stylesheet" href="include/flickity/flickity.css" media="screen">
     <script src="include/flickity/flickity.pkgd.js"></script>
 
+    <!-- I don't want the bundle, because I want to use the moment.js library myself-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.0/Chart.bundle.min.js"></script>
+
+    <!-- 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.js"></script>
+    --> 
+
+    <!-- This is potentially double inclusion, as chart.bundle already contains moment
+	 this is advised against but I am doing it anyhow -->   
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.js"></script>
+
 
     <!-- library / framework JS -->
     <script src="fabric.js-1.5.0/dist/fabric.min.js"></script>

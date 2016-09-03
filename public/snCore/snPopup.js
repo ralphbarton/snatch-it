@@ -228,39 +228,29 @@ snCore.Popup = {
 
     setChart: function(data){
 	
-	console.log(JSON.stringify(data, null, 2));
-/*
-	var data = {
-	    datasets: [{
-		label: 'Sam',
-		borderColor: 'rgba(255,99,132,1)',
-		data: [{
-		    x: (new Date("2016-07-29T22:38:44.120Z")-new Date("2016-07-29T22:38:44.120Z")),
-		    y: 0
-		}, {
-		    x: (new Date("2016-07-29T22:38:46.680Z")-new Date("2016-07-29T22:38:44.120Z")),
-		    y: 10
-		}, {
-		    x: (new Date("2016-07-29T22:38:49.336Z")-new Date("2016-07-29T22:38:44.120Z")),
-		    y: 5
-		}]
-	    },{
-		label: 'Dave',
-		steppedLine: true,
-		borderColor: 'rgba(54, 162, 235, 1)',
-		data: [{
-		    x: (new Date("2016-07-29T22:38:44.120Z")-new Date("2016-07-29T22:38:44.120Z")),
-		    y: 2
-		}, {
-		    x: (new Date("2016-07-29T22:38:46.680Z")-new Date("2016-07-29T22:38:44.120Z")),
-		    y: 4
-		}, {
-		    x: (new Date("2016-07-29T22:38:49.336Z")-new Date("2016-07-29T22:38:44.120Z")),
-		    y: 9
-		}]
-	    }]
-	};
-*/
+
+
+	//get t_max
+	var t_max = 0;
+	for(var i = 0; i < data.datasets.length; i++){
+	    var series_i = data.datasets[i].data;
+	    for(var j = 0; j < series_i.length; j++){
+		t_max = Math.max(t_max, series_i[j].x);
+
+		// convert all the times into moment durations
+		series_i[j].x = moment(series_i[j].x).utc();//the .utc() removes local 1h offset (e.g. on browser with BST)
+	    }
+	}
+	var n_steps = 12;
+	var minutes_per_step = (t_max/60000) / n_steps;
+	minutes_per_step = Math.round(minutes_per_step);//because of rounding down, n_steps will be at least 12
+	minutes_per_step = Math.max(minutes_per_step,1);//don't let it be less than 1.
+
+	var in_hours = (t_max/60000) > 40; //use a 40 minute threshold...
+	var time_format = in_hours ? "H:mm" : "m:ss";
+	var time_axis_label = in_hours ? "hours of play" : "minutes of play";
+
+	console.log(JSON.stringify(data, null, 2));	    
 
 	//NOW create chart contents...
 	if(this.myChart == undefined){
@@ -277,14 +267,14 @@ snCore.Popup = {
 			    },
 			    time: {
 				unit: 'minute',
-				unitStepSize: 1,
+				unitStepSize: minutes_per_step,
 				displayFormats: {
-				    minute: "m:ss"
+				    minute: time_format
 				}
 			    },
 			    scaleLabel: {
 				display: true,
-				labelString: 'minutes of play'
+				labelString: time_axis_label
 			    }
 			}]
 		    },
