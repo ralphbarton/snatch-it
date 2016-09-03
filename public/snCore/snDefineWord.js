@@ -73,8 +73,9 @@ snCore.DefineWord = {
 		);
 	    }
 	}
-
-	return snCore.Toast.showToast("(text str)",{HTML_frag: Def_Frag, holdable: true, via_KB: via_kb});
+	//clear any existing definitions toast before raising the new definitions toast.
+	snCore.Toast.clear_all_definitions();
+	return snCore.Toast.showToast("(text str)",{HTML_frag: Def_Frag, holdable: true, via_KB: via_kb, ToastType: 'defn'});
     },
 
 

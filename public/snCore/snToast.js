@@ -96,6 +96,7 @@ snCore.Toast = {
 	    HTML_frag: <object, jQuery>
 	    holdable: boolean
 	    via_KB: boolean (for the case where Toast was triggered via the keyboard, alter its disappearance behaviour)
+	    ToastType: string (the options are: 'defn', etc....)
 	}
 	*/
 
@@ -117,6 +118,10 @@ snCore.Toast = {
 	    }else{
 		// also use this behaviour when not persistent
 		this.setToastRemTimeout(t_key);
+	    }
+
+	    if(ToastOptions.ToastType !== undefined){
+		$NewToast.addClass("typeClass-"+ToastOptions.ToastType);
 	    }
 
 	    if(ToastOptions.HTML_frag !== undefined){
@@ -219,6 +224,17 @@ snCore.Toast = {
 	for (var my_tk in this.Active_byKey) {
 	    if (this.Active_byKey.hasOwnProperty(my_tk)) {
 		snCore.Toast.setToastRemTimeout(my_tk, {instant: true});//the true means clear fast...
+	    }
+	}
+    },
+
+    clear_all_definitions: function(){
+	for (var my_tk in this.Active_byKey) {
+	    if (this.Active_byKey.hasOwnProperty(my_tk)) {
+		//test if it is a definition toast (type information stored in DOM)
+		if($("#"+my_tk).hasClass("typeClass-defn")){
+		    snCore.Toast.setToastRemTimeout(my_tk, {instant: true});//the true means clear fast...
+		}
 	    }
 	}
     },
