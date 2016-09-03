@@ -210,6 +210,12 @@ snCore.Popup = {
 
 	    $("#myChart-container").css("width", px(div_w-140)).css("height", px(div_h_inr-30)).css("margin", "15px");
 
+	    //delete any chart which may already be there...
+	    if(this.myChart != undefined){
+		this.myChart.destroy();
+		this.myChart = undefined;
+	    }
+
 	    GAME_GRAPHING_STATS_REQUEST();
 	}
 
