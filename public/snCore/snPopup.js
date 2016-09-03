@@ -272,10 +272,14 @@ snCore.Popup = {
 		    scales: {
 			xAxes: [{
 			    type: 'time',
+			    ticks: {
+				beginAtZero: true
+			    },
 			    time: {
-				unit: 'second',
+				unit: 'minute',
+				unitStepSize: 1,
 				displayFormats: {
-				    second: 'm:ss'
+				    minute: "m:ss"
 				}
 			    },
 			    scaleLabel: {
