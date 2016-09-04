@@ -114,6 +114,28 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 	    }
 	},
 
+	//we could make this an embedded class and be snazzy! Is there time??
+	provideColorChoice: function(socket_key) {
+
+	    var mySet = undefined;
+	    fiveColorsSent_socketKey[socket_key] = {};
+
+	    if(GD.my_color_palette.length >= 5){
+		mySet = GD.my_color_palette.splice(0,5);
+		fiveColorsSent_socketKey[socket_key].restore = true;
+		}
+	    else{
+		mySet = GD.emergency_colors.slice(0,5);
+		GD.emergency_colors = GD.emergency_colors.concat(GD.emergency_colors.splice(0,5));
+		fiveColorsSent_socketKey[socket_key].restore = false;
+	    }
+
+	    fiveColorsSent_socketKey[socket_key].cols = mySet;//remove 5 colours from the palette
+	    console.log("PALETTE:", GD.my_color_palette)
+	    return mySet;
+	},
+
+
 	removePlayer: function(socket_key) {
 	    var PI = player_index_from_socketKey_lkup[socket_key];
 	    //there is the possibility that the player was never attached to this socket...
@@ -433,26 +455,6 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 	    console.log("--------\n");
 
 	    return Response;
-	},
-
-	//we could make this an embedded class and be snazzy! Is there time??
-	provideColorChoice: function(socket_key) {
-
-	    var mySet = undefined;
-	    fiveColorsSent_socketKey[socket_key] = {};
-
-	    if(GD.my_color_palette.length >= 5){
-		mySet = GD.my_color_palette.splice(0,5);
-		fiveColorsSent_socketKey[socket_key].restore = true;
-		}
-	    else{
-		mySet = GD.emergency_colors.slice(0,5);
-		GD.emergency_colors = GD.emergency_colors.concat(GD.emergency_colors.splice(0,5));
-		fiveColorsSent_socketKey[socket_key].restore = false;
-	    }
-
-	    fiveColorsSent_socketKey[socket_key].cols = mySet;//remove 5 colours from the palette
-	    return mySet;
 	},
 
 	//this is copy-pasted client side code...
