@@ -171,6 +171,7 @@ snCore.Event = {
 
 	// 2.2 Put new tile and obsurer into location outside the canvas (plot only no animation)
 	var newTile = snCore.Tile.generateTileObject(tileset[tile_index], tile_index);
+	snCore.Tile.briefPaleTileObject(newTile);
 	newTile.visual = "animating_in";
 	var RandCx = snCore.Tile.GenRandomCoords_TileEntryOrigin();
 	snCore.Basic.moveSwitchable(newTile, false, null, RandCx);
@@ -280,14 +281,17 @@ snCore.Event = {
 	    players[i].words.clean(undefined);
 	}
 
-	// 2.2 update tileset for letters now In Words, and detach any letters in grid (i.e. the Fabric Objects)
+	// 2.2 update tileset for to reflect that all of these tiles are in a word.
+	// trigger Animated pale effect
 	for(var i = 0; i < tile_indices.length; i++){
 	    var TID = tile_indices[i];
 	    tileset[TID].status = 'inword';
+	    snCore.Tile.briefPaleTileObject(snCore.Tile.TileArray[TID]);
 	}
 
-	// 2.3 Detach tiles and animate compacting of the remainder
-	//note, function CAN cope when 'tile_indices' includes tiles not in grid. Animated rearrange (packing eff.) will follow removal
+	// 2.3 Detach tiles from grid and animate compacting of the remainder
+	// note, function CAN cope when 'tile_indices' includes tiles not in grid.
+	// Animated rearrange (packing eff.) will follow removal
 	snCore.Grid.DetachLetterSetFromGrid(tile_indices, snCore.Basic.ani.sty_Resize);
 
 	// 2.4 update the players data structure:

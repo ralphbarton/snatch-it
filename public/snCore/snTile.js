@@ -28,7 +28,6 @@ snCore.Tile = {
 	var myTileLetterObj = new fabric.Text(tile.letter,{
 	    originX: 'center',
 	    top: -this.dims.ts/2,
-	    fill: 'yellow',
 	    fontWeight: 'bold',
 	    fontSize: this.dims.ts_font1,
 	    selectable: false
@@ -46,8 +45,6 @@ snCore.Tile = {
 	var myTileRectObj = new fabric.Rect({
 	    originX: 'center',
 	    originY: 'center',
-	    fill: 'rgb(54,161,235)',
-	    stroke: '#777',
 	    strokeWidth: this.dims.ts_thick,
 	    width: this.dims.tsi,
 	    height: this.dims.tsi,
@@ -67,11 +64,14 @@ snCore.Tile = {
 	myNewTileObj.tileID=tile_id;
 	myNewTileObj.letter=tile.letter;
 
-	if(tile.status == "turned"){this.modifyTileObject(myNewTileObj,"flipped");}
-	if(tile.status == "inword"){this.modifyTileObject(myNewTileObj,"flipped");}
+	//initially, unconditionally set it to 'normal'
+	this.modifyTileObject(myNewTileObj, "normal");
+
+	if(tile.status == "turned"){this.modifyTileObject(myNewTileObj, "flipped");}
+	if(tile.status == "inword"){this.modifyTileObject(myNewTileObj, "flipped");}
 
 	//note that tile.status does not refer to a real member of the 'tileset' array, necessarily
-	if(tile.status == "skeletal"){this.modifyTileObject(myNewTileObj,"skeletal");}
+	if(tile.status == "skeletal"){this.modifyTileObject(myNewTileObj, "skeletal");}
 
 	//add flat-array reference to the object
 	this.TileArray[tile_id] = myNewTileObj;
@@ -84,7 +84,17 @@ snCore.Tile = {
 	//record the visual state of the tile as part of the object
 	myTile.visual = to_state;
 
-	if(to_state=="flipped"){//only to be called from within the function
+	if(to_state=="normal"){
+	    myTile.item(0).setFill('rgb(54,161,235)');
+	    myTile.item(1).setFill('yellow');
+	    myTile.item(0).setStroke('#777');
+	}
+	else if(to_state=="new"){
+	    myTile.item(0).setFill('rgb(105,193,255)');
+	    myTile.item(1).setFill('yellow');
+	    myTile.item(0).setStroke('yellow');
+	}
+	else if(to_state=="flipped"){//only to be called from within the function
 	    myTile.setOpacity(1.0);
 	}
 	else if(to_state=="skeletal"){
@@ -103,6 +113,14 @@ snCore.Tile = {
 	    myTile.item(0).setStroke('white');
 	}
 
+    },
+
+    briefPaleTileObject: function(myTile){
+	this.modifyTileObject(myTile, "new");
+	setTimeout(function(){
+	    snCore.Tile.modifyTileObject(myTile, "normal");	    
+	    snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+	}, 1500);
     },
 
     TileArray_to_LettersArray: function(TileArray){
