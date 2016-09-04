@@ -39,8 +39,9 @@ snCore.DefineWord = {
 		$('<span/>').addClass("defn-main-word").html(word_str)
 	    );
 	}else if (no_defns_found){
+	    var HR = DefnObj.properties.source + DefnObj.word_queried.toLowerCase();
 	    Def_Frag.text("No definitions were retrieved for ").append(
-		$('<span/>').addClass("defn-main-word").html(DefnObj.word_queried)
+		$('<a/>').attr("href", HR).addClass("defn-main-word").text(DefnObj.word_queried.toUpperCase())
 	    );
 	}else{
 	    // 1. Generate the "Top Line"
