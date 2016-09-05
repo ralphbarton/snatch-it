@@ -308,6 +308,7 @@ function access_room(room_pin){
 	return true;
     }else{
 	console.log("message recieved for non-existant room ["+room_pin+"]... no action taken");
+	console.trace();
 	return false;
     }
 }

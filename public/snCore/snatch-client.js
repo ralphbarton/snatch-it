@@ -92,6 +92,11 @@ socket.on('full game state transmission', function(gameState){
     }
 
     snCore.Toast.join_message(); //show a welcome toast
+    
+    if(typeof Chart == "undefined"){
+	snCore.Toast.showToast("Charting library has not been loaded from CDN, and charts will not work");
+    }
+
     emit_heartbeat(); //start the hearbeat process now.
 
 });//end of function to load game data
@@ -99,7 +104,15 @@ socket.on('full game state transmission', function(gameState){
 
 //player joins game
 socket.on('player has joined game', function(player_join_details){
-    snCore.Event.Connection(player_join_details);
+
+    if(client_player_index !== undefined){//Game rendered and in-progress
+	snCore.Event.Connection(player_join_details);
+
+    }else{ // Still at the Splash stage.
+	console.log("Player Joined");
+	console.log(JSON.stringify(player_join_details, null, 2));
+	
+    }
 });
 
 
@@ -162,7 +175,10 @@ socket.on('snatch assert', function(SnatchUpdateMsg){
 
 
 socket.on('player disconnected', function(player_index){
-    snCore.Event.Disconnection(player_index);
+    //the player disconnection handling is only relevant once the game is rendered.
+    if(client_player_index !== undefined){
+	snCore.Event.Disconnection(player_index);
+    }
 });
 
 
