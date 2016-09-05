@@ -492,8 +492,7 @@ io.on('connection', function(socket){
 
 	    var myGame = myRoom.GameInstance;
 	    var gameObj = myGame.getGameObject();
-	    var colorChoices = myGame.provideColorChoice(socket.id)
-	    var msg_obj = {color_choice: colorChoices,
+	    var msg_obj = {colors_remaining: (myGame.getRemainingColorsArray()),
 			   players_t: gameObj.playerSet	    
 			  };
 

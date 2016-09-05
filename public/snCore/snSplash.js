@@ -2,16 +2,18 @@ snCore.Splash = {
 
     player_name: null,
     myFiveColors: undefined,
+    colorsStore: undefined,
     myFiveBBs: [],
     textObject_main: undefined,
     ringZoneTopPx: undefined,
     name_validated: false,
     players_t: undefined,
 
-    triggerPromptScreen: function(colorSet, players_t){
+    triggerPromptScreen: function(colors_remaining, players_t){
 	
 	//set the global objects
-	this.myFiveColors = colorSet;
+	this.colorsStore = colors_remaining;
+	this.myFiveColors = this.colorsStore.splice(0,5);
 	this.players_t = players_t;
 
 	//up until this point the canvas is transparent...
@@ -185,6 +187,24 @@ snCore.Splash = {
 
     },
 
+    colorChoiceConsumed: function(col){
+
+	var index_in_5 = this.myFiveColors.indexOf(col);
+	console.log("Just consumed index = ", index_in_5);
+
+	//perform a live replacement
+	if(index_in_5 != -1){
+	    this.myFiveColors[index_in_5] = this.colorsStore.splice(0,1)[0];
+	    this.myFiveBBs[index_in_5].setFill(this.myFiveColors[index_in_5]),
+	    snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+
+	}else{//just take it from the set...
+	    var consumed_i = this.colorsStore.indexOf(col);
+	    this.colorsStore.splice(consumed_i, 1);
+	}
+	
+    },
+
     shrinkAndRemoveBBwithIndex: function(index,extra_onComplete_function){
 	var shrinkMeBB = this.myFiveBBs[index];
 	var newLeft = shrinkMeBB.getLeft() + this.blipBlopRadius; 
@@ -231,6 +251,13 @@ snCore.Splash = {
 		fontSize: my_font_size,
 		fill: 'rgb(230,0,40)'
 	    });
+	    
+	    setTimeout(function(){
+		if(socket.connected == false){
+		    textObj.setText("Somehow, the websocket\nconnection is now closed.\nRefresh to try again...");
+		    snCore.Basic.more_animation_frames_at_least(3);//as an alternative to canvas.renderAll()
+		}
+	    },1000);
 
 	    //this needs to be a separate, later function call, since the first one alters the size...
 	    textObj.set({
@@ -241,7 +268,7 @@ snCore.Splash = {
 	    //send the data to the server
 	    var playerDetailsObj = {
 		name: snCore.Splash.player_name,
-		color_index: snCore.Splash.BB_chosen_was,
+		color: snCore.Splash.myFiveBBs[snCore.Splash.BB_chosen_was].getFill(),
 		reclaiming_player_index: undefined
 	    };
 	    PLAYER_JOINED_WITH_DETAILS(playerDetailsObj);

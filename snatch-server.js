@@ -6,7 +6,6 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
     var cum_hash = Math.round(Math.random()*100000);
     var player_previous_snatch_tileIDs = [];
     var player_index_from_socketKey_lkup = [];
-    var fiveColorsSent_socketKey = {};
     
     //container for "Game Data"
     var GD = {};
@@ -51,7 +50,6 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 		uOpt_penalty: false
 	    }
 	}
-	GD.emergency_colors = shuffle(GD.my_color_palette.slice(0));//duplicated data
 
 	console.log("New snatch game instance created on server");
     }
@@ -79,27 +77,22 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 	addPlayer: function(playerDetails,socket_key) {//todo implement this
 
 	    var rPID = playerDetails.reclaiming_player_index;
-	    if(rPID === undefined){
+	    if(rPID === undefined){ // Case 1: completely new player
 
-		var FiveCols = fiveColorsSent_socketKey[socket_key];
-		if(FiveCols !== undefined){
-		    var ci = playerDetails.color_index;
-		    var col = FiveCols.cols[ci];
-
-		    //return the unused colours to the list...
-		    if(fiveColorsSent_socketKey[socket_key].restore){
-			for(var i=0; i<5; i++){
-			    if(i == ci){continue;}
-			    GD.my_color_palette.push(fiveColorsSent_socketKey[socket_key].cols[i]);
-			}
-		    }
-		    delete fiveColorsSent_socketKey[socket_key];
+		var col = playerDetails.color;
+		var consumed_i = GD.my_color_palette.indexOf(col);
+		if(consumed_i !== undefined){
+		    // Remove the colour that this client chose. It is no longer available.
+		    GD.my_color_palette.splice(consumed_i, 1);
+		    console.log("Color " + col + " was chosen and removed from choices");
+		}else{
+		    console.log("The client chose the color " + col + " which cannot be found.");
 		}
 
 		var nm = playerDetails.name;
 		var newPlayer = {
 		    name : nm,
-		    color : col,
+		    color : col,//////////////////////////// no good now
 		    words : [],
 		    is_disconnected: false,
 		    is_finished: this.areAllTilesTurned(),// typically false!
@@ -107,7 +100,9 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 		};
 		GD.playerSet.push(newPlayer);
 		player_index_from_socketKey_lkup[socket_key] = GD.playerSet.length-1;
-	    }else{
+
+		
+	    }else{ // Case 2: rejoining player
 		GD.playerSet[rPID].is_disconnected = false;
 		GD.playerSet[rPID].socket_key = socket_key;
 		player_index_from_socketKey_lkup[socket_key] = rPID;
@@ -115,24 +110,8 @@ module.exports = function (nTiles, WordChecker, SaveGameData){
 	},
 
 	//we could make this an embedded class and be snazzy! Is there time??
-	provideColorChoice: function(socket_key) {
-
-	    var mySet = undefined;
-	    fiveColorsSent_socketKey[socket_key] = {};
-
-	    if(GD.my_color_palette.length >= 5){
-		mySet = GD.my_color_palette.splice(0,5);
-		fiveColorsSent_socketKey[socket_key].restore = true;
-		}
-	    else{
-		mySet = GD.emergency_colors.slice(0,5);
-		GD.emergency_colors = GD.emergency_colors.concat(GD.emergency_colors.splice(0,5));
-		fiveColorsSent_socketKey[socket_key].restore = false;
-	    }
-
-	    fiveColorsSent_socketKey[socket_key].cols = mySet;//remove 5 colours from the palette
-	    console.log("PALETTE:", GD.my_color_palette)
-	    return mySet;
+	getRemainingColorsArray: function() {
+	    return GD.my_color_palette;
 	},
 
 

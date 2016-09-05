@@ -175,12 +175,14 @@ module.exports = function (){
 	    //note that this still doesn't guarentee a 'final' point.
 	    for (var pi=0; pi < Scores_Timeseries.length; pi++){
 		var series_pi = Scores_Timeseries[pi];
-		if (series_pi.length > 0){//test if this player has had score so far at all
-		    var pi_sco = individual_score(SNi.player_words[pi]);
-		    series_pi.push({
-			x: SNi.time_elapsed,
-			y: pi_sco
-		    });
+		if (series_pi != undefined){//test if the array exists
+		    if (series_pi.length > 0){//test if this player has had score so far at all
+			var pi_sco = individual_score(SNi.player_words[pi]);
+			series_pi.push({
+			    x: SNi.time_elapsed,
+			    y: pi_sco
+			});
+		    }
 		}
 	    }
 

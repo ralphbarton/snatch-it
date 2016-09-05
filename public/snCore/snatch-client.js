@@ -55,9 +55,9 @@ socket.on('player color choices', function(msg_obj){
     snCore.Basic.makeCanvasFitWholeWindow();
 
     //the colour set is an array with objects <fabric color>, length 5
-    var colorSet = msg_obj.color_choice;
+    var colors_remaining = msg_obj.colors_remaining;
     var players_t = msg_obj.players_t;
-    snCore.Splash.triggerPromptScreen(colorSet, players_t);
+    snCore.Splash.triggerPromptScreen(colors_remaining, players_t);
 });
 
 
@@ -109,9 +109,8 @@ socket.on('player has joined game', function(player_join_details){
 	snCore.Event.Connection(player_join_details);
 
     }else{ // Still at the Splash stage.
-	console.log("Player Joined");
-	console.log(JSON.stringify(player_join_details, null, 2));
-	
+	//remove the joined player's color from the choices...
+	snCore.Splash.colorChoiceConsumed(player_join_details.player_object.color);
     }
 });
 
