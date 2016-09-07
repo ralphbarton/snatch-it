@@ -62,7 +62,7 @@ snCore.Keyboard = {
 
 
 
-	//Keystroke is a user-active eveny. Clear Persistent Toasts
+	//Keystroke is a user-active event. Clear Persistent Toasts
 	snCore.Toast.clear_all_persistent();
 
 
@@ -112,6 +112,9 @@ snCore.Keyboard = {
 		snCore.Toast.clear_all();
 		//also remove the keyboard-based picker to define a word
 		snCore.DefineWord.KPicker_cycler('clear');
+
+		//also, (and really just as an alternative for fixing display bugs at the root) let this redraw all.
+		snCore.Event.DrawAll();
 	    }
 
 	    if(keyPressed == '2'){
