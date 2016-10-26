@@ -86,16 +86,19 @@ snCore.Tile = {
 
 	if(to_state=="normal"){
 	    myTile.item(0).setFill('rgb(54,161,235)');
-	    myTile.item(1).setFill('yellow');
+	    myTile.item(1).setFill('#FF0');
 	    myTile.item(0).setStroke('#777');
 	}
 	else if(to_state=="new"){
 	    myTile.item(0).setFill('rgb(105,193,255)');
-	    myTile.item(1).setFill('yellow');
-	    myTile.item(0).setStroke('yellow');
+	    myTile.item(1).setFill('#FF0');
+	    myTile.item(0).setStroke('#FF0');
 	}
 	else if(to_state=="flipped"){//only to be called from within the function
 	    myTile.setOpacity(1.0);
+
+	    //Change opacity of the letter in YELLOW - somehow the command above stopped affecting it.
+	    myTile.item(1).setFill("rgba(255,255,0,1.0)");
 	}
 	else if(to_state=="skeletal"){
 	    myTile.item(0).setFill('black');
@@ -104,9 +107,15 @@ snCore.Tile = {
 	}
 	else if(to_state=="partial"){
 	    myTile.setOpacity(0.75);
+
+	    //Change opacity of the letter in YELLOW - somehow the command above stopped affecting it.
+	    myTile.item(1).setFill("rgba(255, 255, 0, 0.75)");
 	}
 	else if(to_state=="shadow"){
 	    myTile.setOpacity(0.40);
+
+	    //Change opacity of the letter in YELLOW - somehow the command above stopped affecting it.
+	    myTile.item(1).setFill("rgba(255, 255, 0, 0.4)");
 	}
 	else if(to_state=="invert"){
 	    myTile.item(1).setFill('black');
