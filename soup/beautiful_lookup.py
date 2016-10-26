@@ -39,8 +39,9 @@ def collinsdictionary_com__digest(page_html, search_word):
 
 
 
-
-        frequency_note = wrd_header.find('div', class_="word-frequency-img")["title"]
+        # I think the HTML element intended to be grabbed here was taken off http://www.collinsdictionary.com
+        # frequency_note = wrd_header.find('div', class_="word-frequency-img")["title"]
+        frequency_note = None
 
         # Word's defintions content
         main_content_tag = soup.select('div.content.definitions.ced')[0]
@@ -50,14 +51,14 @@ def collinsdictionary_com__digest(page_html, search_word):
 
         # 'hom' spans are containers for each gramatical group...
         n_definitions = 0
-        for direct_child_SENSE_TAG in main_content_tag.select("span.hom > span.sense"):
+        for direct_child_SENSE_TAG in main_content_tag.select("span.hom > div.sense"):
             # Note: the 'direct_child_SENSE_TAG' is the tag we manipulate the content of, before finally returning...
 
             gg_main = direct_child_SENSE_TAG.parent.find('span', class_=" gramGrp").get_text()
             gg_sub_tag  = direct_child_SENSE_TAG.find('span', class_=" gramGrp")
             gg_sub = "" if gg_sub_tag == None else " " + gg_sub_tag.get_text()
             gg_descriptor_txt = gg_main + gg_sub
-            
+
             # 1. TOTAL REMOVAL of tags....
             # 1.1 remove "sensenum" tag (but only the FIRST found, not it make not be present)
             for x in direct_child_SENSE_TAG.find_all('span', class_="sensenum", limit=1):
@@ -146,6 +147,7 @@ def collinsdictionary_com__digest(page_html, search_word):
         looper = 0
         LC = 0
         dry_lists = 0
+        
         while len(DefinitionHTML_list) < qty_defn:        
             mylist = defn_html_frag_dict[GG_array[looper]]
             if LC < len(mylist):
