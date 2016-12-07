@@ -369,16 +369,23 @@
 
 	      <!-- Graph here -->
 	      <div class="carousel-cell stats-cell">
+		<div id="myChart-container">
+		  <canvas id="myChart"></canvas>
+		</div>
+	      </div>
+
+	      <!-- Game stats block A -->
+	      <div class="carousel-cell stats-cell">
 		<p>
-		  Hello World 1
+		  Placeholder A for game stats
 		</p>
 	      </div>
 
-	      <!-- Graph here -->
+	      <!-- Game stats block B -->
 	      <div class="carousel-cell stats-cell">
-		<div id="myChart-container" style="display:inline-block;">
-		  <canvas id="myChart"></canvas>
-		</div>
+		<p>
+		  Placeholder B for game stats
+		</p>
 	      </div>
 
 	    </div>

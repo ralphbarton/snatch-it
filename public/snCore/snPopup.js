@@ -269,7 +269,8 @@ snCore.Popup = {
 			xAxes: [{
 			    type: 'time',
 			    ticks: {
-				beginAtZero: true
+				beginAtZero: true,
+				fontColor: 'white'// X-axis time tickmarks color
 			    },
 			    time: {
 				unit: 'minute',
@@ -280,7 +281,12 @@ snCore.Popup = {
 			    },
 			    scaleLabel: {
 				display: true,
+				fontColor: 'white', // X-axis axis-title colour
 				labelString: time_axis_label
+			    },
+			    gridLines: {
+				color: 'rgba(255,255,255,0.3)',
+				zeroLineColor: 'rgba(255,255,255,0.45)'
 			    }
 			}],
 			yAxes: [{
@@ -290,18 +296,27 @@ snCore.Popup = {
 				    return Math.round(value);
 				},
 				stepSize: ( score_max>5 ? undefined : 1 ),//undefined will mean auto.
-				min: 0
+				min: 0,
+				fontColor: 'white' // y-axis score tick-marks colour
+			    },
+			    gridLines: {
+				color: 'rgba(255,255,255,0.3)',
+				zeroLineColor: 'rgba(255,255,255,0.45)'
 			    }
 			}]
 		    },
 		    legend: {
 			position: 'bottom',
-			display: true
+			display: true,
+			labels: {
+			    fontColor: 'white' // legend font colour
+			}
 		    },
 		    title: {
 			display: true,
 			text: "Scores Plot",
-			fontSize: 28
+			fontSize: 28,
+			fontColor: 'white' // title font colour
 		    },
 		    maintainAspectRatio: false,
 		    responsive: true
