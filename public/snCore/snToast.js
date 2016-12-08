@@ -34,56 +34,13 @@ snCore.Toast = {
 	this.VisibleToast_keys_list.push(t_key);
 	this.Active_byKey[t_key] = true;
 
-	// 1.2 Add to the DOM
+	// 1.2 Add to the DOM and put in a free position using algorithm
 	var $NewToast = $( "<div/>", {id: t_key}).addClass("ToastGrey ToastCentral ToastIn").html(my_string);
 	$("#canv-inside").append($NewToast);
+	this.positionToastVertically($NewToast);
 
-	// 2. Determine Vertical Placement for new Toast - a two step algorithm
 
-	// 2.1 Step 1 - Decide the upper boundary which all toasts must be beneath
-	var ClientZone_Title = snCore.Zones.PlayerZone[0].Zone_FabObjs[1];
-	var ToastTop_current_client_zone_top = ClientZone_Title.top + ClientZone_Title.height;
-
-	var Client_Words_Grps = snCore.Words.TileGroupsArray[client_player_index];
-	var ToastTop_current_client_words = 0;
-        for(var i = 0; i < Client_Words_Grps.length; i++){
-	    ToastTop_current_client_words = Math.max(ToastTop_current_client_words, Client_Words_Grps[i].getTop());
-        }
-
-	var H_spacer = snCore.Tile.dims.ts + snCore.Tile.stdDimention * 0.35;
-	var toast_top = Math.max(this.ToastTop_consumed_words + H_spacer,
-				 this.ToastTop_snatched_word + H_spacer,
-				 this.ToastTop_zone_inner_final,
-				 this.ToastTop_client_words_final + H_spacer,
-				 ToastTop_current_client_words +  H_spacer,
-				 ToastTop_current_client_zone_top);
-	this.reset_ToastTop_params();
-
-	// 2.2 Step 2 - keep shuffling it down until it does not interfere
-	// i.e. this 'fits it around' all existing toasts which are already there
-	var toast_spacing = snCore.Tile.stdDimention * 0.18;
-	for(var i = 0; i < this.VisibleToast_keys_list.length; i++){
-	    var t_key_i = this.VisibleToast_keys_list[i];
-	    var $ExistingToast = $("#"+t_key_i);
-
-	    var Toast_i_top = $ExistingToast.position().top;
-	    var Toast_i_height = $ExistingToast.outerHeight();
-	    var Toast_i_bot = Toast_i_top + Toast_i_height + toast_spacing;
-	    var toast_height = $NewToast.outerHeight();
-	    var toast_bot = toast_top + toast_height + toast_spacing;
-
-	    // This -IF- statement tests for Interference
-	    // if found, the looping variable is reset. Thus a clean sweep is required for loop to terminate
-	    if((Toast_i_top <= toast_bot)&&(Toast_i_bot >= toast_top)){//Interference detected
-		toast_top = Toast_i_bot + 0.5;//shuffle down the candidate position
-		i = -1;//reset the loop (it will get imcremented, so must here make it -1.
-	    }
-	}
-	
-	// 2.3 Now, place the Toast in position
-	$NewToast.css("top", (toast_top + "px"));
-
-	// 3. Certain styles are dependent on screen scaling. Apply these to the DOM object here.
+	// 2. Certain styles are dependent on screen scaling. Apply these to the DOM object here.
 	var sd = snCore.Tile.stdDimention;
 	$NewToast.css("font-size", (sd*0.35)+"px");
 	$NewToast.css("-moz-border-radius", (sd*0.1)+"px");
@@ -92,7 +49,7 @@ snCore.Toast = {
 	// why can't I use jQuery to change the properties of the CSS class universally whilst no objects of that class exist?
 
 
-	// 4. Apply options to the generated Toast...
+	// 3. Apply options to the generated Toast...
 
 	/*
 	ToastOptions = {
@@ -156,12 +113,89 @@ snCore.Toast = {
 	    }
 	}
 
-	// 5. Cause links within Toast Text to open in a new window (this will apply to links in str or frags...)
+	// 4. Cause links within Toast Text to open in a new window (this will apply to links in str or frags...)
 	$NewToast.find( "a" ).attr("target","_blank");
 	$NewToast.find( ".samewin" ).attr("target","_self");
 
 	return t_key;
     },
+
+
+    get_ToastTop: function(){
+
+	var ClientZone_Title = snCore.Zones.PlayerZone[0].Zone_FabObjs[1];
+	var ToastTop_current_client_zone_top = ClientZone_Title.top + ClientZone_Title.height;
+
+	var Client_Words_Grps = snCore.Words.TileGroupsArray[client_player_index];
+	var ToastTop_current_client_words = 0;
+        for(var i = 0; i < Client_Words_Grps.length; i++){
+	    ToastTop_current_client_words = Math.max(ToastTop_current_client_words, Client_Words_Grps[i].getTop());
+        }
+
+	var H_spacer = snCore.Tile.dims.ts + snCore.Tile.stdDimention * 0.35;
+
+	return Math.max(this.ToastTop_consumed_words + H_spacer,
+			this.ToastTop_snatched_word + H_spacer,
+			this.ToastTop_zone_inner_final,
+			this.ToastTop_client_words_final + H_spacer,
+			ToastTop_current_client_words + H_spacer,
+			ToastTop_current_client_zone_top);
+    },
+
+
+    positionToastVertically: function($NewToast){
+	// Determine Vertical Placement for new Toast - a two step algorithm
+
+	// Step 1 - Decide the upper boundary which all toasts must be beneath
+
+	var H_spacer = snCore.Tile.dims.ts + snCore.Tile.stdDimention * 0.35;
+	var toast_top = this.get_ToastTop();
+	this.reset_ToastTop_params();
+
+	// Step 2 - keep shuffling it down until it does not interfere
+	// i.e. this 'fits it around' all existing toasts which are already there
+	var toast_spacing = snCore.Tile.stdDimention * 0.18;
+	for(var i = 0; i < this.VisibleToast_keys_list.length; i++){
+	    var t_key_i = this.VisibleToast_keys_list[i];
+	    var $ExistingToast = $("#"+t_key_i);
+
+	    var Toast_i_top = $ExistingToast.position().top;
+	    var Toast_i_height = $ExistingToast.outerHeight();
+	    var Toast_i_bot = Toast_i_top + Toast_i_height + toast_spacing;
+	    var toast_height = $NewToast.outerHeight();
+	    var toast_bot = toast_top + toast_height + toast_spacing;
+
+	    // This -IF- statement tests for Interference
+	    // if found, the looping variable is reset. Thus a clean sweep is required for loop to terminate
+	    if((Toast_i_top <= toast_bot)&&(Toast_i_bot >= toast_top)){//Interference detected
+		toast_top = Toast_i_bot + 0.5;//shuffle down the candidate position
+		i = -1;//reset the loop (it will get imcremented, so must here make it -1.
+	    }
+	}
+	
+	// Step 3 - Now, place the Toast in position
+	$NewToast.css("top", (toast_top + "px"));
+
+    },
+
+
+    // this function will move downwards any Toasts which are now overlapping words...
+    ToastsJumpDown: function(reposition_all){
+	console.log("shuffle down commanded");
+	var toasts_upper_boundary = this.get_ToastTop();
+	for(var i = 0; i < this.VisibleToast_keys_list.length; i++){
+	    var t_key_i = this.VisibleToast_keys_list[i];
+	    var $ExistingToast = $("#"+t_key_i);
+	    console.log("checking toast", t_key_i);
+	    console.log("boundary", toasts_upper_boundary);
+	    console.log("v pos = ", $ExistingToast.position().top);
+	    // Condition for v-reposition command (too high up on screen / apply to all)
+	    if((reposition_all)||($ExistingToast.position().top < toasts_upper_boundary)){
+		this.positionToastVertically($ExistingToast);
+	    }
+	}
+    },
+
 
     holdToast: function(t_key, via_kb){
 	var this_toast = $("#"+t_key);

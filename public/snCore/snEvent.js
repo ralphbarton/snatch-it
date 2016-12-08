@@ -161,6 +161,7 @@ snCore.Event = {
 		canvas.clear();
 		snCore.Event.DrawAll();
 		snCore.Toast.showToast("Scale changed to fit tiles...");
+		snCore.Toast.ToastsJumpDown(true);//true means reposition ALL existing toasts...
 	    }, 2000); //2 seconds after turn, apply the resize. This avoids interference with animate in tile...
 	}
 

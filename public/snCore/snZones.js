@@ -304,7 +304,7 @@ snCore.Zones = {
 	    }
 	}
 
-	// 4. Now move all of the player zones, and their contained words
+	// 3. Now move all of the player zones, and their contained words
 	var PlayerZoneProps = this.getZoneProperties("player");
 	for (var i = 0; i < snCore.Zones.PlayerZone.length; i++){
 
@@ -318,13 +318,13 @@ snCore.Zones = {
 						   );
 	}
 
-	// 5. Some side effect code to Alter where Toasts are positioned....
+	// 4. Some side effect code to Alter where Toasts are positioned....
 
-	// 5.1 Set a Toast max-height parameter using the Final Zone position...
+	// 4.1 Set a Toast max-height parameter using the Final Zone position...
 	var Client_Zone_Size = Positions.ZoneSizes[0];
 	snCore.Toast.ToastTop_zone_inner_final = Client_Zone_Size.Top + PlayerZoneProps.ZoneSty.fontsize;	
 
-	// 5.2 set another Toast max-height parameter using the final word arrangement.
+	// 4.2 set another Toast max-height parameter using the final word arrangement.
 	var cli_Arrangement_noH = Positions.ArrangementsArray_noH[0];
 	var pzwb = PlayerZoneProps.WordBounds;
 	var cli_Arrangement = snCore.Words.WordArrangementSetHeight(cli_Arrangement_noH, pzwb, Client_Zone_Size.Top);
@@ -336,6 +336,8 @@ snCore.Zones = {
         }
 	snCore.Toast.ToastTop_client_words_final = ToastTop_client_words;
 
+	// 4.3 Trigger rearrangment of already placed Toasts guarenteed not to overlap Client Word tiles...
+	snCore.Toast.ToastsJumpDown();
 
 	//return the array: [{Top: , Height: }, {}, ...] for all zones
 	return Positions;
