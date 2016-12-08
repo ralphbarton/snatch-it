@@ -6,6 +6,7 @@ snCore.Toast = {
     ToastTop_snatched_word: 0,
     ToastTop_client_words_final: 0,
     ToastTop_zone_inner_final: 0,
+    Active_byKey: {},
 
     reset_ToastTop_params: function(){
 	this.ToastTop_consumed_words = 0;
@@ -31,6 +32,7 @@ snCore.Toast = {
 	var t_key = "toast-n" + this.ToastCounter; 
 	this.ToastCounter++;
 	this.VisibleToast_keys_list.push(t_key);
+	this.Active_byKey[t_key] = true;
 
 	// 1.2 Add to the DOM
 	var $NewToast = $( "<div/>", {id: t_key}).addClass("ToastGrey ToastCentral ToastIn").html(my_string);
@@ -105,6 +107,7 @@ snCore.Toast = {
 	if (ToastOptions == undefined){
 	    //the default behaviour
 	    this.setToastRemTimeout(t_key);
+
 	}else{
 	    if(ToastOptions.persistent == true){
 		// add cross in corner to close it
@@ -179,11 +182,9 @@ snCore.Toast = {
     //these hash tables use t_key as their keys
     // TODO: can't 3 hash tables be combined into one, given they use the same keys? This is housekeeping work.
     timeoutIDs: {},
-    Active_byKey: {},
 
     //this will remove any existing timeouts to remove the toast indexed by t_key
     setToastRemTimeout: function(t_key, ToastRemovalOptions){
-
 	// default options values
 	var toast_duration = 4000;
 	var fast = false;
@@ -214,7 +215,6 @@ snCore.Toast = {
 	var old_timeoutID = this.timeoutIDs[t_key];
 	this.timeoutIDs[t_key] = new_timoutID;
 	clearTimeout(old_timeoutID);
-	this.Active_byKey[t_key] = true;
     },
 
     persistent_toast_list_byKey: [],
@@ -222,6 +222,8 @@ snCore.Toast = {
 	$.each(this.persistent_toast_list_byKey, function( index, value ) {
 	    snCore.Toast.setToastRemTimeout(value, {instant: true});
 	});
+	//now they're all gone, the list must be erased. Lack of this line of code was causing display errors.
+	this.persistent_toast_list_byKey = [];
     },
 
     clear_all: function(){
