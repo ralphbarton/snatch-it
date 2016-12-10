@@ -150,9 +150,6 @@ def collinsdictionary_com__digest(page_html, search_word):
         LC = 0
         dry_lists = 0
      
-        # debug logging
-        print ("==GG_array", GG_array)
-   
         while len(DefinitionHTML_list) < qty_defn:        
             mylist = defn_html_frag_dict[GG_array[looper]]
             if LC < len(mylist):
