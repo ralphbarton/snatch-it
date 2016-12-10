@@ -150,13 +150,13 @@ snCore.Toast = {
 
 	var H_spacer = snCore.Tile.dims.ts + snCore.Tile.stdDimention * 0.35;
 	var toast_top = this.get_ToastTop();
-	this.reset_ToastTop_params();
 
 	// Step 2 - keep shuffling it down until it does not interfere
 	// i.e. this 'fits it around' all existing toasts which are already there
 	var toast_spacing = snCore.Tile.stdDimention * 0.18;
 	for(var i = 0; i < this.VisibleToast_keys_list.length; i++){
 	    var t_key_i = this.VisibleToast_keys_list[i];
+	    if(t_key_i == $NewToast.attr("id")){continue;}//don't test interference with self.
 	    var $ExistingToast = $("#"+t_key_i);
 
 	    var Toast_i_top = $ExistingToast.position().top;
@@ -167,6 +167,8 @@ snCore.Toast = {
 
 	    // This -IF- statement tests for Interference
 	    // if found, the looping variable is reset. Thus a clean sweep is required for loop to terminate
+	    // the values compared here are the current ones (actual position on-screen during animation)
+	    // TODO - add as meta-data to the div tag the destination position, and use this in calculations.
 	    if((Toast_i_top <= toast_bot)&&(Toast_i_bot >= toast_top)){//Interference detected
 		toast_top = Toast_i_bot + 0.5;//shuffle down the candidate position
 		i = -1;//reset the loop (it will get imcremented, so must here make it -1.
@@ -181,23 +183,30 @@ snCore.Toast = {
 
     // this function will move downwards any Toasts which are now overlapping words...
     ToastsJumpDown: function(reposition_all){
-	console.log("shuffle down commanded");
-	var toasts_upper_boundary = this.get_ToastTop();
-	for(var i = 0; i < this.VisibleToast_keys_list.length; i++){
-	    var t_key_i = this.VisibleToast_keys_list[i];
-	    var $ExistingToast = $("#"+t_key_i);
+	setTimeout(function(){
+	    if(snCore.Toast.VisibleToast_keys_list.length > 0){
+		var toasts_upper_boundary = snCore.Toast.get_ToastTop();
 
-	    // Condition for v-reposition command (too high up on screen / apply to all)
-	    if((reposition_all)||($ExistingToast.position().top < toasts_upper_boundary)){
-		this.positionToastVertically($ExistingToast);
+		for(var i = 0; i < snCore.Toast.VisibleToast_keys_list.length; i++){
+		    var t_key_i = snCore.Toast.VisibleToast_keys_list[i];
+		    var $ExistingToast = $("#"+t_key_i);
+
+		    // Condition for v-reposition command (too high up on screen / apply to all)
+		    if((reposition_all)||($ExistingToast.position().top < toasts_upper_boundary)){
+			snCore.Toast.positionToastVertically($ExistingToast);
+		    }
+		}
 	    }
-	}
+	    snCore.Toast.reset_ToastTop_params();//only needed on a shuffling event...
+	}, 10); // Delay the step of toast shuffling, so that all NEW toasts are drawn first... This is still imperfect
+	// the issue I could foresee would be if multiple toasts slide, they could slide into each other. The more complete solution
+	// would attach a final_top variable to every Toast, and check for conflicts using this...
     },
 
 
     holdToast: function(t_key, via_kb){
 	var this_toast = $("#"+t_key);
-	snCore.Toast.setToastRemTimeout(t_key, {duration: 120000});//2 minutes
+	this.setToastRemTimeout(t_key, {duration: 120000});//2 minutes
 	$("#m1"+t_key).removeClass("S1").addClass("S2").text((via_kb?"ESC":"click")+" to clear");
 	this_toast.click(function(){//get rid of
 	    snCore.Toast.setToastRemTimeout(t_key, {instant: true});
@@ -220,6 +229,7 @@ snCore.Toast = {
 	// default options values
 	var toast_duration = 4000;
 	var fast = false;
+	var err = new Error();//record the stack at this time (these is a minor and subtle bug that this will help with).
 
 	if (ToastRemovalOptions != undefined){
 	    fast = ToastRemovalOptions.instant || fast;
