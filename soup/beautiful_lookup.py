@@ -147,7 +147,10 @@ def collinsdictionary_com__digest(page_html, search_word):
         looper = 0
         LC = 0
         dry_lists = 0
-        
+     
+        # debug logging
+        print ("==GG_array", GG_array)
+   
         while len(DefinitionHTML_list) < qty_defn:        
             mylist = defn_html_frag_dict[GG_array[looper]]
             if LC < len(mylist):
@@ -292,14 +295,17 @@ class MyServerProtocol(WebSocketServerProtocol):
             def collinsdictionary_com__fail(error_obj):
                 print("==webpage retrieval FAILED (collinsdictionary.com) for query "+my_query+"==")
                 print(error_obj)
-                null_response['properties']['source'] = 'http://www.collinsdictionary.com/dictionary/english/'
-                self.sendMessage(json.dumps(null_response), False)
+                #null_response['properties']['source'] = 'http://www.collinsdictionary.com/dictionary/english/'
+                #self.sendMessage(json.dumps(null_response), False)
 
-            # GET webpage, and involke callback upon reciept of data
-            #grabber_1 = client.getPage('http://www.dictionary.com/browse/' + payload)
-            #grabber_1.addCallback(dictionary_com__handler)
-            #grabber_1.addErrback(dictionary_com__fail)
+                # in the case of Collins fail, next try a dictionary.com Lookup...
+                # GET webpage, and involke callback upon reciept of data
+                grabber_1 = client.getPage('http://www.dictionary.com/browse/' + payload)
+                grabber_1.addCallback(dictionary_com__handler)
+                grabber_1.addErrback(dictionary_com__fail)
 
+
+            # This code runs unconditionally upon message. May trigger grabber 1.
             # GET webpage, and involke callback upon reciept of data
             grabber_2 = client.getPage('http://www.collinsdictionary.com/dictionary/english/' + payload)
             grabber_2.addCallback(collinsdictionary_com__handler)
