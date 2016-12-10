@@ -51,13 +51,15 @@ def collinsdictionary_com__digest(page_html, search_word):
 
         # 'hom' spans are containers for each gramatical group...
         n_definitions = 0
-        for direct_child_SENSE_TAG in main_content_tag.select("span.hom > div.sense"):
+        #for direct_child_SENSE_TAG in main_content_tag.select("span.hom > div.sense"): // SPAN changed to DIV ???
+        for direct_child_SENSE_TAG in main_content_tag.select("div.hom > div.sense"):
             # Note: the 'direct_child_SENSE_TAG' is the tag we manipulate the content of, before finally returning...
 
-            gg_main = direct_child_SENSE_TAG.parent.find('span', class_=" gramGrp").get_text()
+            gg_main = direct_child_SENSE_TAG.parent.select('span.gramGrp')[0].get_text()
             gg_sub_tag  = direct_child_SENSE_TAG.find('span', class_=" gramGrp")
             gg_sub = "" if gg_sub_tag == None else " " + gg_sub_tag.get_text()
             gg_descriptor_txt = gg_main + gg_sub
+
 
             # 1. TOTAL REMOVAL of tags....
             # 1.1 remove "sensenum" tag (but only the FIRST found, not it make not be present)
