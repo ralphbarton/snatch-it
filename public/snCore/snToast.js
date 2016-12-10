@@ -58,6 +58,7 @@ snCore.Toast = {
 	    holdable: boolean
 	    via_KB: boolean (for the case where Toast was triggered via the keyboard, alter its disappearance behaviour)
 	    ToastType: string (the options are: 'defn', etc....)
+	    defn_source: <string-url>
 	}
 	*/
 
@@ -82,7 +83,9 @@ snCore.Toast = {
 	    }
 
 	    if(ToastOptions.ToastType !== undefined){
-		$NewToast.addClass("typeClass-"+ToastOptions.ToastType);
+		$NewToast.addClass("typeClass-" + ToastOptions.ToastType);
+		//if it's a definition toast, store away source as data for the DOM object...
+		$NewToast.data({defn_source: ToastOptions.defn_source})
 	    }
 
 	    if(ToastOptions.HTML_frag !== undefined){
@@ -205,10 +208,24 @@ snCore.Toast = {
 
 
     holdToast: function(t_key, via_kb){
-	var this_toast = $("#"+t_key);
-	this.setToastRemTimeout(t_key, {duration: 120000});//2 minutes
+	var $thisToast = $("#"+t_key);
+	// 1. Replace the Timout for disappearance. Use 2 minutes
+	this.setToastRemTimeout(t_key, {duration: 120000});
+
+	// 2. DOM - change the annotation
 	$("#m1"+t_key).removeClass("S1").addClass("S2").text((via_kb?"ESC":"click")+" to clear");
-	this_toast.click(function(){//get rid of
+
+	// 2.1 DOM (add the source website)
+	var url = $thisToast.data("defn_source");
+	$thisToast.append(
+	    $('<div/>').addClass("D-Source").html("from ").append(
+		$('<a/>').attr("href", url).attr("target","_blank").text(url)
+	    )
+	);
+
+	// 3. remove original click handler and add functionality where clicking it mow makes it disappear
+	$thisToast.unbind("click");
+	$thisToast.click(function(){//get rid of
 	    snCore.Toast.setToastRemTimeout(t_key, {instant: true});
 	});
     },
