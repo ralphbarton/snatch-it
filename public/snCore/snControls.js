@@ -300,9 +300,11 @@ snCore.Controls = {
 			snCore.Controls.setButtonDisabled(1, false);//un-disable the "Turn Letter" button
 
 			//also, remove any toast that relates to the Turn being disabled...
-			snCore.Toast.setToastRemTimeout(snCore.Controls.turn_tk, {instant: true});//the true means clear fast...
-			snCore.Controls.turn_tk = undefined;// to not hold a reference to a now deleted toast.
-			
+			if(snCore.Controls.turn_tk != undefined){
+			    snCore.Toast.setToastRemTimeout(snCore.Controls.turn_tk, {instant: true});//the true means clear fast...
+			    snCore.Controls.turn_tk = undefined;// to not hold a reference to a now deleted toast.
+			}
+
 			return true; //this means the function call chain shall terminate
 		    }else{
 			return false; // function call chain to continue

@@ -186,9 +186,7 @@ snCore.Toast = {
 	for(var i = 0; i < this.VisibleToast_keys_list.length; i++){
 	    var t_key_i = this.VisibleToast_keys_list[i];
 	    var $ExistingToast = $("#"+t_key_i);
-	    console.log("checking toast", t_key_i);
-	    console.log("boundary", toasts_upper_boundary);
-	    console.log("v pos = ", $ExistingToast.position().top);
+
 	    // Condition for v-reposition command (too high up on screen / apply to all)
 	    if((reposition_all)||($ExistingToast.position().top < toasts_upper_boundary)){
 		this.positionToastVertically($ExistingToast);
@@ -237,10 +235,16 @@ snCore.Toast = {
 
 		//find the array index of the toast concerned (by its key)
 		var kill_index = snCore.Toast.VisibleToast_keys_list.indexOf(t_key);
-		//remove this toast key from the array: it is GONE!
-		snCore.Toast.VisibleToast_keys_list.splice(kill_index, 1);
-		$("#"+t_key).remove();
-		snCore.Toast.Active_byKey[t_key] = false;
+		if( kill_index != -1){
+
+		    //remove this toast key from the array: it is GONE!
+		    snCore.Toast.VisibleToast_keys_list.splice(kill_index, 1);
+		    $("#"+t_key).remove();
+		    snCore.Toast.Active_byKey[t_key] = false;
+		}else{
+		    console.log("A timeout for removing Toast " + t_key + " occured, but it's already gone!" );
+		    console.log(err.stack);
+		}
 
 	    }, 400 + 10);//delete 10ms after fade out is complete.
 
@@ -261,20 +265,17 @@ snCore.Toast = {
     },
 
     clear_all: function(){
-	for (var my_tk in this.Active_byKey) {
-	    if (this.Active_byKey.hasOwnProperty(my_tk)) {
-		snCore.Toast.setToastRemTimeout(my_tk, {instant: true});//the true means clear fast...
-	    }
+	for(var i = 0; i < this.VisibleToast_keys_list.length; i++){
+	    var t_key_i = this.VisibleToast_keys_list[i];
+	    snCore.Toast.setToastRemTimeout(t_key_i, {instant: true});//the true means clear fast...
 	}
     },
 
     clear_all_definitions: function(){
-	for (var my_tk in this.Active_byKey) {
-	    if (this.Active_byKey.hasOwnProperty(my_tk)) {
-		//test if it is a definition toast (type information stored in DOM)
-		if($("#"+my_tk).hasClass("typeClass-defn")){
-		    snCore.Toast.setToastRemTimeout(my_tk, {instant: true});//the true means clear fast...
-		}
+	for(var i = 0; i < this.VisibleToast_keys_list.length; i++){
+	    var t_key_i = this.VisibleToast_keys_list[i];
+	    if($("#"+t_key_i).hasClass("typeClass-defn")){
+		snCore.Toast.setToastRemTimeout(t_key_i, {instant: true});//the true means clear fast...
 	    }
 	}
     },
