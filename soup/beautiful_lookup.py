@@ -24,18 +24,14 @@ def collinsdictionary_com__digest(page_html, search_word):
     wrd_header = soup.find('div', class_="entry_header")
     if wrd_header != None:
         
-        #remove unwanted number 1's from the heading (class='homnum')
-        wrd_header_H1 = wrd_header.find('h1')
-        if wrd_header_H1 != None:
-            for x in wrd_header_H1.find_all('span', class_='homnum'):
-                x.decompose()
-            word_actual = wrd_header_H1.get_text()
-        # This copy-pasted block of code from above is because the H1 has been changed to a H2. Retain backward compat...
+        # On the latest version of the side, and <h2> tag shows the actual word retrieved in the dictionary
         wrd_header_H2 = wrd_header.find('h2')
         if wrd_header_H2 != None:
+            #remove unwanted number 1's from the heading (class='homnum')
             for x in wrd_header_H2.find_all('span', class_='homnum'):
                 x.decompose()
-            word_actual = wrd_header_H2.get_text()
+            #This assumes the first span class orth within the <h2> simply contains the word looked up. 
+            word_actual = wrd_header_H2.select("span.orth")[0].get_text()
 
 
 
@@ -111,7 +107,7 @@ def collinsdictionary_com__digest(page_html, search_word):
                 x['class'] = "dbox-bold"
             # 3.5 <a> tags need no custom class, but href needs completing:
             for x in direct_child_SENSE_TAG.find_all('a'):
-                x["href"] = "http://www.collinsdictionary.com/dictionary/english/" + x["href"]# additionall
+                x["href"] = "http://www.collinsdictionary.com" + x["href"] # turn hrefs from relative to absolute 
                 del x["class"]
 
             # 4. MERGING of adjacent tags of same type
