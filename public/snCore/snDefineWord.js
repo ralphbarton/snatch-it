@@ -85,7 +85,7 @@ snCore.DefineWord = {
 	    holdable: true,
 	    via_KB: via_kb,
 	    ToastType: 'defn',
-	    defn_source: DefnObj.properties.source
+	    defn_source: invalid_defn ? "(valid dictionary data not recieved)" : DefnObj.properties.source
 	});
     },
 

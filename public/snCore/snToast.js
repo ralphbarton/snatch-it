@@ -6,7 +6,6 @@ snCore.Toast = {
     ToastTop_snatched_word: 0,
     ToastTop_client_words_final: 0,
     ToastTop_zone_inner_final: 0,
-    Active_byKey: {},
 
     reset_ToastTop_params: function(){
 	this.ToastTop_consumed_words = 0;
@@ -32,7 +31,6 @@ snCore.Toast = {
 	var t_key = "toast-n" + this.ToastCounter; 
 	this.ToastCounter++;
 	this.VisibleToast_keys_list.push(t_key);
-	this.Active_byKey[t_key] = true;
 
 	// 1.2 Add to the DOM and put in a free position using algorithm
 	var $NewToast = $( "<div/>", {id: t_key}).addClass("ToastGrey ToastCentral ToastIn").html(my_string);
@@ -267,7 +265,6 @@ snCore.Toast = {
 		    //remove this toast key from the array: it is GONE!
 		    snCore.Toast.VisibleToast_keys_list.splice(kill_index, 1);
 		    $("#"+t_key).remove();
-		    snCore.Toast.Active_byKey[t_key] = false;
 		}else{
 		    console.log("A timeout for removing Toast " + t_key + " occured, but it's already gone!" );
 		    console.log(err.stack);

@@ -435,7 +435,9 @@ snCore.Controls = {
 
 		$("#q12").html(time_remaining);
 
-		var t_active = snCore.Toast.Active_byKey[snCore.Controls.turn_tk];
+		// Determine if the Turn-blocking toast is Active and STORE
+		var t_active = snCore.Toast.VisibleToast_keys_list.indexOf(snCore.Controls.turn_tk) != -1;
+		
 		if (time_remaining == 0){
 		    //the point is that in this case we DON'T make any recursive call...
 		}else if(t_active){
