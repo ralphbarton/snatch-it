@@ -178,6 +178,8 @@ snCore.Words = {
 	return Arrangement;
     },
 
+    // This non-side-effect function transforms an *Arrangement* into a
+    // a new *Arrangement with the height set (i.e. relevant to a zone)
     WordArrangementSetHeight: function(Arrangement, WordBounds, Top){
 	// Arrangement
 	// data...

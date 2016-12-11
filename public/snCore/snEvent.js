@@ -208,6 +208,17 @@ snCore.Event = {
 	// 3. Determine if zones need to be squeezed downwards because the tile grid has grown vertically...
 	if(snCore.Grid.GetGridBottomPx() != old_grid_bottom_px){
 	    snCore.Zones.AnimateResizeAllZones(snCore.Basic.ani.sty_Resize, null);
+
+	    // 3.1 in the special case where this is an Auto flip which has cause squeezing...
+	    // as a crude fix to any interrupted-animation glitches, redraw the whole canvas in 1.5 seconds time
+	    // $('#uOpt_flippy').prop('checked') - "null player index" can anyway only happen when "Flippy rule" is active.
+	    if(player_index == null){
+		this.resizeTimeoutID = setTimeout(function(){
+		    snCore.Event.DrawAll();
+		}, 1500);
+	    }
+
+
 	}
 
 	// 4. Modify the "Turn Letter" button, based upon who turned the tile (start timer or cancel timer)
@@ -229,7 +240,6 @@ snCore.Event = {
 	if(client_is_snatcher){snCore.Spell.CancelWord();}
 	var client_is_snatcher = client_player_index == snatching_player.index;
 	var snatcher_first_word = snatching_player.words.length == 0;
-
 
 	// 2. Tile Detachment (from existing words & fresh). Tile & Words data structure update (incl. "tileset", "players[i].words")
 
@@ -548,7 +558,6 @@ snCore.Event = {
 	
 	this.resizeTimeoutID = setTimeout(function(){
 	    snCore.DefineWord.KPicker_cycler('clear');
-	    canvas.clear();
 	    snCore.Basic.makeCanvasFitWholeWindow();
 	    snCore.Event.DrawAll();
 	}, 200); //inject 0.2 second delay ("size stablisation time") before redrawing all...
