@@ -160,7 +160,7 @@ snCore.Toast = {
 	    if(t_key_i == $NewToast.attr("id")){continue;}//don't test interference with self.
 	    var $ExistingToast = $("#"+t_key_i);
 
-	    var Toast_i_top = $ExistingToast.position().top;
+	    var Toast_i_top = $ExistingToast.data("final_top");
 	    var Toast_i_height = $ExistingToast.outerHeight();
 	    var Toast_i_bot = Toast_i_top + Toast_i_height + toast_spacing;
 	    var toast_height = $NewToast.outerHeight();
@@ -178,30 +178,26 @@ snCore.Toast = {
 	
 	// Step 3 - Now, place the Toast in position
 	$NewToast.css("top", (toast_top + "px"));
-
+	$NewToast.data({final_top: toast_top});
     },
 
 
     // this function will move downwards any Toasts which are now overlapping words...
     ToastsJumpDown: function(reposition_all){
-	setTimeout(function(){
-	    if(snCore.Toast.VisibleToast_keys_list.length > 0){
-		var toasts_upper_boundary = snCore.Toast.get_ToastTop();
+	if(this.VisibleToast_keys_list.length > 0){
+	    var toasts_upper_boundary = this.get_ToastTop();
 
-		for(var i = 0; i < snCore.Toast.VisibleToast_keys_list.length; i++){
-		    var t_key_i = snCore.Toast.VisibleToast_keys_list[i];
-		    var $ExistingToast = $("#"+t_key_i);
+	    for(var i = 0; i < this.VisibleToast_keys_list.length; i++){
+		var t_key_i = this.VisibleToast_keys_list[i];
+		var $ExistingToast = $("#"+t_key_i);
 
-		    // Condition for v-reposition command (too high up on screen / apply to all)
-		    if((reposition_all)||($ExistingToast.position().top < toasts_upper_boundary)){
-			snCore.Toast.positionToastVertically($ExistingToast);
-		    }
+		// Condition for v-reposition command (too high up on screen / apply to all)
+		if((reposition_all)||($ExistingToast.data("final_top") < toasts_upper_boundary)){
+		    this.positionToastVertically($ExistingToast);
 		}
 	    }
-	    snCore.Toast.reset_ToastTop_params();//only needed on a shuffling event...
-	}, 10); // Delay the step of toast shuffling, so that all NEW toasts are drawn first... This is still imperfect
-	// the issue I could foresee would be if multiple toasts slide, they could slide into each other. The more complete solution
-	// would attach a final_top variable to every Toast, and check for conflicts using this...
+	}
+	this.reset_ToastTop_params();//only needed on a shuffling event...
     },
 
 
@@ -280,6 +276,8 @@ snCore.Toast = {
     },
 
     persistent_toast_list_byKey: [],
+    // 11-Dec-16 - there are 3 places this is called:
+    // 1. add letter to spell, 2. any non-heartbeat message sent to server 3. any keystroke occurs
     clear_all_persistent: function(){
 	$.each(this.persistent_toast_list_byKey, function( index, value ) {
 	    snCore.Toast.setToastRemTimeout(value, {instant: true});
