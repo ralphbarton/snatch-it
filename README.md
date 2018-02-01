@@ -53,7 +53,7 @@ Writing software is a mixture of sourcing ready-made components that provide sta
 
 **[Multi-coloured push Buttons](http://www.cssflow.com/snippets/multi-colored-push-buttons/demo)** (CSS only) – I used to buy my push buttons from Maplins.
 
-**[Spinner](https://projects.lukehaas.me/css-loaders/)** (CSS only) – this fixed animation is most likely to make an appearance if you’re playing over a 3G! If there is latency in the connection then the game has to indicate it. If the server is not responding then what you’re seeing on your screen may not reflect the other players’ most recent moves.
+**[Spinner](https://projects.lukehaas.me/css-loaders/)** (CSS only) – this fixed animation is most likely to make an appearance if you’re playing over a 3G! If there is latency in the connection then the game has to warn you of this. If messages are not being recieved from the server, then what you are seeing on your screen may not reflect the other players’ most recent moves.
 
 
 #### On the server-side:
@@ -62,13 +62,13 @@ Writing software is a mixture of sourcing ready-made components that provide sta
 
 **_(bits in [Python](https://en.wikipedia.org/wiki/Python_(programming_language)))_**
 
-**[Beautiful Soup](https://www.crummy.com/software/BeautifulSoup/)** – this forms a part of the game you don’t see directly but is working in the background. Try hovering the mouse over a word. After a second or so the definition of the word will appear. Am I hosting a massive database with all the definitions of all the possible words? No. I am running a module of code on the server which can actually visit web-pages on your behalf, and does so automatically. It will then digest the HTML response to extract particular bits of information. This part is written in Python. Beautiful Soup is a library that facilitates [web scraping](https://en.wikipedia.org/wiki/Web_scraping) by converting served html file into a [tree data structure](https://en.wikipedia.org/wiki/Tree_(data_structure)).
+**[Beautiful Soup](https://www.crummy.com/software/BeautifulSoup/)** – this forms a part of the game you don’t see directly but is working in the background. Try hovering the mouse over a word. After a second or so the definition of the word will appear. Am I hosting a massive database with all the definitions of all the possible words? No. I am running a module of code on the server which can actually visit other webpages on your behalf, and does so automatically. It will then digest the HTML response to extract particular bits of information. This part is written in Python. Beautiful Soup is a library that facilitates [web scraping](https://en.wikipedia.org/wiki/Web_scraping) by converting the served html file into a ['Tree data structure'](https://en.wikipedia.org/wiki/Tree_(data_structure)).
 
-**[Autobahn](https://crossbar.io/autobahn/)** – the python application which scrapes the word definitions from [www.dictionary.com](http://www.dictionary.com/) is a distinct program running on the server to the Node application running all the concurrent **snatch it** games. So how do they communicate? The answer is using sockets. WebSockets are an abstraction-layer built on top of TCP sockets and here I am using the WebSocket standard for local (i.e. not over the internet but within the same machine) exchange of messages encoded in [JSON](https://en.wikipedia.org/wiki/JSON) between two distinct processes. The Python side of the Websocket is Autobahn.
+**[Autobahn](https://crossbar.io/autobahn/)** – the Python application which scrapes the word definitions from [www.dictionary.com](http://www.dictionary.com/) is a distinct program running on the server to the Node application running all the concurrent **snatch it** games. So how do they communicate? The answer is using sockets. WebSockets are an abstraction-layer built on top of TCP sockets and here I am using the WebSocket standard for local (i.e. not over the internet but within the same machine) exchange of messages encoded in [JSON](https://en.wikipedia.org/wiki/JSON) between two distinct processes. The Python side of the Websocket is Autobahn.
 
 
 ## Other projects
 
-Using what I have learned building **snatch it**, I am now (since Dec '16) building a [web-based patterns design system](https://github.com/ralphbarton/pattern-generation). The goal of this Project is an intuitive-to-use system for creating [abstract patterns](http://ralphbarton.co.uk/patterns).
+Using what I have learned building **snatch it**, I am now (since Dec '16) building a [web-based patterns design system](https://github.com/ralphbarton/pattern-generation). The goal of this project is an intuitive-to-use system that will allow you to create [Abstract Patterns](http://ralphbarton.co.uk/patterns).
 
 Work is ongoing
